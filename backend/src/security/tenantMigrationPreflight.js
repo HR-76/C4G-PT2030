@@ -2,7 +2,7 @@ const { validateInterestCapabilities } = require('./tenantInterestCapabilities')
 const { isRotatingAuditTable } = require('./auditPartitionPolicy');
 const { registeredManifest: manifest, allRegisteredMigrations, receiptManifest, failureReceiptManifest, assignedReviewManifest,
   applicationChatManifest, APPLICATION_CHAT_SCHEMA_VERSION, organizationStrategyManifest, ORGANIZATION_STRATEGY_SCHEMA_VERSION,
-  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION, documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION,
+  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION, documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION, chatRetentionManifest, CHAT_RETENTION_SCHEMA_VERSION,
   migrationSql, validateTenantLedger } = require('./tenantMigrationManifest');
 const { tenantSchemaFingerprint, tenantSchemaSnapshot } = require('./tenantSchemaFingerprint');
 const {
@@ -213,8 +213,9 @@ function opportunityCatalogSpecification(required) {
         ...(required.has('APPLICATION_FIRST_SLICE')?['application','application_change','application_receipt']:[]),
         ...(required.has('APPLICATION_TEAM_TASKS')?['application_work','application_participant','application_task','application_work_change','application_work_receipt']:[]),
         ...(required.has('APPLICATION_TEAM_CHAT')?['application_chat_message','application_chat_receipt']:[]),
+        ...(required.has('APPLICATION_CHAT_RETENTION')?['application_chat_purge']:[]),
         ...(required.has('APPLICATION_DOCUMENT_REVIEW')?['application_document_head','application_document_link','application_review_request','application_review_item','application_review_decision','application_document_change','application_document_receipt']:[])].sort(),
-      required.has('APPLICATION_TEAM_CHAT')?42:required.has('ORGANIZATIONAL_OPPORTUNITY_INTERESTS')?40:required.has('ORGANIZATION_NOTICES')?35:required.has('APPLICATION_ALERTS')?33:required.has('APPLICATION_PARTNERS')?32:required.has('APPLICATION_DOCUMENT_REVIEW')?28:required.has('APPLICATION_TEAM_TASKS')?21:required.has('APPLICATION_FIRST_SLICE')?16:required.has('OPPORTUNITY_EVIDENCED_CRITERIA')?13:required.has('F12_OPPORTUNITY_XLSX_IMPORT')?9:7];
+      required.has('APPLICATION_CHAT_RETENTION')?43:required.has('APPLICATION_TEAM_CHAT')?42:required.has('ORGANIZATIONAL_OPPORTUNITY_INTERESTS')?40:required.has('ORGANIZATION_NOTICES')?35:required.has('APPLICATION_ALERTS')?33:required.has('APPLICATION_PARTNERS')?32:required.has('APPLICATION_DOCUMENT_REVIEW')?28:required.has('APPLICATION_TEAM_TASKS')?21:required.has('APPLICATION_FIRST_SLICE')?16:required.has('OPPORTUNITY_EVIDENCED_CRITERIA')?13:required.has('F12_OPPORTUNITY_XLSX_IMPORT')?9:7];
 }
 
 function organizationalScopeSpecification(required) {
@@ -558,6 +559,7 @@ async function preflightTenantClient(client, expected, entries = manifest, loadM
     if (entries === manifest && currentMigration === ORGANIZATION_STRATEGY_SCHEMA_VERSION) entries = organizationStrategyManifest;
     if (entries === manifest && currentMigration === APPLICATION_TASK_DETAILS_SCHEMA_VERSION) entries = applicationTaskDetailsManifest;
     if (entries === manifest && currentMigration === DOCUMENT_DELETION_SCHEMA_VERSION) entries = documentDeletionManifest;
+    if (entries === manifest && currentMigration === CHAT_RETENTION_SCHEMA_VERSION) entries = chatRetentionManifest;
     const currentEntry = entries.find(item => item.version === currentMigration);
     const allowedFeatureSchemas = currentEntry ? [
       currentEntry.capabilities.includes('F9_ASYNC_EXECUTION') && 'async_exec',

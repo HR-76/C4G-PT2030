@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Send } from 'lucide-react'
+import { Download, Send } from 'lucide-react'
 import FormModal from '../../components/FormModal'
+import { chatToText, downloadText, loadWholeChat } from './chatExport'
 import { privateApplicationsApi as api } from '../../api/api'
 import './application-team-chat.css'
 
@@ -34,6 +35,23 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
   const intention = useRef(null)
   const follow = useRef(true)
   const anchor = useRef(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+
+  const exportChat = useCallback(async () => {
+    const scope = scopeRef.current
+    if (!scope || exporting) return
+    setExporting(true)
+    setExportError('')
+    try {
+      const messages = await loadWholeChat(params => api.chat(applicationId, params, organizationId, scope.controller.signal), scope.controller.signal)
+      downloadText(chatToText(messages, 'Chat da equipa da candidatura'), `chat-candidatura-${applicationId}.txt`)
+    } catch (error) {
+      if (!scope.controller.signal.aborted) setExportError(denied(error) ? 'Já não tem acesso ao chat da equipa.' : 'Não foi possível exportar a conversa. Tente novamente.')
+    } finally {
+      setExporting(false)
+    }
+  }, [applicationId, organizationId, exporting])
 
   const revoke = useCallback(scope => {
     scope.controller.abort()
@@ -172,6 +190,13 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
         </li>)}
       </ol>}
     </div>
+    {!unavailable && <div className="application-chat-retention">
+      <p>As conversas de candidaturas fechadas são eliminadas 90 dias depois. Exporte uma cópia se precisar dela.</p>
+      <button type="button" className="btn btn-outline btn-sm" disabled={!feed || exporting} onClick={exportChat}>
+        <Download size={16} aria-hidden="true" /> {exporting ? 'A exportar…' : 'Exportar conversa'}
+      </button>
+      {exportError && <p role="alert">{exportError}</p>}
+    </div>}
     {!unavailable && <form className="application-chat-composer" onSubmit={send}>
       {sendError && <p role="alert">{sendError}</p>}
       <label htmlFor="application-chat-draft">Mensagem</label>
