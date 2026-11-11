@@ -1,6 +1,6 @@
 # Retenção do chat da candidatura
 
-Estado: **Review** — código e migração 040 prontos e provados em PostgreSQL descartável; **não aplicada a nenhuma base habitual** e sem executor periódico.
+Estado: **Review** — código e migração 040 prontos e provados em PostgreSQL descartável; migração 040 aplicada à base local em 11/11/2026; executor periódico decidido e implementado, ainda sem tarefa registada.
 
 ## Decisão de produto (11/11/2026)
 
@@ -34,9 +34,15 @@ Motivo: o chat é uma conversa por candidatura, com mensagens imutáveis e sem r
 
 `test/integration/chat-retention/proof.js`: contentor próprio em `127.0.0.1`, removido no fim; **19 verificações PASS**, sem bases habituais, R2 ou fornecedores. O runner oficial aplica a 040 (fingerprint e ledger conferem; repetir é no-op); fechada há 91 dias e há exatamente 90 dias são eliminadas; fechada há 30 dias, ativa e reaberta ficam intactas; recibos saem com as mensagens; outra organização intacta; registo sem texto e imutável; o runtime da aplicação não faz `DELETE` nem executa a função; outros papéis não executam; menos de 90 dias e lotes fora de limites recusados; repetir não tem efeito; `DELETE` direto fora da função continua recusado; uma candidatura fechada de novo recomeça os 90 dias.
 
-## Execução periódica e pendentes
+## Execução periódica (decidida a 11/11/2026)
 
-- **Sem agendador:** a eliminação só corre quando alguém executa `runOnce`. Decidir o executor (tarefa do Windows, timer do VPS ou ciclo de worker) e provisionar um login de base de dados para `c4g_chat_retention_runtime`.
-- **Não aplicada a bases habituais:** a 040 não foi aplicada a `c4g_tenant_dev` nem a produção; exige script de ativação local (como `documentDeletion.js`), cópia de segurança e autorização própria.
+Executor: comando de uma só execução, diário às 03:00 de Lisboa, lançado pelo agendador do sistema (tarefa do Windows no perfil local; timer systemd no VPS). Alternativas descartadas: ciclo dentro do worker (os workers atuais não têm credenciais de tenant para isto) e job na fila central pg-boss (alinhado com a arquitetura, mas exige ativar o agendamento, novo tipo de job e linhagem; reavaliar quando houver um agendador central). O serviço é reutilizável por esse job no futuro.
+
+Implementado: `chatRetentionRunner.js` (lotes, isolamento por organização, só contagens nos registos), adaptador local `scripts/localPlatform/chatRetentionRun.js` (`--check` não elimina) e registo da tarefa `scheduleChatRetention.ps1`. Operação: [runbook](../runbooks/chat-retention.md).
+
+## Pendentes
+
+- **Tarefa do Windows por registar** e **primeira execução por fazer**: dependem de autorização expressa. A primeira execução cria um registo permanente em `application_chat_purge` para cada candidatura final com mais de 90 dias.
+- **Produção (VPS):** falta o adaptador de organizações e credenciais, o login por tenant só com o papel de retenção e aplicar a 040 em cada tenant. Ver o runbook.
 - **Sem aviso «conversa eliminada em …» no painel:** o painel mostra «Ainda não há mensagens» depois da eliminação. Fica por fazer: `chatGet` ler `application_chat_purge` quando a 040 existir.
 - A estimativa de custo (≈2,5 KB por mensagem) é uma estimativa; a base local tinha 0 mensagens.

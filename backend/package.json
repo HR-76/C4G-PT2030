@@ -19,6 +19,8 @@
     "worker": "node src/worker.js",
     "worker:documents": "node src/documentWorker.js",
     "worker:local": "node scripts/localPlatform/worker.js",
+    "retention:chat:local": "node scripts/localPlatform/chatRetentionRun.js",
+    "retention:chat:local:schedule": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/localPlatform/scheduleChatRetention.ps1",
     "dev": "nodemon scripts/startDev.js",
     "setup:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/localPlatform/setup.ps1",
     "start": "node src/server.js",
