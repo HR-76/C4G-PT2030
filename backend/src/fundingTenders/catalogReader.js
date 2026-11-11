@@ -12,7 +12,7 @@ function readerOptions(env) {
   return {connectionString:value,max:4,connectionTimeoutMillis:5000,idleTimeoutMillis:30000};
 }
 function createCatalogReader({env,Pool=require('pg').Pool}) {
-  const pool=new Pool(readerOptions(env));
+  const pool=require('../config/poolResilience').guardPool(new Pool(readerOptions(env)),'catalog-reader');
   let closed=false,closing=null,verified=null;
   async function ready(){
     if(closed)throw new Error('CATALOG_READER_CLOSED');

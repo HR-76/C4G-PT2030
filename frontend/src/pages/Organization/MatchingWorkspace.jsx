@@ -29,12 +29,14 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
   // shared authority queue. Never cache or reuse a previous context's result.
   Promise.resolve().then(()=>current?api.matching(opportunityId?{opportunityId,origin}:personId?{personId}:{},controller.signal):null).then(response=>{if(response)read.keep(response.data);if(current&&response)setResult(response.data)}).catch(error=>{if(current){read.drop();setResult(null);setError(error?.response?.status===409&&error?.response?.data?.error?.code==='LIMIT_EXCEEDED'?'limit':'retry')}} ).finally(()=>{if(current)setLoading(false)})
   return()=>{current=false;controller.abort()}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; resultName, scope are read at that moment.
  },[api,personId,opportunityId,origin,retry])
  // Queue the primary result before the auxiliary selector. Opportunity mode
  // does not display this selector and already receives people from Matching.
  useEffect(()=>{let current=true;const controller=new AbortController(),read=startConfirmedRead(scope,'matching-people');setPeople(read.held||[])
   if(!opportunityId)Promise.resolve().then(()=>current?collectPages(q=>api.people(q,controller.signal),()=>current):null).then(items=>{if(items)read.keep(items);if(current&&items)setPeople(items)}).catch(()=>{if(current){read.drop();setPeople([])}})
   return()=>{current=false;controller.abort()}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[api,opportunityId])
  const rows=result?.items||[]
  return <section className="organization-matching">

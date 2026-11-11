@@ -73,7 +73,7 @@ async function main(argv=process.argv.slice(2)){
  protect(folder);fs.writeFileSync(path.join(folder,'restore-owner.txt'),marker);
  const report={status:'IN_PROGRESS',createdAt:new Date().toISOString(),backup:path.relative(cfg.root,folder),aclRestricted:true,databases:{},configuration:{},cleanup:false};
  const publicFile=path.join(cfg.root,'output/organizational-opportunity-interest/backup-restore-'+marker+'.json');
- const sources={},restored={};let admin,started=false;
+ const sources={},restored={};let admin;
  const temporary={host:'127.0.0.1',port:await freePort(),user:'postgres',password:randomBytes(32).toString('hex')};
  assert.notEqual(temporary.port,config.port);
  const privateFiles=['backend/.env','.tmp/local-platform/runtime.json','.tmp/local-platform/admissions/worker.json',
@@ -109,7 +109,7 @@ async function main(argv=process.argv.slice(2)){
   pg('initdb',['-D',cluster,'-U','postgres','--pwfile='+passFile,'--auth=scram-sha-256','--encoding=UTF8','--locale-provider=icu','--icu-locale=und']);
   fs.appendFileSync(path.join(cluster,'postgresql.conf'),`\nlisten_addresses='127.0.0.1'\nport=${temporary.port}\ntimezone='UTC'\n`);
   ownedCluster(folder,cluster,marker);
-  pg('pg_ctl',['-D',cluster,'-l',path.join(folder,'restore-server.log'),'-w','-t','30','start']);started=true;
+  pg('pg_ctl',['-D',cluster,'-l',path.join(folder,'restore-server.log'),'-w','-t','30','start']);
   admin=new Pool({...temporary,database:'postgres',max:1,connectionTimeoutMillis:2000});await ready(admin);
   // initdb already creates postgres. Keep every other dumped role and membership.
   const restoreRoles=roles.replace(/^CREATE ROLE postgres;\r?\n/m,'');assert.notEqual(restoreRoles,roles);

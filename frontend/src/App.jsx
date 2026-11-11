@@ -72,7 +72,7 @@ function AppRoutes() {
   const home = getHomePath(user)
   if (loading) return <LoadingIndicator className="page-loading" />
   if (user && admissions?.limited) {
-    if (location.pathname === '/conta/seguranca') return <main><Link className="btn btn-secondary" to="/adesao">Voltar Ã  ficha da entidade</Link><AccountSecurity /></main>
+    if (location.pathname === '/conta/seguranca') return <main><Link className="btn btn-secondary" to="/adesao">Voltar à ficha da entidade</Link><AccountSecurity /></main>
     const target = admissions.items?.[0]?.id
     if (!location.pathname.startsWith('/adesao')) return <Navigate to={target ? `/adesao/${target}` : '/adesao'} replace />
     return <EntityAdmission key={user.id} />

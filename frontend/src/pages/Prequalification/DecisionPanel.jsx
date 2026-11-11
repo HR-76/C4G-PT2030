@@ -9,6 +9,7 @@ export default function DecisionPanel({result,identity,pending,session,onPending
  const live=useRef(false),mutex=useRef(false),id=result.evaluationId
  const blocked=pending.some(p=>p.operation==='PQ1_ACTIVATE'||p.resourceId===id||p.resourceId===result.result.identity.opportunityId)
  async function load(){try{const value=(await api.decisions(id)).data;if(live.current){setHistory(value);setConfirmed(false)}}catch{if(live.current)setError('Não foi possível consultar o histórico autorizado.')}}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
  useEffect(()=>{live.current=true;load();const invalidate=()=>setConfirmed(false);window.addEventListener('focus',invalidate);return()=>{live.current=false;window.removeEventListener('focus',invalidate)}},[id])
  async function more(){if(mutex.current)return;mutex.current=true;setBusy(true);try{const value=(await api.decisions(id,history.nextCursor)).data;if(live.current)setHistory({...value,items:[...history.items,...value.items]})}catch{if(live.current)setError('Histórico indisponível.')}finally{mutex.current=false;if(live.current)setBusy(false)}}
  async function submit(){if(mutex.current||!confirmed||blocked||!history?.canDecide)return;mutex.current=true;setBusy(true);setError('');let intent,sent=false

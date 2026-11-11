@@ -94,6 +94,7 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   const controller=new AbortController()
   api.documents(applicationId,undefined,controller.signal).then(s=>{if(active){setSnapshot(s.data);setSnapshotContext(contextKey)}}).catch(e=>{if(active){if(accessDenied(e))setAccessBlocked(true);setError(readMessage(e))}}).finally(()=>{if(active)setReading(false)})
   return()=>{active=false;controller.abort()}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; contextKey is read at that moment.
  },[applicationId,organizationId,userId,refresh])
  useEffect(()=>{
   if(!loadDetails)return

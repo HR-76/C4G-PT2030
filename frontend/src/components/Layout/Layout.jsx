@@ -114,6 +114,7 @@ export default function Layout() {
     panel.addEventListener('keydown', keyboard)
     return () => {
       panel.removeEventListener('keydown', keyboard)
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Cleanup needs the latest menuButton.current.
       if (!menuNavigation.current && window.matchMedia(breakpoint).matches) menuButton.current?.focus()
     }
   }, [menuOpen, breakpoint])

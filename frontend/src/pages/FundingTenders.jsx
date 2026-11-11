@@ -3,6 +3,7 @@ import {Globe, BookOpen, GraduationCap, Network, Map, RefreshCw} from 'lucide-re
 import {fundingTendersApi as api} from '../api/api'
 import {useAuth} from '../contexts/AuthContext'
 import InfoTooltip from '../components/InfoTooltip'
+import {scheduleWhenVisible} from '../utils/visiblePolling'
 import './FundingTenders.css'
 
 const sources = [
@@ -31,18 +32,18 @@ export default function FundingTenders() {
     return () => {owner.alive=false}
   },[user?.id])
   useEffect(() => {
-    const owner=session.current; let active=true,timer
+    const owner=session.current; let active=true,cancel
     setFresh(false)
     async function load() {
       try {
         const response=await api.status()
         if (!active || !owner.alive || owner!==session.current) return
         setSnapshot({owner,value:response.data});setFresh(true);setError('')
-        if (['QUEUED','RUNNING'].includes(response.data.lastRun?.status)) timer=setTimeout(load,1500)
-        else if(response.data.worker) timer=setTimeout(load,15000)
+        if (['QUEUED','RUNNING'].includes(response.data.lastRun?.status)) cancel=scheduleWhenVisible(load,1500)
+        else if(response.data.worker) cancel=scheduleWhenVisible(load,15000)
       } catch(e) {if(active && owner.alive && owner===session.current){setFresh(false);setError(errorText(e))}}
     }
-    load();return () => {active=false;clearTimeout(timer)}
+    load();return () => {active=false;cancel?.()}
   },[user?.id,refresh])
   const data=snapshot?.owner===session.current ? snapshot.value : null
   const historyPages=Math.max(1,Math.ceil((data?.runs?.length||0)/HISTORY_PAGE_SIZE))

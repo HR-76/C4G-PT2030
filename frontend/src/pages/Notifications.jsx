@@ -127,7 +127,7 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
   }, [api, organizationId, unreadOnly, scope])
   useEffect(() => {
     alive.current = true; load()
-    return () => { alive.current = false; requestId.current++ }
+    return () => { alive.current = false; requestId.current += 1 }
   }, [load])
 
   /* filter --------------------------------------------------------------- */
@@ -152,7 +152,7 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
     try {
       await api.markRead(id, organizationId)
       if (!alive.current) return
-      requestId.current++
+      requestId.current += 1
       setLoading(false)
       setRows(rs => rs.map(r => r.id === id ? { ...r, is_read: true } : r))
       window.dispatchEvent(new Event('notifications:changed'))
@@ -168,7 +168,7 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
     try {
       await api.markAllRead(organizationId)
       if (!alive.current) return
-      requestId.current++
+      requestId.current += 1
       setLoading(false)
       setRows(rs => rs.map(r => ({ ...r, is_read: true })))
       window.dispatchEvent(new Event('notifications:changed'))

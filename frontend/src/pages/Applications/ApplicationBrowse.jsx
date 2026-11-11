@@ -42,6 +42,7 @@ export default function ApplicationBrowse(){
    .catch(e=>{if(active&&e?.code!=='ERR_CANCELED'){read.drop();setData(null)}if(active&&e?.code!=='ERR_CANCELED')setError(e?.response?.data?.error?.code==='INVALID_CURSOR'?'A lista mudou ou a página expirou. Volte à primeira página.':'Não foi possível carregar as candidaturas. Tente novamente.')})
    .finally(()=>{if(active)setLoading(false)}),delay)
   return()=>{active=false;controller.abort();clearTimeout(timer)}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; pageName, scope are read at that moment.
  },[org,userId,q,status,sort,direction,opportunityId,unitId,cursor,refresh])
  function filter(values){setCursor(null);setData(null);setSelection(null);setParams(previous=>{const next=new URLSearchParams(previous);for(const [key,value] of Object.entries(values)){if(value)next.set(key,value);else next.delete(key)}return next},{replace:true})}
  async function send(intent){if(busy)return;setBusy(true);setError('');setNotice('')

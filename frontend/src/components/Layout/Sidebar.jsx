@@ -71,6 +71,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
       matching.forEach(group => { delete next[group.label] })
       return next
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; groups is read at that moment.
   }, [pathname])
 
   return (

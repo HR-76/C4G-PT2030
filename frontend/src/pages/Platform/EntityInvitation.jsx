@@ -12,7 +12,7 @@ export default function EntityInvitation({api=admissionApi}){
  const [page,setPage]=useState(1),[list,setList]=useState(null),[listRevision,setListRevision]=useState(0),[listError,setListError]=useState(false)
  const invitationTrigger=useRef(null)
  useEffect(()=>{let current=true;setList(null);setListError(false);api.list(page).then(r=>{if(current)setList(r.data)}).catch(()=>{if(current)setListError(true)});return()=>{current=false}},[api,page,listRevision])
- useEffect(()=>{const current=++epoch.current;setLink(null);setRecord(null);if(id)api.get(id).then(r=>{if(epoch.current===current)setRecord(r.data)}).catch(()=>{if(epoch.current===current)setError('Não foi possível consultar este convite.')});return()=>{epoch.current++}},[id,api])
+ useEffect(()=>{const current=++epoch.current;setLink(null);setRecord(null);if(id)api.get(id).then(r=>{if(epoch.current===current)setRecord(r.data)}).catch(()=>{if(epoch.current===current)setError('Não foi possível consultar este convite.')});return()=>{epoch.current += 1}},[id,api])
  async function execute(command){const current=epoch.current;setBusy(true);setError('');setPending(command)
   try{let value
    if(command.kind==='create')value=(await api.create(command.body)).data

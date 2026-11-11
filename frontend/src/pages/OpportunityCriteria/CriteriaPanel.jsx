@@ -23,13 +23,15 @@ export default function CriteriaPanel({ opportunity, organization }) {
  const pages={};for(const kind of Object.keys(kinds)){if(!valid(n))return;pages[kind]=(await api.get(root+'/catalog',{params:{kind}})).data}if(!valid(n))return;setCatalog(pages)
  const list=(await api.get(root+'/revisions')).data;if(!valid(n))return;setHistory(list);pendingLoad();title.current?.focus()
  }catch(e){if(valid(n)){setHead(null);setRecord(null);setCriteria([]);setSources([]);setHistory({items:[]});setError(errorText(e))}}finally{if(valid(n))setLoading(false)} }
- useEffect(()=>{alive.current=true;load();return()=>{alive.current=false;generation.current++;clearTimeout(timer.current)}},[])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{alive.current=true;load();return()=>{alive.current=false;generation.current += 1;clearTimeout(timer.current)}},[])
  useEffect(()=>{if(error)alert.current?.focus()},[error])
  async function recover(value,attempt=0,deadline=Date.now()+30000){if(!alive.current||mutex.current||document.visibilityState==='hidden')return;mutex.current=true;setBusy(true)
  try{if(!await session())return;const budget=deadline-Date.now();if(budget<=0)return;const {requestId,operation,resourceId}=value;const r=(await api.post(root+'/intentions/lookup',{requestId,operation,resourceId},{timeout:Math.min(10000,budget)})).data;if(!alive.current)return
  if(['CONFIRMED','FAILED_FINAL'].includes(r.status)){removeIntention(requestId);setPending(null);setNotice(r.status==='CONFIRMED'?'Operação confirmada.':'Rollback comprovado. Consulte antes de iniciar outra operação.');await load()}
  else {setNotice('Resultado não confirmado. Contacte o suporte se persistir. Referência: '+r.correlationId+' · Intenção: '+requestId);if(attempt<2&&Date.now()+5000<deadline)timer.current=setTimeout(()=>recover(value,attempt+1,deadline),5000)}
  }catch(e){if(alive.current)setError(errorText(e))}finally{mutex.current=false;if(alive.current)setBusy(false)}}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; pending, recover are read at that moment.
  useEffect(()=>{if(pending&&!loading){timer.current=setTimeout(()=>recover(pending),1000)}return()=>clearTimeout(timer.current)},[pending?.requestId,loading])
  async function write(method){if(mutex.current||pending||head?.opportunityRevisionId!==opportunity.revisionId||(method==='save'&&record?.opportunityRevisionId!==head?.opportunityRevisionId&&record&&!adopt))return;mutex.current=true;setBusy(true);setError('');let intent,sent=false
  try{if(!await session())return;const requestId=crypto.randomUUID(),revisionId=record?.revisionId;intent={...identity,requestId,operation:method==='save'?'SAVE_REVISION':'CONFIRM',resourceId:method==='save'?opportunity.opportunityId:revisionId};

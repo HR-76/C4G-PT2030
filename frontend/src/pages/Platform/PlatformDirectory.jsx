@@ -26,6 +26,7 @@ export function DirectoryView({api=platformDirectoryApi,enableInvitations=false}
  const [snapshot,setSnapshot]=useState(null),[error,setError]=useState(null),[busy,setBusy]=useState(true),[revision,setRevision]=useState(0)
  const [q,setQ]=useState(params.get('q')||''),[state,setState]=useState(params.get('status')||'')
  const data=snapshot?.key===key?snapshot:null,visibleError=error?.key===key?error.message:null
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
  useEffect(()=>{setQ(params.get('q')||'');setState(params.get('status')||'')},[key])
  useEffect(()=>{
   const epoch=++generation.current,controller=new AbortController();setSnapshot(null);setError(null);setBusy(true)
@@ -34,7 +35,8 @@ export function DirectoryView({api=platformDirectoryApi,enableInvitations=false}
     .then(([list,entity,profile])=>{if(epoch===generation.current)setSnapshot({key,list:list.data,entity:entity?.data,profile:profile?.data?.registration})})
    .catch(e=>{if(epoch===generation.current)setError({key,message:errors[e.response?.data?.error?.code]||'Não foi possível consultar os registos. Tente atualizar a lista.'})})
    .finally(()=>{if(epoch===generation.current)setBusy(false)})
-  return()=>{generation.current++;controller.abort()}
+  return()=>{generation.current += 1;controller.abort()}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; entityId, params, users are read at that moment.
  },[key,revision,api])
  const filter=e=>{e.preventDefault();setParams({...(q.trim()?{q:q.trim()}:{}),...(state?{status:state}:{})})}
  const page=direction=>{const next=new URLSearchParams(params);next.set('page',String(data.list.page+direction));setParams(next)}

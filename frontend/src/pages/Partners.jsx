@@ -72,6 +72,7 @@ function PartnersView({organizationId, organizationName, scope=null}) {
         .finally(()=>{if(active)setLoading(false)})
     },250)
     return ()=>{active=false;controller.abort();clearTimeout(timer)}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   },[filters,cursor,refresh,organizationId])
 
   const setFilter = (key, value) => {setCursor(null);setFilters(current => ({ ...current, [key]: value }))}

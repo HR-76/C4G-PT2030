@@ -69,7 +69,7 @@ async function createOpportunityReceiptWorkerInfrastructure({ env, telemetry, cr
     'F12_OPPORTUNITY_QUEUE_DATABASE_URL']) {
     if (!env[name]) throw new TypeError(`F12 worker requires ${name}.`);
   }
-  const pool = name => new Pool({ connectionString: env[name], max: 5, connectionTimeoutMillis: 5000, statement_timeout: 5000 });
+  const pool = name => require('./poolResilience').guardPool(new Pool({ connectionString: env[name], max: 5, connectionTimeoutMillis: 5000, statement_timeout: 5000 }), 'receipt-worker');
   const central = pool('CENTRAL_DATABASE_URL');
   const issuer = pool('F12_RECEIPT_ISSUER_DATABASE_URL');
   const recoveryCentral = pool('F12_RECEIPT_RECOVERY_DATABASE_URL');

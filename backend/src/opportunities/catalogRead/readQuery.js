@@ -1,5 +1,5 @@
 'use strict';
-const {validateQuery,validate}=require('./contractValidation');
+const {validateQuery}=require('./contractValidation');
 const {fail}=require('./readErrors');
 const fold=require('./casefold.json').mapping;
 const normalize=v=>[...v.normalize('NFD').replace(/\p{M}/gu,'')].map(c=>fold[c]||c).join('').normalize('NFC');

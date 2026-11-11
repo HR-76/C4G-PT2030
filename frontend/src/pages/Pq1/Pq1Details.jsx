@@ -32,7 +32,7 @@ export default function Pq1Details({ record, editable, disabled, onAction, onMfa
       }
     }
     if (editable) load()
-    return () => { epoch.current++; documentGeneration.current++ }
+    return () => { epoch.current += 1; documentGeneration.current += 1 }
   }, [editable, record.draftId])
   const moreCatalog = (kind, label) => cursors[kind] && <button disabled={disabled || loading[kind]} onClick={() => loadCatalog(kind,cursors[kind])}>Mais {label}</button>
   const action = (operation, method, command, resourceId) => onAction(operation,{method,command,resourceId})

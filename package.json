@@ -11,6 +11,7 @@
     "billing:prepare-local": "npm --prefix backend run db:billing:prepare-local",
     "billing:apply-local": "npm --prefix backend run db:billing:apply-local",
     "build": "npm --prefix frontend run build",
+    "lint": "node lint-harness/node_modules/eslint/bin/eslint.js -c lint-harness/eslint.config.js --max-warnings 0 backend/src backend/scripts frontend/src",
     "test:dashboard-regression": "npm run build && npm run regression:dashboard-global && npm run regression:oidc-pending",
     "test:oidc-pending": "npm run build && npm run regression:oidc-pending",
     "regression:oidc-pending": "node test/integration/dashboard/global-budget-regression.cjs --inherit-guard && node test/integration/dashboard/global-budget-regression.cjs --pending-login",

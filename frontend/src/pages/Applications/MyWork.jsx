@@ -40,6 +40,7 @@ function Work({ organization, scope }) {
       setError([401, 403, 404].includes(failure.response?.status) ? 'Não foi possível autorizar a consulta. Confirme o acesso à organização.' : 'Não foi possível carregar as tarefas. Repita a consulta.')
     }).finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   }, [filters, cursor, reload, organization.id])
   useEffect(() => {
     const refresh = () => { setSelected(null); setData(null); setCursor(null); setReload(n => n + 1) }

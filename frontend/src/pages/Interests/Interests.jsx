@@ -54,6 +54,7 @@ function InterestList({ userId, organizationId, organization }) {
     api.list({ ...(q ? { q } : {}), ...(unitId ? { unitId } : {}), status, ...(cursor ? { cursor } : {}) }, organizationId, controller.signal)
       .then(({ data: result }) => { read.keep(result); if (active) setData(result) }).catch(e => { if (active) { read.drop(); setData(null); setError(interestError(e)) } }).finally(() => { if (active) setLoading(false) })
     return () => { active = false; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; listName, scope are read at that moment.
   }, [organizationId, q, unitId, status, cursor, refresh])
   useEffect(() => {
     let active = true; const controller = new AbortController(); setUnitError('')
@@ -119,7 +120,7 @@ function InterestDetail({ id, userId, organizationId }) {
   const [record, setRecord] = useState(null), [history, setHistory] = useState([]), [historyNext, setHistoryNext] = useState(null), [historyBusy, setHistoryBusy] = useState(false)
   const [units, setUnits] = useState([]), [unitsReady, setUnitsReady] = useState(false), [unitsLoading, setUnitsLoading] = useState(false), [notes, setNotes] = useState(''), [unitIds, setUnitIds] = useState([]), [archiveOpen, setArchiveOpen] = useState(false), [reason, setReason] = useState('')
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [unitError, setUnitError] = useState(''), [refresh, setRefresh] = useState(0), [notice, setNotice] = useState('')
-  const command = useInterestCommand(userId, organizationId, () => { generation.current++; setArchiveOpen(false); setNotice('Alteração guardada.'); setRefresh(value => value + 1) })
+  const command = useInterestCommand(userId, organizationId, () => { generation.current += 1; setArchiveOpen(false); setNotice('Alteração guardada.'); setRefresh(value => value + 1) })
   async function loadUnits(data, token, signal) {
     const current = () => alive.current && token === generation.current
     setUnitsLoading(true); setUnitError('')
@@ -130,7 +131,7 @@ function InterestDetail({ id, userId, organizationId }) {
     } catch { if (current()) setUnitError('Não foi possível consultar as unidades. As associações existentes foram preservadas.') }
     finally { if (current()) setUnitsLoading(false) }
   }
-  useEffect(() => { alive.current = true; return () => { alive.current = false; generation.current++ } }, [])
+  useEffect(() => { alive.current = true; return () => { alive.current = false; generation.current += 1 } }, [])
   useEffect(() => {
     const token = ++generation.current, controller = new AbortController(); setLoading(true); setError(''); setUnitError(''); setRecord(null); setUnitsReady(false)
     const current = () => alive.current && token === generation.current
@@ -143,7 +144,8 @@ function InterestDetail({ id, userId, organizationId }) {
       } catch (e) { if (current()) setError(interestError(e)) }
       finally { if (current()) setLoading(false) }
     }
-    load(); return () => { controller.abort(); generation.current++ }
+    load(); return () => { controller.abort(); generation.current += 1 }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; loadUnits is read at that moment.
   }, [id, organizationId, refresh])
   async function moreHistory() {
     if (historyBusy || !historyNext) return

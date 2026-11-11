@@ -25,8 +25,8 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
   const returnFocusRef = useRef(null)
   const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
   const command = useInterestCommand(userId, organizationId, data => { setSelection(null); setSummaries(previous => ({ ...previous, [data.opportunityId]: data })) })
-  useEffect(() => { alive.current = true; return () => { alive.current = false; epoch.current++ } }, [])
-  useEffect(() => { epoch.current++; openMutex.current = false; setOpening(false); setSelection(null); setOpenError('') }, [ids, location.pathname, location.search])
+  useEffect(() => { alive.current = true; return () => { alive.current = false; epoch.current += 1 } }, [])
+  useEffect(() => { epoch.current += 1; openMutex.current = false; setOpening(false); setSelection(null); setOpenError('') }, [ids, location.pathname, location.search])
   useEffect(() => {
     let active = true; const controller = new AbortController(); setState('loading'); setSummaries({}); setCapabilities(null)
     if (!ids) return

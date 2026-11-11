@@ -29,7 +29,8 @@ export default function useTaskSelection({ applicationId, userId, organizationId
       setError(true)
       if ([401, 403, 404].includes(reason.response?.status)) handlers.current.onDenied(reason)
     }).finally(() => { if (active && epoch === generation.current) setLoading(false) })
-    return () => { active = false; controller.abort(); generation.current++ }
+    return () => { active = false; controller.abort(); generation.current += 1 }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; applicationId, filter, work are read at that moment.
   }, [key, retry])
 
   const data = result?.key === key ? result.data : null

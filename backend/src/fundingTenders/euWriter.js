@@ -9,7 +9,7 @@ const {createCandidateArchiveV2}=require('./candidateRepositoryV2');
 const {createAcceptedOpportunityV2Repository}=require('../opportunities/v2/acceptedRepository');
 const {createEuWriterAuthorityV2}=require('../opportunities/v2/euWriterAuthority');
 const {createEuWriterAuditV2}=require('../opportunities/v2/euWriterAudit');
-const POLICY='eu-existing-v2.0',MODE='CANONICAL_V2',SERVICE='FUNDING_TENDERS_CENTRAL';
+const POLICY='eu-existing-v2.0',MODE='CANONICAL_V2';
 const EU=Object.freeze(['EU_FUNDING_TENDERS','CORDIS','ERASMUS']);
 function fail(code='OPPORTUNITY_V2_EU_WRITER_INVALID'){throw Object.assign(new Error(code),{code});}
 function euWriterConfiguration(){return deepFreeze({policyVersion:POLICY,mappingDigest:hash({version:'eu-writer-mapping-v2.1',

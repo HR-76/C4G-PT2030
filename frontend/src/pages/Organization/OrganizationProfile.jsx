@@ -61,7 +61,8 @@ function Workspace({userId,organizationId}){
  const alive=useRef(true),generation=useRef(0),listGeneration=useRef(0),mutex=useRef(false),formRef=useRef(null)
  const key=directoryIntentKey(userId,organizationId)
  useEffect(()=>{alive.current=true;try{const saved=JSON.parse(sessionStorage.getItem(key)||'null');if(saved?.userId===userId&&saved?.organizationId===organizationId)setPending(saved)}catch{setError('Não foi possível recuperar o envio anterior.')}
-  let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current++;listGeneration.current++}},[key,tab])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load, organizationId, userId are read at that moment.
+  let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current += 1;listGeneration.current += 1}},[key,tab])
  useEffect(()=>{setForm(null);setNotice('')},[tab])
  const previousPath=useRef(location.pathname)
  useEffect(()=>{
@@ -69,8 +70,10 @@ function Workspace({userId,organizationId}){
   const returnedToPeople=location.pathname==='/perfil-organizacao/pessoas'&&previousPath.current.startsWith('/perfil-organizacao/pessoas/')
   previousPath.current=location.pathname
   if(returnedToPeople&&context&&!readDirectoryCache(cacheKey))load(true)
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; cacheKey, context, load are read at that moment.
  },[location.pathname])
  // Deferred like the context read, so a development double mount sends one request.
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; loadPeople is read at that moment.
  useEffect(()=>{if(tab!=='people'||!context)return;let active=true;Promise.resolve().then(()=>{if(active)loadPeople(filters)});return()=>{active=false}},[tab,context,filters])
  useEffect(()=>{formRef.current?.focus()},[form?.method,form?.id])
  const current=token=>alive.current&&token===generation.current
@@ -83,7 +86,7 @@ function Workspace({userId,organizationId}){
   const unitsAllowed=held?.context.permissions.units===true,ready=Boolean(held)&&(!wantsUnits||!unitsAllowed||Boolean(held.units))
   setError('');setLoading(!ready)
   if(held){setContext(old=>same(old,held.context)?old:held.context);setUnits(held.units||[])}
-  else{setContext(null);setUnits([]);setPeople({items:[],nextCursor:null});setAreasOpen(false);listGeneration.current++}
+  else{setContext(null);setUnits([]);setPeople({items:[],nextCursor:null});setAreasOpen(false);listGeneration.current += 1}
   try{
    const readUnits=()=>sharedDirectoryRead(cacheKey,'units',()=>api.units())
    const early=held&&wantsUnits&&unitsAllowed?readUnits():null;early?.catch(()=>{})
@@ -93,7 +96,7 @@ function Workspace({userId,organizationId}){
    writeDirectoryCache(cacheKey,{context:result,...(rows?{units:rows}:result.permissions.units?{}:{units:undefined})})
    setContext(old=>same(old,result)?old:result);setUnits(old=>rows?(same(old,rows)?old:rows):result.permissions.units?old:[])
    prepare(result)
-  }catch(e){if(current(token)){clearDirectoryCache();listGeneration.current++;setContext(null);setUnits([]);setPeople({items:[],nextCursor:null});setAreasOpen(false);setError(directoryError(e))}}finally{if(current(token))setLoading(false)}
+  }catch(e){if(current(token)){clearDirectoryCache();listGeneration.current += 1;setContext(null);setUnits([]);setPeople({items:[],nextCursor:null});setAreasOpen(false);setError(directoryError(e))}}finally{if(current(token))setLoading(false)}
  }
  // Reads in the background what the other two pages will need, so they open at
  // once. Their own entry still reads the data again; a save or a refusal in

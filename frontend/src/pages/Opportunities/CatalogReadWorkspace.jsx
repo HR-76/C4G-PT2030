@@ -21,10 +21,12 @@ export default function CatalogReadWorkspace({ scope, basePath = '/catalogo', is
       params.size
         ? cleanFilters(params)
         : {},
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
     [],
   )
   const store = useMemo(
     () => catalogSession(scope, catalogReadApi, initial),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; initial is read at that moment.
     [scope],
   )
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot)
@@ -63,6 +65,7 @@ export default function CatalogReadWorkspace({ scope, basePath = '/catalogo', is
       if (!current.pages.length) store.list()
       else store.revalidate()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; initial, params are read at that moment.
   }, [id, store, params.toString()])
   useEffect(() => {
     document.documentElement.scrollTop = 0

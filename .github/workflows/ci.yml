@@ -35,3 +35,11 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm audit --omit=dev --audit-level=high
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: npm, cache-dependency-path: lint-harness/package-lock.json }
+      - run: npm ci --prefix lint-harness
+      - run: npm run lint

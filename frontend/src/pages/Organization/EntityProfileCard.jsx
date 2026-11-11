@@ -15,6 +15,7 @@ const shown=(fields,key)=>fields?.[key]===0?'0':fields?.[key]||'Por preencher'
 
 export default function EntityProfileCard({profile,organization,canEdit,onSave,defaults={}}){
  const initial={...empty,...defaults,...(profile?.fields||{})},[current,setCurrent]=useState(profile),[editing,setEditing]=useState(false),[fields,setFields]=useState(initial),[errors,setErrors]=useState({}),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),pending=useRef(null)
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; defaults, editing are read at that moment.
  useEffect(()=>{setCurrent(profile);if(!editing)setFields({...empty,...defaults,...(profile?.fields||{})})},[profile,organization?.id])
  const registration=current||profile,values={...empty,...defaults,...(registration?.fields||{})},complete=Boolean(registration?.complete||registration?.fields?.nif),revision=Number(registration?.revision||0)
  function begin(){setFields(values);setErrors({});setMessage('');pending.current=null;setEditing(true)}

@@ -114,6 +114,7 @@ export function Section({ name, title, id, store, state, descriptor, basePath })
   useEffect(() => {
     if (name === 'windows' && !section && !state.error)
       store.collection(id, name)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; section is read at that moment.
   }, [id, name, store, !!section, state.error])
   return (
     <details

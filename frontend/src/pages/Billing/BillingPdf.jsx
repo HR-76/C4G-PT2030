@@ -10,7 +10,8 @@ export default function BillingPdf({documentId,organizationId,platform=false,api
   async function load(generation=epoch.current,signal){
     try{const r=await api.list(documentId,signal);if(generation===epoch.current)setData(r.data)}catch(e){if(generation===epoch.current){setData(null);setError(errors[e.response?.data?.error?.code]||'Não foi possível consultar os PDFs.')}}
   }
-  useEffect(()=>{const generation=++epoch.current,controller=new AbortController();active.current=controller;setData(null);setError('');setFile(null);setPending(null);setBusy(false);setNotice('');load(generation,controller.signal);return()=>{epoch.current++;active.current?.abort()}},[api,documentId])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+  useEffect(()=>{const generation=++epoch.current,controller=new AbortController();active.current=controller;setData(null);setError('');setFile(null);setPending(null);setBusy(false);setNotice('');load(generation,controller.signal);return()=>{epoch.current += 1;active.current?.abort()}},[api,documentId])
   async function execute(kind,version,command){
     const generation=epoch.current,controller=new AbortController();active.current=controller;setBusy(true);setError('');setNotice('')
     try{

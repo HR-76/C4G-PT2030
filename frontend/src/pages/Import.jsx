@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { ImportPreview, ImportResult, importError, stateLabel, terminal } from './Imports/ImportPresentation'
 import './Imports/import.css'
 import CentralImportPreview from './Imports/CentralImportPreview'
+import { scheduleWhenVisible } from '../utils/visiblePolling'
 
 export default function Import() {
   const { user } = useAuth()
@@ -68,7 +69,8 @@ export function ImportWorkspace({ organization, platform=false, importsApi=priva
       setHistoryError(importError(err)); setReady(false)
     } finally { if (alive.current && request === historyRequest.current) setLoading(false) }
   }
-  useEffect(() => { alive.current = true; load(); return () => { alive.current = false; historyRequest.current++ } }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+  useEffect(() => { alive.current = true; load(); return () => { alive.current = false; historyRequest.current += 1 } }, [])
 
   async function run(action, work) {
     if (lock.current || !alive.current) return
@@ -79,7 +81,7 @@ export function ImportWorkspace({ organization, platform=false, importsApi=priva
   }
   useEffect(() => {
     if (!detail?.job || terminal.has(detail.job.state) || ['UPLOADED', 'READY_FOR_CONFIRMATION'].includes(detail.job.state)) return undefined
-    let active = true, timer
+    let active = true, cancel
     const poll = async () => {
       try {
         if (!lock.current) {
@@ -88,10 +90,11 @@ export function ImportWorkspace({ organization, platform=false, importsApi=priva
           setDetail(response.data); await load()
         }
       } catch (err) { if (active && alive.current) setError(importError(err)) }
-      finally { if (active && alive.current) timer = setTimeout(poll, 2000) }
+      finally { if (active && alive.current) cancel = scheduleWhenVisible(poll, 2000) }
     }
-    timer = setTimeout(poll, 2000)
-    return () => { active = false; clearTimeout(timer) }
+    cancel = scheduleWhenVisible(poll, 2000)
+    return () => { active = false; cancel() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; detail.job, importsApi, load are read at that moment.
   }, [detail?.job?.importId, detail?.job?.state, busy])
 
   function resetSelection() {

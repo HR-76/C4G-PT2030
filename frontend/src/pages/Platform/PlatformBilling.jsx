@@ -25,6 +25,7 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
   const [snapshot, setSnapshot] = useState(null), [busy, setBusy] = useState(true), [error, setError] = useState(''), [reload, setReload] = useState(0)
   const [setup, setSetup] = useState(false)
   const query = cleanParams(params), data = snapshot?.key === key ? snapshot : null
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
   useEffect(() => setFilters({ ...emptyFilters, ...Object.fromEntries(params) }), [key])
   useEffect(() => {
     const epoch = ++generation.current, controller = new AbortController(); setBusy(true); setError('')
@@ -34,6 +35,7 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
       .catch(reason => { if (epoch === generation.current && reason?.code !== 'ERR_CANCELED') setError(billingError(reason)) })
       .finally(() => { if (epoch === generation.current) setBusy(false) })
     return () => { generation.current += 1; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; query is read at that moment.
   }, [api, key, reload])
   const applyFilters = event => {
     event.preventDefault()
@@ -103,6 +105,7 @@ function BillingSetup({ api, directoryApi, onClose, onCreated, onChanged }) {
   const [account, setAccount] = useState(null), [accountLoaded, setAccountLoaded] = useState(false), [mode, setMode] = useState('select')
   const [busy, setBusy] = useState(false), [error, setError] = useState('')
   const findEntities = async event => { event?.preventDefault(); setBusy(true); setError(''); try { const { data } = await directoryApi.entities({ ...(query.trim() ? { q: query.trim() } : {}), status: 'ACTIVE', page: 1 }); setEntities(data.items) } catch (reason) { setError(billingError(reason)) } finally { setBusy(false) } }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; findEntities is read at that moment.
   useEffect(() => { findEntities() }, [])
   const choose = async value => { setEntityId(value); setAccount(null); setAccountLoaded(false); setError(''); if (!value) return; setBusy(true); try { const { data } = await api.account(value); setAccount(data); setAccountLoaded(true); setMode(data.account ? 'cycle' : 'account') } catch (reason) { setError(billingError(reason)) } finally { setBusy(false) } }
   const refreshAccount = async () => { if (!entityId) return; await choose(entityId) }

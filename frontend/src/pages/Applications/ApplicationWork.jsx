@@ -56,11 +56,11 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
     setWork(null);setHistory([]);setHistoryNext(null);setError('');setNotice('');setEditing(null);setTaskForm(emptyTask);setParticipant('');setEditor(null);setChatOpen(false);setStorageBlocked(false)
     try{setPending(loadWorkIntention(userId,organizationId,applicationId))}catch{setPending(null);setStorageBlocked(true);setError('Não foi possível recuperar o envio guardado. Os dados foram preservados; volte a consultar a equipa.')}
   },[applicationId,userId,organizationId,intentKey,refresh])
-  useEffect(()=>{let active=true;generation.current++;setReading(true);setWork(null)
+  useEffect(()=>{let active=true;generation.current += 1;setReading(true);setWork(null)
     const controller=new AbortController()
     api.work(applicationId,undefined,controller.signal).then(w=>{if(active)setWork(w.data)})
       .catch(e=>{if(active){reject(e);if(!e?.response?.status||e.response.status>=500)setError('Não foi possível carregar a equipa e tarefas. Repita a consulta.')}}).finally(()=>{if(active)setReading(false)})
-    return()=>{active=false;controller.abort();generation.current++}
+    return()=>{active=false;controller.abort();generation.current += 1}
   },[applicationId,userId,organizationId,refresh])
   const workReady=Boolean(work)&&!reading
   useEffect(()=>{

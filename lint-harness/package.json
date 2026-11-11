@@ -1,0 +1,11 @@
+{
+  "name": "c4g-lint-harness",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "eslint": "9.39.5",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "globals": "17.14.0"
+  }
+}

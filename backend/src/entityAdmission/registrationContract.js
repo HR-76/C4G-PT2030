@@ -79,7 +79,7 @@ function validateProfile(raw,identity,{now=new Date()}={}){
    const phone=normalized.replace(/\s+/g,'');if(!/^\+?[1-9][0-9]{6,14}$/.test(phone))errors[key]='Indique um telefone válido, com indicativo se necessário.';fields[key]=phone;
   }
  }
- for(const [legacy,canonical] of [['administratorProfessionalPhone','responsiblePhone'],['administratorJobTitle','responsibleJobTitle']])delete fields[legacy];
+ for(const [legacy] of [['administratorProfessionalPhone','responsiblePhone'],['administratorJobTitle','responsibleJobTitle']])delete fields[legacy];
  return {fields,errors,valid:Object.keys(errors).length===0};
 }
 function assertValid(result){if(!result.valid)throw Object.assign(Error('REGISTRATION_FIELDS_INVALID'),{code:'REGISTRATION_FIELDS_INVALID',fields:result.errors});return result.fields;}

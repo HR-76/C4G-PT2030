@@ -1,4 +1,3 @@
-import React from 'react'
 // Recovered from the UBI detail's APPLICATION_STATUS_NEXT_ACTION guidance.
 // Current C4G terminal states remain read-only guidance, never transitions.
 export const NEXT_STEP = Object.freeze({

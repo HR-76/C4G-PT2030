@@ -104,7 +104,8 @@ export function Workspace({ auth, pathname, confirmed = false }) {
       setConfirm(null); checkSession().catch(e => { if (alive.current) setError(message(e)) })
     } }
     window.addEventListener('focus', focus)
-    return () => { alive.current = false; generation.current++; clearTimeout(timer.current); window.removeEventListener('focus', focus) }
+    return () => { alive.current = false; generation.current += 1; clearTimeout(timer.current); window.removeEventListener('focus', focus) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; checkSession, load are read at that moment.
   }, [])
   useEffect(() => { if (error) errorBox.current?.focus() }, [error])
   async function reconcile(intent, attempt = 0) {
@@ -136,6 +137,7 @@ export function Workspace({ auth, pathname, confirmed = false }) {
   useEffect(() => {
     if (pending.length && !loading) { clearTimeout(timer.current); recoveryDeadline.current = Date.now() + 30000; timer.current = setTimeout(() => reconcile(pending[0]), 2000) }
     return () => clearTimeout(timer.current)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; pending, reconcile are read at that moment.
   }, [pending[0]?.idempotencyKey, loading])
   async function more(key, domain) {
     const token = generation.current, old = domain ? catalog[domain] : lists[key]

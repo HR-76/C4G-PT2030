@@ -80,6 +80,7 @@ function ApplicationRecord() {
     api.responsibles().then(r=>{if(active){setResponsibles(r.data.items||[]);setResponsiblesNext(r.data.nextCursor||null)}})
       .catch(()=>{if(active)setResponsiblesLoadFailed(true)}).finally(()=>{if(active)setLoadingResponsibles(false)})
     return()=>{active=false}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
   },[org,id,Boolean(record),record?.canEdit])
   const loadMoreResponsibles=async()=>{if(!responsiblesNext||loadingResponsibles)return
     const requestedOrg=org,cursor=responsiblesNext;setLoadingResponsibles(true)
@@ -102,6 +103,7 @@ function ApplicationRecord() {
   useEffect(()=>{if(!org||(!creating&&(!id||!record||record.canEdit===false||['CANCELLED','ARCHIVED'].includes(record.status))))return;let active=true;const controller=new AbortController();setUnitsReady(false);setUnitsError('')
     opportunityInterestsApi.units({purpose:'ASSIGN'},org,controller.signal).then(r=>{if(active){if(!Array.isArray(r.data.items))throw Error('Incomplete units');setUnits(r.data.items);setUnitsReady(true)}}).catch(()=>{if(active)setUnitsError('Não foi possível carregar as unidades. Os dados da candidatura foram preservados.')})
     return()=>{active=false;controller.abort()}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
   },[org,id,creating,Boolean(record),record?.canEdit,record?.status,unitsRefresh])
   useEffect(()=>{if(!org||id||creating)return;let active=true
     api.list({cursor,opportunityId:opportunityId||undefined}).then(r=>{if(active){setItems(r.data.items||[]);setNext(r.data.nextCursor)}}).catch(e=>{if(active)setError(message(e))})
@@ -116,6 +118,7 @@ function ApplicationRecord() {
     api.history(id).then(h=>{if(active){setHistory(h.data.items||[]);setHistoryNext(h.data.nextCursor)}})
       .catch(()=>{if(active)setHistoryError('Não foi possível carregar o histórico.')}).finally(()=>{if(active)setHistoryLoading(false)})
     return()=>{active=false}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
   },[org,userId,id,Boolean(record),refresh,historyRefresh])
   if(!org||!userId)return <main className="page"><p role="status">Esta conta não tem uma entidade associada para acompanhar candidaturas.</p></main>
   const activePending=pendingIntent?.userId===userId&&pendingIntent?.organizationId===org?pendingIntent:null

@@ -31,7 +31,8 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
   }:null)
   setMembershipId(profile?.membershipId||'')
  }catch{if(alive.current&&gen===generation.current){setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
- useEffect(()=>{alive.current=true;let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current++}},[api,personId])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{alive.current=true;let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current += 1}},[api,personId])
  async function send(command){setBusy(true);setError('');setNotice('');setPending(command);try{
   if(command.method==='selfEdit')await api.selfEdit(command.body);else await api[command.method](personId,command.body)
   clearDirectoryCache()

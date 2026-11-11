@@ -1,6 +1,6 @@
 'use strict';
 // Explicit, local-only activation of the additive application alerts.
-const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{createHash}=require('node:crypto'),{spawnSync}=require('node:child_process');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
 const {Pool}=require('pg'),cfg=require('./config');
 async function fingerprint(pool){const result=await require('./officialSources').fingerprint(pool,['opportunity_catalog','organizational_scope','organization_profile','document_storage']);delete result['"opportunity_catalog"."application_alert"'];return result}
 async function main(){

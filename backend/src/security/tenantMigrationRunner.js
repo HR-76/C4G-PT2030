@@ -324,7 +324,7 @@ function createRegisteredTenantMigrationRunner(options) {
 }
 
 function createF12ReceiptTenantMigrationRunner({ pool, observationPublisher, timeoutMs, scheduler }) {
-  const { receiptManifest, failureReceiptManifest } = require('./tenantMigrationManifest');
+  const { receiptManifest } = require('./tenantMigrationManifest');
   return createTenantMigrationRunner({ pool, observationPublisher, timeoutMs, scheduler,
     entries: receiptManifest, requiredBaseVersion: manifest.at(-1).version });
 }

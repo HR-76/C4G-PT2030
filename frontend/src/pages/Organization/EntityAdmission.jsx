@@ -15,7 +15,8 @@ export default function EntityAdmission({api=admissionApi}){
  const alive=useRef(true),mutex=useRef(false),heading=useRef(null),request=useRef(0)
  const [preparation,setPreparation]=useState(null),[submission,setSubmission]=useState(null)
  const dirty=draft&&JSON.stringify(payload(fields))!==JSON.stringify(draft.fields)
- useEffect(()=>{alive.current=true;setDraft(null);setFields({});setPending(null);setPreparation(null);setSubmission(null);setLoaded(false);load();return()=>{alive.current=false;request.current++}},[id])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{alive.current=true;setDraft(null);setFields({});setPending(null);setPreparation(null);setSubmission(null);setLoaded(false);load();return()=>{alive.current=false;request.current += 1}},[id])
  useEffect(()=>{const prevent=e=>{if(dirty||pending||submission){e.preventDefault();e.returnValue=''}};window.addEventListener('beforeunload',prevent);return()=>window.removeEventListener('beforeunload',prevent)},[dirty,pending,submission])
  useEffect(()=>{heading.current?.focus()},[step])
  async function load(){

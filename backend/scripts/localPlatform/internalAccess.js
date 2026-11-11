@@ -7,7 +7,7 @@ async function authorityFingerprint(pool){const result={};for(const table of ['g
  const rows=(await pool.query(`SELECT to_jsonb(t)::text row FROM public.${table} t ORDER BY to_jsonb(t)::text`)).rows;result[table]={count:rows.length,digest:createHash('sha256').update(JSON.stringify(rows)).digest('hex')};}return result;}
 async function main(){
  assert(process.argv.slice(2).every(a=>a==='--apply'));const apply=process.argv.includes('--apply'),version='019_internal_access_profiles';
- const config=cfg.readConfig(),state=JSON.parse(fs.readFileSync(path.join(cfg.folder,'runtime.json')));
+ const config=cfg.readConfig();JSON.parse(fs.readFileSync(path.join(cfg.folder,'runtime.json')));
  assert.equal(config.centralDatabase,'c4g_central_dev');assert.equal(config.tenantDatabase,'c4g_tenant_dev');assert.equal(config.port,5432);
  const central=new Pool(cfg.connection(config,config.centralDatabase)),tenant=new Pool(cfg.connection(config,config.tenantDatabase));
  try{

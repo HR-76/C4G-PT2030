@@ -211,6 +211,9 @@ async function main() {
   if (!['up', 'down', 'status'].includes(action) || (action === "down" && !target)) {
     throw new Error("Usage: runCentralMigrations.js up|down <allowlisted-version>|status");
   }
+  // Migrations may run long statements; the runtime backstops apply only when set explicitly.
+  process.env.CENTRAL_DB_STATEMENT_TIMEOUT_MS ??= '0';
+  process.env.CENTRAL_DB_IDLE_IN_TRANSACTION_TIMEOUT_MS ??= '0';
   const pool = require("../src/config/centralDb");
   try {
     if (action === "up") await applyCentralMigrations(pool);

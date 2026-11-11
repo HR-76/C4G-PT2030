@@ -35,13 +35,14 @@ Não tratar o código existente como arquitetura aprovada. A implementação atu
 - API e workers têm entradas separadas: `backend/src/server.js`, `backend/src/worker.js` e `backend/src/documentWorker.js`. O supervisor local arranca API, worker configurado e frontend; consultar `LOCAL.md` para o perfil habitual.
 - O runtime C4G resolve uma base Central e bases tenant por organização. As migrações estão separadas em `backend/database/central/migrations/` e `backend/database/tenant/migrations/`; o perfil local documenta Central e tenant distintos. A base única pertence ao legado UBI, não descreve o runtime C4G atual.
 - A topologia de produção (VPS, proxy, Neon e fornecedores externos) descrita em `context/architecture.md` é a arquitetura aprovada; a sua implantação efetiva exige evidência do ambiente, não se deduz dos diretórios.
-- Existem suites `npm test` em `backend/` (Node test runner) e `frontend/` (Vitest, harness próprio). Não existem scripts gerais de lint ou type checking.
+- Existem suites `npm test` em `backend/` (Node test runner) e `frontend/` (Vitest, harness próprio). Existe um lint de correção, `npm run lint` na raiz (ESLint, harness próprio em `lint-harness/`, instalado com `npm ci --prefix lint-harness`); cobre `backend/src`, `backend/scripts` e `frontend/src`, não tem regras de formatação e falha com qualquer aviso. Não existem formatter nem type checking.
 - O runtime ativo é exclusivamente C4G multi-instituição com OIDC; não existem scripts ou rotas executáveis do piloto UBI.
 
 ## Validação durante a transição
 
 - Para frontend, executar `npm run build` em `frontend/`.
 - Para backend, executar `node --check` nos ficheiros JavaScript alterados e testes direcionados disponíveis.
+- Executar `npm run lint` na raiz depois de alterar JavaScript. Uma supressão `eslint-disable` leva sempre a justificação na mesma linha.
 - Para correções, adicionar primeiro a regressão, executar testes focados, suites completas e build; registar falhas preexistentes separadamente. Gates de integração que criam infraestrutura, aplicam SQL ou usam bases externas exigem âmbito isolado e autorização própria; `npm test` não os substitui.
 - Ao alterar contratos HTTP, confirmar cliente em `frontend/src/api/api.js` e rotas em `backend/src/routes/`.
 - Alterações de tenancy, autorização, migrações, jobs, documentos ou reporting exigem testes automatizados antes de produção.

@@ -47,6 +47,7 @@ export function PrivateOpportunityList({ organization }) {
     const timer = setTimeout(() => opportunitiesApi.list(params, controller.signal).then(response => { if (active) { setItems(response.data.items); setNext(response.data.nextCursor) } })
       .catch(e => { if (active) setError(errorMessage(e)) }).finally(() => { if (active) setLoading(false) }), 250)
     return () => { active = false; clearTimeout(timer); controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; organization is read at that moment.
   }, [organization?.id, filters, cursor, reload])
   if (!organization) return <p role="status">Esta conta não tem uma entidade associada para consultar oportunidades privadas.</p>
   const filter = (key,value) => { setCursor(null); setHistory([]); setFilters(previous => ({...previous,[key]:value})) }
@@ -81,6 +82,7 @@ export function PrivateOpportunityDetail({ id, organization }) {
     let active=true;setLoading(true);setRecord(null);setError('')
     opportunitiesApi.get(id).then(response=>{if(active)setRecord(response.data)}).catch(e=>{if(active)setError(errorMessage(e))}).finally(()=>{if(active)setLoading(false)})
     return ()=>{active=false}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; organization is read at that moment.
   },[id,organization?.id,reload])
   if(!organization)return <p role="status">Esta conta não tem uma entidade associada para consultar esta oportunidade.</p>
   return <section className="page recovered-opportunities">

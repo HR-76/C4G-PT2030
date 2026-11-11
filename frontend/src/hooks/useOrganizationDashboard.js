@@ -30,7 +30,8 @@ export default function useOrganizationDashboard({ organizationId, userId }) {
         .catch(() => { if (isCurrent()) { read.drop(); setDashboard(null) } if (isCurrent()) setError('Não foi possível consultar todos os indicadores autorizados. Tente novamente.') })
         .finally(() => { if (isCurrent()) setLoading(false) })
     }
-    return () => { active = false; generation.current++; controller.abort() }
+    return () => { active = false; generation.current += 1; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   }, [organizationId, userId, retry])
 
   async function exportReport() {

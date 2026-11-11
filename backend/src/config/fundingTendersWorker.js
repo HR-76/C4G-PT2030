@@ -21,7 +21,7 @@ async function loadFundingTendersWorker({ env = process.env } = {}) {
   const activation=require('../opportunities/v2/activationHttp');
   const euSourceControlEnabled=activation.runtimeEnabled(env);
   const euWriterV2=require('../fundingTenders/euWriterConfig').configuredEuWriter(env);
-  const pool = new Pool({ connectionString: target.toString(), max: 4 });
+  const pool = require('./poolResilience').guardPool(new Pool({ connectionString: target.toString(), max: 4 }), 'funding-worker');
   let queue;
   try {
     const ready = await require('../security/centralMigrationPreflight').preflightCentral(pool);

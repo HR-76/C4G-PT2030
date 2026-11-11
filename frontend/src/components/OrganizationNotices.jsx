@@ -18,7 +18,8 @@ export default function OrganizationNotices({ organizationId, organizationName, 
     api.noticeContext(organizationId).then(r => { if (alive.current && current === contextSequence.current) setContext(r.data) })
       .catch(() => { if (alive.current && current === contextSequence.current) setContextError(true) })
   }
-  useEffect(() => { alive.current = true; loadContext(); return () => { alive.current = false; sequence.current++; contextSequence.current++ } }, [organizationId])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; loadContext is read at that moment.
+  useEffect(() => { alive.current = true; loadContext(); return () => { alive.current = false; sequence.current += 1; contextSequence.current += 1 } }, [organizationId])
   const loadHistory = async (cursor = null) => {
     const current = ++sequence.current
     setHistoryBusy(true); setHistoryError(''); setDetail(null)

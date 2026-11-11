@@ -96,7 +96,8 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   app.use('/api/opportunities/:id/criteria', express.json({ limit: '64kb' }));
   app.use('/api/admin/billing', express.json({ limit: '64kb' }));
   app.use('/api/admin/opportunity-activation', express.json({ limit: '16kb' }));
-  app.use(express.json());
+  // Explicit default: every other route accepts at most 100 kB of JSON.
+  app.use(express.json({ limit: '100kb' }));
 
   if (security) {
     // One Central schema preflight per request; see requestAdmissionScope.

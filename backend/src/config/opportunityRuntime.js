@@ -48,8 +48,8 @@ function createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,en
     return{material:e,async dispose(){}};
   }});
   const poolManager=createTenantPoolManager({clock,scheduler,jitter:Math.random,
-    poolFactory:async({credentialMaterial:e})=>new Pool({host:e.host,port:e.port,database:e.database,user:e.login,password:e.password,
-      ssl:e.ssl?{rejectUnauthorized:true}:false,max:5,connectionTimeoutMillis:5000,idleTimeoutMillis:30000}),
+    poolFactory:async({credentialMaterial:e})=>require('./poolResilience').guardPool(new Pool({host:e.host,port:e.port,database:e.database,user:e.login,password:e.password,
+      ssl:e.ssl?{rejectUnauthorized:true}:false,max:5,connectionTimeoutMillis:5000,idleTimeoutMillis:30000}),'tenant-api'),
     policy:{globalLimit:20,perTenantLimit:5,operationalReserve:2,globalQueueLimit:40,perTenantQueueLimit:10,
       operationalQueueReserve:2,acquireTimeoutMs:5000,leaseTimeoutMs:15000,idleTimeoutMs:30000,drainTimeoutMs:10000,
       circuitFailureThreshold:3,circuitResetMs:10000,backoffBaseMs:25,maxBackoffMs:250}});

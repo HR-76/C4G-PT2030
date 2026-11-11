@@ -16,7 +16,8 @@ export function AccessTable({organizationId,api:providedApi}){
  const [data,setData]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[review,setReview]=useState(null),[selected,setSelected]=useState({})
  const reviewTrigger=useRef(null)
  async function load(epoch=generation.current){setBusy(true);setError('');try{const r=await api.access();if(epoch===generation.current){setData(r.data);setSelected({})}}catch(e){if(epoch===generation.current){setData(null);setError(e.response?.status===403?'O seu perfil não permite consultar os acessos desta organização.':e.response?.status===409?'A organização ou a sessão mudou. Atualize a lista.':'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.')}}finally{if(epoch===generation.current)setBusy(false)}}
- useEffect(()=>{const epoch=++generation.current;setData(null);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current++}},[api])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{const epoch=++generation.current;setData(null);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current += 1}},[api])
  async function send(command){const epoch=generation.current;setBusy(true);setPending(command);setReview(null);setError('');setNotice('');try{
   await (command.kind==='billing'?api.membershipBilling:command.kind==='profile'?api.membershipProfile:api.membershipStatus)(command.id,command.body)
   if(epoch!==generation.current)return

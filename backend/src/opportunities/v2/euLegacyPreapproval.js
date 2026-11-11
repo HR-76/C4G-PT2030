@@ -1,7 +1,6 @@
 'use strict';
 // An OIDC approval for archiving exactly one legacy EU candidate. This module
 // deliberately has no candidate, revision, run or source-control write path.
-const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { isDeepStrictEqual } = require('node:util');

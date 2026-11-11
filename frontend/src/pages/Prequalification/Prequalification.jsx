@@ -55,7 +55,8 @@ export function Workspace({auth,search=''}){
    const h=(await api.history()).data;if(current(n))setHistory(h)
   }catch(e){if(current(n)){setError(errorText(e));setContext(null);setActive(null);setHead(null);setResult(null)}}finally{if(current(n))setLoading(false)}
  }
- useEffect(()=>{alive.current=true;load();const focus=()=>{setConfirmed(false);setPreview(null);if(!mutex.current)load()};window.addEventListener('focus',focus);return()=>{alive.current=false;generation.current++;window.removeEventListener('focus',focus)}},[])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{alive.current=true;load();const focus=()=>{setConfirmed(false);setPreview(null);if(!mutex.current)load()};window.addEventListener('focus',focus);return()=>{alive.current=false;generation.current += 1;window.removeEventListener('focus',focus)}},[])
  const activationPending=pending.some(p=>p.operation==='PQ1_ACTIVATE'),evaluationPending=pending.some(p=>(p.operation==='PQ1_EVALUATE'&&p.resourceId===opportunityId)||(p.operation==='PQ1_DECIDE'&&p.opportunityId===opportunityId))
  async function preflight(){if(mutex.current||!selected)return;mutex.current=true;setBusy(true);setConfirmed(false);setPreview(null);setError('');try{if(!await session())return;const value=(await api.preview(selected)).data;if(alive.current)setPreview(value)}catch(e){if(alive.current)setError(errorText(e))}finally{mutex.current=false;if(alive.current)setBusy(false)}}
  async function finish(receipt){if(receipt.decisionId){await load();return}if(receipt.evaluationId)navigate('/pre-qualificacao?evaluationId='+receipt.evaluationId);else await load()}

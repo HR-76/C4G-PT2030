@@ -195,8 +195,8 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       authorityCoordinator.registerRuntimeRecovery(require('./security/tenantAuthorityRecovery').createTenantAuthorityRecovery(runtimeDependencies));
       if (env.F12_RECEIPT_RECOVERY_DATABASE_URL) {
         const { Pool } = require('pg');
-        const central = new Pool({ connectionString: env.F12_RECEIPT_RECOVERY_DATABASE_URL,
-          max: 1, connectionTimeoutMillis: 5000, statement_timeout: 5000 });
+        const central = require('./config/poolResilience').guardPool(new Pool({ connectionString: env.F12_RECEIPT_RECOVERY_DATABASE_URL,
+          max: 1, connectionTimeoutMillis: 5000, statement_timeout: 5000 }), 'receipt-recovery');
         const recovery = require('./config/f12ReceiptRecoveryService').createF12ReceiptRecoveryService({
           central, tenantRuntimeDependencies: runtimeDependencies,
           onUnavailable: () => logger.warn('c4g.f12.receipt_recovery.unavailable', { component: 'f12', outcome: 'degraded' })

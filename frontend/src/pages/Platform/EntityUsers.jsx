@@ -12,7 +12,8 @@ export default function EntityUsers({organizationId,organizationName,platform=fa
  const addTrigger=useRef(null)
  const Heading=platform?'h2':'h1'
  async function load(generation=epoch.current){try{const r=await api.invitations();if(generation===epoch.current)setData(r.data)}catch(e){if(generation===epoch.current){setData(null);setError(messages[e.response?.data?.error?.code]||'Não foi possível consultar as ativações de utilizadores. Tente atualizar.')}}}
- useEffect(()=>{const generation=++epoch.current;setData(null);setForm(null);setResult(null);setError('');setPending(null);setReview(false);load(generation);return()=>{epoch.current++}},[api])
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
+ useEffect(()=>{const generation=++epoch.current;setData(null);setForm(null);setResult(null);setError('');setPending(null);setReview(false);load(generation);return()=>{epoch.current += 1}},[api])
  async function execute(command){const generation=epoch.current;setBusy(true);setError('');setPending(command);
   try{let value;
    if(command.kind==='create')value=(await api.create(command.body)).data
