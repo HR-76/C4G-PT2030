@@ -130,7 +130,7 @@ Detalhes: [runbook de PDFs](context/runbooks/billing-private-pdfs.md).
 
 O ambiente habitual passou a arrancar a partir de `C4G_PT2030`. Até 11/11/2026 os servidores corriam de `GCNI_C4G`, cujo código só conhece o tenant até à migração 038; como as bases locais estão na 040 (irreversível), esse checkout deixou de as poder servir.
 
-O estado privado foi copiado de `GCNI_C4G\.tmp` para este repositório, sem substituir ficheiros existentes: `.tmp/f2-integration` e `.tmp/local-platform` (cerca de 4 GB). Sem `.tmp/f2-integration`, `npm run dev` termina com `LOCAL_DEV_IDENTITY_CA_INVALID`. A variável `NODE_EXTRA_CA_CERTS` do perfil copiado continua a apontar para o certificado em `GCNI_C4G\.tmp\f2-integration`; não apagar essa pasta enquanto o caminho não for atualizado.
+O estado privado foi copiado de `GCNI_C4G\.tmp` para este repositório, sem substituir ficheiros existentes: `.tmp/f2-integration` e `.tmp/local-platform` (cerca de 4 GB). Sem `.tmp/f2-integration`, `npm run dev` termina com `LOCAL_DEV_IDENTITY_CA_INVALID`. A variável `NODE_EXTRA_CA_CERTS` do perfil copiado aponta, desde 11/11/2026, para o certificado deste repositório (`.tmp\f2-integration\mkcert-rootCA.pem`); o valor anterior ficou em `.tmp/f2-integration/.env.before-ca-path-20261111`. Continuam a referir caminhos de `GCNI_C4G`: `F2_SECRET_DIR` no mesmo `.env` (montagens TLS do proxy Nginx local em `test/integration/f2/compose.yaml`) e os ficheiros `worker.json` de `.tmp/local-platform/members` e `admissions`. Não apagar `GCNI_C4G\.tmp` enquanto essas referências existirem.
 
 **Sintoma:** dashboard, diretório da organização e notificações respondem 503, enquanto `/api/local-health` continua a devolver `ready: true`. Confirmar com:
 
