@@ -125,3 +125,31 @@ Manter Docker Desktop ativo. Se o scanner foi parado manualmente, usar
 `docker start c4g-billing-clamav`. Dados privados e backups em
 `.tmp/local-platform/billing-pdfs/`; não apagar nem publicar essa pasta.
 Detalhes: [runbook de PDFs](context/runbooks/billing-private-pdfs.md).
+
+## Checkout de trabalho e 503 nas rotas do tenant (11/11/2026)
+
+O ambiente habitual passou a arrancar a partir de `C4G_PT2030`. Até 11/11/2026 os servidores corriam de `GCNI_C4G`, cujo código só conhece o tenant até à migração 038; como as bases locais estão na 040 (irreversível), esse checkout deixou de as poder servir.
+
+O estado privado foi copiado de `GCNI_C4G\.tmp` para este repositório, sem substituir ficheiros existentes: `.tmp/f2-integration` e `.tmp/local-platform` (cerca de 4 GB). Sem `.tmp/f2-integration`, `npm run dev` termina com `LOCAL_DEV_IDENTITY_CA_INVALID`. A variável `NODE_EXTRA_CA_CERTS` do perfil copiado continua a apontar para o certificado em `GCNI_C4G\.tmp\f2-integration`; não apagar essa pasta enquanto o caminho não for atualizado.
+
+**Sintoma:** dashboard, diretório da organização e notificações respondem 503, enquanto `/api/local-health` continua a devolver `ready: true`. Confirmar com:
+
+```powershell
+curl.exe -s http://127.0.0.1:5000/health/db
+```
+
+Central `healthy` com tenant `unhealthy` indica que o diretório Central regista uma versão de esquema diferente da base tenant. A API resolve o snapshot pelo Central, a verificação do vínculo físico falha (`PHYSICAL_TENANT_MISMATCH`) e, num novo arranque, a API termina com `LOCAL_API_START_FAILED`.
+
+**Causa em 11/11/2026:** os scripts locais de ativação das migrações 039 e 040 aplicaram a migração e atualizaram apenas `.tmp/local-platform/runtime.json`. A linha do tenant em `public.tenant_schema_state` da Central ficou na 038.
+
+**Reparação feita:** a observação real do tenant foi publicada na Central pelo publicador oficial (038 → 040, revisão 9 → 10). A linha anterior ficou em `.tmp/local-platform/central-schema-state-before-040-*.json`.
+
+**Correção (commit `c88dc3e`):** `backend/scripts/localPlatform/documentDeletion.js` e `chatRetention.js` publicam agora a observação na Central depois de migrar. Sem argumentos são só de leitura e indicam o estado da Central; com `--apply` reparam uma Central atrasada mesmo quando a migração já está aplicada:
+
+```powershell
+node backend/scripts/localPlatform/chatRetention.js
+```
+
+`"central":"IN_SYNC"` confirma o alinhamento; `"STALE"` pede nova execução com `--apply`. Um novo script de ativação de migração tenant deve chamar `syncCentralObservation` de `backend/scripts/localPlatform/centralObservation.js`.
+
+As secções de regressão do Dashboard acima ainda referem a raiz de `GCNI_C4G`; não foram revalidadas neste checkout.
