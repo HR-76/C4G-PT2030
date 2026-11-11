@@ -8,6 +8,13 @@ const { identityConfig } = require('./identity');
 const { RECOGNIZED_ASSURANCE_POLICIES } = require('../../src/security/authConfig');
 const { supportsCentralVersion } = require('./centralVersions');
 
+// Optional daily collection (state.funding.schedule = {userId, sources?, at?}); only defined keys are exported.
+function fundingScheduleEnvironment(schedule) {
+  if (!schedule) return {};
+  return { FUNDING_TENDERS_SCHEDULE: 'daily-v1', FUNDING_TENDERS_SCHEDULE_USER_ID: schedule.userId,
+    ...(schedule.sources ? { FUNDING_TENDERS_SCHEDULE_SOURCES: schedule.sources.join(',') } : {}),
+    ...(schedule.at ? { FUNDING_TENDERS_SCHEDULE_AT: schedule.at } : {}) };
+}
 function runtimeEnvironment(config, state, controlledAdmission) {
   assertTarget(config);
   if (state.phase !== 'READY' || state.target.centralDatabase !== config.centralDatabase
@@ -37,6 +44,7 @@ function runtimeEnvironment(config, state, controlledAdmission) {
     AUTH_MODE: 'oidc', FUNDING_TENDERS_RUNTIME: 'central',
     FUNDING_TENDERS_SOURCE: state.funding?.source || 'unconfigured', FUNDING_TENDERS_REHEARSAL_APPROVED: state.funding?.approval,
     FUNDING_TENDERS_COVERAGE: state.funding?.coverage || 'disabled',
+    ...fundingScheduleEnvironment(state.funding?.schedule),
     NODE_ENV: 'development', PORT: '5000', PUBLIC_APP_URL: origin, CORS_ORIGIN: origin,
     ...(state.identity.emailVerification === true ? { OIDC_EMAIL_VERIFICATION: 'keycloak-account-v1' } : {}),
     OIDC_ISSUER: state.identity.issuer, OIDC_CLIENT_ID: state.identity.clientId,
@@ -185,4 +193,4 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
     await authorityPool.end(); await centralPool.end(); throw error;
   }
 }
-module.exports = { runtimeEnvironment, listenLocalApi, startNative };
+module.exports = { fundingScheduleEnvironment, runtimeEnvironment, listenLocalApi, startNative };

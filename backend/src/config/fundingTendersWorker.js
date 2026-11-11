@@ -30,6 +30,8 @@ async function loadFundingTendersWorker({ env = process.env } = {}) {
     if(euWriterV2)await require('../fundingTenders/euWriterConfig').assertEuWriterCapability(pool,ready.currentVersion);
     const coverage=require('../fundingTenders/coverageConfig').coverageConfig(env.FUNDING_TENDERS_COVERAGE,ready.currentVersion,env.FUNDING_TENDERS_ENRICHMENT);
     const collection = collectionPolicy(env.FUNDING_TENDERS_SOURCE, env.FUNDING_TENDERS_REHEARSAL_APPROVED);
+    // Opt-in daily collection (FUNDING_TENDERS_SCHEDULE=daily-v1); an invalid configuration fails the start.
+    const schedule = require('../fundingTenders/scheduledRefresh').loadScheduleConfiguration(env, collection.sources);
     if (!supportsCentralVersion(ready.currentVersion, '015_funding_tenders_central')
       || collection.sources.length > 1 && !supportsCentralVersion(ready.currentVersion, '017_funding_programmes')
       || collection.sources.length > 3 && !supportsCentralVersion(ready.currentVersion, '018_official_programme_sources')) throw new Error('FUNDING_SCHEMA_REQUIRED');
@@ -49,7 +51,12 @@ async function loadFundingTendersWorker({ env = process.env } = {}) {
     const source = {lookup(input){if(!collection.sources.includes(input.source))throw new Error("INVALID_INPUT");return euSource.lookup(input);},collect(input) { if (!collection.sources.includes(input.source)) throw Object.assign(new Error('INVALID_INPUT'), {code:'INVALID_INPUT'}); return require('../fundingTenders/sourceIdentity').OFFICIAL.includes(input.source) ? official.collect(input) : euSource.collect(input); }};
     const repository=require('../fundingTenders/repository').createFundingRepository({pool,euSourceControlEnabled,euWriterV2,coverageEnabled:coverage.supported,startCoverage:coverage.enabled,refreshEnabled:coverage.temporalSupported===true,resolutionEnabled:coverage.resolutionSupported===true,enrichmentEnabled:coverage.enrichmentEnabled===true});
     const runtime = createFundingWorker({ pool, queue, source, repository });
-    return { ...runtime, async shutdown() { try { await runtime.shutdown(); } finally { await pool.end(); } } };
+    const scheduled = schedule ? require('../fundingTenders/scheduledRefresh').createScheduledRefresh({ repository, userId: schedule.userId, sources: schedule.sources, at: schedule.at,
+      log: entry => process.stdout.write(`${JSON.stringify({ at: new Date().toISOString(), ...entry })}
+`) }) : null;
+    return { ...runtime,
+      async start(...args) { const started = await runtime.start(...args); scheduled?.start(); return started; },
+      async shutdown() { try { await scheduled?.shutdown(); await runtime.shutdown(); } finally { await pool.end(); } } };
   } catch (error) { if (queue) await queue.shutdown(); await pool.end(); throw error; }
 }
 module.exports = { loadFundingTendersWorker, fundingWorkerTarget };
