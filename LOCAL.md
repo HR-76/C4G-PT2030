@@ -132,7 +132,16 @@ O ambiente habitual passou a arrancar a partir de `C4G_PT2030`. Até 11/11/2026 
 
 O estado privado foi copiado de `GCNI_C4G\.tmp` para este repositório, sem substituir ficheiros existentes: `.tmp/f2-integration` e `.tmp/local-platform` (cerca de 4 GB). Sem `.tmp/f2-integration`, `npm run dev` termina com `LOCAL_DEV_IDENTITY_CA_INVALID`. A variável `NODE_EXTRA_CA_CERTS` do perfil copiado aponta, desde 11/11/2026, para o certificado deste repositório (`.tmp\f2-integration\mkcert-rootCA.pem`); o valor anterior ficou em `.tmp/f2-integration/.env.before-ca-path-20261111`. Na mesma data, `F2_SECRET_DIR` no mesmo `.env` e o campo `certificate` dos `worker.json` de `.tmp/local-platform/members` e `admissions` passaram também a apontar para este repositório; cada ficheiro tem ao lado uma cópia `.before-*-20261111`.
 
-Os contentores Docker existentes não foram recriados e continuam a montar ficheiros de `GCNI_C4G`: o proxy `c4g-f2-integration-proxy-1` monta `GCNI_C4G\.tmp\f2-integration\demo-nginx.conf` e os ficheiros TLS, e o Keycloak monta `GCNI_C4G\test\integration\f2\realm.json`. Não apagar nem mover `GCNI_C4G` enquanto esses contentores existirem. Consequência conhecida: se a identidade local estiver parada, `npm run dev` neste repositório compara a configuração montada pelo proxy com `.tmp/f2-integration/demo-nginx.conf` daqui e termina com `LOCAL_DEV_IDENTITY_PROFILE_UNKNOWN`; nesse caso, iniciar primeiro os contentores de identidade no Docker Desktop e repetir o arranque.
+O proxy `c4g-f2-integration-proxy-1` (Nginx, sem estado) foi recriado em 11/11/2026 a partir deste repositório e monta agora `demo-nginx.conf`, `demo-dist` e os ficheiros TLS de `C4G_PT2030\.tmp\f2-integration`. O override `.tmp/f2-integration/demo-static.compose.yaml` aponta para estes caminhos. Para o repetir, na raiz:
+
+```powershell
+docker compose --project-name c4g-f2-integration --env-file .tmp/f2-integration/.env -f test/integration/f2/compose.yaml -f .tmp/f2-integration/demo-static.compose.yaml up -d --no-deps --force-recreate proxy
+docker network connect c4g-native-email-edge c4g-f2-integration-proxy-1
+```
+
+O segundo comando é obrigatório: a rede `c4g-native-email-edge` não faz parte do compose e sem ela o realm `c4g-native-local` deixa de responder em `https://localhost:8443`.
+
+O contentor `c4g-f2-integration-keycloak-1` **não foi recriado e não deve ser**: guarda dentro do próprio contentor a base H2 e o módulo `c4g-manual-activation.jar`, sem volume. Recriá-lo apaga ambos. A sua única montagem é `GCNI_C4G\test\integration\f2\realm.json`, só de leitura; não apagar nem mover esse ficheiro enquanto o contentor existir. Outros contentores antigos (`c4g-local-demo-*`, `c4g-assisted-app-*`, `c4g-recovery-*`, bases `c4g-f2-integration-*-db-1`) também montam caminhos de `GCNI_C4G`.
 
 **Sintoma:** dashboard, diretório da organização e notificações respondem 503, enquanto `/api/local-health` continua a devolver `ready: true`. Confirmar com:
 
