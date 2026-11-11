@@ -112,7 +112,11 @@ async function centralSchemaSnapshot(client, {compact = false, compactAuthority 
   if (!Array.isArray(result?.rows) || result.rows.length !== 1 || !row || !fields.every(field => Array.isArray(row[field]))) {
     throw Object.assign(new Error('CENTRAL_SCHEMA_SNAPSHOT_INVALID'), { code: 'CENTRAL_SCHEMA_SNAPSHOT_INVALID' });
   }
-  const { tables, columns, constraints, indexes, triggers, triggerFunctions, authoritySequence } = row;
+  const { triggerFunctions, authoritySequence } = row;
+  // Monthly audit partitions rotate operationally; only the baseline ones are fingerprinted.
+  const { omitRotatingAuditPartitions: omitRotating } = require('./auditPartitionPolicy');
+  const [tables, columns, constraints, indexes, triggers] =
+    ['tables', 'columns', 'constraints', 'indexes', 'triggers'].map(field => omitRotating(row[field]));
   // Keep legacy insertion order and omit the same optional keys. Security
   // evidence remains separately collected; nothing is cached across calls/locks.
   const snapshot = { tables, columns, constraints: canonicalConstraints(constraints), indexes };

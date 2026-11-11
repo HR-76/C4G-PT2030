@@ -31,6 +31,6 @@ async function transitionTenantOwnership(client,expected){
     await client.query('COMMIT');
     return {operation:'TENANT_030_CANONICAL_LINEAGE_OWNER_V1',changed,before,after:evidence.schemaFingerprint,
       ledgerDigest:ledgerDigest(rows),transactionId,evidence};
-  }catch(error){await client.query('ROLLBACK');throw error;}
+  }catch(error){try{await client.query('ROLLBACK');}catch{/* keep the original failure */}throw error;}
 }
 module.exports={transitionTenantOwnership};

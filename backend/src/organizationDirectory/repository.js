@@ -101,6 +101,18 @@ function createDirectoryRepository({organizationId:org,actor,authorize,protect,a
   return {areas,items:page.map(row=>({...personProjection(row),areaIds:row.area_ids||[],
    ...(withInterests?{interestAreaIds:row.interest_area_ids||[]}: {})})),nextCursor:rows.length>25?tokens.cursor(page.at(-1).person_id,bind):null};
  }
+ // person_unit rows carry no data beyond the set itself, so an edit that keeps the set and the primary unit
+ // writes nothing; otherwise the set is replaced with a fixed number of statements (the primary-unit index
+ // is immediate, so the old rows must go before the new ones are inserted).
+ async function replacePersonUnits(client,personId,input,existing){
+  if(existing){
+   const current=(await client.query('SELECT scope_id,is_primary FROM organizational_scope.person_unit WHERE organization_id=$1 AND person_id=$2',[org,personId])).rows;
+   const wanted=new Set(input.unitIds);
+   if(current.length===wanted.size&&current.every(row=>wanted.has(row.scope_id)&&row.is_primary===(row.scope_id===input.primaryUnitId)))return;
+   await client.query('DELETE FROM organizational_scope.person_unit WHERE organization_id=$1 AND person_id=$2',[org,personId]);
+  }
+  if(input.unitIds.length)await client.query('INSERT INTO organizational_scope.person_unit(organization_id,person_id,scope_id,is_primary) SELECT $1,$2,u,(u=$4::uuid) FROM unnest($3::uuid[]) AS u',[org,personId,input.unitIds,input.primaryUnitId]);
+ }
  async function personWrite(client,method,input,id){
   // The create resource is the organization so a replay retains the same digest.
   const target=id||org;await guarded(method,input,target,[readScope]);
@@ -116,8 +128,7 @@ function createDirectoryRepository({organizationId:org,actor,authorize,protect,a
    updated_by=$7,updated_at=transaction_timestamp() WHERE organization_id=$1 AND person_id=$2 RETURNING *`,[org,id,input.name,input.email,input.functionLabel,input.active,actor.id])).rows[0]
    :(await client.query(`INSERT INTO organizational_scope.person(organization_id,person_id,name,email,function_label,active,created_by,updated_by)
     VALUES($1,$2,$3,$4,$5,$6,$7,$7) RETURNING *`,[org,personId,input.name,input.email,input.functionLabel,input.active,actor.id])).rows[0];
-  await client.query('DELETE FROM organizational_scope.person_unit WHERE organization_id=$1 AND person_id=$2',[org,personId]);
-  for(const unitId of input.unitIds)await client.query('INSERT INTO organizational_scope.person_unit(organization_id,person_id,scope_id,is_primary) VALUES($1,$2,$3,$4)',[org,personId,unitId,unitId===input.primaryUnitId]);
+  await replacePersonUnits(client,personId,input,Boolean(id));
   const result={...personProjection(row),unitIds:input.unitIds,primaryUnitId:input.primaryUnitId};
   return finish(client,method,input,target,prior.digest,result);
  }

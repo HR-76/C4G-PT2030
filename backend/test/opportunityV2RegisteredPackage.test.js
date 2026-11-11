@@ -76,6 +76,7 @@ test('ordinary central migration entry point applies no package SQL on baseline 
   const queries=[];
   const rows=entries.map(entry=>({version:entry.version,checksum_sha256:central.migrationSql(entry.version,'up').checksum,irreversible:entry.irreversible}));
   const client={async query(sql){queries.push(sql);
+   if(sql.includes('pg_try_advisory'))return{rows:[{acquired:true}]};
    if(sql.includes('marker_exists'))return{rows:[{marker_exists:true}]};
    if(sql.includes('AS matches'))return{rows:[{matches:true}]};
    if(sql.includes('SELECT version, checksum_sha256'))return{rows};
@@ -92,6 +93,7 @@ test('registered package refuses missing/wrong baseline before SQL and rollback 
  const entries=central.manifest.slice(0,-1),queries=[];
  const rows=entries.map(entry=>({version:entry.version,checksum_sha256:central.migrationSql(entry.version,'up').checksum,irreversible:entry.irreversible}));
  const client={async query(sql){queries.push(sql);
+  if(sql.includes('pg_try_advisory'))return{rows:[{acquired:true}]};
   if(sql.includes('marker_exists'))return{rows:[{marker_exists:true}]};
   if(sql.includes('AS matches'))return{rows:[{matches:true}]};
   if(sql.includes('SELECT version, checksum_sha256'))return{rows};return{rows:[]};},release(){}};

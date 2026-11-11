@@ -1,11 +1,12 @@
 const { Pool } = require('pg');
 const { load } = require('../src/audit/migrationManifest');
 const { auditPreflight } = require('../src/audit/preflight');
+const { assertDisposableTarget } = require('../test/support/disposableTarget');
 
 async function gate(scope, connectionString) {
   if (!connectionString) throw new Error(`Missing disposable F7 ${scope} target.`);
-  const target = new URL(connectionString);
-  if (['5432', '5433'].includes(target.port) || !target.pathname.startsWith('/f7_synthetic_')) throw new Error('Persistent or non-synthetic database target refused.');
+  // Loopback host, non-default port and an f7_synthetic_ database: the gate runs the audit rollback.
+  assertDisposableTarget(connectionString, { prefix: 'f7_synthetic_' });
   const pool = new Pool({ connectionString, max: 2 });
   try {
     const version = Number((await pool.query('SHOW server_version_num')).rows[0].server_version_num);

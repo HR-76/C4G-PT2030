@@ -1,4 +1,5 @@
 const crypto = require("node:crypto");
+const { assertNoTransactionControl } = require("./sqlTransactionControl");
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -255,6 +256,8 @@ function sourceMigrationSql(version, direction, readSql) {
     ? path.resolve(migrationsRoot, '../candidates', `${version.slice(4)}.${direction}.sql`)
     : path.join(migrationsRoot, `${version}.${direction}.sql`);
   const sourceSql = readSql(sourcePath);
+  // The runner owns BEGIN/COMMIT for the whole run; SQL that controls transactions would break atomicity.
+  assertNoTransactionControl(sourceSql, `Central migration ${version} ${direction}: transaction control belongs to the runner.`);
   const policy = migrationChecksumPolicy(sourceSql, {
     acceptsHistoricalCrlfChecksum: direction === "up" && entry.acceptsHistoricalCrlfChecksum === true
   });

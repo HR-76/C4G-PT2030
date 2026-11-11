@@ -105,8 +105,14 @@ async function tenantSchemaSnapshot(client, schemasToInspect = TENANT_SCHEMAS) {
   }
   // Retain the result shape for the unchanged security branches below. Every
   // branch still queries fresh evidence; no snapshot crosses a checkpoint.
+  // Monthly audit partitions rotate operationally; only the baseline ones are fingerprinted.
+  const { omitRotatingAuditPartitions } = require('./auditPartitionPolicy');
+  const partitioned = new Set(['tables', 'columns', 'constraints', 'indexes', 'triggers']);
   const { schemas, tables, columns, constraints, indexes, triggers, functions } =
-    Object.fromEntries(fields.map(field => [field, { rows: row[field] }]));
+    Object.fromEntries(fields.map(field => [field, {
+      rows: partitioned.has(field)
+        ? omitRotatingAuditPartitions(row[field], item => `${item.schema_name}.${item.table_name}`) : row[field]
+    }]));
   const hasOrganizationalScope = tables.rows.some(row => row.schema_name === 'organizational_scope' && row.table_name === 'scope');
   let organizationalScopeSecurity = null;
   if (hasOrganizationalScope) {

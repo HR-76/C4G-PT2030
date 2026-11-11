@@ -28,21 +28,43 @@ async function ensureLedger(client) {
   )`);
 }
 
+// Every pending migration runs in one transaction, so no wait may be unbounded: a busy migration lock is
+// refused at once and any other lock wait gives up after this long.
+const MIGRATION_LOCK = 42420002;
+const LOCK_TIMEOUT_MS = 30000;
+
+function migrationFailure(code, message) {
+  return Object.assign(new Error(message), { code });
+}
+
+// A migration may SET ROLE for its own statements but must RESET ROLE: otherwise every later migration
+// in this transaction would silently run as the wrong role.
+async function assertSessionRoleRestored(client, version) {
+  const { rows } = await client.query("SELECT current_user = session_user AS plain");
+  if (rows[0]?.plain !== true) {
+    throw migrationFailure("MIGRATION_ROLE_NOT_RESET", `Migration ${version} left the session role changed; the transaction was refused.`);
+  }
+}
+
 async function inTransaction(pool, operation) {
   const client = await pool.connect();
+  let broken;
   try {
     await client.query("BEGIN");
-    await client.query("SELECT pg_advisory_xact_lock($1)", [42420002]);
+    await client.query("SELECT set_config('lock_timeout', $1, true)", [`${LOCK_TIMEOUT_MS}ms`]);
+    const lock = await client.query("SELECT pg_try_advisory_xact_lock($1) AS acquired", [MIGRATION_LOCK]);
+    if (lock.rows[0]?.acquired !== true) throw migrationFailure("MIGRATION_IN_PROGRESS", "Another central migration is in progress.");
     await assertCentralMarker(client);
     await ensureLedger(client);
     const result = await operation(client);
     await client.query("COMMIT");
     return result;
   } catch (error) {
-    try { await client.query("ROLLBACK"); } catch { /* preserve original failure */ }
+    // A connection whose ROLLBACK failed is in an unknown state: destroy it instead of pooling it.
+    try { await client.query("ROLLBACK"); } catch (rollbackError) { broken = rollbackError; }
     throw error;
   } finally {
-    client.release();
+    client.release(broken);
   }
 }
 
@@ -106,6 +128,7 @@ async function applyCentralMigrationsWithManifest(pool, entries, loadMigration, 
         if (entry.requiresCatalogSecurityFingerprint) await require('../src/security/catalogSecurityManifest').assertCatalogSecurity(client,entry.requiresCatalogSecurityFingerprint);
       }
       await client.query(migration.sql);
+      await assertSessionRoleRestored(client, entry.version);
       if (afterSql) await afterSql({ client, entry });
       if (entry.catalogSecurityFingerprint) {
         await require('../src/security/centralSchemaManifest').assertCentralSchema(client,entry.version);
@@ -180,6 +203,7 @@ async function rollbackCentralMigrationWithManifest(pool, target, entries, loadM
       throw new Error("Only the latest applied reversible central migration can be rolled back.");
     }
     await client.query(migration.sql);
+    await assertSessionRoleRestored(client, migration.entry.version);
     await client.query("DELETE FROM public.c4g_schema_migration WHERE version = $1", [migration.entry.version]);
     return migration.entry.version;
   });

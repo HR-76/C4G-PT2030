@@ -27,7 +27,7 @@ async function provisionDocumentApiProfile(client,{login,password}){
  ident(login);if(/^c4g_/.test(login))throw new TypeError('DOCUMENT_API_LOGIN_MUST_BE_DEDICATED');
  let began=false;
  try{
-  await client.query('BEGIN');began=true;await client.query('SELECT pg_advisory_xact_lock(43000032)');
+  await client.query('BEGIN');began=true;await client.query("SET LOCAL lock_timeout='5s'");await client.query('SELECT pg_advisory_xact_lock(43000032)');
   const profiles=(await client.query('SELECT rolname,rolcanlogin,rolinherit,rolsuper,rolbypassrls,rolcreatedb,rolcreaterole,rolreplication FROM pg_roles WHERE rolname=ANY($1::text[])',[ROLES])).rows;
   if(profiles.length!==ROLES.length||profiles.some(({rolname,...attributes})=>Object.values(attributes).some(Boolean)))throw Error('DOCUMENT_API_FUNCTIONAL_ROLE_DRIFT');
   await require('./documentApiRoleContract').validateDocumentRole(client);
@@ -55,6 +55,6 @@ async function provisionDocumentApiProfile(client,{login,password}){
   await validateLoginPrivileges(client,login);
   await client.query('COMMIT');began=false;
   return Object.freeze({state,login,aggregator:'c4g_tenant_api_capabilities',functionalRoles:ROLES});
- }catch(error){if(began)await client.query('ROLLBACK');throw error;}
+ }catch(error){if(began){try{await client.query('ROLLBACK');}catch{/* keep the original failure */}}throw error;}
 }
 module.exports={BASE,ROLES,provisionDocumentApiProfile};

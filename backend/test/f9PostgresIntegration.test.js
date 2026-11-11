@@ -2,7 +2,8 @@ const assert=require('node:assert/strict');const test=require('node:test');const
 const {OutboxRepository}=require('../src/async/outboxRepository');const {InboxRepository}=require('../src/async/inboxRepository');const {createPgBossQueueAdapter}=require('../src/async/adapters/pgBossQueueAdapter');
 const {createEnvelope,createEnvelopeV2,createTrustedObservability}=require('../src/async/envelope');const {OutboxRelay}=require('../src/async/outboxRelay');
 const {createJobRegistry}=require('../src/async/jobRegistry');const {result}=require('../src/async/jobResult');const {createWorkerProcessor}=require('../src/async/workerProcessor');const {WorkerLifecycle}=require('../src/async/workerLifecycle');const {createMessagingTelemetry}=require('../src/observability/messaging');const {NodeTracerProvider,SimpleSpanProcessor,InMemorySpanExporter}=require('@opentelemetry/sdk-trace-node');
-const url=process.env.F9_TEST_DATABASE_URL;const enabled=Boolean(url);
+const {assertDisposableTarget}=require('./support/disposableTarget');
+const url=process.env.F9_TEST_DATABASE_URL;if(url)assertDisposableTarget(url);const enabled=Boolean(url);
 const orgA='11111111-1111-4111-8111-111111111111',orgB='22222222-2222-4222-8222-222222222222';
 const built=createEnvelope({trustedContext:{organizationId:orgA,actor:{kind:'SERVICE',serviceActorCode:'SYNTHETIC_WORKER'},operation:'synthetic_resource.update',correlationId:orgB,causationId:'33333333-3333-4333-8333-333333333333'},job:{type:'synthetic_resource.update',version:1,payloadVersion:1,idempotencyKey:'idem-001'},payload:{value:1},registry:{supports:()=>true},clock:()=>new Date('2026-10-08T10:00:00Z'),id:()=>orgA});const digest=built.contentDigest,envelope=built.envelope;
 async function tx(pool,fn){const c=await pool.connect();try{await c.query('BEGIN');const v=await fn(c);await c.query('COMMIT');return v;}catch(e){await c.query('ROLLBACK');throw e;}finally{c.release();}}

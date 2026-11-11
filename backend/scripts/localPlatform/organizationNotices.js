@@ -1,7 +1,7 @@
 'use strict';
 // Explicit, local-only activation of the additive organization notices.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{createHash}=require('node:crypto'),{spawnSync}=require('node:child_process');
-const {Pool}=require('pg'),cfg=require('./config');
+const {Pool}=require('pg'),cfg=require('./config'),{withInstallerAuthority}=require('./installerAuthority');
 async function fingerprint(pool){const result=await require('./officialSources').fingerprint(pool,['opportunity_catalog','organizational_scope','organization_profile','document_storage']);delete result['"opportunity_catalog"."organization_notice"'];delete result['"opportunity_catalog"."organization_notice_recipient"'];return result}
 async function identities(pool){const result={};for(const table of ['global_user','auth_identity_ref','organization','organization_membership','platform_admin_assignment']){
  const rows=(await pool.query(`SELECT to_jsonb(t) AS row FROM public.${table} t ORDER BY to_jsonb(t)::text`)).rows;
@@ -11,7 +11,7 @@ async function main(){
  const apply=process.argv.includes('--apply');assert(process.argv.slice(2).every(v=>v==='--apply'));
  const config=cfg.readConfig(),state=JSON.parse(fs.readFileSync(path.join(cfg.folder,'runtime.json')));require('./runtime').runtimeEnvironment(config,state);
  assert.equal(config.port,5432);assert.equal(config.centralDatabase,'c4g_central_dev');assert.equal(config.tenantDatabase,'c4g_tenant_dev');
- const pool=new Pool(cfg.connection(config,config.tenantDatabase));const central=new Pool(cfg.connection(config,config.centralDatabase));let elevated=false,authority;
+ const pool=new Pool(cfg.connection(config,config.tenantDatabase));const central=new Pool(cfg.connection(config,config.centralDatabase));let authority;
  try{
   const version=(await pool.query('SELECT migration_id FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1')).rows[0].migration_id;
   assert(['029_application_alerts','030_organization_notices'].includes(version));
@@ -34,11 +34,10 @@ async function main(){
    const dump=spawnSync(binary+'pg_dump.exe',['-h',config.host,'-p',String(config.port),'-U',config.user,'-Fc','-f',file,db],{env:{...process.env,PGPASSWORD:config.password},windowsHide:true});
    assert.equal(dump.status,0);assert(fs.statSync(file).size>1000);assert.equal(spawnSync(binary+'pg_restore.exe',['--list',file],{windowsHide:true}).status,0);
   }
-  const role=(await pool.query("SELECT rolcanlogin,rolsuper FROM pg_roles WHERE rolname='c4g_f12_admin'")).rows[0];assert.equal(role.rolcanlogin,false);assert.equal(role.rolsuper,false);
-  await pool.query('ALTER ROLE c4g_f12_admin SUPERUSER');elevated=true;
-  const native={async connect(){const c=await pool.connect();await c.query('SET SESSION AUTHORIZATION c4g_f12_admin');return{query:(...args)=>c.query(...args),release:error=>c.release(error||Error('INSTALLER_DISPOSED'))}}};
-  await require('../../src/security/tenantMigrationRunner').createTenantMigrationRunner({pool:native,observationPublisher:{async publish(){}},timeoutMs:30000,scheduler:{setTimeout,clearTimeout}}).migrate({tenantId:state.tenantId,databaseGenerationId:state.generationId,expectedRevision:1,correlationId:state.installationId,idempotencyKey:state.installationId+'-notices'});
-  await pool.query('ALTER ROLE c4g_f12_admin NOSUPERUSER NOCREATEROLE NOCREATEDB NOLOGIN');elevated=false;
+  await withInstallerAuthority(pool,{},async({native,demote})=>{
+   await require('../../src/security/tenantMigrationRunner').createTenantMigrationRunner({pool:native,observationPublisher:{async publish(){}},timeoutMs:30000,scheduler:{setTimeout,clearTimeout}}).migrate({tenantId:state.tenantId,databaseGenerationId:state.generationId,expectedRevision:1,correlationId:state.installationId,idempotencyKey:state.installationId+'-notices'});
+   await demote();
+  });
   const observation=await require('../../src/security/tenantMigrationPreflight').preflightTenant(pool,{tenantId:state.tenantId,databaseGenerationId:state.generationId},undefined,{timeoutMs:15000});
   assert.deepEqual(await fingerprint(pool),before);
   state.snapshot.schema={...state.snapshot.schema,currentVersion:observation.currentVersion,schemaFingerprint:observation.schemaFingerprint,verifiedCapabilities:Object.fromEntries(observation.capabilities.map(code=>[code,true]))};
@@ -50,6 +49,6 @@ async function main(){
   assert.deepEqual(await identities(central),identitiesBefore);
   cfg.saveState(state);cfg.saveState({result:'PASS',tenantMigration:'030_organization_notices',existingFieldsHistoryTasksReceiptsUnchanged:true,centralCatalogUnchanged:true,identitiesMembershipsUnchanged:true,grantsAdded,backup:path.relative(cfg.root,backup)},path.join(out,'local-upgrade.json'));
   console.log('LOCAL_ORGANIZATION_NOTICES_UPGRADE_PASS');
- }finally{if(elevated)await pool.query('ALTER ROLE c4g_f12_admin NOSUPERUSER NOCREATEROLE NOCREATEDB NOLOGIN');await authority?.end();await central.end();await pool.end()}
+ }finally{await authority?.end();await central.end();await pool.end()}
 }
 main().catch(error=>{console.error(error.code||'LOCAL_ORGANIZATION_NOTICES_UPGRADE_FAILED');process.exitCode=1});

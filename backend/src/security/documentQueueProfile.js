@@ -44,7 +44,7 @@ async function validateDocumentQueueProfile(client,{login,requireSelected=false}
 async function provisionDocumentQueueProfile(client,{login,password}){
  identifier(login);if(/^c4g_/.test(login))throw Error('DOCUMENT_QUEUE_DEDICATED_LOGIN_REQUIRED');
  await client.query('BEGIN');try{
- await client.query('SELECT pg_advisory_xact_lock(43000045)');await assertSchema(client);
+ await client.query("SET LOCAL lock_timeout='5s'");await client.query('SELECT pg_advisory_xact_lock(43000045)');await assertSchema(client);
  const existing=(await client.query('SELECT rolname FROM pg_roles WHERE rolname=ANY($1::text[])',[[ROLE,login]])).rows;let state;
  if(!existing.length){
   if(typeof password!=='string'||password.length<24)throw Error('DOCUMENT_QUEUE_PASSWORD_REQUIRED');
@@ -58,6 +58,6 @@ async function provisionDocumentQueueProfile(client,{login,password}){
   await client.query(`GRANT CONNECT ON DATABASE ${identifier(db)} TO ${identifier(login)}`);state='PROVISIONED';
  }else{if(existing.length!==2)throw Error('DOCUMENT_QUEUE_PARTIAL_PROFILE');state='ALREADY_CONFORMING';}
  const profile=await validateDocumentQueueProfile(client,{login});await client.query('COMMIT');return{state,...profile};
- }catch(error){await client.query('ROLLBACK');throw error;}
+ }catch(error){try{await client.query('ROLLBACK');}catch{/* keep the original failure */}throw error;}
 }
 module.exports={ROLE,TABLES,UPDATE,QUEUES,options,assertSchema,validateDocumentQueueProfile,provisionDocumentQueueProfile};

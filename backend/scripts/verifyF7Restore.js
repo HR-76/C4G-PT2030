@@ -1,9 +1,9 @@
 const { Pool } = require('pg');
 const { auditPreflight } = require('../src/audit/preflight');
+const { assertDisposableTarget } = require('../test/support/disposableTarget');
 
 (async () => {
-  const target = new URL(process.env.F7_RESTORE_DATABASE_URL || '');
-  if (['5432', '5433'].includes(target.port) || target.pathname !== '/f7_synthetic_restore') throw new Error('Non-synthetic restore target refused.');
+  const target = assertDisposableTarget(process.env.F7_RESTORE_DATABASE_URL, { exact: 'f7_synthetic_restore' });
   const pool = new Pool({ connectionString: target.toString() });
   try {
     const ready = await auditPreflight(pool);

@@ -1,4 +1,5 @@
 const { validateInterestCapabilities } = require('./tenantInterestCapabilities');
+const { isRotatingAuditTable } = require('./auditPartitionPolicy');
 const { registeredManifest: manifest, allRegisteredMigrations, receiptManifest, failureReceiptManifest, assignedReviewManifest,
   applicationChatManifest, APPLICATION_CHAT_SCHEMA_VERSION, organizationStrategyManifest, ORGANIZATION_STRATEGY_SCHEMA_VERSION,
   applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION,
@@ -262,7 +263,7 @@ async function validateFeatureCapabilities(client, entry) {
         JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
        WHERE n.nspname=$1 AND c.relkind IN ('r','p')
        ORDER BY c.relname`, [schema]);
-    const names = rows.rows.map(row => row.table_name);
+    const names = rows.rows.filter(row => !isRotatingAuditTable(`${schema}.${row.table_name}`)).map(row => row.table_name);
     if (required.has(capability)) {
       if (JSON.stringify(names) !== JSON.stringify(tables)
           || rows.rows.filter(row => row.rls).length < minimumRls) refuse('CAPABILITY_EVIDENCE_MISMATCH');

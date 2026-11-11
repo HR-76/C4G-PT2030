@@ -45,7 +45,7 @@ test("central migration SQL is transaction-controlled by the allowlisted runner"
     assert.doesNotMatch(sql, /^\s*COMMIT\s*;/im);
   }
   const runner = fs.readFileSync(path.resolve(__dirname, "../scripts/runCentralMigrations.js"), "utf8");
-  assert.match(runner, /pg_advisory_xact_lock/);
+  assert.match(runner, /pg_try_advisory_xact_lock/);
   assert.match(runner, /checksum_sha256/);
   assert.match(runner, /rollback refused/);
   assert.match(runner, /Only rollback of 001_f2_oidc_sessions is permitted/);
@@ -124,7 +124,9 @@ test("new applications execute canonical SQL and record one checksum for LF or C
   const inserted = [];
   const client = {
     async query(sql, parameters) {
-      if (sql === "BEGIN" || sql === "COMMIT" || sql.includes("pg_advisory_xact_lock")) return { rows: [] };
+      if (sql === "BEGIN" || sql === "COMMIT" || sql.includes("set_config('lock_timeout'")) return { rows: [] };
+      if (sql.includes("pg_try_advisory_xact_lock")) return { rows: [{ acquired: true }] };
+      if (sql.includes("current_user = session_user")) return { rows: [{ plain: true }] };
       if (sql.includes("to_regclass")) return { rows: [{ marker_exists: true }] };
       if (sql.includes("SELECT EXISTS") && sql.includes("c4g_database_identity")) return { rows: [{ matches: true }] };
       if (sql.includes("CREATE TABLE IF NOT EXISTS public.c4g_schema_migration")) return { rows: [] };

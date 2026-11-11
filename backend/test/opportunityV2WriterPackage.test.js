@@ -32,7 +32,7 @@ test('ordinary migrations never install043 and writer package refuses035 before 
  const m=require('../src/security/centralMigrationManifest'),r=require('../scripts/runCentralMigrations');
  for(const entries of [m.manifest,m.registeredManifest,m.knownManifest]){
   const statements=[],rows=entries.map(entry=>({version:entry.version,checksum_sha256:m.migrationSql(entry.version,'up').checksum,irreversible:entry.irreversible}));
-  const client={async query(sql){statements.push(sql);if(sql.includes('marker_exists'))return{rows:[{marker_exists:true}]};if(sql.includes('AS matches'))return{rows:[{matches:true}]};if(sql.includes('SELECT version, checksum_sha256'))return{rows};return{rows:[]};},release(){}};
+  const client={async query(sql){statements.push(sql);if(sql.includes('pg_try_advisory'))return{rows:[{acquired:true}]};if(sql.includes('marker_exists'))return{rows:[{marker_exists:true}]};if(sql.includes('AS matches'))return{rows:[{matches:true}]};if(sql.includes('SELECT version, checksum_sha256'))return{rows};return{rows:[]};},release(){}};
   const pool={connect:async()=>client};assert.deepEqual(await r.applyCentralMigrations(pool),[]);
   assert(!statements.some(sql=>sql.includes('INSERT INTO public.c4g_schema_migration')));
   if(entries===m.manifest)await assert.rejects(r.applyRegisteredEuWriterPackage(pool,'opportunity-eu-writer-v2'),/baseline mismatch/);
