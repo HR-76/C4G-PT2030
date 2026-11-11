@@ -4,6 +4,7 @@ const { randomUUID } = require('node:crypto');
 const { Pool } = require('pg');
 const { createProductionCatalogs } = require('../authorization/catalogs');
 const { createPgBossQueueAdapter } = require('../async/adapters/pgBossQueueAdapter');
+const { inspectPgBossSchema } = require('../async/pgBossSchemaInspection');
 const { deadLetterRecord } = require('../async/deadLetter');
 const { createEnvelopeV2, createTrustedObservability, V2_KEYS, validateEnvelope } = require('../async/envelope');
 const { createExecutionLineageProjection } = require('../async/executionLineageProjection');
@@ -153,11 +154,7 @@ async function createOpportunityReceiptWorkerInfrastructure({ env, telemetry, cr
     [organizationId, JOBS, now, owner])).rows;
     const projection = createExecutionLineageProjection({ transaction: work => transaction(central, work) });
     queue = await createPgBossQueueAdapter({ connectionString: env.F12_OPPORTUNITY_QUEUE_DATABASE_URL, queueMap,
-      inspectSchema: async () => {
-        const version = await queuePool.query('SELECT version FROM pgboss.version');
-        const names = await queuePool.query('SELECT name FROM pgboss.queue WHERE name=ANY($1::text[])', [Object.values(queueMap)]);
-        return { schemaVersion: version.rows[0]?.version, drift: names.rowCount !== JOBS.length };
-      },
+      inspectSchema: () => inspectPgBossSchema(queuePool, Object.values(queueMap)),
       lineagePort: { async load(id) {
         const lineage = await projection.load(id);
         if (lineage.organizationId !== organizationId) throw new Error('F12_WORKER_TENANT_MISMATCH');

@@ -4,6 +4,7 @@ const { createFundingWorker } = require('../fundingTenders/worker');
 const { createSource, LIMITS } = require('../fundingTenders/source');
 const { collectionPolicy, EXPANDED_APPROVAL, OFFICIAL_APPROVAL } = require('../fundingTenders/programmes');
 const { createPgBossQueueAdapter } = require('../async/adapters/pgBossQueueAdapter');
+const { inspectPgBossSchema } = require('../async/pgBossSchemaInspection');
 const { supportsCentralVersion } = require('../security/centralMigrationManifest');
 function fundingWorkerTarget(env) {
   if (env.FUNDING_TENDERS_RUNTIME !== 'central' || env.OPPORTUNITY_IMPORTS_RUNTIME === 'f12-xlsx') throw new Error('FUNDING_WORKER_REQUIRES_SEPARATE_PROCESS');
@@ -33,7 +34,7 @@ async function loadFundingTendersWorker({ env = process.env } = {}) {
       || collection.sources.length > 1 && !supportsCentralVersion(ready.currentVersion, '017_funding_programmes')
       || collection.sources.length > 3 && !supportsCentralVersion(ready.currentVersion, '018_official_programme_sources')) throw new Error('FUNDING_SCHEMA_REQUIRED');
     await require('../opportunities/preflight').opportunityPreflight(pool,'central');
-    queue = await createPgBossQueueAdapter({ connectionString: target.toString(), queueMap: { 'funding_tenders.refresh': 'funding-tenders-refresh' }, inspectSchema: async () => ({ schema: 'pgboss', schemaVersion: Number((await pool.query('SELECT version FROM pgboss.version')).rows[0].version) }) });
+    queue = await createPgBossQueueAdapter({ connectionString: target.toString(), queueMap: { 'funding_tenders.refresh': 'funding-tenders-refresh' }, inspectSchema: () => inspectPgBossSchema(pool, ['funding-tenders-refresh']) });
     const fundingSource = createSource({ enrichmentEnabled:coverage.enrichmentEnabled===true, canonicalV2Enabled:euWriterV2!==null, limits: { ...LIMITS, ...collection.limits }, fetchImpl: live ? globalThis.fetch : async () => new Response(JSON.stringify({ results: [
       { content: 'Oportunidade sintética Funding & Tenders', url: 'https://example.invalid/funding/synthetic', metadata: { identifier: ['SYNTHETIC-FT-LOCAL-1'], frameworkProgramme: ['43108390'], startDate: ['2026-01-01'], deadlineDate: ['2027-12-31'] } }
     ] })) });

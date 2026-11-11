@@ -3,6 +3,7 @@
 const path=require('node:path');
 const {Pool}=require('pg');
 const {guardPool,runtimePoolTimeouts}=require('./poolResilience');
+const {inspectPgBossSchema}=require('../async/pgBossSchemaInspection');
 const queueProfile=require('../security/documentQueueProfile');
 const {createTenantDirectoryReader}=require('../security/tenantDirectoryReader');
 const {createAuthorityCoordinator}=require('../security/authorityCoordinator');
@@ -73,8 +74,8 @@ async function createDocumentWorkerInfrastructure({env=process.env,telemetry=nul
    const [storageHealth,scannerHealth]=await Promise.all([storage.health(),scanner.health()]);if(storageHealth?.ready!==true||scannerHealth?.ready!==true)throw new Error('DOCUMENT_WORKER_DEPENDENCY_UNAVAILABLE');
    ports.set(credential.organizationId,Object.freeze({repository,storage,scanService:createScanService({scanner,repository,storage,audit:postgres.audit,telemetryPort:telemetry}),audit:postgres.audit,reconciliation:postgres.reconciliation}));
   }
-  const version=Number((await centralPool.query('SELECT version FROM pgboss.version')).rows[0]?.version),names=(await centralPool.query('SELECT name FROM pgboss.queue WHERE name=ANY($1::text[])',[Object.values(QUEUES)])).rows.map(row=>row.name);if(names.length!==JOBS.length)throw new Error('DOCUMENT_WORKER_QUEUE_REQUIRED');
-  queue=await createPgBossQueueAdapter({connectionString:config.centralDatabaseUrl,options:queueProfile.options,queueMap:QUEUES,inspectSchema:async()=>({schema:'pgboss',schemaVersion:version})});
+  const inspection=await inspectPgBossSchema(centralPool,Object.values(QUEUES));if(inspection.missingQueues.length)throw new Error('DOCUMENT_WORKER_QUEUE_REQUIRED');
+  queue=await createPgBossQueueAdapter({connectionString:config.centralDatabaseUrl,options:queueProfile.options,queueMap:QUEUES,inspectSchema:async()=>inspection});
   const transactionResolver=Object.freeze({async resolve(organizationId,envelope){const pool=pools.get(organizationId),actor=SERVICE_ACTORS[envelope?.jobType];if(!pool||envelope?.organizationId!==organizationId||envelope?.actor?.kind!=='SERVICE'||!actor||envelope.actor.serviceActorCode!==actor.code||envelope.operation!==actor.operation||envelope.payload?.organizationId!==organizationId)throw Object.assign(new Error('AUTHORIZATION_REVOKED'),{code:'AUTHORIZATION_REVOKED'});return work=>transaction(pool,'c4g_document_worker_runtime',organizationId,work);}});
   const outbox=new OutboxRepository(),relays=[...pools.entries()].map(([organizationId,pool])=>new OutboxRelay({repository:outbox,queue,transaction:work=>transaction(pool,'c4g_document_worker_runtime',organizationId,work),workerId:`document-relay-${organizationId}`,telemetryPort:telemetry}));
   return Object.freeze({queue,inbox:new InboxRepository(),transactionResolver,relay:Object.freeze({async poll(){const result=[];for(const relay of relays)result.push(...await relay.poll());return Object.freeze(result);}}),portsForOrganization(organizationId){const value=ports.get(organizationId);if(!value)throw Object.assign(new Error('AUTHORIZATION_REVOKED'),{code:'AUTHORIZATION_REVOKED'});return value;},retryPortFactory:registry=>createPersistentRetryPort({outboxRepository:outbox,registry,observabilityFactory:()=>createTrustedObservability({traceparent:null,tracestate:null})}),continuous:true,pollIntervalMs:config.pollIntervalMs,batchSize:config.batchSize,graceMs:config.graceMs,forcedCancelMs:config.forcedCancelMs,leaseMs:config.leaseMs,errorObserver:error=>process.stderr.write(`${error?.code||'DOCUMENT_WORKER_FAILURE'}\n`),readiness:()=>Object.freeze({ready:true,schemaVersion:SCHEMA_VERSION,organizations:ports.size,queueTypes:Object.freeze([...JOBS])}),close});
