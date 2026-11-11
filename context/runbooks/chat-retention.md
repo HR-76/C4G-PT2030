@@ -21,21 +21,31 @@ powershell -NoProfile -File backend/scripts/localPlatform/scheduleChatRetention.
 
 A tarefa chama-se «C4G chat retention», acrescenta ao registo `.tmp/local-platform/logs/chat-retention.log` e usa a hora do Windows: manter o PC no fuso de Lisboa. `StartWhenAvailable` corre a tarefa em atraso se o PC estava desligado às 03:00; não corre em paralelo consigo própria.
 
-## VPS (produção) — por implementar
+## VPS (produção)
 
-Exige, antes de ativar:
+Executor: `backend/src/chatRetention.js` (`npm --prefix backend run retention:chat`), com a infraestrutura em `backend/src/config/chatRetentionInfrastructure.js`. Mesmo modelo de confiança do worker de documentos:
 
-1. Um adaptador de produção para `listTenants`/`openTenant` (organizações e credenciais de tenant a partir do diretório Central) que ainda não existe.
-2. Um login de base de dados por tenant, só com o papel `c4g_chat_retention_runtime` (a função não está acessível a mais ninguém), provisionado como os restantes logins de serviço. Não reutilizar o login do worker de importações.
-3. A migração 040 aplicada em cada tenant, com cópia de segurança e autorização.
+- **Organizações e credenciais:** lista explícita em `CHAT_RETENTION_CREDENTIALS_JSON` (um objeto por organização, `workload: 'WORKER'`, com `organizationId`, `tenantId`, `connectionVersion`, `credentialRef`, `databaseGenerationId`, `host`, `port`, `database`, `login`, `password`, `ssl`; máximo 100). Guardar no gestor de segredos, nunca no Git.
+- **Identidade:** é o login WORKER que o diretório Central já tem registado para o tenant; não há login novo nem workload novo. O executor confirma o binding com a Central (`AUTHORITY_DATABASE_URL`, `AUTHORITY_COMMIT_PERMIT_SECRET`), que o login é limitado (sem herança, superutilizador, `BYPASSRLS`, etc.), que a cadeia de papéis é exatamente a esperada e que o esquema está na 040 com a capacidade `APPLICATION_CHAT_RETENTION`. Qualquer falha conta como falha dessa organização e não corre nada nela.
+- **Opcionais:** `CHAT_RETENTION_DAYS` (por omissão e mínimo 90), `CHAT_RETENTION_BATCH_SIZE` (50, máx. 500), `CHAT_RETENTION_MAX_BATCHES` (200).
 
-Modelo do timer (a ajustar ao comando de produção):
+### Provisionamento (uma vez por tenant, como administrador, depois de aplicar a 040)
+
+```sql
+GRANT c4g_chat_retention_runtime TO c4g_tenant_worker_capabilities WITH SET TRUE, INHERIT FALSE, ADMIN FALSE;
+```
+
+Contrapartida aceite (decisão de 11/11/2026): o agregador é partilhado, por isso **todos os logins WORKER desse tenant** (documentos, importações, receitas, retenção) passam a poder executar a função de eliminação através de `SET ROLE`. Está limitada a candidaturas fechadas há 90 ou mais dias, só apaga o chat e nunca texto de outros dados. Os restantes workers toleram a presença deste papel (`validateLocalTenantRoleChain`) sem o exigirem. Para retirar: `REVOKE c4g_chat_retention_runtime FROM c4g_tenant_worker_capabilities;`.
+
+### Timer (systemd)
 
 ```ini
 # /etc/systemd/system/c4g-chat-retention.service
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/node /opt/c4g/backend/scripts/chatRetentionRun.js
+WorkingDirectory=/opt/c4g/backend
+EnvironmentFile=/etc/c4g/chat-retention.env
+ExecStart=/usr/bin/node src/chatRetention.js
 User=c4g
 # /etc/systemd/system/c4g-chat-retention.timer
 [Timer]
@@ -44,6 +54,12 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 ```
+
+`/etc/c4g/chat-retention.env` (permissões 600) contém as variáveis acima. Ativar com `systemctl enable --now c4g-chat-retention.timer`.
+
+### Ainda não validado
+
+Não há VPS nem diretório Central de produção neste ambiente: a infraestrutura foi testada com portas simuladas (binding, login limitado, esquema, recusas) e a identidade com um login real num PostgreSQL 17 descartável (cadeia de papéis validada pela função existente e eliminação por `SET ROLE`). Falta correr contra o diretório Central real e um tenant real, com autorização própria.
 
 ## Verificar e operar
 

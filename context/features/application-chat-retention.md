@@ -32,7 +32,7 @@ Motivo: o chat é uma conversa por candidatura, com mensagens imutáveis e sem r
 
 ## Validação em PostgreSQL 17 descartável (11/11/2026)
 
-`test/integration/chat-retention/proof.js`: contentor próprio em `127.0.0.1`, removido no fim; **22 verificações PASS**, sem bases habituais, R2 ou fornecedores. O runner oficial aplica a 040 (fingerprint e ledger conferem; repetir é no-op); fechada há 91 dias e há exatamente 90 dias são eliminadas; fechada há 30 dias, ativa e reaberta ficam intactas; recibos saem com as mensagens; outra organização intacta; registo sem texto e imutável; o runtime da aplicação não faz `DELETE` nem executa a função; outros papéis não executam; menos de 90 dias e lotes fora de limites recusados; repetir não tem efeito; `DELETE` direto fora da função continua recusado; uma candidatura fechada de novo recomeça os 90 dias.
+`test/integration/chat-retention/proof.js`: contentor próprio em `127.0.0.1`, removido no fim; **27 verificações PASS**, sem bases habituais, R2 ou fornecedores. O runner oficial aplica a 040 (fingerprint e ledger conferem; repetir é no-op); fechada há 91 dias e há exatamente 90 dias são eliminadas; fechada há 30 dias, ativa e reaberta ficam intactas; recibos saem com as mensagens; outra organização intacta; registo sem texto e imutável; o runtime da aplicação não faz `DELETE` nem executa a função; outros papéis não executam; menos de 90 dias e lotes fora de limites recusados; repetir não tem efeito; `DELETE` direto fora da função continua recusado; uma candidatura fechada de novo recomeça os 90 dias.
 
 ## Aviso «conversa eliminada» (11/11/2026)
 
@@ -44,8 +44,14 @@ Executor: comando de uma só execução, diário às 03:00 de Lisboa, lançado p
 
 Implementado: `chatRetentionRunner.js` (lotes, isolamento por organização, só contagens nos registos), adaptador local `scripts/localPlatform/chatRetentionRun.js` (`--check` não elimina) e registo da tarefa `scheduleChatRetention.ps1`. Operação: [runbook](../runbooks/chat-retention.md).
 
+## Identidade de produção (decidida a 11/11/2026)
+
+O executor usa o login WORKER já registado no diretório Central para o tenant, com o papel `c4g_chat_retention_runtime` acrescentado ao agregador `c4g_tenant_worker_capabilities`. Alternativa descartada: novo workload `MAINTENANCE` (menor privilégio, mas exige migração na Central, cuja restrição só admite `API` e `WORKER`, e alterações no diretório e no provisionamento). Contrapartida aceite: todos os logins WORKER do tenant passam a poder executar a função de eliminação (limitada a candidaturas fechadas há 90+ dias). `validateLocalTenantRoleChain` tolera agora o papel de retenção em qualquer login WORKER sem o exigir (`TOLERATED_WORKER_ROLES`) e aceita papéis opcionais (`optionalFunctionalRoles`); o executor exige o papel de retenção e tolera os papéis dos outros workers.
+
+Implementado: `chatRetentionInfrastructure.js` (configuração explícita, binding com a Central, login limitado, cadeia de papéis, esquema 040) e `chatRetention.js` (entrypoint, código de saída 0/1). Testes: `chatRetentionInfrastructure.test.js` e `localTenantRoleChainRetention.test.js`. Prova em PostgreSQL 17 descartável (27 verificações no total): a função existente valida a cadeia de um login real com o papel no agregador, o login não lê nem apaga chat diretamente e o serviço elimina por `SET ROLE`; sem o papel no agregador a cadeia é recusada.
+
 ## Pendentes
 
 - **Tarefa do Windows por registar** e **primeira execução por fazer**: dependem de autorização expressa. A primeira execução cria um registo permanente em `application_chat_purge` para cada candidatura final com mais de 90 dias.
-- **Produção (VPS):** falta o adaptador de organizações e credenciais, o login por tenant só com o papel de retenção e aplicar a 040 em cada tenant. Ver o runbook.
+- **Produção (VPS):** executor `src/chatRetention.js` implementado (11/11/2026), ver «Identidade de produção». Falta aplicar a 040 em cada tenant, o `GRANT` ao agregador e a execução contra um diretório Central e tenant reais (com autorização própria).
 - A estimativa de custo (≈2,5 KB por mensagem) é uma estimativa; a base local tinha 0 mensagens.

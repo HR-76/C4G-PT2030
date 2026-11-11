@@ -18,6 +18,7 @@
     "benchmark:f10": "node scripts/benchmarkF10Observability.js",
     "worker": "node src/worker.js",
     "worker:documents": "node src/documentWorker.js",
+    "retention:chat": "node src/chatRetention.js",
     "worker:local": "node scripts/localPlatform/worker.js",
     "retention:chat:local": "node scripts/localPlatform/chatRetentionRun.js",
     "retention:chat:local:schedule": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/localPlatform/scheduleChatRetention.ps1",

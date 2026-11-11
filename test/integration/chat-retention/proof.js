@@ -8,6 +8,9 @@ const root = path.resolve(__dirname, '../../../backend');
 const { Pool } = require(path.join(root, 'node_modules/pg'));
 const { chatRetentionManifest: manifest } = require(path.join(root, 'src/security/tenantMigrationManifest'));
 const { createTenantMigrationRunner } = require(path.join(root, 'src/security/tenantMigrationRunner'));
+const { validateLocalTenantRoleChain } = require(path.join(root, 'src/security/localTenantIdentityProvisioner'));
+const { createChatRetentionService } = require(path.join(root, 'src/applications/chatRetention'));
+const { OTHER_WORKER_ROLES } = require(path.join(root, 'src/config/chatRetentionInfrastructure'));
 
 function target() {
   if (process.env.CHATRET_PROOF !== 'C4G_CHAT_RETENTION_LOCAL_V1') throw new Error('Disposable chat retention proof is required.');
@@ -51,7 +54,7 @@ async function main() {
 
     // --- synthetic data: one organization, applications in several states --------------------------------------
     const org = uuid(), other = uuid();
-    const g = await pool.connect();
+    let g = await pool.connect();
     await g.query("SET session_replication_role = 'replica'"); // synthetic rows without the whole catalogue graph
     const day = n => `now() - interval '${n} days'`;
     async function application(status, closedDaysAgo, messages, orgId = org) {
@@ -132,6 +135,43 @@ async function main() {
       assert.equal((await c.query('SELECT 1 FROM opportunity_catalog.application_chat_purge WHERE application_id=$1', [archived91.id])).rowCount, 0);
     }, other); ok('another organization cannot see the purge record (RLS); a missing table reports absent without error');
     await as('c4g_opportunity_tenant_runtime', async c => { await assert.rejects(c.query("INSERT INTO opportunity_catalog.application_chat_purge(organization_id,application_id,terminal_status,terminal_at,message_count,retention_days) VALUES($1,$2,'ARCHIVED',now(),0,90)", [org, active.id]), /permission denied/); }); ok('runtime cannot write the purge log');
+
+    // --- production identity: the tenant's WORKER login reaches the purge only through the aggregator ----------------
+    g = await pool.connect();
+    await g.query("SET session_replication_role = 'replica'");
+    const late = await application('CANCELLED', 100, 2);
+    await g.query('RESET session_replication_role'); g.release();
+    const loginPassword = crypto.randomBytes(16).toString('hex');
+    await admin.query(`DO $$ BEGIN IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='c4g_tenant_worker_capabilities') THEN CREATE ROLE c4g_tenant_worker_capabilities NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS; END IF; END $$`);
+    await admin.query(`CREATE ROLE chat_ret_login LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD '${loginPassword}'`);
+    await admin.query('GRANT c4g_tenant_worker_capabilities TO chat_ret_login WITH SET TRUE, INHERIT FALSE, ADMIN FALSE');
+    await admin.query('GRANT c4g_chat_retention_runtime TO c4g_tenant_worker_capabilities WITH SET TRUE, INHERIT FALSE, ADMIN FALSE');
+    await admin.query(`GRANT CONNECT ON DATABASE ${name} TO chat_ret_login`);
+    const loginUrl = new URL(withDb(source, name)); loginUrl.username = 'chat_ret_login'; loginUrl.password = loginPassword;
+    const loginPool = new Pool({ connectionString: loginUrl.toString(), max: 2 });
+    try {
+      const c = await loginPool.connect();
+      try {
+        await c.query('BEGIN TRANSACTION READ ONLY');
+        await validateLocalTenantRoleChain(c, { login: 'chat_ret_login', workload: 'WORKER', functionalRoles: ['c4g_chat_retention_runtime'], optionalFunctionalRoles: [...OTHER_WORKER_ROLES] });
+        await c.query('COMMIT');
+      } finally { c.release(); }
+      ok('real catalog: the WORKER login chain validates with the retention role required');
+      await assert.rejects(loginPool.query('SELECT 1 FROM opportunity_catalog.application_chat_message'), /permission denied/); ok('the WORKER login cannot read chat directly');
+      await assert.rejects(loginPool.query('DELETE FROM opportunity_catalog.application_chat_message'), /permission denied/); ok('the WORKER login cannot delete chat directly');
+      const result = await createChatRetentionService({ pool: loginPool, organizationId: org }).runOnce();
+      assert.deepEqual([result.applications, result.messages, result.more], [1, 2, false]);
+      assert.equal(await count('application_chat_message', late.id), 0); ok('the service run as the WORKER login purges through SET ROLE and nothing else');
+      assert.equal(await count('application_chat_message', cancelled30.id), 2); assert.equal(await count('application_chat_message', active.id), 2);
+      const negative = await pool.connect();
+      try {
+        await negative.query('BEGIN');
+        await negative.query('REVOKE c4g_chat_retention_runtime FROM c4g_tenant_worker_capabilities');
+        await assert.rejects(validateLocalTenantRoleChain(negative, { login: 'chat_ret_login', workload: 'WORKER', functionalRoles: ['c4g_chat_retention_runtime'], optionalFunctionalRoles: [...OTHER_WORKER_ROLES] }), /ROLE_CHAIN_INVALID/);
+        await negative.query('ROLLBACK');
+      } finally { negative.release(); }
+      ok('without the retention role on the aggregator the executor chain is refused');
+    } finally { await loginPool.end(); }
 
     const result = checks.every(c => c.result === 'PASS') ? 'PASS' : 'FAIL';
     console.log(JSON.stringify({ result, checks }, null, 1));
