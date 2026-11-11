@@ -19,6 +19,8 @@
 /context/references/opportunity-v2/pt2030-expected-177.json -text whitespace=cr-at-eol
 /context/references/opportunity-v2/validation.json -text whitespace=cr-at-eol
 /backend/src/opportunities/v2/opportunity-v2.schema.json -text whitespace=cr-at-eol
+/test/integration/dashboard-report-authority/fixtures/composition-before.cjs -text whitespace=cr-at-eol
+/test/integration/dashboard-report-authority/fixtures/composition-shared-before.cjs -text whitespace=cr-at-eol
 /test/integration/page-performance/before/*.txt -text whitespace=cr-at-eol
 /test/integration/page-performance/before/contracts.js.txt whitespace=cr-at-eol,-blank-at-eol
 /test/integration/page-performance/before/requestConcurrency.js.txt text eol=lf

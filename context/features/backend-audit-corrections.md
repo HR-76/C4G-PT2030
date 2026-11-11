@@ -27,3 +27,4 @@
 - Após a correção do arranque local, os 31 testes focados passaram. A suite backend teve 2943 aprovados, 9 ignorados e zero falhas. Os 959 testes frontend e o build passaram.
 - O run remoto anterior falhou em `OpportunityFirstAnalysis.test.jsx` por falta de `ajv/dist/2020`. A suite carrega o modelo de leitura do backend. O job frontend instala agora as dependências de runtime do backend a partir do respetivo lockfile.
 - O primeiro run com a suite backend completa identificou cinco falhas de igualdade de bytes. Os atributos Git preservam os snapshots do manifesto histórico do Dashboard e mantêm idênticas as duas cópias do esquema de oportunidades.
+- O segundo run identificou a fixture de autoridade do relatório que ainda dependia da conversão de fins de linha do Windows. As duas variantes históricas preservam agora os bytes definidos nos checksums.
