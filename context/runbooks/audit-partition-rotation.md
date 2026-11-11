@@ -1,10 +1,20 @@
 # Runbook: rotação das partições de auditoria
 
-Contrato: [audit-partition-rotation](../features/audit-partition-rotation.md). Executar uma vez por mês, ou no deploy, **em cada base**: a Central e cada tenant. Primeiro prazo: antes de 2026-12-01.
+Contrato: [audit-partition-rotation](../features/audit-partition-rotation.md). A rotação é automática para tenants novos, para a Central (`db:central:up`) e para o instalador local; o comando manual abaixo serve só para as bases já existentes. Prazo para essas: antes de 2026-12-01.
 
-## Não é automático
+## Automático (decisão de 2026-11-11)
 
-Nada na plataforma corre esta rotina sozinho: os runners de migrações só atuam no provisionamento de um tenant ou quando invocados, e os tenants criados depois de dezembro também nascem só com `2026_10` e `2026_11`. Decisão do utilizador em 2026-11-11: manter manual, com lembrete operacional mensal. Alternativas avaliadas e não adotadas: partições a 5 anos com chamada no provisionamento e na Central; job mensal em pg-boss (exige credenciais de migrator em todas as bases).
+Já não depende de ninguém: cada base recebe cinco anos de partições mensais (60 meses à frente) sem passo manual.
+
+- **Tenant novo:** o provisionamento cria as partições logo a seguir às migrações do tenant (`postgresProvisioner`).
+- **Central:** `npm run db:central:up` cria-as depois das migrações. É idempotente, por isso correr o `up` sem migrações pendentes também as garante.
+- **Instalação local:** `schema.js` cria-as na Central e no tenant.
+
+### Passo único para o que já existe
+
+As bases criadas antes desta alteração só recebem as partições na próxima vez que passarem por um dos pontos acima. Para **cada tenant já existente**, e para a Central se o `db:central:up` não for correr antes de 2026-12-01, corra uma vez o comando abaixo (secção «Executar»), com `AUDIT_PARTITION_MONTHS_AHEAD=60`. Depois disso nada mais é preciso até 2031.
+
+Passados cinco anos, repita este passo uma vez por base (ou volte a correr `db:central:up` e reprovisione o que for novo).
 
 ## Antes
 

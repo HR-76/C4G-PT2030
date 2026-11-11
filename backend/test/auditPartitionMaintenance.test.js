@@ -2,7 +2,10 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { planAuditPartitions, ensureAuditPartitions, defaultPartitionRows } = require('../src/audit/partitionMaintenance');
+const fs = require('node:fs');
+const path = require('node:path');
+const { planAuditPartitions, ensureAuditPartitions, ensureAuditPartitionsWithPool, defaultPartitionRows,
+  PROVISIONING_MONTHS_AHEAD, MAX_MONTHS_AHEAD } = require('../src/audit/partitionMaintenance');
 
 // audit.event is partitioned by month and the baseline creates only 2026_10, 2026_11 and DEFAULT.
 // Rotation is plain DDL run by the audit migrator, so no schema fingerprint changes.
@@ -29,7 +32,7 @@ test('plan covers the current month plus the horizon with UTC bounds and zero-pa
 });
 
 test('plan refuses a missing, fractional or out-of-range horizon and an invalid date', () => {
-  for (const bad of [0, -1, 25, 1.5, NaN, '3', undefined, null]) {
+  for (const bad of [0, -1, 61, 100, 1.5, NaN, '3', undefined, null]) {
     assert.throws(() => planAuditPartitions(now, bad), /AUDIT_PARTITION_HORIZON_INVALID/, String(bad));
   }
   assert.throws(() => planAuditPartitions(new Date('nope'), 3), /AUDIT_PARTITION_DATE_INVALID/);
@@ -81,4 +84,55 @@ test('ensure rolls back on any DDL failure and rethrows the original error', asy
 test('default partition alarm reports the row count', async () => {
   assert.equal(await defaultPartitionRows(fakeClient({ defaultRows: 7 })), 7);
   assert.equal(await defaultPartitionRows(fakeClient({ defaultRows: 0 })), 0);
+});
+
+test('the provisioning horizon is five years and is the maximum the planner accepts', () => {
+  assert.equal(PROVISIONING_MONTHS_AHEAD, 60);
+  assert.equal(MAX_MONTHS_AHEAD, 60);
+  const plan = planAuditPartitions(now, PROVISIONING_MONTHS_AHEAD);
+  assert.equal(plan.length, 61);
+  assert.equal(plan.at(-1).name, 'event_2031_11');
+  assert.equal(new Set(plan.map(p => p.name)).size, 61);
+});
+
+function fakePool({ failAt = null } = {}) {
+  const released = [];
+  const client = fakeClient();
+  const original = client.query;
+  client.query = async (sql, params) => {
+    if (failAt && sql.includes(failAt)) throw new Error('boom');
+    return original(sql, params);
+  };
+  client.release = error => released.push(error ?? null);
+  return { pool: { connect: async () => client }, released, client };
+}
+
+test('the pool helper creates the five-year horizon on one checked-out connection and releases it', async () => {
+  const { pool, released, client } = fakePool();
+  const result = await ensureAuditPartitionsWithPool(pool, { now });
+  assert.equal(result.created.length, 61);
+  assert.equal(client.calls.filter(c => /^CREATE TABLE/.test(c[0])).length, 61);
+  assert.deepEqual(released, [null]);
+});
+
+test('the pool helper destroys the connection when the operation fails', async () => {
+  const { pool, released } = fakePool({ failAt: 'CREATE TABLE' });
+  await assert.rejects(() => ensureAuditPartitionsWithPool(pool, { now }), /boom/);
+  assert.equal(released.length, 1);
+  assert.ok(released[0] instanceof Error);
+});
+
+// Automation: nothing should depend on someone remembering to run the script.
+const read = file => fs.readFileSync(path.resolve(__dirname, file), 'utf8');
+test('new tenants, the Central migration entry point and the local installer create the partitions themselves', () => {
+  const provisioner = read('../src/platformOnboarding/postgresProvisioner.js');
+  assert.match(provisioner, /ensureAuditPartitionsWithPool\(pool/);
+  assert.ok(provisioner.indexOf('runner.migrate(') < provisioner.indexOf('ensureAuditPartitionsWithPool('), 'after the tenant migrations');
+  assert.ok(provisioner.indexOf('ensureAuditPartitionsWithPool(') < provisioner.indexOf('preflightTenant(pool'), 'before the final preflight');
+  const central = read('../scripts/runCentralMigrations.js');
+  assert.match(central, /ensureAuditPartitionsWithPool\(pool\)/);
+  assert.ok(central.indexOf('await applyCentralMigrations(pool)') < central.indexOf('ensureAuditPartitionsWithPool(pool)'));
+  const installer = read('../scripts/localPlatform/schema.js');
+  assert.match(installer, /ensureAuditPartitionsWithPool\(central\)/);
+  assert.match(installer, /ensureAuditPartitionsWithPool\(tenant\)/);
 });

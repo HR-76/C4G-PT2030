@@ -4,7 +4,9 @@
 // audit migrator. Plain DDL on purpose: no new schema objects, and rotated partitions are
 // ignored by the schema fingerprints (see security/auditPartitionPolicy.js).
 const MIN_MONTHS_AHEAD = 1;
-const MAX_MONTHS_AHEAD = 24;
+const MAX_MONTHS_AHEAD = 60;
+// Five years: what provisioning and the migration entry points create, so nobody has to rotate by hand.
+const PROVISIONING_MONTHS_AHEAD = 60;
 const pad = value => String(value).padStart(2, '0');
 
 function failure(code, message = code) {
@@ -68,6 +70,21 @@ async function ensureAuditPartitions(client, { now = new Date(), monthsAhead = 3
   return Object.freeze({ created: Object.freeze(created), defaultRows });
 }
 
+// Convenience for callers that own a pool: one checked-out connection, destroyed if anything fails.
+async function ensureAuditPartitionsWithPool(pool, options = {}) {
+  const client = await pool.connect();
+  let failure;
+  try {
+    return await ensureAuditPartitions(client, { monthsAhead: PROVISIONING_MONTHS_AHEAD, ...options });
+  } catch (error) {
+    failure = error;
+    throw error;
+  } finally {
+    client.release(failure);
+  }
+}
+
 module.exports = Object.freeze({
-  MIN_MONTHS_AHEAD, MAX_MONTHS_AHEAD, planAuditPartitions, ensureAuditPartitions, defaultPartitionRows
+  MIN_MONTHS_AHEAD, MAX_MONTHS_AHEAD, PROVISIONING_MONTHS_AHEAD, planAuditPartitions, ensureAuditPartitions,
+  ensureAuditPartitionsWithPool, defaultPartitionRows
 });

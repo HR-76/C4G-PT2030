@@ -21,7 +21,23 @@ async function createPgBossQueueAdapter({ connectionString, options, queueMap, i
   const call=async fn=>{try{return await fn();}catch(e){throw sanitized(e);}};
   return assertQueuePort({
     publish:({type,envelope,envelopeDigest})=>{const validated=validateEnvelope(envelope,{supports:()=>true});if(validated.envelope.jobType!==type)throw new TypeError('Queue type conflicts with validated envelope.');if(typeof envelopeDigest!=='string'||!/^[a-f0-9]{64}$/.test(envelopeDigest)||!crypto.timingSafeEqual(Buffer.from(envelopeDigest,'hex'),Buffer.from(validated.envelopeDigest,'hex')))throw new TypeError('Queue envelope digest is invalid.');return call(()=>boss.send(nameFor(type),validated.envelope,{retryLimit:0}));},
-    claim:({type,batchSize=10})=>call(async()=>{const rows=await boss.fetch(nameFor(type),{batchSize:Math.min(10,batchSize),includeMetadata:true});return Promise.all((rows||[]).map(async row=>normalizeClaimedJob(row,type,lineagePort?await lineagePort.load(row.data?.executionId):null)));}),
+    // fetch() leaves every row `active` and C4G runs pg-boss without a supervisor, so nothing reclaims an
+    // abandoned delivery. A deterministic validation failure (TypeError) therefore poisons only its own
+    // delivery; any other failure, such as a lineage database error, still rejects the claim.
+    claim:({type,batchSize=10})=>call(async()=>{
+      const queueName=nameFor(type);
+      const rows=await boss.fetch(queueName,{batchSize:Math.min(10,batchSize),includeMetadata:true});
+      const outcomes=await Promise.all((rows||[]).map(async row=>{
+        try{normalizeClaimedJob(row,type,null);}catch(error){if(error instanceof TypeError)return {poison:row};throw error;}
+        const lineage=lineagePort?await lineagePort.load(row.data?.executionId):null;
+        try{return {job:normalizeClaimedJob(row,type,lineage)};}catch(error){if(error instanceof TypeError)return {poison:row};throw error;}
+      }));
+      for(const {poison} of outcomes){
+        if(!poison||typeof poison.id!=='string'||poison.id.length<1)continue;
+        try{await boss.fail(queueName,poison.id,{code:'POISON_MESSAGE'});}catch{/* best effort: the valid deliveries must still be returned */}
+      }
+      return outcomes.filter(outcome=>outcome.job).map(outcome=>outcome.job);
+    }),
     heartbeat:({type,id})=>call(()=>boss.touch(nameFor(type),id)),
     complete:({type,id,result})=>call(()=>boss.complete(nameFor(type),id,result)),
     fail:({type,id,result})=>call(()=>boss.fail(nameFor(type),id,result)),

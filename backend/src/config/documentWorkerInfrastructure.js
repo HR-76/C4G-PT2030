@@ -2,7 +2,7 @@
 
 const path=require('node:path');
 const {Pool}=require('pg');
-const {guardPool}=require('./poolResilience');
+const {guardPool,runtimePoolTimeouts}=require('./poolResilience');
 const queueProfile=require('../security/documentQueueProfile');
 const {createTenantDirectoryReader}=require('../security/tenantDirectoryReader');
 const {createAuthorityCoordinator}=require('../security/authorityCoordinator');
@@ -32,7 +32,8 @@ const QUEUES=Object.freeze({'document.scan':'c4g.document.scan','document.reconc
 function json(env,name){try{return JSON.parse(env[name]);}catch{throw new TypeError(`${name} is invalid.`);}}
 function positive(env,name,fallback,min,max){if(env[name]===undefined)return fallback;const value=Number(env[name]);if(!Number.isSafeInteger(value)||value<min||value>max)throw new TypeError(`${name} is invalid.`);return value;}
 function credentials(env){const values=json(env,'DOCUMENT_WORKER_CREDENTIALS_JSON');if(!Array.isArray(values)||!values.length||values.some(value=>!value||value.workload!=='WORKER'||typeof value.organizationId!=='string'||typeof value.tenantId!=='string'||!Number.isSafeInteger(value.connectionVersion)||typeof value.credentialRef!=='string'||typeof value.databaseGenerationId!=='string'||typeof value.host!=='string'||!Number.isSafeInteger(value.port)||typeof value.database!=='string'||typeof value.login!=='string'||typeof value.password!=='string'||typeof value.ssl!=='boolean'))throw new TypeError('Document worker credential configuration is invalid.');const organizations=new Set(),tuples=new Set();return Object.freeze(values.map(value=>{const tuple=`${value.tenantId}:${value.connectionVersion}:${value.credentialRef}`;if(organizations.has(value.organizationId)||tuples.has(tuple))throw new TypeError('Document worker credential configuration is duplicated.');organizations.add(value.organizationId);tuples.add(tuple);return Object.freeze({...value});}));}
-function poolOptions(value){return{host:value.host,port:value.port,database:value.database,user:value.login,password:value.password,ssl:value.ssl?{rejectUnauthorized:true}:false,max:5,connectionTimeoutMillis:5000,idleTimeoutMillis:30000};}
+// Same server-side backstops as the Central and Authority pools (statement and idle-in-transaction timeouts).
+function tenantPoolOptions(value,env){return{host:value.host,port:value.port,database:value.database,user:value.login,password:value.password,ssl:value.ssl?{rejectUnauthorized:true}:false,max:5,connectionTimeoutMillis:5000,idleTimeoutMillis:30000,...runtimePoolTimeouts(env,'DOCUMENT_WORKER_DB')};}
 function closed(value,keys){return value&&Object.getPrototypeOf(value)===Object.prototype&&Reflect.ownKeys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key));}
 
 function loadDocumentWorkerConfiguration(env=process.env){
@@ -66,7 +67,7 @@ async function createDocumentWorkerInfrastructure({env=process.env,telemetry=nul
   for(const credential of config.credentials){
    const snapshot=await directory.resolveSnapshotByOrganization(credential.organizationId,'WORKER');
    if(!snapshot||snapshot.tenantId!==credential.tenantId||snapshot.connectionVersion!==credential.connectionVersion||snapshot.credentialRef!==credential.credentialRef||snapshot.databaseGenerationId!==credential.databaseGenerationId||snapshot.bindingDigest!==bindingDigest(credential))throw new Error('DOCUMENT_WORKER_TENANT_BINDING_REQUIRED');
-   const pool=guardPool(new Pool(poolOptions(credential)),'document-worker-tenant');pools.set(credential.organizationId,pool);const client=await pool.connect();
+   const pool=guardPool(new Pool(tenantPoolOptions(credential,env)),'document-worker-tenant');pools.set(credential.organizationId,pool);const client=await pool.connect();
    try{await client.query('BEGIN TRANSACTION READ ONLY');const login=(await client.query('SELECT session_user,current_user,r.rolcanlogin,r.rolinherit,r.rolsuper,r.rolbypassrls,r.rolcreatedb,r.rolcreaterole,r.rolreplication FROM pg_roles r WHERE r.rolname=session_user')).rows[0];if(!login||login.current_user!==login.session_user||!login.rolcanlogin||login.rolinherit||login.rolsuper||login.rolbypassrls||login.rolcreatedb||login.rolcreaterole||login.rolreplication)throw new Error('DOCUMENT_WORKER_LIMITED_LOGIN_REQUIRED');await validateLocalTenantRoleChain(client,{login:login.session_user,workload:'WORKER',functionalRoles:['c4g_document_worker_runtime','c4g_document_runtime','c4g_f4_metadata_executor']});const observed=await observeTenantRuntimeMetadata(client,{tenantId:credential.tenantId,databaseGenerationId:credential.databaseGenerationId});if(!SCHEMA_VERSIONS.includes(observed.currentVersion)||REQUIRED.some(capability=>!observed.capabilities.includes(capability)))throw new Error('DOCUMENT_WORKER_SCHEMA_INCOMPATIBLE');await client.query('COMMIT');}catch(error){await client.query('ROLLBACK').catch(()=>{});throw error;}finally{client.release();}
    const repository=createDocumentRepository(pool),storage=await storageProvider.create({organizationId:credential.organizationId,tenantId:credential.tenantId,pool}),scanner=createClamavScanner({organizationId:credential.organizationId,storage,host:config.documents.scanner.host,port:config.documents.scanner.port}),postgres=createPostgresDocumentWorkerPorts({pool,organizationId:credential.organizationId,tenantId:credential.tenantId,telemetry});
    const [storageHealth,scannerHealth]=await Promise.all([storage.health(),scanner.health()]);if(storageHealth?.ready!==true||scannerHealth?.ready!==true)throw new Error('DOCUMENT_WORKER_DEPENDENCY_UNAVAILABLE');
@@ -80,4 +81,4 @@ async function createDocumentWorkerInfrastructure({env=process.env,telemetry=nul
  }catch(error){if(queue)await queue.shutdown().catch(()=>{});await close().catch(()=>{});throw error;}
 }
 
-module.exports={QUEUES,REQUIRED,SCHEMA_VERSION,SCHEMA_VERSIONS,createDocumentWorkerInfrastructure,loadDocumentWorkerConfiguration,createInfrastructureClose};
+module.exports={QUEUES,REQUIRED,SCHEMA_VERSION,SCHEMA_VERSIONS,tenantPoolOptions,createDocumentWorkerInfrastructure,loadDocumentWorkerConfiguration,createInfrastructureClose};

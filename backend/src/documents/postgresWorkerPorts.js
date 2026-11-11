@@ -8,7 +8,7 @@ const {createUuidV7}=require('../audit/uuidV7');
 const {createDocumentAuditPort}=require('./audit');
 
 function identifier(value){if(!/^[a-z][a-z0-9_]{0,62}$/.test(value||''))throw new TypeError('Document worker role is invalid.');return `"${value}"`;}
-function transaction(pool,role,organizationId,work){return(async()=>{const client=await pool.connect();let began=false;try{await client.query('BEGIN');began=true;await client.query(`SET LOCAL ROLE ${identifier(role)}`);await client.query("SELECT set_config('app.organization_id',$1,true)",[organizationId]);const value=await work(client);await client.query('COMMIT');began=false;return value;}catch(error){if(began)await client.query('ROLLBACK').catch(()=>{});throw error;}finally{client.release();}})();}
+function transaction(pool,role,organizationId,work){return(async()=>{const client=await pool.connect();let began=false,broken;try{await client.query('BEGIN');began=true;await client.query(`SET LOCAL ROLE ${identifier(role)}`);await client.query("SELECT set_config('app.organization_id',$1,true)",[organizationId]);const value=await work(client);await client.query('COMMIT');began=false;return value;}catch(error){if(began){try{await client.query('ROLLBACK');}catch(rollbackError){broken=rollbackError;}}throw error;}finally{client.release(broken);}})();}
 
 function createPostgresDocumentWorkerPorts({pool,organizationId,tenantId,clock=()=>new Date(),telemetry=null}){
  if(!pool||typeof pool.connect!=='function'||typeof organizationId!=='string'||typeof tenantId!=='string')throw new TypeError('Document worker PostgreSQL ports are invalid.');

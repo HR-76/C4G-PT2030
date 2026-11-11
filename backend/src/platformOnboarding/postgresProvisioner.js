@@ -5,6 +5,7 @@ const {uuid,hash,fail}=require('./contracts');
 const {createTenantMigrationRunner}=require('../security/tenantMigrationRunner');
 const {manifest}=require('../security/tenantMigrationManifest');
 const {preflightTenant}=require('../security/tenantMigrationPreflight');
+const {ensureAuditPartitionsWithPool}=require('../audit/partitionMaintenance');
 const {bindingDigest}=require('../security/localTenantCredentialAdapter');
 const {createLocalTenantIdentityProvisioner}=require('../security/localTenantIdentityProvisioner');
 const id=value=>{if(!/^[a-z][a-z0-9_]{0,62}$/.test(value))fail('PROVISIONING_IDENTIFIER_INVALID');return '"'+value+'"';};
@@ -56,6 +57,8 @@ function createPostgresProvisioner({adminPool,centralPool,connection,journal,own
     await pool.query(`ALTER ROLE c4g_tenant_runtime IN DATABASE ${id(r.database)} SET search_path TO pg_catalog,c4g_app`);
     const runner=createTenantMigrationRunner({pool,observationPublisher:{async publish(){}},timeoutMs:30000,scheduler:{setTimeout,clearTimeout}});
     await runner.migrate({tenantId:r.tenantId,databaseGenerationId:r.generationId,expectedRevision:1,correlationId:r.operationId,idempotencyKey:r.operationId});
+    // A new tenant only has the baseline audit partitions; create five years ahead so nobody rotates by hand.
+    await ensureAuditPartitionsWithPool(pool);
     const provisioner=await createLocalTenantIdentityProvisioner(adminPool);await provisioner.reconcile({apiLogin:r.apiLogin,workerLogin:r.workerLogin,apiPassword:r.apiPassword,workerPassword:r.workerPassword,apiRoles:['c4g_opportunity_tenant_runtime'],workerRoles:['c4g_opportunity_tenant_runtime']});
     await pool.query(`GRANT CONNECT ON DATABASE ${id(r.database)} TO ${id(r.apiLogin)},${id(r.workerLogin)}`);
     const evidence=await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},manifest,{timeoutMs:15000});

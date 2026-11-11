@@ -18,7 +18,8 @@ const INTERNAL_OPERATION_ALLOWLIST = Object.freeze([
   {path:'backend/scripts/runCentralMigrations.js',operation:'runner-invocation',reason:'Canonical Central migration runner.'},
   {path:'backend/scripts/runCentralMigrations.js',operation:'runner-ddl',reason:'Canonical Central runner transaction.'},
   {path:'backend/scripts/runCentralMigrations.js',operation:'runner-ledger',reason:'Canonical Central ledger writer.'},
-  {path:'backend/src/security/tenantMigrationRunner.js',operation:'runner-ledger',reason:'Canonical tenant ledger writer.'}
+  {path:'backend/src/security/tenantMigrationRunner.js',operation:'runner-ledger',reason:'Canonical tenant ledger writer.'},
+  {path:'backend/src/audit/partitionMaintenance.js',operation:'administrative-ddl',reason:'Monthly audit partition rotation, run by the audit migrator at provisioning and migration time.'}
 ]);
 
 function normalized(file){return path.resolve(file).replace(/\\/g,'/');}

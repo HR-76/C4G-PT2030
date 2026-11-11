@@ -71,6 +71,7 @@ function fixture(failAt = null, primary = new Error('PRIVATE_CANARY'), cleanupFa
       pg: { Pool }, 'node:crypto': { ...crypto, randomUUID: () => '50000000-0000-4000-8000-000000000005', randomBytes: n => Buffer.alloc(n, 1) },
       '../security/tenantMigrationRunner': migration, '../security/localTenantIdentityProvisioner': identity,
       '../security/tenantMigrationPreflight': preflight,
+      '../audit/partitionMaintenance': { async ensureAuditPartitionsWithPool() { check('audit-partitions'); } },
       ...publication
     };
     instance.require = name => Object.hasOwn(replacements, name) ? replacements[name] : Object.hasOwn(defaults, name) ? defaults[name] : local(name);

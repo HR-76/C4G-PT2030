@@ -9,6 +9,7 @@ const { createTenantMigrationRunner } = require('../../src/security/tenantMigrat
 const { createLocalTenantIdentityProvisioner } = require('../../src/security/localTenantIdentityProvisioner');
 const { bindingDigest } = require('../../src/security/localTenantCredentialAdapter');
 const { withInstallerAuthority, nativePool } = require('./installerAuthority');
+const { ensureAuditPartitionsWithPool } = require('../../src/audit/partitionMaintenance');
 
 function initialState(config) {
   assertTarget(config);
@@ -82,6 +83,9 @@ async function installSchemas(config, state, persist = () => {}) {
         correlationId: state.installationId, idempotencyKey: state.installationId });
       await demote();
     });
+    // Five years of monthly audit partitions ahead, in both databases, so nobody rotates by hand.
+    await ensureAuditPartitionsWithPool(central);
+    await ensureAuditPartitionsWithPool(tenant);
     await central.query(`ALTER ROLE c4g_authority_runtime PASSWORD '${state.authorityPassword}'`);
     const provisioner = await createLocalTenantIdentityProvisioner(tenant);
     await provisioner.reconcile({ apiLogin: 'c4g_local_api', workerLogin: 'c4g_local_worker',

@@ -56,10 +56,11 @@ function createExecutionLineageProjection({ transaction }) {
     return run(async client => {
       const row = (await client.query(`SELECT execution_id::text,organization_id::text,job_type,lineage_version,delivery_kind,attempt,root_execution_id::text,previous_execution_id::text,content_digest,envelope_digest,replay_request_id::text FROM async_exec.execution WHERE execution_id=$1`, [executionId])).rows[0];
       if (row) return lineage(row);
+      // The expression and predicate repeat the partial unique index f9_*_outbox_execution_v1 so this stays an index lookup.
       // Queue publication can precede the relay commit, or survive its rollback.
       // The immutable source intent already exists and preserves retry/replay
       // lineage without waiting for that projection or inventing attempt one.
-      const rows=(await client.query(`SELECT organization_id::text,envelope,digest_sha256,lineage_version,delivery_kind,attempt,root_execution_id::text,previous_execution_id::text,content_digest,envelope_digest,replay_request_id::text FROM async_exec.outbox WHERE envelope->>'executionId'=$1 LIMIT 2`,[executionId])).rows;
+      const rows=(await client.query(`SELECT organization_id::text,envelope,digest_sha256,lineage_version,delivery_kind,attempt,root_execution_id::text,previous_execution_id::text,content_digest,envelope_digest,replay_request_id::text FROM async_exec.outbox WHERE (envelope->>'executionId')::uuid = $1::uuid AND lineage_version = 1 LIMIT 2`,[executionId])).rows;
       if(rows.length!==1)throw new Error('ASYNC_LINEAGE_PROJECTION_UNAVAILABLE');
       const durable=rows[0];let validated;
       try{validated=validateEnvelope(durable.envelope,{supports:()=>true});}catch{throw new Error('ASYNC_LINEAGE_PROJECTION_INVALID');}

@@ -72,10 +72,11 @@ function createDocumentRepository(pool, { runtimeRole = 'c4g_document_runtime' }
   }
   async function standalone(organizationId, work) {
     validOrganization(organizationId);
-    const client=await pool.connect();let began=false;
+    const client=await pool.connect();let began=false,broken;
     try { await client.query('BEGIN');began=true;const result=await withClient(client,organizationId,work);await client.query('COMMIT');began=false;return result; }
-    catch(error){if(began)await client.query('ROLLBACK').catch(()=>{});throw error;}
-    finally{await client.release();}
+    // A connection whose ROLLBACK failed is in an unknown state: destroy it instead of pooling it.
+    catch(error){if(began){try{await client.query('ROLLBACK');}catch(rollbackError){broken=rollbackError;}}throw error;}
+    finally{client.release(broken);}
   }
   const api={withClient};
   for(const name of ['createIntent','findIntent','addCapability','loadCapability','consumeCapability','transition','findVersion','findConfirmation','confirm','registerMultipart','recordMultipartPart','completeMultipart','abortMultipart','claimExpiredMultipart','claimTransportRecovery','findCurrent']){

@@ -3,6 +3,8 @@ const {
   migrationRecordMatches, migrationSql, requiredCentralMigrations
 } = require("../src/security/centralMigrationManifest");
 
+const { ensureAuditPartitionsWithPool } = require("../src/audit/partitionMaintenance");
+
 async function assertCentralMarker(client) {
   const marker = await client.query(
     `SELECT to_regclass($1) IS NOT NULL AS marker_exists`,
@@ -240,7 +242,11 @@ async function main() {
   process.env.CENTRAL_DB_IDLE_IN_TRANSACTION_TIMEOUT_MS ??= '0';
   const pool = require("../src/config/centralDb");
   try {
-    if (action === "up") await applyCentralMigrations(pool);
+    if (action === "up") {
+      await applyCentralMigrations(pool);
+      // Idempotent: keeps five years of monthly audit partitions ahead without any manual rotation.
+      await ensureAuditPartitionsWithPool(pool);
+    }
     else if (action === "down") await rollbackCentralMigration(pool, target);
     else await status(pool);
     console.log(`Central migration action completed: ${action}.`);
