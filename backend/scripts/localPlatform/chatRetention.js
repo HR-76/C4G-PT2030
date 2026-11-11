@@ -11,6 +11,7 @@ const { spawnSync } = require('node:child_process');
 const { Pool } = require('pg');
 const cfg = require('./config');
 const { withInstallerAuthority } = require('./installerAuthority');
+const { syncCentralObservation } = require('./centralObservation');
 
 const FROM = '039_document_deletion';
 const TO = '040_application_chat_retention';
@@ -40,12 +41,21 @@ async function main() {
   assert.equal(config.centralDatabase, 'c4g_central_dev');
   assert.equal(config.tenantDatabase, 'c4g_tenant_dev');
   const pool = new Pool(cfg.connection(config, config.tenantDatabase));
+  const central = new Pool(cfg.connection(config, config.centralDatabase));
+  // The runner below gets a silent publisher, so Central is synchronised here from a fresh tenant observation.
+  const observe = () => require('../../src/security/tenantMigrationPreflight').preflightTenant(pool,
+    { tenantId: state.tenantId, databaseGenerationId: state.generationId }, undefined, { timeoutMs: 15000 });
+  const syncCentral = observation => syncCentralObservation({ central, observation, tenantId: state.tenantId, installationId: state.installationId, apply });
   try {
     const manifest = require('../../src/security/tenantMigrationManifest');
     assert.equal(manifest.chatRetentionManifest.at(-1).version, TO);
     const ledger = (await pool.query('SELECT migration_id, resulting_fingerprint FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1')).rows[0];
     assert(ledger && [FROM, TO].includes(ledger.migration_id), 'LOCAL_TENANT_VERSION_UNEXPECTED');
-    if (ledger.migration_id === TO) { console.log(JSON.stringify({ result: 'ALREADY_APPLIED', version: TO })); return; }
+    if (ledger.migration_id === TO) {
+      // Repairs a Central directory left behind by an earlier run; read-only without --apply.
+      console.log(JSON.stringify({ result: 'ALREADY_APPLIED', version: TO, central: (await syncCentral(await observe())).status }));
+      return;
+    }
     assert.equal(ledger.resulting_fingerprint, manifest.documentDeletionManifest.at(-1).schemaFingerprint, 'LOCAL_TENANT_FINGERPRINT_UNEXPECTED');
     const before = await chatDigest(pool);
     if (!apply) {
@@ -77,8 +87,7 @@ async function main() {
       await demote();
     });
 
-    const observation = await require('../../src/security/tenantMigrationPreflight').preflightTenant(pool,
-      { tenantId: state.tenantId, databaseGenerationId: state.generationId }, undefined, { timeoutMs: 15000 });
+    const observation = await observe();
     assert.equal(observation.currentVersion, TO);
     assert(observation.capabilities.includes('APPLICATION_CHAT_RETENTION'));
     assert.deepEqual(await chatDigest(pool), before);
@@ -90,9 +99,11 @@ async function main() {
     state.snapshot.schema = { ...state.snapshot.schema, currentVersion: observation.currentVersion, schemaFingerprint: observation.schemaFingerprint,
       verifiedCapabilities: Object.fromEntries(observation.capabilities.map(code => [code, true])) };
     cfg.saveState(state);
-    cfg.saveState({ result: 'PASS', from: FROM, to: TO, chatUnchanged: true, fingerprint: observation.schemaFingerprint },
+    const centralState = await syncCentral(observation);
+    assert(['PUBLISHED', 'IN_SYNC'].includes(centralState.status));
+    cfg.saveState({ result: 'PASS', from: FROM, to: TO, chatUnchanged: true, fingerprint: observation.schemaFingerprint, central: centralState.status },
       path.join(backup, 'verification.json'));
     console.log('LOCAL_CHAT_RETENTION_UPGRADE_PASS');
-  } finally { await pool.end(); }
+  } finally { await pool.end(); await central.end(); }
 }
 main().catch(error => { console.error(error.code || error.message || 'LOCAL_CHAT_RETENTION_UPGRADE_FAILED'); process.exitCode = 1; });
