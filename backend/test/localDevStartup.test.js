@@ -6,6 +6,26 @@ const { EventEmitter } = require('node:events');
 const test = require('node:test');
 const { main, startupDiagnostic } = require('../scripts/startDev');
 
+test('the local API opens on IPv4 loopback and serves readiness after startup', async t => {
+  const express = require('express');
+  const { createApp } = require('../src/app');
+  const { createObservability } = require('../src/observability');
+  const { listenLocalApi } = require('../scripts/localPlatform/runtime');
+  const observability = createObservability({ service: 'c4g-api' });
+  const app = createApp({ express, cors: require('cors'), config: {}, pool: {}, routes: {},
+    databaseReadiness: { check: async () => ({ ready: true }) }, observability });
+
+  const server = await listenLocalApi(app, 0, observability.lifecycle);
+  t.after(async () => {
+    await new Promise(resolve => server.close(resolve));
+    await observability.lifecycle.stop();
+  });
+  assert.equal(server.address().address, '127.0.0.1');
+  const response = await fetch(`http://127.0.0.1:${server.address().port}/health/ready`);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { schemaVersion: 1, status: 'READY', reasons: [] });
+});
+
 function harness(overrides = {}) {
   const processApi = new EventEmitter();
   processApi.env = { NODE_ENV: 'development' };

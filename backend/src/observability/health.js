@@ -32,7 +32,10 @@ class HealthRegistry {
       }, this.timeoutMs);
     });
     const execution = Promise.resolve().then(() => def.check({ signal: controller.signal }))
-      .then(value => ({ ok: value === true, reason: value === true ? 'OK' : 'FAILED' }),
+      .then(value => {
+        const ok = value === true || value?.ok === true;
+        return { ok, reason: ok ? 'OK' : 'FAILED', ...(value?.details === undefined ? {} : { details: value.details }) };
+      },
         () => ({ ok: false, reason: 'FAILED' }));
     const response = Promise.race([execution, timeout]).then(value => {
       clearTimeout(timer);
@@ -70,6 +73,11 @@ class HealthRegistry {
   }
 
   live() { return Object.freeze({ status: 'LIVE', schemaVersion: 1 }); }
+
+  async checkDependency(code) {
+    const probe = this.probes.get(code);
+    return probe ? this._run(probe) : null;
+  }
 }
 
 module.exports = { HealthRegistry };

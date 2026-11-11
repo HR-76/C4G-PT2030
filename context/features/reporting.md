@@ -48,8 +48,9 @@ Consultas e exportações aplicam organização, perfil, unidades e participaç�
 
 ### Exportação do relatório de candidaturas
 
-- A ação «Exportar candidaturas para Excel» descarrega `relatorio-candidaturas-c4g.xlsx` com todas as candidaturas acessíveis, incluindo as que estão nas páginas seguintes. O topo identifica a organização e a hora da consulta em Lisboa.
+- A ação «Exportar candidaturas para Excel» descarrega `relatorio-candidaturas-c4g.xlsx` com todas as candidaturas acessíveis, incluindo as que estão nas páginas seguintes. O topo apresenta o nome da entidade ativa resolvido pelo servidor e a hora da consulta em Lisboa.
 - A folha «Candidaturas» apresenta primeiro os dados de negócio, com o ID e a revisão no fim. Tem cabeçalhos com filtros, linhas alternadas, títulos longos com quebra de linha e painéis fixos para o cabeçalho e a coluna «Candidatura». Os prazos válidos são datas Excel e os orçamentos numéricos têm formato em euros.
+- A coluna «Prazo da oportunidade» apresenta o prazo oficial quando existe. Para uma oportunidade central sem prazo oficial, mostra a data ou o período de fecho da revisão associada à candidatura com a indicação «previsto». Sem informação de fecho, mostra «Não indicado».
 - O servidor valida o identificador do relatório e as permissões atuais e regista a auditoria antes de entregar o ficheiro. Os textos são gravados como texto literal. Os orçamentos em EUR são numéricos dentro da precisão do Excel, ficam vazios quando ausentes e são gravados como texto quando necessário para preservar os cêntimos.
 
 Relatórios personalizados, benchmarking e análises preditivas ficam fora do MVP.

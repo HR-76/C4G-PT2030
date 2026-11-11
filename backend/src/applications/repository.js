@@ -16,7 +16,7 @@ function project(row){return {applicationId:row.application_id,opportunityId:row
  lifecycleExtended:Object.hasOwn(row,'notes'),status:currentStatus(row.status),revision:Number(row.revision),createdAt:new Date(row.created_at).toISOString(),updatedAt:new Date(row.updated_at).toISOString()}}
 function resource(id,org,type='APPLICATION'){return {id,organizationId:org,resourceType:type,status:'ACTIVE',scopeType:id===org?'ORGANIZATION':'RESOURCE',scopeId:id,
  distinctFromActorIds:[],unitId:null,teamIds:[],ancestorUnitIds:[]}}
-function createApplicationRepository({organizationId,actor,protect,authorize,verifyResponsible,cursor,audit,centralOrigin=null,centralCurrent=null,notify=async()=>{},recordStatusEmail=async()=>{},responsibleNames=async()=>new Map(),reportDirectory=async()=>null,readAuthority,responsibleDirectory,transitionCapability,taskDetailsAvailable=false,canReadStrategyAlignment}){
+function createApplicationRepository({organizationId,organizationName,actor,protect,authorize,verifyResponsible,cursor,audit,centralOrigin=null,centralCurrent=null,notify=async()=>{},recordStatusEmail=async()=>{},responsibleNames=async()=>new Map(),reportDirectory=async()=>null,readAuthority,responsibleDirectory,transitionCapability,taskDetailsAvailable=false,canReadStrategyAlignment}){
  const org=organizationId;
  async function existing(client,id,lock=false){return (await client.query(`SELECT a.*,(SELECT recorded_at FROM opportunity_catalog.application_change h WHERE h.organization_id=a.organization_id AND h.application_id=a.application_id AND h.kind IN ('CREATE','TRANSITION') ORDER BY h.revision DESC LIMIT 1) AS status_changed_at,(SELECT recorded_at FROM opportunity_catalog.application_change h WHERE h.organization_id=a.organization_id AND h.application_id=a.application_id AND h.kind='TRANSITION' AND h.to_status='SUBMITTED' ORDER BY h.revision DESC LIMIT 1) AS last_submitted_at FROM opportunity_catalog.application a WHERE organization_id=$1 AND application_id=$2${lock?' FOR UPDATE':''}`,[org,id])).rows[0]||null}
  async function origin(client,id){const row=(await client.query('SELECT opportunity_id,title,closing_date::text AS closing_date,lifecycle_state FROM opportunity_catalog.opportunity WHERE organization_id=$1 AND opportunity_id=$2',[org,id])).rows[0];if(!row)fail('RESOURCE_NOT_AVAILABLE');return row}
@@ -168,7 +168,7 @@ function createApplicationRepository({organizationId,actor,protect,authorize,ver
   return {items:(await interestLink.hydratePageUnits(client,org,items)).map(project),nextCursor:more?cursor.cursor(lastIncluded,bind):null};
  }
  const browse=require('./browseSql').createSqlBrowse({org,actor,cursor,guarded,project,readAuthority,responsibleDirectory,transitionCapability});
- const report=require('./reportSql').createSqlReport({org,actor,guarded,readAuthority,responsibleDirectory,directory:reportDirectory,project,cursor,audit,canReadStrategyAlignment});
+ const report=require('./reportSql').createSqlReport({org,organizationName,actor,guarded,readAuthority,responsibleDirectory,directory:reportDirectory,project,cursor,audit,canReadStrategyAlignment});
  async function browsePage(client,input){
   const page=await browse(client,input);
   const units=await protectedUnitOptions(client);

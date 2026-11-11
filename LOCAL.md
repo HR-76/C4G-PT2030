@@ -53,6 +53,8 @@ Abrir **http://localhost:3000**. Os endereços anteriores 3100 (preview) e 5189 
 
 O arranque diário não executa migrações, seeds nem alterações de passwords. Para aplicar migrations novas, voltar a executar `npm run setup:local`, que mantém as identidades e os segredos existentes. O endpoint `/api/local-health` confirma a disponibilidade da Central e, após consolidação, o sinal de vida do worker; o arranque também valida o esquema Central e o vínculo físico ao tenant.
 
+A API local escuta em `127.0.0.1:5000`, o endereço de loopback que o Nginx do Docker Desktop alcança através de `host.docker.internal`. A rota `https://localhost:8443/api/local-health` verifica o encaminhamento pelo Nginx. A rota direta `http://127.0.0.1:5000/health/ready` devolve `READY` depois do arranque.
+
 ## Regressão do orçamento global no Dashboard
 
 Para executar a regressão completa na raiz de `GCNI_C4G`, com o PostgreSQL e o Keycloak locais em execução:

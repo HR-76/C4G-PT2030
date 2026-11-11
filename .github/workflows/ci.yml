@@ -21,9 +21,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: npm, cache-dependency-path: frontend/package-lock.json }
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            frontend/test-harness/package-lock.json
       - run: npm ci
       - run: npm ci --prefix test-harness
+      # OpportunityFirstAnalysis imports the backend read model.
+      - run: npm ci --prefix ../backend --omit=dev
       - run: npm run build
       - run: npm test
       - run: npm audit --omit=dev --audit-level=high

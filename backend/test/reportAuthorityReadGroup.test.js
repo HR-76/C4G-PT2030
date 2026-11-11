@@ -103,7 +103,8 @@ function fixture(t, { timeoutMs = 10000 } = {}) {
       const target = require('../src/applications/repository').resource(ports.organizationId, ports.organizationId);
       await ports.protect({ operationCode: 'APPLICATION_READ', resource: target });
       const directory = await ports.reportDirectory(client);
-      return { organizationId: ports.organizationId, unitsAvailable: Boolean(directory) };
+      return { organizationId: ports.organizationId, unitsAvailable: Boolean(directory),
+        ...(ports.organizationName === undefined ? {} : { organizationName: ports.organizationName }) };
     };
     const browse = () => phases.run('repository', async () => {
       const target = require('../src/applications/repository').resource(ports.organizationId, ports.organizationId);
@@ -149,9 +150,9 @@ function fixture(t, { timeoutMs = 10000 } = {}) {
   const composition = instance.exports.createApplicationComposition({ authorityCoordinator: coordinator,
     authorizationCatalogs: catalogs, assurancePolicyVersion: policyVersion, recentMfaRequirement, clock: dateClock,
     tenantRuntimeDependencies: {}, tokenKeys: { test: 'synthetic-report-key-only-not-production' }, tokenKeyId: 'test' });
-  const run = (method, p, headers = {}) => composition.execute(method, method === 'calendar' ? { month: '2026-11' }
+  const run = (method, p, headers = {}, organizationContext) => composition.execute(method, method === 'calendar' ? { month: '2026-11' }
     : method === 'dashboard' ? {today:'2026-11-06',asOf:'2026-11-06T12:00:00.000Z'}
-      : method === 'reportExport' ? { digest: 'a'.repeat(64) } : {}, null, { principal: p, headers });
+      : method === 'reportExport' ? { digest: 'a'.repeat(64) } : {}, null, { principal: p, headers, organizationContext });
   return { run, principal, transactions, events, policies, protections, active, hooks, clock, repositoryCalls: () => repositoryCalls };
 }
 const reads = (f, phase = 'prechecks') => f.transactions.filter(tx => tx.phase === phase && tx.protocol.length);
@@ -212,6 +213,17 @@ for (const [method, expected] of [['partnersBrowse', 1], ['browse', 2], ['browse
   assert.equal(await f.run(method, p), true);
   assert.equal(reads(f, 'repository').length, expected);
   assert.deepEqual(domain(reads(f, 'repository')).map(row => row.kind), ['membership', 'policy']);
+});
+
+test('report export uses the active organization name even without directory permission', async t => {
+  const f = fixture(t), p = f.principal();
+  p.directory = false;
+  const organization = { id: p.organizationId, displayName: 'Centro de Investigação' };
+  const own = await f.run('reportExport', p, {}, { organization });
+  assert.equal(own.organizationName, organization.displayName);
+  assert.equal(own.unitsAvailable, false);
+  const other = await f.run('reportExport', p, {}, { organization: { id: randomUUID(), displayName: 'Outra entidade' } });
+  assert.equal(other.organizationName, undefined);
 });
 
 test('report keeps optional directory denial and freshly observes permission and membership revocation', async t => {

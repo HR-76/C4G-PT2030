@@ -1,3 +1,21 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.sql text eol=lf
+
+# Preserve the byte representation checked by the catalog and tenant fixtures.
+/context/references/opportunity-v2/contract.md text eol=lf
+/context/references/opportunity-v2/examples.md text eol=lf
+/context/references/opportunity-v2/mappings.md text eol=lf
+/context/references/opportunity-v2/evidence/pt2030-plan-177.json text eol=lf
+/context/references/opportunity-v2/evidence/eu-11145.metadata.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/evidence/eu-programme-taxonomy.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/eu-11145.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/pt2030-8485.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/pt2030-8514.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/pt2030-8583.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/pt2030-8614.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/examples/pt2030-8664.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/opportunity-v2.schema.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/pt2030-expected-177.json -text whitespace=cr-at-eol
+/context/references/opportunity-v2/validation.json -text whitespace=cr-at-eol
+/test/integration/dashboard-tenant-cost/fixtures/tenantSchemaFingerprint-before.cjs -text whitespace=cr-at-eol

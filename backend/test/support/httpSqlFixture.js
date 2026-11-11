@@ -2,14 +2,21 @@
 const {Client}=require('pg');
 const {readConfig,connection}=require('../../scripts/localPlatform/config');
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
+function testConnection(){
+ if(process.env.C4G_HTTP_SQL_TEST!=='isolated-report')return connection(readConfig(),'postgres');
+ const port=Number(process.env.C4G_REPORT_GATE_PG_PORT),password=process.env.C4G_REPORT_GATE_PG_PASSWORD;
+ if(!Number.isInteger(port)||port<=1024||port>65535||[5432,5433].includes(port)||!/^[a-f0-9]{64}$/.test(password||''))
+  throw Error('ISOLATED_REPORT_POSTGRES_REQUIRED');
+ return {host:'127.0.0.1',port,password,user:'c4g_report_gate',database:'c4g_report_gate',connectionTimeoutMillis:5000};
+}
 async function fixture(size=57){
  // Only session-local temporary tables in the maintenance database. No Dev DB,
  // migration, grant or persistent table is accessed or modified.
- const config=readConfig(),db=new Client(connection(config,'postgres'));await db.connect();
+ const db=new Client(testConnection());await db.connect();
  try{
  await db.query(`CREATE TEMP TABLE application(organization_id uuid,application_id uuid PRIMARY KEY,opportunity_id uuid,central_opportunity_id uuid,central_revision_id uuid,central_snapshot jsonb,evaluation_id uuid,title text,responsible_membership_id uuid,deadline date,notes text,total_budget numeric(18,2),organization_budget numeric(18,2),status text,revision bigint,created_at timestamptz,updated_at timestamptz);
  CREATE TEMP TABLE opportunity(organization_id uuid,opportunity_id uuid,title text,closing_date date,lifecycle_state text,current_revision_id uuid);
- CREATE TEMP TABLE application_change(organization_id uuid,application_id uuid,revision bigint,kind text,to_status text,recorded_at timestamptz);
+ CREATE TEMP TABLE application_change(organization_id uuid,application_id uuid,revision bigint,kind text,to_status text,recorded_at timestamptz,total_budget numeric(18,2));
  CREATE TEMP TABLE application_participant(organization_id uuid,application_id uuid,membership_id uuid,active boolean);
  CREATE TEMP TABLE person(organization_id uuid,person_id uuid,name text,email text,function_label text,active boolean,revision bigint);
  CREATE TEMP TABLE person_profile(organization_id uuid,person_id uuid,membership_id uuid,area_ids uuid[]);

@@ -19,6 +19,19 @@ const dashboardResponse = (organizationId = 'a', title = 'Oportunidade atual') =
   recent_opportunities: [{ id: title, title, href: '/catalogo/current' }],
 } })
 
+it('shows that server totals by status are unavailable for a report with only page items', async () => {
+  state.auth = { user: { id: 'u' }, organization: { id: 'a' } }
+  const response = dashboardResponse()
+  response.data.report.items = [{ applicationId: 'a1', title: 'Candidatura A', status: 'APPROVED' }]
+  state.organization.mockResolvedValue(response)
+  render(<MemoryRouter initialEntries={['/dashboard?vista=relatorio']}><Dashboard /></MemoryRouter>)
+  fireEvent.click(await screen.findByRole('button', { name: 'Por estado' }))
+  expect(screen.getByText('Indicadores por estado indisponíveis.')).toBeTruthy()
+  expect(screen.queryByRole('table', { name: 'Indicadores por estado' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Candidaturas' }))
+  expect(screen.getByRole('link', { name: 'Candidatura A' })).toBeTruthy()
+})
+
 it('shows dashboard navigation immediately without inventing indicators while the summary is pending', async () => {
   state.auth = { user: { id: 'u' }, organization: { id: 'a', displayName: 'Entidade A' } }
   const pending = deferred()

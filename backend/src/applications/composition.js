@@ -219,7 +219,7 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     if(!await isOrganizationAdmin())fail('NOT_AUTHORIZED');
     return organizationCalendar.read(client,{organizationId:org,authority:await readAuthority(),clock,taskDetailsAvailable},s.input);
    }
-   const repository=createApplicationRepository({organizationId:org,actor:context.actor,cursor:tokens,centralOrigin,centralCurrent,notify:alerts.notify,
+   const repository=createApplicationRepository({organizationId:org,organizationName:s.organizationName,actor:context.actor,cursor:tokens,centralOrigin,centralCurrent,notify:alerts.notify,
     taskDetailsAvailable,
     recordStatusEmail:statusEmailProducer||(statusEmailIsolatedCapture===true?require('./statusEmails/producer').createProducer({mode:'isolated',isolated:true,clock:()=>clock.now(),capture:require('./statusEmails/capture').createCapture({centralPool:{query:(sql,values)=>coordinator.withAuthority(()=>coordinator.pool.query(sql,values))},organizationId:org,actorUserId:context.actor.id,assertAuthorized:assertCurrent})}):undefined),
     readAuthority,transitionCapability:id=>capability(resource(id,org)),
@@ -324,7 +324,9 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
   const expectedOrganization=request.headers?.['x-c4g-organization'];
   if(expectedOrganization!==undefined&&uuid(expectedOrganization)!==context.actor.organizationId)fail('RESOURCE_NOT_AVAILABLE');
   coordinator.registerRecovery(context.actor.organizationId,createTenantAuthorityRecovery(dependencies));
-  const s={method,input,id:exactId,handle,context,guard:null};let result=await attempt(s);
+  const organization=request.organizationContext?.organization;
+  const organizationName=method==='reportExport'&&organization?.id===context.actor.organizationId?organization.displayName:undefined;
+  const s={method,input,id:exactId,handle,context,organizationName,guard:null};let result=await attempt(s);
   if(result?.uncertain){await coordinator.reconcile(s.guard);s.context=await authority.resolve(handle);s.guard=null;result=await attempt(s);if(result?.uncertain)fail('SERVICE_UNAVAILABLE')}
   return result;
  }});

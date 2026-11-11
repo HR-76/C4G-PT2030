@@ -43,7 +43,11 @@ export default function useOrganizationDashboard({ organizationId, userId }) {
       const url = URL.createObjectURL(response.data), link = document.createElement('a')
       link.href = url; link.download = 'relatorio-candidaturas-c4g.xlsx'; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url)
     } catch (err) {
-      if (generation.current === current) setExportError(err.response?.status === 409 ? 'Os dados mudaram. Atualize os indicadores antes de exportar.' : 'Não foi possível exportar com o acesso atual.')
+      if (generation.current === current) {
+        if (err.response?.status === 429) setExportError('Há exportações em curso. Tente novamente dentro de momentos.')
+        else if (err.response?.status === 409) setExportError('Os dados mudaram. Atualize os indicadores antes de exportar.')
+        else setExportError('Não foi possível exportar com o acesso atual.')
+      }
     } finally { if (generation.current === current) setExporting(false) }
   }
 

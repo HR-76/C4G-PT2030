@@ -1,4 +1,6 @@
 # Active work
+11/11/2026 — [Correções da auditoria ao backend](features/backend-audit-corrections.md) em Review. Nginx e Vite encaminham a API no ambiente ativo. Prontidão direta HTTP 200 `READY` e Central e tenant saudáveis. Gate PostgreSQL isolado com 4 testes aprovados. Backend 2943 aprovados e 9 ignorados. Frontend 959 aprovados e build concluído.
+
 11/11/2026 — [Calendário da entidade](features/organization-calendar.md) em Review e disponível no ambiente habitual. Vista mensal e próximos prazos com filtros combináveis por candidatura e por estado para o Admin Cliente. Chrome autenticado confirmou ambos os filtros, a navegação e o regresso da ficha.
 
 11/11/2026 — [Seletor único de áreas temáticas](features/organization-strategy-and-department-contributions.md#seleção-de-áreas-temáticas-na-ficha) em Review. A ficha da pessoa e o perfil pessoal mostram cada área uma única vez e preservam as seleções existentes. Build e 947 testes frontend aprovados. Chrome com API simulada confirmou a gravação e leitura nas duas fichas.

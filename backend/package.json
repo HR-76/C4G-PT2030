@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test/**/*.test.js",
+    "test": "node --test \"test/**/*.test.js\"",
     "audit:security": "npm audit --offline=false",
     "test:f5": "node --test test/f5FunctionalAuthorization.test.js",
     "benchmark:f5": "node scripts/benchmarkF5Authorization.js",

@@ -16,7 +16,7 @@ const columns=[
  {header:'Responsável',width:20,alignment:wrapped},
  {header:'Unidade principal do responsável',width:30,alignment:wrapped},
  {header:'Prazo interno',width:16,alignment:center,format:'dd/mm/yyyy'},
- {header:'Prazo da oportunidade',width:18,alignment:center,format:'dd/mm/yyyy'},
+ {header:'Prazo da oportunidade',width:24,alignment:{...center,wrapText:true},format:'dd/mm/yyyy'},
  {header:'Orçamento total (EUR)',width:23,alignment:number,format:eur},
  {header:'Orçamento da organização (EUR)',width:24,alignment:number,format:eur},
  {header:'ID',width:39,alignment:center},
@@ -43,6 +43,17 @@ function budgetCell(value){
 function dateCell(value){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||value<'1900-03-01')return value;
  return new Date(`${value}T00:00:00Z`);
+}
+function opportunityDeadline(item){
+ if(item.opportunityClosingDate)return {value:dateCell(item.opportunityClosingDate),planned:false};
+ const planned=item.opportunityPlannedClosing;
+ if(planned?.precision==='PERIOD'&&planned.label)return {value:`${planned.label} (previsto)`,planned:true};
+ if(planned?.precision==='DATE'&&planned.value){
+  const date=dateCell(planned.value);
+  return {value:date instanceof Date?date:`${date} (previsto)`,planned:true};
+ }
+ if(planned?.precision==='INSTANT'&&planned.value)return {value:`${planned.value} (previsto)`,planned:true};
+ return {value:'Não indicado',planned:false};
 }
 function wrappedLines(value,width){
  if(value==null)return 1;
@@ -71,7 +82,7 @@ function workbook(result){
  title.height=29;
  title.getCell(1).font={...bodyFont,size:16,bold:true,color:{argb:'FF163550'}};
  title.getCell(1).alignment=text;
- for(const [label,value] of [['Organização',result.organizationId],['Consultado em',consultedAt.format(new Date(result.generatedAt))]]){
+ for(const [label,value] of [['Organização',result.organizationName],['Consultado em',consultedAt.format(new Date(result.generatedAt))]]){
   const row=sheet.addRow([label,value]);
   row.height=19;
   row.alignment=text;
@@ -89,8 +100,9 @@ function workbook(result){
  const unitLabels=new Map(result.units.map(unit=>[unit.unitId,unit.label]));
  for(const item of result.items){
   const unitLabel=result.unitsAvailable?(unitLabels.get(item.unitId)||'Sem unidade atribuída'):'Sem acesso ao diretório';
+  const closing=opportunityDeadline(item);
   const values=[item.title,item.opportunityTitle,labels[item.status]||item.status,item.responsibleName,unitLabel,
-   dateCell(item.deadline),dateCell(item.opportunityClosingDate),budgetCell(item.totalBudget),budgetCell(item.organizationBudget),item.applicationId,item.revision];
+   dateCell(item.deadline),closing.value,budgetCell(item.totalBudget),budgetCell(item.organizationBudget),item.applicationId,item.revision];
   const row=sheet.addRow(values);
   row.font=bodyFont;
   row.fill=rowFills[(row.number-header.number-1)%2];
@@ -100,8 +112,9 @@ function workbook(result){
    const value=values[index];
    cell.alignment=alignment;
    if(format)cell.numFmt=typeof value==='string'?'@':format;
-   if(alignment.wrapText)lines=Math.max(lines,wrappedLines(value,width));
+   if(alignment.wrapText&&typeof value==='string')lines=Math.max(lines,wrappedLines(value,width));
   });
+  if(closing.planned&&closing.value instanceof Date)row.getCell(7).numFmt='dd/mm/yyyy" (previsto)"';
   row.height=Math.min(400,7+13*lines);
  }
  sheet.autoFilter={from:{row:header.number,column:1},to:{row:sheet.rowCount,column:columns.length}};

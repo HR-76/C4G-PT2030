@@ -24,6 +24,7 @@ function billingEndpointCatalog() {
 }
 
 const { createErrorHandler } = require('./middlewares/httpErrorHandler');
+const { HealthRegistry } = require('./observability/health');
 
 function parseTrustProxyHops(value) {
   if (value === undefined || value === null || value === '') return 1;
@@ -38,6 +39,19 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   }
 
   const app = express();
+  const health = observability?.health ?? new HealthRegistry();
+  health.register({
+    code: 'database',
+    criticality: 'REQUIRED',
+    async check() {
+      if (databaseReadiness) {
+        const result = await databaseReadiness.check();
+        return { ok: result.ready === true, details: result.dependencies };
+      }
+      await pool.query('SELECT NOW()');
+      return true;
+    }
+  });
   const production = config.nodeEnv === "production" || security?.nodeEnv === "production";
   // Set before parsers and session guards so early refusals are uncached too.
   app.use('/api/auth', (_req, res, next) => {
@@ -140,19 +154,12 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   }));
 
   app.get("/health/db", async (req, res) => {
-    if (databaseReadiness) {
-      const result = await databaseReadiness.check();
-      return res.status(result.ready ? 200 : 503).json({
-        status: result.ready ? "ok" : "unhealthy",
-        dependencies: result.dependencies
-      });
-    }
-    try {
-      await pool.query("SELECT NOW()");
-      return res.json({ status: "ok", dependencies: { central: { status: "healthy" } } });
-    } catch {
-      return res.status(503).json({ status: "unhealthy", dependencies: { central: { status: "unhealthy" } } });
-    }
+    const result = await health.checkDependency('database');
+    const ready = result?.ok === true;
+    return res.status(ready ? 200 : 503).set('Cache-Control', 'no-store').json({
+      status: ready ? 'ok' : 'unhealthy',
+      dependencies: result?.details ?? { central: { status: ready ? 'healthy' : 'unhealthy' } }
+    });
   });
 
   app.get('/health/live', (req,res)=>res.status(200).json(observability ? observability.health.live() : { status:'LIVE', schemaVersion:1 }));

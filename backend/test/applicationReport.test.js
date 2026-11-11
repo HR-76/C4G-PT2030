@@ -7,19 +7,28 @@ const {createSqlReport}=require('../src/applications/reportSql');
 const {strategyAlignment}=require('../src/applications/strategyAlignment');
 const {areas}=require('../src/organizationDirectory/thematicAreas');
 const item={applicationId:'a',title:'=HYPERLINK("bad")',status:'APPROVED',responsibleMembershipId:'m',totalBudget:'99999999999999.99',organizationBudget:null,revision:2};
-function fixture(overrides={}){let record={...item,...overrides},unit='one',auditError=false;const events=[];
- const client={query:async()=>({rows:[{items:[{...record,unit_id:unit}],metrics:{total:1},states:{},units:[],fingerprint:JSON.stringify([record,unit]),deadlines:[],deadline_total:0}]})};
- const run=createSqlReport({org:'org-a',actor:{id:'u'},guarded:async()=>{},readAuthority:async()=>({application:{all:true,ids:[]},opportunity:{all:true,ids:[]},evaluation:{all:true,ids:[]}}),responsibleDirectory:async()=>new Map(),project:r=>r,
-  directory:async()=>({units:[{unitId:unit,label:'Unidade A'}]}),audit:async(c,e)=>{if(auditError)throw Error('Audit unavailable');events.push(e)}});
+function fixture(overrides={}, {org='org-a', beforeExport=async()=>{}, total=1}={}){let record={...item,...overrides},unit='one',auditError=false;const events=[],queries=[];
+ const client={async query(sql,params){
+  queries.push({sql,params});
+  const exporting=params.length===13||params[12]===10001;
+  if(exporting)await beforeExport();
+  const planned=record.central_snapshot?.schedule?.plannedClosing;
+  const exported={...record,application_id:record.applicationId,total_budget:record.totalBudget,organization_budget:record.organizationBudget,
+   opportunity_planned_closing:planned?.state==='PRESENT'?planned.value:null};
+  return {rows:[{items:[{...(exporting?exported:record),unit_id:unit}],total,metrics:{total},states:{},units:[],fingerprint:JSON.stringify([record,unit]),deadlines:[],deadline_total:0}]};
+ }};
+ const run=createSqlReport({org,organizationName:'Centro de Investigação',actor:{id:'u'},guarded:async()=>{},readAuthority:async()=>({application:{all:true,ids:[]},opportunity:{all:true,ids:[]},evaluation:{all:true,ids:[]}}),responsibleDirectory:async()=>new Map(),project:r=>r,
+  directory:async()=>({units:[{unitId:unit,label:'Unidade A'}]}),cursor:{cursor:()=> 'next'},
+  audit:async(c,e)=>{if(auditError)throw Error('Audit unavailable');events.push(e)}});
  const report=(c,input,exporting)=>run(client,input,exporting);
- return {report,events,change(){record.revision++},move(){unit='two'},failAudit(){auditError=true}};
+ return {report,events,queries,change(){record.revision++},move(){unit='two'},failAudit(){auditError=true}};
 }
 test('report export revalidates the snapshot including unit assignment and records critical audit',async()=>{
  const f=fixture(),snapshot=await f.report(null,{});assert.equal(snapshot.items[0].unitId,'one');assert.equal(f.events.length,0);
  const {content}=await f.report(null,{digest:snapshot.digest},true);
  assert(Buffer.isBuffer(content));
  const sheet=read(content,{cellNF:true}).Sheets.Candidaturas;
- assert.equal(sheet.B2.v,'org-a');
+ assert.equal(sheet.B2.v,'Centro de Investigação');
  assert.equal(sheet.A5.v,'Candidatura');
  assert.equal(sheet.A6.t,'s');
  assert.equal(sheet.A6.v,item.title);
@@ -60,9 +69,59 @@ test('the workbook styles and freezes the report table and omits scope and defin
  assert.equal(sheet.views[0].ySplit,5);
  assert.equal(sheet.views[0].showGridLines,false);
 });
+test('the export distinguishes published deadlines, planned closing and missing dates',async()=>{
+ const plannedDate={state:'PRESENT',value:{precision:'DATE',value:'2027-03-31'}};
+ const plannedPeriod={state:'PRESENT',value:{precision:'PERIOD',label:'2.º trimestre de 2027',start:'2027-04-01',end:'2027-06-30'}};
+ for(const [published,planned,expected,format] of [
+  ['2027-03-26',plannedDate,new Date('2027-03-26T00:00:00Z'),'dd/mm/yyyy'],
+  [null,plannedDate,new Date('2027-03-31T00:00:00Z'),'dd/mm/yyyy" (previsto)"'],
+  [null,plannedPeriod,'2.º trimestre de 2027 (previsto)','@'],
+  [null,{state:'CONFLICT',value:null},'Não indicado','@'],
+ ]){
+  const f=fixture({opportunity_closing_date:published,central_snapshot:{schemaVersion:2,schedule:{plannedClosing:planned}}});
+  const snapshot=await f.report(null,{});
+  assert.equal(snapshot.items[0].opportunityClosingDate,published);
+  assert.equal(Object.hasOwn(snapshot.items[0],'opportunityPlannedClosing'),false);
+  const {content}=await f.report(null,{digest:snapshot.digest},true);
+  const book=new Workbook();
+  await book.xlsx.load(content);
+  const cell=book.getWorksheet('Candidaturas').getCell('G6');
+  assert.deepEqual(cell.value,expected);
+  assert.equal(cell.numFmt,format);
+ }
+});
 test('failed audit never returns export content and a failed directory never becomes unassigned',async()=>{
  const f=fixture(),snapshot=await f.report(null,{});f.failAudit();await assert.rejects(f.report(null,{digest:snapshot.digest},true),/Audit unavailable/);
  const report=createSqlReport({actor:{id:'u'},guarded:async()=>{},readAuthority:async()=>({}),responsibleDirectory:async()=>new Map(),directory:async()=>{throw Error('Read failed')}});await assert.rejects(report(null,{}),/Read failed/);
+});
+test('export selects a bounded workbook projection and rejects oversize reports before audit',async()=>{
+ const f=fixture({}, {total:10001});
+ const {digest}=await f.report(null,{});
+ await assert.rejects(f.report(null,{digest},true),{code:'LIMIT_EXCEEDED'});
+ const {sql,params}=f.queries.at(-1);
+ assert.equal(params.at(-1),10000);
+ assert.match(sql,/total_budget::text/);
+ assert.doesNotMatch(sql,/approval_periods|SELECT \* FROM assigned/);
+ assert.deepEqual(f.events,[]);
+});
+test('export admits one task per organization and two per process and releases failed tasks',async()=>{
+ const first=Promise.withResolvers(),second=Promise.withResolvers();
+ let aExports=0;
+ const a=fixture({}, {org:'org-a',beforeExport:()=>++aExports===1?first.promise:Promise.reject(new Error('unexpected second query'))});
+ const b=fixture({}, {org:'org-b',beforeExport:()=>second.promise});
+ const c=fixture({}, {org:'org-c'});
+ const [aReport,bReport,cReport]=await Promise.all([a,b,c].map(f=>f.report(null,{})));
+ const one=a.report(null,{digest:aReport.digest},true),two=b.report(null,{digest:bReport.digest},true);
+ const failed=assert.rejects(one,/export interrupted/);
+ try{
+  await assert.rejects(a.report(null,{digest:aReport.digest},true),{code:'REPORT_EXPORT_BUSY'});
+  await assert.rejects(c.report(null,{digest:cReport.digest},true),{code:'REPORT_EXPORT_BUSY'});
+ }finally{
+  first.reject(new Error('export interrupted'));
+  second.resolve();
+  await Promise.all([failed,two]);
+ }
+ assert.ok((await c.report(null,{digest:cReport.digest},true)).content.length);
 });
 test('the XLSX download uses the workbook MIME type and keeps ordinary and zero budgets numeric',async()=>{
  const express=require('express');
@@ -91,7 +150,7 @@ test('the XLSX download uses the workbook MIME type and keeps ordinary and zero 
  }finally{await new Promise(resolve=>server.close(resolve))}
 });
 test('exact export query rejects forged scopes',()=>{
- for(const value of [{},{digest:'x'},{digest:'a'.repeat(64),organizationId:'other'}])assert.throws(()=>parse('reportExport',value),{code:'INVALID_INPUT'});
+ for(const value of [{},{digest:'x'},{digest:'a'.repeat(64),organizationId:'other'},{digest:'a'.repeat(64),organizationName:'other'}])assert.throws(()=>parse('reportExport',value),{code:'INVALID_INPUT'});
  assert.deepEqual(parse('report',{cursor:'x'}),{cursor:'x'});
  assert.throws(()=>parse('report',{cursor:[]}),{code:'INVALID_INPUT'});
 });

@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const { once } = require('node:events');
 const { Pool } = require('pg');
 const { root, folder, readConfig, connection, connectionUrl, assertTarget } = require('./config');
 const { identityConfig } = require('./identity');
@@ -54,6 +55,19 @@ function trustLocalIdentityCertificate() {
   if (!certificate || typeof tls.setDefaultCACertificates !== 'function') throw Error('LOCAL_IDP_CA_CONFIGURATION_REQUIRED');
   tls.setDefaultCACertificates([...tls.getCACertificates('default'), fs.readFileSync(certificate, 'utf8')]);
 }
+async function listenLocalApi(app, port, lifecycle) {
+  // Docker Desktop reaches this host through IPv4, while localhost can bind to ::1.
+  const server = app.listen(port, '127.0.0.1');
+  await once(server, 'listening');
+  try {
+    lifecycle.start();
+    return server;
+  } catch (error) {
+    await new Promise(resolve => server.close(resolve));
+    throw error;
+  }
+}
+
 async function startNative({ config = readConfig(), state = JSON.parse(fs.readFileSync(path.join(folder, 'runtime.json'))), port = 5000 } = {}) {
   if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') throw Error('LOCAL_PLATFORM_DEVELOPMENT_ONLY');
   trustLocalIdentityCertificate();
@@ -144,10 +158,22 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
       catch { res.status(503).json({ ready: false }); }
     });
     app.use(composition.app);
-    server = app.listen(port, 'localhost');
-    await new Promise((resolve, reject) => { server.once('listening', resolve); server.once('error', reject); });
+    server = await listenLocalApi(app, port, composition.observability.lifecycle);
     let closing;
-    const close = () => closing ||= (async () => { clearInterval(admissionSupervisor);await catalogStartup?.close();await composition?.closeOpportunityRuntime();await new Promise(resolve => server.close(resolve));if(bridgeServer)await new Promise(resolve=>bridgeServer.close(resolve));await memberWorker?.close();await admissionWorker?.close(); await runtime.poolManager.closeAll(); await authorityPool.end(); await platformLogs?.flush(); await centralPool.end(); })();
+    const close = () => closing ||= (async () => {
+      clearInterval(admissionSupervisor);
+      await new Promise(resolve => server.close(resolve));
+      await composition.observability.lifecycle.stop();
+      await catalogStartup?.close();
+      await composition.closeOpportunityRuntime();
+      if(bridgeServer)await new Promise(resolve=>bridgeServer.close(resolve));
+      await memberWorker?.close();
+      await admissionWorker?.close();
+      await runtime.poolManager.closeAll();
+      await authorityPool.end();
+      await platformLogs?.flush();
+      await centralPool.end();
+    })();
     return { app, server, close, env };
   } catch (error) {
     clearInterval(admissionSupervisor);
@@ -159,4 +185,4 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
     await authorityPool.end(); await centralPool.end(); throw error;
   }
 }
-module.exports = { runtimeEnvironment, startNative };
+module.exports = { runtimeEnvironment, listenLocalApi, startNative };

@@ -4,7 +4,7 @@ const {fixture,id}=require('./support/httpSqlFixture');
 const {createApplicationRepository}=require('../src/applications/repository');
 const {createPq1UiTokens}=require('../src/organizationalProfile/pq1UiTokens');
 const {query}=require('../src/applications/contracts');
-const enabled=process.env.C4G_HTTP_SQL_TEST==='1';
+const enabled=['1','isolated-report'].includes(process.env.C4G_HTTP_SQL_TEST);
 const sqlTest=(name,fn)=>test(name,{skip:!enabled},fn);
 function repo(f,authority={teamOnly:false,membershipId:f.member,application:{all:true,ids:[]},opportunity:{all:true,ids:[]},evaluation:{all:false,ids:[]},version:[1,1]},options={}){
  let authCalls=0;return {repository:createApplicationRepository({organizationId:f.org,actor:{id:id(200000)},protect:async()=>{},readAuthority:async()=>{authCalls++;return authority;},
@@ -67,6 +67,50 @@ sqlTest('SQL unit aggregates and exports change identity after primary-unit move
   failAudit=true;await assert.rejects(r.reportExport(f.client,{digest:first.digest}),/audit failed/);failAudit=false;
   await f.db.query('UPDATE person_unit SET scope_id=$1',[id(902)]);
   await assert.rejects(r.reportExport(f.client,{digest:first.digest}),{code:'STALE_REPORT'});
+ }finally{await f.close();}
+});
+sqlTest('report export uses frozen opportunity dates, exact money and the authorized SQL population',async()=>{
+ const f=await fixture(5);try{
+  const date={precision:'DATE',value:'2027-03-31'};
+  const period={precision:'PERIOD',start:'2027-04-01',end:'2027-06-30',label:'2.º trimestre de 2027'};
+  for(const [n,planned,official] of [[1,date,'2027-03-26'],[2,date,null],[3,period,null],[4,null,null]]){
+   const snapshot={schemaVersion:2,description:{title:{state:'PRESENT',value:'Aviso central'}},schedule:{
+    plannedClosing:planned?{state:'PRESENT',value:planned}:{state:'NOT_FOUND'},
+    deadlines:official?{state:'PRESENT',value:[{at:{precision:'DATE',value:official}}]}:{state:'NOT_FOUND'}
+   }};
+   await f.db.query('UPDATE application SET opportunity_id=NULL,central_opportunity_id=$2,central_snapshot=$3 WHERE application_id=$1',[id(n),id(500+n),snapshot]);
+  }
+  await f.db.query("UPDATE application SET organization_id=$1,title='Outra entidade' WHERE application_id=$2",[id(999),id(5)]);
+  await f.db.query("UPDATE application SET total_budget='99999999999999.99' WHERE application_id=$1",[id(2)]);
+  const events=[];
+  const {repository:r}=repo(f,undefined,{audit:async(_client,event)=>events.push(event.eventCode)});
+  const report=await r.report(f.client,{});
+  assert.equal(report.total,4);
+  const {content}=await r.reportExport(f.client,{digest:report.digest});
+  const book=new (require('exceljs').Workbook)();
+  await book.xlsx.load(content);
+  const sheet=book.getWorksheet('Candidaturas');
+  assert.equal(sheet.rowCount,9);
+  assert.deepEqual(sheet.getCell('G6').value,new Date('2027-03-26T00:00:00Z'));
+  assert.deepEqual(sheet.getCell('G7').value,new Date('2027-03-31T00:00:00Z'));
+  assert.equal(sheet.getCell('G7').numFmt,'dd/mm/yyyy" (previsto)"');
+  assert.equal(sheet.getCell('G8').value,'2.º trimestre de 2027 (previsto)');
+  assert.equal(sheet.getCell('G9').value,'Não indicado');
+  assert.equal(sheet.getCell('H7').value,'99999999999999.99');
+  assert.deepEqual(events,['EXPORT_ALLOWED']);
+ }finally{await f.close();}
+});
+sqlTest('report export rejects a population above the row limit without loading workbook rows',async()=>{
+ const f=await fixture(10001);try{
+  const {repository:r}=repo(f,undefined,{audit:async()=>assert.fail('An oversized export must not be audited as allowed')});
+  const report=await r.report(f.client,{});
+  assert.equal(report.total,10001);
+  const client={async query(sql,params){
+   const result=await f.client.query(sql,params);
+   assert.deepEqual(result.rows[0].items,[]);
+   return result;
+  }};
+  await assert.rejects(r.reportExport(client,{digest:report.digest}),{code:'LIMIT_EXCEEDED'});
  }finally{await f.close();}
 });
 sqlTest('opportunity summary uses SQL counts, known deadlines and bounded details on both databases',async()=>{

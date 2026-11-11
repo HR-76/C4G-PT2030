@@ -37,7 +37,7 @@ O runtime ativo é C4G multi-instituição com OIDC, API e workers separados e r
 ## Testes
 
 - Frontend: `npm test` em `frontend/` executa a suite Vitest com `test-harness/vitest.config.js`; executar também `npm run build`.
-- Backend: `npm test` em `backend/` executa `node --test test/**/*.test.js`; executar também `node --check` nos ficheiros JavaScript alterados.
+- Backend: `npm test` em `backend/` passa o padrão `"test/**/*.test.js"` ao runner do Node, incluindo testes na raiz e nos subdiretórios. Executar também `node --check` nos ficheiros JavaScript alterados.
 - Correções começam pelo teste de regressão e validação focada, seguida das suites completas e build. Registar falhas anteriores e testes ignorados separadamente; não os ocultar nem enfraquecer expectativas para obter um resultado verde.
 - Gates em `test/integration/` são provas separadas, frequentemente com PostgreSQL/Keycloak/contentores e SQL de preparação. Não executar contra Dev nem assumir autorização implícita para migrations, grants ou dados. Usar apenas o âmbito isolado explicitamente autorizado. As suites locais não substituem essas provas.
 - Novos componentes críticos exigem testes de isolamento entre organizações, revogação, autorização por unidade, idempotência, migrações, outbox, documentos e métricas.

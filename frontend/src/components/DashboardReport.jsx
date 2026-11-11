@@ -2,10 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Download } from 'lucide-react'
 import InfoTooltip from './InfoTooltip'
-import { exactMoney, applicationMetrics } from '../api/organizationDashboard'
+import { exactMoney } from '../api/organizationDashboard'
 import { applicationStatusLabels, applicationStatusChips } from '../utils/applicationStatuses'
 import { dashboardApi } from '../api/api'
 import './DashboardReport.css'
+
+const emptyBudget = { total: '0.00', missing: 0 }
+const emptyState = { total: 0, active: 0, submitted: 0, approved: 0,
+  totalBudget: emptyBudget, organizationBudget: emptyBudget, approvedBudget: emptyBudget }
 
 export function BudgetValue({ value }) {
   return <>{exactMoney(value.total)}{value.missing > 0 && <small className="text-muted" style={{ display: 'block' }}>{value.missing} sem valor</small>}</>
@@ -33,7 +37,10 @@ export default function DashboardReport({ dashboard, exporting, exportError, onE
     finally { if (!request.signal.aborted) setPageLoading(false) }
   }
   const metrics = dashboard.applications
-  const states = Object.entries(applicationStatusLabels).map(([status, label]) => ({ status, label, ...(report.states ? report.states[status] || applicationMetrics([]) : applicationMetrics(report.items.filter(item => item.status === status))) }))
+  const hasStates = report.states != null && typeof report.states === 'object' && !Array.isArray(report.states)
+  const states = hasStates ? Object.entries(applicationStatusLabels).map(([status, label]) => ({
+    status, label, ...(report.states[status] || emptyState),
+  })) : []
   const row = item => <><td>{item.total}</td><td>{item.active}</td><td>{item.submitted}</td><td>{item.approved}</td><td><BudgetValue value={item.totalBudget} /></td><td><BudgetValue value={item.organizationBudget} /></td><td><BudgetValue value={item.approvedBudget} /></td></>
   return <section className="dash-section dashboard-report">
     <div className="section-hd"><div className="heading-with-info"><h2>Relatório de candidaturas</h2><InfoTooltip label="Informação sobre o relatório">Submetidas/decididas inclui submetidas, aprovadas e rejeitadas. Por unidade, cada candidatura pertence à unidade principal do responsável, sem somar subunidades. Os valores são orçamentos em euros, não financiamento concedido.</InfoTooltip></div><button className="btn btn-outline btn-sm" disabled={exporting} onClick={onExport}><Download size={13} />{exporting ? 'A preparar Excel…' : 'Exportar candidaturas para Excel'}</button></div>
@@ -41,7 +48,9 @@ export default function DashboardReport({ dashboard, exporting, exportError, onE
     <div className="dashboard-subtabs">
       {[['units', 'Por unidade'], ['states', 'Por estado'], ['applications', 'Candidaturas']].map(([key,label]) => <button key={key} className={`tab-btn${view === key ? ' active' : ''}`} aria-pressed={view === key} onClick={() => setView(key)}>{label}</button>)}
     </div>
-    {view === 'units' && !dashboard.unit_totals ? <p role="status">Sem acesso aos indicadores do diretório. Pode consultar o relatório por estado e as candidaturas autorizadas.</p> : view !== 'applications' ? <div className="table-wrap dashboard-table-wrap"><table className={`data-table dashboard-report-table${view === 'units' ? ' dashboard-units-table' : ''}`}>
+    {view === 'units' && !dashboard.unit_totals ? <p role="status">Sem acesso aos indicadores do diretório. Pode consultar o relatório por estado e as candidaturas autorizadas.</p>
+      : view === 'states' && !hasStates ? <p role="status">Indicadores por estado indisponíveis.</p>
+      : view !== 'applications' ? <div className="table-wrap dashboard-table-wrap"><table className={`data-table dashboard-report-table${view === 'units' ? ' dashboard-units-table' : ''}`}>
       <caption className="sr-only">{view === 'units' ? 'Indicadores por unidade' : 'Indicadores por estado'}</caption>
       <thead><tr><th>{view === 'units' ? 'Departamento / Unidade' : 'Estado'}</th>{view === 'units' && <th>Pessoas</th>}<th>Candidaturas</th><th>Ativas</th><th>Submetidas/<wbr/>decididas</th><th>Aprovadas</th><th>Orç. total dos projetos</th><th>Orç. da organização</th><th>Orç. org. em aprovadas</th></tr></thead>
       <tbody>{(view === 'units' ? dashboard.unit_totals : states).map(item => <tr key={view === 'units' ? item.unitId || 'unassigned' : item.status}><td>{item.label}{item.lifecycle === 'ARCHIVED' && ' (arquivada)'}</td>{view === 'units' && <td>{item.people}</td>}{row(item)}</tr>)}</tbody>

@@ -6,6 +6,8 @@ const cors = require('cors');
 const { createApp } = require('../src/app');
 const { createDatabaseReadiness, observeCentralDatabase } = require('../src/security/databaseReadiness');
 const { requiredCentralMigrations } = require('../src/security/centralMigrationManifest');
+const { HealthRegistry } = require('../src/observability/health');
+const { createObservability } = require('../src/observability');
 
 function centralPool({ fail = false, incomplete = false, historicalCrlf = false,
   omitVersion = null, corruptVersion = null, marker = true } = {}) {
@@ -57,6 +59,43 @@ test('readiness endpoint fails closed without exposing connection details', asyn
   const body = await response.json();
   assert.deepEqual(body, { status: 'unhealthy', dependencies: { central: { status: 'unhealthy' } } });
   assert.doesNotMatch(JSON.stringify(body), /sensitive connection detail/);
+});
+
+test('database diagnostics and readiness share one Central check', async t => {
+  const pool = centralPool();
+  const app = createApp({ express, cors, config: {}, pool, routes: {},
+    databaseReadiness: createDatabaseReadiness({ centralPool: pool }),
+    observability: { health: new HealthRegistry() } });
+  const server = http.createServer(app);
+  await new Promise((resolve, reject) => server.listen(0, '127.0.0.1', resolve).once('error', reject));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const [database, ready, second] = await Promise.all(['/health/db', '/health/ready', '/health/db'].map(path => fetch(base + path)));
+  assert.equal(database.status, 200);
+  assert.equal(database.headers.get('cache-control'), 'no-store');
+  assert.equal((await ready.json()).status, 'READY');
+  assert.deepEqual(await second.json(), await database.json());
+  assert.equal(pool.calls.filter(call => /FROM pg_catalog\.pg_database/.test(call.sql)).length, 1);
+});
+
+test('shared readiness preserves Central and tenant statuses when the tenant is unavailable', async t => {
+  let checks = 0;
+  const dependencies = { central: { status: 'healthy' }, tenant: { status: 'unhealthy' } };
+  const observability = createObservability({ service: 'c4g-api' });
+  observability.lifecycle.start();
+  const app = createApp({ express, cors, config: {}, pool: {}, routes: {},
+    databaseReadiness: { async check() { checks++; return { ready: false, dependencies }; } },
+    observability });
+  const server = http.createServer(app);
+  await new Promise((resolve, reject) => server.listen(0, '127.0.0.1', resolve).once('error', reject));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const [database, ready] = await Promise.all(['/health/db', '/health/ready'].map(path => fetch(base + path)));
+  assert.equal(database.status, 503);
+  assert.deepEqual(await database.json(), { status: 'unhealthy', dependencies });
+  assert.equal(ready.status, 503);
+  assert.deepEqual((await ready.json()).reasons, ['DATABASE']);
+  assert.equal(checks, 1);
 });
 
 test('readiness rejects missing markers and incomplete or divergent migrations', async () => {

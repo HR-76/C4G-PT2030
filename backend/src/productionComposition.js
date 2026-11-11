@@ -87,7 +87,6 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     return row&&{id:row.id,legalName:row.legal_name,name:row.display_name,typeCode:row.type_code,status:row.status,currency:row.reporting_currency};
   }}):null;
   const databaseReadiness = dependencies.databaseReadiness || createDatabaseReadiness({ centralPool, admissionRequired:Boolean(admissionService||registrationService) });
-  observability.health.register({code:'database',criticality:'REQUIRED',check:async()=>{try{const result=await databaseReadiness.check();return result.ready===true;}catch{return false;}}});
   const sessionRegistry = security ? createPgSessionRegistry(centralPool,authorityCoordinator) : null;
   const taxonomies = security ? createTaxonomyRuntimeComposition({ sessionStore: security.sessionStore, sessionRegistry,
     authorityCoordinator,authorizationCatalogs, featureTelemetry, telemetry: createTaxonomyTelemetry({ metrics: observability.metrics }),
