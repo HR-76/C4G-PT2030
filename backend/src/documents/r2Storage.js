@@ -165,6 +165,12 @@ function createR2Storage(configuration, options = {}) {
       catch(error){if(error.code!=='STORAGE_OBJECT_NOT_FOUND')throw error;}
       return Object.freeze({ aborted: true });
     },
+    // Physical removal; an already-absent object counts as removed so retries stay idempotent.
+    async deleteObject({ objectId, storageClass = 'QUARANTINE', signal = null }) {
+      try { await send(sdk.DeleteObjectCommand, target(objectId, storageClass), signal); }
+      catch (error) { if (error.code !== 'STORAGE_OBJECT_NOT_FOUND') throw error; }
+      return Object.freeze({ deleted: true });
+    },
     async head({ objectId, storageClass = 'QUARANTINE', signal = null }) {
       let result;
       try { result = await send(sdk.HeadObjectCommand, target(objectId, storageClass),signal); }

@@ -22,8 +22,8 @@ function opportunityV2RuntimeEnvironment(config, state) {
       || !['host', 'port', 'centralDatabase', 'tenantDatabase'].every(key => state.target?.[key] === config[key])
       || (state.identity?.origin || 'http://localhost:3000') !== 'http://localhost:3000') fail('TARGET_INVALID');
   const schema = state.snapshot?.schema;
-  const {assignedReviewManifest,applicationChatManifest,organizationStrategyManifest,applicationTaskDetailsManifest}=require('../../src/security/tenantMigrationManifest');
-  const verifiedVersion = [tenantAddition, assignedReviewManifest.at(-1), applicationChatManifest.at(-1), organizationStrategyManifest.at(-1), applicationTaskDetailsManifest.at(-1)].some(entry =>
+  const {assignedReviewManifest,applicationChatManifest,organizationStrategyManifest,applicationTaskDetailsManifest,documentDeletionManifest}=require('../../src/security/tenantMigrationManifest');
+  const verifiedVersion = [tenantAddition, assignedReviewManifest.at(-1), applicationChatManifest.at(-1), organizationStrategyManifest.at(-1), applicationTaskDetailsManifest.at(-1), documentDeletionManifest.at(-1)].some(entry =>
     schema?.currentVersion === entry.version && schema.schemaFingerprint === entry.schemaFingerprint);
   if (!schema || schema.compatibilityState !== 'COMPATIBLE' || !verifiedVersion || !Number.isSafeInteger(schema.revision) || schema.revision < 1
       || schema.verifiedCapabilities?.[TENANT_CAPABILITY] !== true) fail('SCHEMA_REQUIRED');

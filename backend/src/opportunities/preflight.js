@@ -1,7 +1,7 @@
 'use strict';
 const {manifest}=require('./migrationManifest');
 const {SUPPORTED_POSTGRES_MAJORS}=require('../security/postgresCatalogCompatibility');
-const {applicationTaskDetailsManifest:tenantManifest}=require('../security/tenantMigrationManifest');
+const {documentDeletionManifest:tenantManifest}=require('../security/tenantMigrationManifest');
 const {centralEntries:activationEntries}=require('../security/opportunityV2MigrationPackage');
 const centralEntries=Object.freeze([...activationEntries,require('../security/opportunityEuWriterMigrationPackage').entry,require('../security/opportunityEuReconciliationMigrationPackage').entry,require('../security/opportunityEuLegacyPrearchiveMigrationPackage').entry]);
 const {supportsCentralVersion,knownManifest:centralManifest}=require('../security/centralMigrationManifest');

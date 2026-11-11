@@ -6,6 +6,7 @@ const {resource}=require('./repository');
 const digest=value=>createHash('sha256').update(canonicalize(value)).digest('hex');
 const exact=(value,keys)=>{if(!value||Array.isArray(value)||Object.getPrototypeOf(value)!==Object.prototype||Object.keys(value).sort().join(',')!==[...keys].sort().join(','))fail();return value};
 function parse(method,value){
+ if(method==='documentDeletionGuard'){exact(value,['documentId']);if(typeof value.documentId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.documentId))fail();return {documentId:value.documentId}}
  if(method==='documentTransportAccess'){exact(value,['operationCode']);if(!['DOCUMENT_UPLOAD_INITIATE','DOCUMENT_UPLOAD_CONFIRM','DOCUMENT_VERSION_CREATE'].includes(value.operationCode))fail();return {operationCode:value.operationCode}}
  if(method==='documentDownload'){exact(value,['versionId']);return {versionId:uuid(value.versionId)}}
  if(['documentCandidates','documentGet','documentHistory','reviewMine','reviewReviewers'].includes(method)){
@@ -143,6 +144,15 @@ function createApplicationDocumentsRepository({organizationId:org,actor,protect,
   ]});
   return {organizationId:org,actor:{id:actor.id,membershipId:actor.membershipId,organizationId:org}};
  }
+ // Refuses deletion of evidence: any active link, any review item, or a link of an application already submitted or closed.
+ async function documentDeletionGuard(client,id,input){
+  await documentTransportAccess(client,id,{operationCode:'DOCUMENT_VERSION_CREATE'});
+  const protectedRow=(await client.query(`SELECT 1 FROM opportunity_catalog.application_document_link l JOIN opportunity_catalog.application a ON a.organization_id=l.organization_id AND a.application_id=l.application_id
+    WHERE l.organization_id=$1 AND l.document_id=$2 AND (l.active OR a.status IN ('SUBMITTED','APPROVED','REJECTED','ARCHIVED'))
+   UNION ALL SELECT 1 FROM opportunity_catalog.application_review_item WHERE organization_id=$1 AND document_id=$2 LIMIT 1`,[org,input.documentId])).rows[0];
+  if(protectedRow)fail('STATE_CONFLICT');
+  return {organizationId:org,documentId:input.documentId};
+ }
  async function reviewReviewers(client,id,input){
   await authorizeApplication('APPLICATION_DOCUMENT_EDIT',id);
   const current=await links(client,id);
@@ -246,6 +256,6 @@ function createApplicationDocumentsRepository({organizationId:org,actor,protect,
   await audit(client,{eventCode:'APPLICATION_CHANGED',operationCode:method==='reviewDecide'?'APPLICATION_REVIEW_DECIDE':'APPLICATION_DOCUMENT_EDIT',resourceId:id,idempotencyKey:input.idempotencyKey});
   const projection={revision:next,...result};await client.query("INSERT INTO opportunity_catalog.application_document_receipt(organization_id,idempotency_key,operation,subject_id,resource_id,intention_digest,result_projection) VALUES($1,$2,'DOCUMENT_REVIEW',$3,$4,$5,$6)",[org,input.idempotencyKey,actor.id,id,intentionDigest,projection]);return projection;
  }
- return {documentCandidates,documentGet,documentHistory,documentDownload,documentTransportAccess,reviewMine,reviewReviewers,documentLink:(c,id,i)=>mutate(c,'documentLink',id,i),documentRemove:(c,id,i)=>mutate(c,'documentRemove',id,i),reviewRequest:(c,id,i)=>mutate(c,'reviewRequest',id,i),reviewDecide:(c,id,i)=>mutate(c,'reviewDecide',id,i)};
+ return {documentCandidates,documentGet,documentHistory,documentDownload,documentTransportAccess,documentDeletionGuard,reviewMine,reviewReviewers,documentLink:(c,id,i)=>mutate(c,'documentLink',id,i),documentRemove:(c,id,i)=>mutate(c,'documentRemove',id,i),reviewRequest:(c,id,i)=>mutate(c,'reviewRequest',id,i),reviewDecide:(c,id,i)=>mutate(c,'reviewDecide',id,i)};
 }
 module.exports={parse,createApplicationDocumentsRepository};

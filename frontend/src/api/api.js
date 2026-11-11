@@ -292,6 +292,7 @@ export const privateApplicationsApi = {
   documentUploadIntent: (id, body) => inSessionContext(() => api.post(`/applications/${id}/documents/upload-intents`, body)),
   documentUpload: (id, versionId, capability, file, signal) => api.put(`/applications/${id}/documents/uploads/${versionId}`, file, withSignal({ headers: { 'Content-Type': file.type, 'X-C4G-Upload-Capability': capability }, timeout: 10 * 60 * 1000 }, signal)),
   documentLink: (id, body) => inSessionContext(() => api.post(`/applications/${id}/documents/links`, body)),
+  documentDelete: (id, documentId, versionId) => inSessionContext(() => api.delete(`/applications/${id}/documents/${documentId}/versions/${versionId}`)),
   documentRemove: (id, body) => inSessionContext(() => api.post(`/applications/${id}/documents/remove`, body)),
   reviewRequest: (id, body, organizationId) => api.post(`/applications/${id}/documents/reviews`, body, applicationContext(organizationId)),
   reviewReviewers: (id, params, organizationId, signal) => api.get(`/applications/${id}/documents/reviewers`, {params,...applicationContext(organizationId,signal)}),

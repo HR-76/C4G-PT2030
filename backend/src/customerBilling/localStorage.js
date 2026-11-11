@@ -48,7 +48,7 @@ function createLocalBillingStorage({root,organizationId,environment}){
   async readRange(input){const b=await bytes(input);if(input.etag!==hash(b)||!Number.isSafeInteger(input.start)||!Number.isSafeInteger(input.end)||input.start<0||input.end<input.start||input.end>=b.length)fail('STORAGE_RANGE_INVALID');return Readable.from([b.subarray(input.start,input.end+1)])},
   async health(){try{const stat=await fs.lstat(root);return {ready:stat.isDirectory()&&!stat.isSymbolicLink()}}catch{return {ready:false}}},
   async shutdown(){closed=true;pending.clear()},
-  async beginMultipart(){fail('STORAGE_OPERATION_UNAVAILABLE')},async writePart(){fail('STORAGE_OPERATION_UNAVAILABLE')},async abortMultipartSession(){fail('STORAGE_OPERATION_UNAVAILABLE')},async createDownloadCapability(){fail('STORAGE_OPERATION_UNAVAILABLE')}
+  async beginMultipart(){fail('STORAGE_OPERATION_UNAVAILABLE')},async writePart(){fail('STORAGE_OPERATION_UNAVAILABLE')},async abortMultipartSession(){fail('STORAGE_OPERATION_UNAVAILABLE')},async deleteObject(){fail('STORAGE_OPERATION_UNAVAILABLE')},async createDownloadCapability(){fail('STORAGE_OPERATION_UNAVAILABLE')}
  });
 }
 module.exports={createLocalBillingStorage};

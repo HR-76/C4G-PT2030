@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
 const { UUID } = require('./objectIdentity');
+const { LIMITS } = require('./constants');
 
 function createDocumentRepository(pool, { runtimeRole = 'c4g_document_runtime' } = {}) {
   if (!pool || typeof pool.connect !== 'function' || !/^c4g_[a-z0-9_]+$/.test(runtimeRole)) {
@@ -12,6 +13,10 @@ function createDocumentRepository(pool, { runtimeRole = 'c4g_document_runtime' }
     return Object.freeze({
       async createIntent(input) {
         if (!input || input.organizationId !== organizationId) throw new TypeError('Document intent tenant is invalid.');
+        // Quota admission and reservation share this transaction; the xact lock serialises concurrent intents per organization.
+        await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`c4g:document-quota:${organizationId}`]);
+        const used=Number((await client.query(`SELECT COALESCE(SUM(expected_size),0)::bigint AS used FROM document_storage.document_version WHERE organization_id=$1 AND state NOT IN ('CANCELLED','EXPIRED','DELETED')`,[organizationId])).rows[0]?.used||0);
+        if(used+Number(input.expectedSize)>LIMITS.organizationQuotaBytes)throw Object.assign(new Error('DOCUMENT_QUOTA_EXCEEDED'),{code:'DOCUMENT_QUOTA_EXCEEDED'});
         await client.query(`INSERT INTO document_storage.document(document_id,organization_id,resource_type,resource_id,created_by_actor_id,correlation_id) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(document_id) DO NOTHING`,[input.documentId,input.organizationId,input.resourceType,input.resourceId,input.actorId,input.correlationId]);
         const values=[input.versionId,input.documentId,input.organizationId,input.versionNumber,input.objectId,input.expectedSize,input.fileClass,input.checksum,input.declaredMime,input.displayFilename,input.idempotencyKey,input.correlationId,input.causationId,input.actorId];
         const result=await client.query(`INSERT INTO document_storage.document_version(version_id,document_id,organization_id,version_number,object_id,storage_class,expected_size,expected_file_class,expected_sha256,declared_mime,display_filename,state,scan_state,idempotency_key,correlation_id,causation_id,created_by_actor_id) VALUES($1,$2,$3,$4,$5,'QUARANTINE',$6,$7,$8,$9,$10,'PENDING','NOT_REQUESTED',$11,$12,$13,$14) RETURNING version_id,state,lock_version`,values);
@@ -60,6 +65,9 @@ function createDocumentRepository(pool, { runtimeRole = 'c4g_document_runtime' }
       async abortMultipart(input) { if(input.organizationId!==organizationId||!input.providerUploadId)return Object.freeze({status:'UNCHANGED'});await client.query('SELECT document_storage.finish_multipart_upload($1,$2,$3,$4)',[organizationId,input.versionId,input.providerUploadId,'ABORTED']);return Object.freeze({status:'ABORTED'}); },
       async claimExpiredMultipart({organizationId: requested,limit=25}) { if(requested!==organizationId||!Number.isInteger(limit)||limit<1||limit>100)throw new TypeError('Document tenant context is invalid.');return (await client.query('SELECT * FROM document_storage.claim_expired_multipart_uploads($1,$2)',[organizationId,limit])).rows; },
       async claimTransportRecovery({organizationId: requested,limit=25}) { if(requested!==organizationId||!Number.isInteger(limit)||limit<1||limit>100)throw new TypeError('Document tenant context is invalid.');return (await client.query('SELECT * FROM document_storage.claim_document_transport_recovery($1,$2)',[organizationId,limit])).rows; },
+      async beginDeletion({organizationId: requested,documentId,versionId,resourceId,fromState}) { if(requested!==organizationId||!UUID.test(documentId||'')||!UUID.test(versionId||'')||!UUID.test(resourceId||''))throw new TypeError('Document tenant context is invalid.');return (await client.query('SELECT * FROM document_storage.begin_document_deletion($1,$2,$3,$4,$5)',[organizationId,documentId,versionId,resourceId,fromState])).rows[0]||null; },
+      async cancelDeletion({organizationId: requested,documentId,versionId,toState}) { if(requested!==organizationId||!UUID.test(documentId||'')||!UUID.test(versionId||''))throw new TypeError('Document tenant context is invalid.');return (await client.query('SELECT * FROM document_storage.cancel_document_deletion($1,$2,$3,$4)',[organizationId,documentId,versionId,toState])).rows[0]||null; },
+      async finishDeletion({organizationId: requested,documentId,versionId}) { if(requested!==organizationId||!UUID.test(documentId||'')||!UUID.test(versionId||''))throw new TypeError('Document tenant context is invalid.');return (await client.query('SELECT * FROM document_storage.finish_document_deletion($1,$2,$3)',[organizationId,documentId,versionId])).rows[0]||null; },
       async findCurrent({organizationId: requested,documentId}) { if(requested!==organizationId)throw new TypeError('Document tenant context is invalid.');return (await client.query(`SELECT v.version_id AS "versionId",v.version_number AS "versionNumber",d.lock_version AS "lockVersion" FROM document_storage.document d JOIN document_storage.document_version v ON v.version_id=d.current_version_id WHERE d.organization_id=$1 AND d.document_id=$2`,[organizationId,documentId])).rows[0]||null; }
     });
   }
@@ -79,7 +87,7 @@ function createDocumentRepository(pool, { runtimeRole = 'c4g_document_runtime' }
     finally{client.release(broken);}
   }
   const api={withClient};
-  for(const name of ['createIntent','findIntent','addCapability','loadCapability','consumeCapability','transition','findVersion','findConfirmation','confirm','registerMultipart','recordMultipartPart','completeMultipart','abortMultipart','claimExpiredMultipart','claimTransportRecovery','findCurrent']){
+  for(const name of ['createIntent','findIntent','addCapability','loadCapability','consumeCapability','transition','findVersion','findConfirmation','confirm','registerMultipart','recordMultipartPart','completeMultipart','abortMultipart','claimExpiredMultipart','claimTransportRecovery','findCurrent','beginDeletion','cancelDeletion','finishDeletion']){
     api[name]=input=>standalone(input?.organizationId,repository=>repository[name](input));
   }
   return Object.freeze(api);

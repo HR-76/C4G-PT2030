@@ -9,15 +9,15 @@ const documentState=item=>item.usable?'Verificado e disponível':['SCANNING','UP
 const decisionLabel={APPROVED:'Aprovado internamente',CHANGES_REQUESTED:'Alterações solicitadas'}
 const kindLabel={DOCUMENT_LINKED:'Versão associada',DOCUMENT_REMOVED:'Documento retirado',REVIEW_REQUESTED:'Revisão solicitada',REVIEW_DECIDED:'Decisão registada'}
 const dateLabel=value=>value&&Number.isFinite(new Date(value).getTime())?new Date(value).toLocaleString('pt-PT'):'Data não disponível'
-const message=error=>error?.response?.data?.error?.code==='REVIEWER_NOT_ELIGIBLE'?'O revisor já não tem as permissões necessárias. Consulte novamente os revisores.':({400:'Verifique os dados.',401:'A sessão terminou. Volte a autenticar-se e selecione a organização.',403:'O acesso à organização foi removido ou não tem autorização documental.',404:'Recurso indisponível ou sem autorização documental.',409:'O conjunto mudou ou a operação já foi decidida. Recarregue.',503:'Serviço indisponível ou resultado incerto. Repita o mesmo envio para confirmar.'}[error?.response?.status]||'Resultado incerto. Repita o mesmo envio para confirmar.')
+const message=error=>error?.response?.data?.error?.code==='DOCUMENT_QUOTA_EXCEEDED'?'O armazenamento da organização está cheio (2,5 GiB). Contacte o suporte C4G.':error?.response?.data?.error?.code==='REVIEWER_NOT_ELIGIBLE'?'O revisor já não tem as permissões necessárias. Consulte novamente os revisores.':({400:'Verifique os dados.',401:'A sessão terminou. Volte a autenticar-se e selecione a organização.',403:'O acesso à organização foi removido ou não tem autorização documental.',404:'Recurso indisponível ou sem autorização documental.',409:'O conjunto mudou ou a operação já foi decidida. Recarregue.',503:'Serviço indisponível ou resultado incerto. Repita o mesmo envio para confirmar.'}[error?.response?.status]||'Resultado incerto. Repita o mesmo envio para confirmar.')
 const readMessage=error=>!error?.response?.status||error.response.status>=500?'Não foi possível carregar os documentos. Repita a consulta.':message(error)
 const accessDenied=error=>[401,403].includes(error?.response?.status)
-const definitive=error=>error?.response?.status===400||(error?.response?.status===409&&['STALE_REVISION','STATE_CONFLICT','LIMIT_EXCEEDED','REVIEWER_NOT_ELIGIBLE'].includes(error?.response?.data?.error?.code))
+const definitive=error=>error?.response?.status===400||(error?.response?.status===409&&['STALE_REVISION','STATE_CONFLICT','LIMIT_EXCEEDED','DOCUMENT_QUOTA_EXCEEDED','REVIEWER_NOT_ELIGIBLE'].includes(error?.response?.data?.error?.code))
 const filePolicy={
- 'application/pdf':{fileClass:'PDF',maxBytes:50*1024*1024},'image/png':{fileClass:'IMAGE',maxBytes:20*1024*1024},'image/jpeg':{fileClass:'IMAGE',maxBytes:20*1024*1024},
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':{fileClass:'OOXML',maxBytes:100*1024*1024},
- 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':{fileClass:'OOXML',maxBytes:100*1024*1024},
- 'application/vnd.openxmlformats-officedocument.presentationml.presentation':{fileClass:'OOXML',maxBytes:100*1024*1024}
+ 'application/pdf':{fileClass:'PDF',maxBytes:20*1024*1024},'image/png':{fileClass:'IMAGE',maxBytes:10*1024*1024},'image/jpeg':{fileClass:'IMAGE',maxBytes:10*1024*1024},
+ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':{fileClass:'OOXML',maxBytes:25*1024*1024},
+ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':{fileClass:'OOXML',maxBytes:25*1024*1024},
+ 'application/vnd.openxmlformats-officedocument.presentationml.presentation':{fileClass:'OOXML',maxBytes:25*1024*1024}
 }
 async function sha256(file){const bytes=await file.arrayBuffer(),hash=await globalThis.crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(value=>value.toString(16).padStart(2,'0')).join('')}
 
@@ -164,6 +164,11 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   sessionStorage.removeItem(uploadIntentKey);setPendingUpload(null);setUploadFile(null);setProcessingVersion(intent.versionId);setCandidatePoll(0);setNotice('Upload confirmado. O documento permanece indisponível até o scan terminar.');setRefresh(value=>value+1)
  }catch(e){setAccessBlocked(accessDenied(e));setError(message(e))}finally{setBusy(false)}}
  const chosen=candidates.find(item=>item.versionId===selected)
+ const removeDocument=async()=>{if(busy||!canEdit||!chosen?.usable)return;if(!window.confirm('Eliminar este documento? A ação é irreversível. Descarregue-o antes se precisar de uma cópia.'))return;setBusy(true);setError('');setNotice('')
+  try{await api.documentDelete(applicationId,chosen.documentId,chosen.versionId);setSelected('');setNotice('Documento eliminado. O espaço foi libertado.');setRefresh(v=>v+1)}
+  catch(e){setError(e?.response?.data?.error?.code==='STATE_CONFLICT'?'Documento em utilização: retire a associação, ou está numa candidatura submetida ou em revisão, e não pode ser eliminado.':message(e))}
+  finally{setBusy(false)}
+ }
  const unavailable=snapshot?.documents.filter(item=>!item.usable).length||0
  const preparationHint=!snapshot?.documents.length?'Associe pelo menos uma versão verificada antes de solicitar revisão.':unavailable?'Resolva as versões indisponíveis antes de solicitar revisão.':'As versões associadas estão disponíveis para revisão interna.'
  const orderedReviews=[...(snapshot?.reviews||[])].sort((a,b)=>Number(a.stale)-Number(b.stale)||Date.parse(b.requestedAt)-Date.parse(a.requestedAt))
@@ -208,13 +213,13 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
        </li>
      })}</ul> : <p className="files-empty"><FileText size={21} aria-hidden="true"/>Sem documentos associados.</p>}
    </section>
-    {canUpload&&<fieldset><legend>Carregar Budget ou documento</legend><p>PDF até 50 MiB, PNG/JPEG até 20 MiB ou DOCX/XLSX/PPTX até 100 MiB. CSV não é aceite.</p>
+    {canUpload&&<fieldset><legend>Carregar Budget ou documento</legend><p>PDF até 20 MiB, PNG/JPEG até 10 MiB ou DOCX/XLSX/PPTX até 25 MiB. Cada organização dispõe de 2,5 GiB de armazenamento. CSV não é aceite.</p>
      <p>Os ficheiros Office com macros, objetos incorporados ou ligações externas, incluindo hiperligações, são bloqueados pela verificação de segurança.</p>
      <input aria-label="Ficheiro documental" type="file" accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx,.pptx" disabled={busy} onChange={event=>setUploadFile(event.target.files?.[0]||null)}/>
      <button type="button" className="btn btn-outline btn-sm" disabled={busy||!uploadFile} onClick={upload}>{pendingUpload?'Repetir upload seguro':'Iniciar upload seguro'}</button></fieldset>}
     {canEdit&&<><h3>Associar uma versão verificada</h3><p>O carregamento não associa automaticamente o documento à candidatura.</p><label>Versão disponível <select key={`${applicationId}:${organizationId}`} value={selected} onChange={e=>setSelected(e.target.value)} disabled={busy||!!pending}>
     <option value="">Escolha uma versão</option>{candidates.map(item=><option key={item.versionId} value={item.versionId} disabled={!item.usable}>{item.filename} · v{item.versionNumber} · {documentState(item)}</option>)}
-   </select></label><button type="button" className="btn btn-outline btn-sm" disabled={busy||!!pending||!chosen?.usable} onClick={()=>mutate('documentLink',{documentId:chosen.documentId,versionId:chosen.versionId})}>Associar versão</button>
+   </select></label><button type="button" className="btn btn-outline btn-sm" disabled={busy||!!pending||!chosen?.usable} onClick={()=>mutate('documentLink',{documentId:chosen.documentId,versionId:chosen.versionId})}>Associar versão</button><button type="button" className="btn btn-outline btn-sm" disabled={busy||!!pending||!canEdit||!chosen?.usable} onClick={removeDocument}>Eliminar documento</button>
     {candidateNext&&<button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={()=>loadMore('candidates')}>Mais versões</button>}
      {!candidates.length&&<p>Não há versões limpas acessíveis para associação.</p>}</>}
    <h3>Revisão interna</h3><p>A decisão refere-se às versões deste pedido; não equivale à submissão oficial da candidatura.</p>

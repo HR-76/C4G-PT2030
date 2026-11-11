@@ -2,7 +2,7 @@ const { validateInterestCapabilities } = require('./tenantInterestCapabilities')
 const { isRotatingAuditTable } = require('./auditPartitionPolicy');
 const { registeredManifest: manifest, allRegisteredMigrations, receiptManifest, failureReceiptManifest, assignedReviewManifest,
   applicationChatManifest, APPLICATION_CHAT_SCHEMA_VERSION, organizationStrategyManifest, ORGANIZATION_STRATEGY_SCHEMA_VERSION,
-  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION,
+  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION, documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION,
   migrationSql, validateTenantLedger } = require('./tenantMigrationManifest');
 const { tenantSchemaFingerprint, tenantSchemaSnapshot } = require('./tenantSchemaFingerprint');
 const {
@@ -557,6 +557,7 @@ async function preflightTenantClient(client, expected, entries = manifest, loadM
     if (entries === manifest && currentMigration === APPLICATION_CHAT_SCHEMA_VERSION) entries = applicationChatManifest;
     if (entries === manifest && currentMigration === ORGANIZATION_STRATEGY_SCHEMA_VERSION) entries = organizationStrategyManifest;
     if (entries === manifest && currentMigration === APPLICATION_TASK_DETAILS_SCHEMA_VERSION) entries = applicationTaskDetailsManifest;
+    if (entries === manifest && currentMigration === DOCUMENT_DELETION_SCHEMA_VERSION) entries = documentDeletionManifest;
     const currentEntry = entries.find(item => item.version === currentMigration);
     const allowedFeatureSchemas = currentEntry ? [
       currentEntry.capabilities.includes('F9_ASYNC_EXECUTION') && 'async_exec',

@@ -188,7 +188,16 @@ const applicationTaskDetailsEntry = Object.freeze({
   compatibility: compatibility(APPLICATION_TASK_DETAILS_SCHEMA_VERSION)
 });
 const applicationTaskDetailsManifest = Object.freeze([...organizationStrategyManifest, applicationTaskDetailsEntry]);
-const allRegisteredMigrations = Object.freeze([...applicationTaskDetailsManifest, receiptEntry, failureReceiptEntry]);
+const DOCUMENT_DELETION_SCHEMA_VERSION = '039_document_deletion';
+const documentDeletionEntry = Object.freeze({
+  version: DOCUMENT_DELETION_SCHEMA_VERSION, ordinal: 39, irreversible: true,
+  sqlChecksum: '56c85d8743c2843a8d3852d4311953ed343b4a31f914f1cc4862b6ac10cb4f38',
+  schemaFingerprint: '45842789b0f1eb7844f5c36085a76d3782f7a6c7f15c3cfeff97fbcf6f254dcc',
+  capabilities: Object.freeze([...applicationTaskDetailsEntry.capabilities, 'DOCUMENT_DELETION']),
+  compatibility: compatibility(DOCUMENT_DELETION_SCHEMA_VERSION)
+});
+const documentDeletionManifest = Object.freeze([...applicationTaskDetailsManifest, documentDeletionEntry]);
+const allRegisteredMigrations = Object.freeze([...documentDeletionManifest, receiptEntry, failureReceiptEntry]);
 
 function plainRecord(value) {
   return Boolean(value) && typeof value === 'object' && !isProxy(value)
@@ -236,7 +245,7 @@ function sourceMigrationSql(version, direction, readSql) {
     : path.join(migrationsRoot, `${version}.${direction}.sql`);
   const sql = canonicalizeTenantMigrationSql(readSql(sourcePath));
   const checksum = checksumSql(sql);
-  if ((entry === failureReceiptEntry || entry === receiptEntry || entry === assignedReviewEntry || entry === applicationChatEntry || entry === organizationStrategyEntry || version === tenantAddition.version) && checksum !== entry.sqlChecksum) throw new TypeError('Tenant migration checksum mismatch.');
+  if ((entry === failureReceiptEntry || entry === receiptEntry || entry === assignedReviewEntry || entry === applicationChatEntry || entry === organizationStrategyEntry || entry === documentDeletionEntry || version === tenantAddition.version) && checksum !== entry.sqlChecksum) throw new TypeError('Tenant migration checksum mismatch.');
   return Object.freeze({ entry, sql, checksum });
 }
 
@@ -355,6 +364,7 @@ validateTenantMigrationManifest(failureReceiptManifest);
 validateTenantMigrationManifest(applicationChatManifest);
 validateTenantMigrationManifest(organizationStrategyManifest);
 validateTenantMigrationManifest(applicationTaskDetailsManifest);
+validateTenantMigrationManifest(documentDeletionManifest);
 
 module.exports = {
   APPLICATION_TENANT_DOWNGRADE,
@@ -390,6 +400,7 @@ module.exports = {
   receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, APPLICATION_CHAT_SCHEMA_VERSION,
   organizationStrategyManifest, ORGANIZATION_STRATEGY_SCHEMA_VERSION,
   applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION,
+  documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION,
   allRegisteredMigrations,
   migrationSql,
   requiredTenantMigrations,

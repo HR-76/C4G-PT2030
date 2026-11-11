@@ -4,6 +4,7 @@ const {createConfirmationService}=require('./confirmationService');
 const {isDownloadable}=require('./stateMachine');
 const {defaultDownloadStaging}=require('./downloadStaging');
 const {sanitizeFilename}=require('./contentPolicy');
+const {createDocumentDeletionService}=require('./deletionService');
 const INTENT_FIELDS=Object.freeze(['expectedSize','declaredMime','filename','fileClass','checksum','idempotencyKey','versionNumber']);
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function required(value,names){for(const name of names)if(!value?.[name])throw new TypeError(`Application document transport dependency ${name} is required.`)}
@@ -25,6 +26,14 @@ function createApplicationDocumentTransport(dependencies){
  return Object.freeze({
   async createIntent({request,applicationId,input}){let safe;const {service,context}=await uploadService(request,applicationId,(input?.versionNumber??1)===1?'DOCUMENT_UPLOAD_INITIATE':'DOCUMENT_VERSION_CREATE',()=>{safe=intentInput(input)});return service.createIntent({context,resourceId:applicationId,...safe})},
   async upload({request,applicationId,versionId,token,source}){const {service,context}=await uploadService(request,applicationId,'DOCUMENT_UPLOAD_CONFIRM');return service.upload({context,versionId,token,source})},
+  async deleteDocument({request,applicationId,documentId,versionId}){
+   if(!UUID.test(documentId||'')||!UUID.test(versionId||''))throw Object.assign(new Error('DOCUMENT_NOT_AVAILABLE'),{code:'DOCUMENT_NOT_AVAILABLE'});
+   if(typeof accessPort.assertDeletable!=='function')throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});
+   const authorization=await accessPort.authorize({request,applicationId,operationCode:'DOCUMENT_VERSION_CREATE'});
+   const p=ports(authorization.context.actor.organizationId);
+   const service=createDocumentDeletionService({repository:p.repository,storage:p.storage,audit:p.audit,guard:{assertDeletable:input=>accessPort.assertDeletable({request,applicationId,documentId:input.documentId})}});
+   return service.deleteDocument({context:authorization.context,applicationId,documentId,versionId});
+  },
   async download({organizationId,versionId,signal,revalidate}){
    if(typeof revalidate!=='function')throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});
    await revalidate();
