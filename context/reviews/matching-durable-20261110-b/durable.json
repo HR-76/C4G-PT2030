@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "checks": [
+    "committed durable guard survives connection loss and rejects two concurrent cooperative writers",
+    "a second capture is refused while the first durable guard remains active",
+    "unknown commit remains fenced until nonce proves termination and durable receipt proves commit",
+    "rollback is reconciled only after termination and the second tenant is unchanged",
+    "guard admission cannot pass a writer already holding the serialization row"
+  ],
+  "limits": [
+    "Synthetic durable guard protocol in three isolated PostgreSQL databases; no product guard, F4, F5, RLS, matching, cursor, or production schema.",
+    "Writers cooperate explicitly; this does not prove complete writer coverage, real network partitions, security grants, deployment, or distributed deadlock freedom."
+  ]
+}

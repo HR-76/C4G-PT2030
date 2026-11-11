@@ -1,0 +1,334 @@
+{
+  "kind": "eu-expired-reconciliation-completed-v1",
+  "status": "PASS",
+  "reviewState": "Review",
+  "createdAt": "2026-10-31T18:38:37.640Z",
+  "completedAt": "2026-10-31T18:37:28.164Z",
+  "scope": "EXPIRED_RUN_RECONCILIATION_ONLY",
+  "planId": "e20d478b-c6b4-4b3a-87cb-25e29bf789ba",
+  "previewDigest": "24feec071971eaea897a5ff251e98cf8007c05438a7c3f97a929699f150681fa",
+  "planValidity": {
+    "createdAt": "2026-10-31T18:33:41.618Z",
+    "expiresAt": "2026-10-31T19:33:41.618Z"
+  },
+  "cycleId": "7266ad6b-8880-4ec1-9399-4751187831c5",
+  "runId": "75b462ed-a399-4bdb-bd96-ed18507761c9",
+  "package": {
+    "id": "opportunity-eu-expired-reconciliation-v1",
+    "digest": "86447823f5fb2879cf2326a7f921fabca47a764381f86f6a65726bd3c812bb22",
+    "entry": {
+      "version": "044_opportunity_eu_expired_reconciliation",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "043_opportunity_eu_writer_v2",
+      "requiresCatalogSecurityFingerprint": "677c31faad484bdd4afb9ea874d8a17556c44cadc9c08dba9e210112dec495cb",
+      "upChecksum": "afadcb18620fed476affae75421c074b34bd6f983209d962e2468295c2355a6c",
+      "schemaFingerprint": "f2798ef14b31a27d4b706c97234bf79650520bc12891b8f62207d11c82fe3e41",
+      "authoritySecurityFingerprint": "eb5f1c51a34ce0219b929629d4918cf152bda95d44fb9209a58d08d076992f7e",
+      "catalogSecurityFingerprint": "e555853a5df214eef5cc64c4f4021de6a2db672373c53cc7809270ed19d1e4b7",
+      "euWriterSecurityFingerprint": "6865b34b57d98c558baa0be42e22cefa46c6530042129b44e2a1d38587c8d71a",
+      "euRunReconciliationSecurityFingerprint": "e66ba2eb826162ed9343d4193d01fb9cd0888ba81cf8c0cb562933c231c014ff"
+    }
+  },
+  "installed": {
+    "centralVersion": "044_opportunity_eu_expired_reconciliation",
+    "centralFingerprint": "f2798ef14b31a27d4b706c97234bf79650520bc12891b8f62207d11c82fe3e41",
+    "tenantVersion": "034_application_snapshot_v2",
+    "tenantFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3"
+  },
+  "authentication": {
+    "provider": "OIDC",
+    "actorId": "e933bc9c-3ba0-40bc-bdb0-59359604be18",
+    "sessionFabricated": false,
+    "credentialsExported": false
+  },
+  "approval": {
+    "eventId": "01a1933e-4e4e-729a-a849-e0efe4adbc1e",
+    "eventHash": "ac4887b361dd54a3ad6236e461869267fa0e1823a1b2659fe0beeab95c2a21ca"
+  },
+  "effect": {
+    "requestId": "01a19340-4131-7bb0-94f9-bd61cc938285",
+    "effectEventId": "01a19340-4131-7bb0-94f9-bd61cc938285",
+    "effectEventHash": "c497d03cb9410a383c1ca2fb9860d86450b0c806d83c5f27b022c23f4cf91a50",
+    "result": {
+      "source": {
+        "fence": 7,
+        "state": "QUIESCED"
+      },
+      "errorCode": "FUNDING_EXECUTION_EXPIRED",
+      "runStatus": "ERROR",
+      "inboxState": "FAILED",
+      "cycleStatus": "ERROR",
+      "inboxResult": "EXPIRED",
+      "outboxState": "PUBLISHED",
+      "pendingRuns": 0,
+      "executionState": "EXPIRED",
+      "targetsChanged": false
+    },
+    "fourRowsExact": true,
+    "publishedOutboxUnchanged": true,
+    "originalExecutionLineageUnchanged": true
+  },
+  "source": {
+    "fence": 7,
+    "state": "QUIESCED",
+    "family": "EU_FUNDING_TENDERS",
+    "acceptedV2": 1,
+    "queuedRuns": 0,
+    "writerMode": "CANONICAL_V2",
+    "pendingRuns": 0,
+    "writerPolicy": "eu-existing-v2.0",
+    "activeRunLeases": 0,
+    "otherPendingRuns": 0,
+    "activeInboxLeases": 0,
+    "activeOutboxLeases": 0,
+    "expiredPendingRuns": 0,
+    "writerMappingDigest": "5419c2beb24ee5131e9291107d45f4f3b47397bb9894bd32d90ba89462616d7a",
+    "incompatiblePendingRuns": 0,
+    "unrecoverablePendingRuns": 0
+  },
+  "newEnqueues": 0,
+  "resumed": false,
+  "sourceResumeAuthorized": false,
+  "preservation": {
+    "centralInventoryTables": 45,
+    "tenantBusinessTables": 129,
+    "heads": {
+      "count": 538,
+      "digest": "8db5e5a87c7d3a15210a36e06e9a9a2a6d6e25cea50629886bf40fc0bbe37d32"
+    },
+    "targets": {
+      "count": 536,
+      "digest": "5d56e7f39df0fe430dcf38fdbc0f91537d473a17a493fa46265b03e6a0ba5110"
+    },
+    "archives": {
+      "count": 138,
+      "digest": "5f9130e2b4a34dd1e54cd462ad275e4a4a0718c6e8e30bc8a6c7313b062d611c"
+    },
+    "decisions": {
+      "count": 138,
+      "digest": "3d80019cfc34bc234358df7a48efcb95343b335dc39c91744bbb124ea2fa4aa6"
+    },
+    "revisions": {
+      "count": 1502,
+      "digest": "0acab114c434832513bc7509d9fee0e6df77860e44d8b9041d87b0ad0eeec371"
+    },
+    "head11145": {
+      "opportunityId": "01a14a80-9143-7177-ba86-9fa72d09fb64",
+      "revisionId": "f6fe19fd-12d7-4c38-920a-b456dd74e9a9",
+      "rowVersion": 5,
+      "contentDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6",
+      "snapshotDigest": "1fa2ae06ce45942735d07a1cd9c393242a0fe757342c8f17b228f8c1da029eb7",
+      "amount": 120000,
+      "amountSqlType": "numeric",
+      "currencyState": "NOT_FOUND",
+      "deadlineCount": 7
+    },
+    "outbox": true,
+    "lineage": true,
+    "transport": true,
+    "configurationFiles": 7,
+    "configurationUnchanged": true
+  },
+  "coverage": {
+    "targets": [
+      {
+        "state": "CONFLICT",
+        "count": 5
+      },
+      {
+        "state": "DISCOVERED",
+        "count": 391
+      },
+      {
+        "state": "PENDING",
+        "count": 2
+      },
+      {
+        "state": "REVIEW",
+        "count": 137
+      },
+      {
+        "state": "UNCHANGED",
+        "count": 1
+      }
+    ],
+    "storedDecisions": [
+      {
+        "decision": "ACCEPTED",
+        "count": 1
+      },
+      {
+        "decision": "REVIEW",
+        "count": 137
+      }
+    ],
+    "unresolvedTargets": 393,
+    "conflicts": 5,
+    "reviewRequired": 137,
+    "coverageComplete": false
+  },
+  "transport": {
+    "totals": [
+      {
+        "state": "active",
+        "count": 1
+      },
+      {
+        "state": "completed",
+        "count": 1395
+      },
+      {
+        "state": "failed",
+        "count": 4
+      }
+    ],
+    "target": {
+      "count": 1,
+      "digest": "bf458af2ef6c45d5a932df998900b18b27298d22c15d9e4331f7508842943f41"
+    },
+    "executionId": "75b462ed-a399-4bdb-bd96-ed18507761c9"
+  },
+  "backup": {
+    "preparationId": "65770b8e-3902-4bee-be0d-1c669306826f",
+    "installationId": "852911f3-a763-4c72-8a04-234c35a4e529",
+    "baseline": {
+      "central": {
+        "version": "043_opportunity_eu_writer_v2",
+        "fingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591"
+      },
+      "tenant": {
+        "version": "034_application_snapshot_v2",
+        "fingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3"
+      }
+    },
+    "tables": 239,
+    "rows": 60842,
+    "globalsMatch": true,
+    "sourceNoDrift": true,
+    "aclRestricted": true,
+    "cleanup": true,
+    "boundary": {
+      "status": "PASS",
+      "checkedAt": "2026-10-31T18:36:14.605Z",
+      "dataAndSequencesMatch": true,
+      "configurationMatches": true,
+      "externalSessions": 0
+    }
+  },
+  "codeValidation": {
+    "backend": {
+      "tests": 2338,
+      "passed": 2331,
+      "skipped": 7,
+      "failed": 0
+    },
+    "frontend": {
+      "files": 63,
+      "passed": 496,
+      "failed": 0,
+      "build": "PASS"
+    },
+    "operations": {
+      "passed": 69,
+      "failed": 0
+    },
+    "syntax": {
+      "passed": 26,
+      "failed": 0
+    },
+    "gate": {
+      "status": "PASS",
+      "checks": 43,
+      "inputCount": 892,
+      "cleanup": true
+    },
+    "validationInputCount": 1360,
+    "planInputCount": 1367,
+    "currentHashesRecheckedAt": "2026-10-31T18:38:37.641Z",
+    "harnessRevision": [
+      {
+        "file": "test/integration/opportunity-v2/eu-reconciliation-http-proof.cjs",
+        "previousSha256": "dcc521e0aba71bd95630cd368b5e04e2bad7027df59a74a8c82d2a9ab1f6aa7b",
+        "currentSha256": "e3675b82cac33e44587a2efb153977455a2ee7a976b7e190398a1a05118cce90",
+        "validation": "COMPLETE_ISOLATED_GATE",
+        "reason": "Use BigInt arithmetic for PostgreSQL bigint fence, instead of string concatenation."
+      }
+    ]
+  },
+  "health": {
+    "ready": true,
+    "checkedAt": "2026-10-31T18:37:28.164Z"
+  },
+  "independentReview": {
+    "source": "activation_authority",
+    "mode": "FILES_ONLY",
+    "result": "NO_BLOCKERS",
+    "scope": "Bindings, current hashes, backup chronology, preservation and final receipt"
+  },
+  "references": {
+    "window": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/window.json",
+      "sha256": "55dd390e653d6ca6f3c5bf7176cb5e54106d92d68cfb45d781370a32ec41acc9"
+    },
+    "plan": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/plan.json",
+      "sha256": "bb7ab1da0570d9e8ccc7764b95faee5f686730ea54062755065aca63bde8f4b5"
+    },
+    "preview": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/preview.json",
+      "sha256": "fec4ff06825c6e7dfd6657b707f1295a2ea037116ffd23af51a456416bcb0519"
+    },
+    "approval": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/approval-2fea460d-95ce-4a16-8ed3-8d9e8c45f2bc.json",
+      "sha256": "351339239b8a3ec94e797460fc6fa5b46871fd152d91e09680cb178912e9813c"
+    },
+    "installation": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/installation.json",
+      "sha256": "d1b2e8f2746513f34371f8a7ee88c836cacdb57378f2de082260ed15db8613f1"
+    },
+    "before": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/before-reconciliation.json",
+      "sha256": "86d3c43a3eb2c389635975c63a8fb565414edd9c1d0dce74d5795c9e9964fc93"
+    },
+    "execution": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/execution.json",
+      "sha256": "9f49d83c61e8bad068d8d7d19484080cc936f034e97290d0f2a4dc365ba289c7"
+    },
+    "after": {
+      "path": "output/opportunity-eu-reconciliation-e20d478b-c6b4-4b3a-87cb-25e29bf789ba/after-reconciliation.json",
+      "sha256": "4730d09726c3bcf7223921ac56b6b493bc0c4976f23e77f833c86721d7f2d11a"
+    },
+    "validation": {
+      "path": "output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/validation.json",
+      "sha256": "1f47c9552f65b5dc06c1a0e94454499d6a71e9888fd4fec3955351ffde0d71e3"
+    },
+    "checks": {
+      "path": "output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/checks-release.json",
+      "sha256": "ae03964ef7b5517e87a9b135e05372ff440c58344f4175e5680bfab410a4f5ae"
+    },
+    "gate": {
+      "path": "output/opportunity-v2-reconciliation-03c3b15b565f47aa8645935e89dc6cb0/verification.json",
+      "sha256": "ef15c6a87247344e4fcdbe94804f70ce940194a3d0ad0622ad65bcb2b2627d26"
+    },
+    "preparationBackup": {
+      "path": "output/opportunity-v2-window/e20d478b-c6b4-4b3a-87cb-25e29bf789ba/backup-restore-65770b8e-3902-4bee-be0d-1c669306826f.json",
+      "sha256": "a40b297a6a205ed56f5f7b65320ccbc6ac6a0c56ff2598f89d58f4b216ec6481"
+    },
+    "installationBackup": {
+      "path": "output/opportunity-v2-window/fb103a50-07fc-4e9b-a7a2-20c1a6c856a8/backup-restore-852911f3-a763-4c72-8a04-234c35a4e529.json",
+      "sha256": "1775400ad1c7c1788efe0a0adbb9488262f3264c8f50abd013f42b2ab02cafbf"
+    }
+  },
+  "limitations": [
+    "Source remains QUIESCED at fence7; no future resume is authorized.",
+    "137 REVIEW,5 CONFLICT and393 unresolved targets remain; expiry reconciliation does not certify source coverage.",
+    "One original PgBoss row remains in active state, with identical digest; operational execution leases are zero. Queues are not certified globally empty.",
+    "The isolated gate uses synthetic identities and sessions; normal OIDC and habitual backup are evidenced separately.",
+    "Currency on11145 remains NOT_FOUND/NULL; amount120000 numeric and seven deadlines are preserved, with no new official fetch.",
+    "Read-only snapshots are per database, not a permanent distributed maintenance lock.",
+    "Local runtime privileges are not a production least-privilege certification.",
+    "Logical restore does not certify all login credentials in a new destination; destructive habitual recovery requires a new authorized window.",
+    "Prior failed/incomplete evidence, including043, remains immutable."
+  ]
+}

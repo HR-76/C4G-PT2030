@@ -1,0 +1,1611 @@
+{
+  "source": "context/reviews/grouped-authority-standard/results.json",
+  "status": "COMPLETE",
+  "samples": 4,
+  "verified": {
+    "stageOrder": true,
+    "noStageOverlap": true,
+    "queryCountsMatchOriginal": true,
+    "authorityTransactionCountsMatchOriginal": true,
+    "allQueryIntervalsPresent": true
+  },
+  "means": {
+    "httpMs": 8327.46,
+    "responseMs": 8324.16,
+    "sqlSumMs": 7382.17,
+    "sqlUnionMs": 7273.15,
+    "overlapMs": 109.03,
+    "outsideQueryMs": 1051.02,
+    "metadataUnionMs": 6257.44
+  },
+  "stages": [
+    {
+      "name": "report",
+      "wallMeanMs": 3181.25,
+      "queries": [
+        913
+      ],
+      "authorityTransactions": [
+        15
+      ],
+      "authorityProtocolCalls": [
+        71
+      ],
+      "sqlSumMeanMs": 2870.26,
+      "sqlUnionMeanMs": 2761.23,
+      "metadataSumMeanMs": 2432.46,
+      "checkpoints": {
+        "assertAuthorityAdmission": {
+          "calls": [
+            15
+          ],
+          "meanInclusiveMs": 1562.66
+        },
+        "assertCentralSchema": {
+          "calls": [
+            15
+          ],
+          "meanInclusiveMs": 1318.15
+        },
+        "assertAuthoritySecurity": {
+          "calls": [
+            15
+          ],
+          "meanInclusiveMs": 412.35
+        },
+        "observeTenantRuntimeMetadata": {
+          "calls": [
+            3
+          ],
+          "meanInclusiveMs": 998.35
+        }
+      }
+    },
+    {
+      "name": "privateSummary",
+      "wallMeanMs": 2352.72,
+      "queries": [
+        656
+      ],
+      "authorityTransactions": [
+        8
+      ],
+      "authorityProtocolCalls": [
+        54
+      ],
+      "sqlSumMeanMs": 2068.63,
+      "sqlUnionMeanMs": 2068.63,
+      "metadataSumMeanMs": 1804.04,
+      "checkpoints": {
+        "assertAuthorityAdmission": {
+          "calls": [
+            8
+          ],
+          "meanInclusiveMs": 852.33
+        },
+        "assertCentralSchema": {
+          "calls": [
+            8
+          ],
+          "meanInclusiveMs": 732.5
+        },
+        "assertAuthoritySecurity": {
+          "calls": [
+            8
+          ],
+          "meanInclusiveMs": 233.92
+        },
+        "observeTenantRuntimeMetadata": {
+          "calls": [
+            3
+          ],
+          "meanInclusiveMs": 1033.05
+        }
+      }
+    },
+    {
+      "name": "centralSummary",
+      "wallMeanMs": 13.81,
+      "queries": [
+        8
+      ],
+      "authorityTransactions": [
+        0
+      ],
+      "authorityProtocolCalls": [
+        0
+      ],
+      "sqlSumMeanMs": 13.41,
+      "sqlUnionMeanMs": 13.41,
+      "metadataSumMeanMs": 8.53,
+      "checkpoints": {}
+    },
+    {
+      "name": "dashboardContext",
+      "wallMeanMs": 2224.82,
+      "queries": [
+        706
+      ],
+      "authorityTransactions": [
+        9
+      ],
+      "authorityProtocolCalls": [
+        67
+      ],
+      "sqlSumMeanMs": 1940.79,
+      "sqlUnionMeanMs": 1940.79,
+      "metadataSumMeanMs": 1659.4,
+      "checkpoints": {
+        "assertAuthorityAdmission": {
+          "calls": [
+            9
+          ],
+          "meanInclusiveMs": 845.18
+        },
+        "assertCentralSchema": {
+          "calls": [
+            9
+          ],
+          "meanInclusiveMs": 722.26
+        },
+        "assertAuthoritySecurity": {
+          "calls": [
+            9
+          ],
+          "meanInclusiveMs": 239.91
+        },
+        "observeTenantRuntimeMetadata": {
+          "calls": [
+            3
+          ],
+          "meanInclusiveMs": 893.27
+        }
+      }
+    },
+    {
+      "name": "request-outside-stages",
+      "wallMeanMs": 551.56,
+      "queries": [
+        138
+      ],
+      "authorityTransactions": [
+        4
+      ],
+      "authorityProtocolCalls": [
+        6
+      ],
+      "sqlSumMeanMs": 489.09,
+      "sqlUnionMeanMs": 489.09,
+      "metadataSumMeanMs": 425.85,
+      "checkpoints": {
+        "assertAuthorityAdmission": {
+          "calls": [
+            4
+          ],
+          "meanInclusiveMs": 401.36
+        },
+        "assertCentralSchema": {
+          "calls": [
+            4
+          ],
+          "meanInclusiveMs": 343.85
+        },
+        "assertAuthoritySecurity": {
+          "calls": [
+            4
+          ],
+          "meanInclusiveMs": 111.9
+        }
+      }
+    }
+  ],
+  "individual": [
+    {
+      "httpMs": 9693.64,
+      "responseMs": 9689.98,
+      "sqlSumMs": 8541.01,
+      "sqlUnionMs": 8430.46,
+      "overlapMs": 110.55,
+      "outsideQueryMs": 1259.52,
+      "metadataUnionMs": 7291.61,
+      "stages": [
+        {
+          "name": "report",
+          "wallMs": 3483.54,
+          "queries": 913,
+          "authorityTransactions": 15,
+          "authorityProtocolCalls": 71,
+          "sqlSumMs": 3124.99,
+          "sqlUnionMs": 3014.44,
+          "metadataSumMs": 2659.67,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 15,
+              "ms": 1717.75
+            },
+            "assertCentralSchema": {
+              "calls": 15,
+              "ms": 1435.15
+            },
+            "assertAuthoritySecurity": {
+              "calls": 15,
+              "ms": 454.01000000000005
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1089.3899999999999
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 150,
+              "ms": 143.55890000003274,
+              "maxMs": 16.69230000000971
+            },
+            "authority/transaction": {
+              "calls": 60,
+              "ms": 78.8007999999827,
+              "maxMs": 6.031400000007125
+            },
+            "authority/metadata": {
+              "calls": 270,
+              "ms": 1748.707800000062,
+              "maxMs": 37.11269999999786
+            },
+            "authority/authority-lock": {
+              "calls": 15,
+              "ms": 37.12429999996675,
+              "maxMs": 26.6305999999895
+            },
+            "authority/authority-protocol": {
+              "calls": 71,
+              "ms": 125.2780999999668,
+              "maxMs": 3.633800000010524
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 17.059699999997974,
+              "maxMs": 3.5832999999984168
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 12.582800000003772,
+              "maxMs": 2.9416999999957625
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 910.9612000001653,
+              "maxMs": 20.241699999998673
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 24.582900000023074,
+              "maxMs": 1.8304000000061933
+            },
+            "tenant/application-selection": {
+              "calls": 1,
+              "ms": 14.821899999995367,
+              "maxMs": 14.821899999995367
+            },
+            "tenant/audit-prepare": {
+              "calls": 5,
+              "ms": 4.92170000000624,
+              "maxMs": 1.4477999999944586
+            },
+            "tenant/audit-append": {
+              "calls": 5,
+              "ms": 6.643899999980931,
+              "maxMs": 1.5023999999975786
+            }
+          }
+        },
+        {
+          "name": "privateSummary",
+          "wallMs": 2614.47,
+          "queries": 656,
+          "authorityTransactions": 8,
+          "authorityProtocolCalls": 54,
+          "sqlSumMs": 2274.67,
+          "sqlUnionMs": 2274.67,
+          "metadataSumMs": 2000.56,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 8,
+              "ms": 945.6999999999999
+            },
+            "assertCentralSchema": {
+              "calls": 8,
+              "ms": 811.6800000000001
+            },
+            "assertAuthoritySecurity": {
+              "calls": 8,
+              "ms": 256.57
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1171.49
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 80,
+              "ms": 73.05340000000433,
+              "maxMs": 1.433499999999185
+            },
+            "authority/transaction": {
+              "calls": 32,
+              "ms": 45.02799999996205,
+              "maxMs": 5.917300000000978
+            },
+            "authority/metadata": {
+              "calls": 144,
+              "ms": 998.1205999999947,
+              "maxMs": 37.89880000000994
+            },
+            "authority/authority-lock": {
+              "calls": 8,
+              "ms": 6.8267999999952735,
+              "maxMs": 1.0746999999973923
+            },
+            "authority/authority-protocol": {
+              "calls": 54,
+              "ms": 88.95699999995122,
+              "maxMs": 3.2655000000086147
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 17.78499999997439,
+              "maxMs": 3.5852999999915482
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 13.696899999980815,
+              "maxMs": 2.6965999999956694
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 1002.4403000001912,
+              "maxMs": 21.825299999996787
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 25.7555999999895,
+              "maxMs": 2.122799999997369
+            },
+            "tenant/audit-prepare": {
+              "calls": 1,
+              "ms": 1.3744000000006054,
+              "maxMs": 1.3744000000006054
+            },
+            "tenant/audit-append": {
+              "calls": 1,
+              "ms": 1.775099999998929,
+              "maxMs": 1.775099999998929
+            }
+          }
+        },
+        {
+          "name": "centralSummary",
+          "wallMs": 20.13,
+          "queries": 8,
+          "authorityTransactions": 0,
+          "authorityProtocolCalls": 0,
+          "sqlSumMs": 19.61,
+          "sqlUnionMs": 19.61,
+          "metadataSumMs": 13.21,
+          "checkpoints": {},
+          "roles": {
+            "catalog/metadata": {
+              "calls": 3,
+              "ms": 13.208000000013271,
+              "maxMs": 6.802200000005541
+            },
+            "catalog/transaction": {
+              "calls": 4,
+              "ms": 4.128000000011525,
+              "maxMs": 1.3879000000015367
+            },
+            "catalog/other": {
+              "calls": 1,
+              "ms": 2.2753999999986263,
+              "maxMs": 2.2753999999986263
+            }
+          }
+        },
+        {
+          "name": "dashboardContext",
+          "wallMs": 2962.93,
+          "queries": 706,
+          "authorityTransactions": 9,
+          "authorityProtocolCalls": 67,
+          "sqlSumMs": 2587.7,
+          "sqlUnionMs": 2587.7,
+          "metadataSumMs": 2227.07,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 9,
+              "ms": 1143.43
+            },
+            "assertCentralSchema": {
+              "calls": 9,
+              "ms": 977.6
+            },
+            "assertAuthoritySecurity": {
+              "calls": 9,
+              "ms": 329.5
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1173.71
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 90,
+              "ms": 90.36080000011134,
+              "maxMs": 2.933499999999185
+            },
+            "authority/transaction": {
+              "calls": 36,
+              "ms": 61.24419999998645,
+              "maxMs": 4.799599999998463
+            },
+            "authority/metadata": {
+              "calls": 162,
+              "ms": 1223.4753000000492,
+              "maxMs": 38.692900000009104
+            },
+            "authority/authority-lock": {
+              "calls": 9,
+              "ms": 7.423700000013923,
+              "maxMs": 1.0780000000086147
+            },
+            "authority/authority-protocol": {
+              "calls": 67,
+              "ms": 134.16749999995227,
+              "maxMs": 3.337199999994482
+            },
+            "central-reader/other": {
+              "calls": 5,
+              "ms": 16.12829999999667,
+              "maxMs": 3.3914999999979045
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 14.3688999999722,
+              "maxMs": 2.744699999995646
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 1003.5910000000295,
+              "maxMs": 21.044800000003306
+            },
+            "tenant/other": {
+              "calls": 22,
+              "ms": 24.34989999998652,
+              "maxMs": 1.9521000000095228
+            },
+            "tenant/audit-prepare": {
+              "calls": 4,
+              "ms": 4.914400000008754,
+              "maxMs": 1.3993000000045868
+            },
+            "tenant/audit-append": {
+              "calls": 4,
+              "ms": 7.80899999999383,
+              "maxMs": 2.1340999999956694
+            }
+          }
+        },
+        {
+          "name": "request-outside-stages",
+          "wallMs": 608.91,
+          "queries": 138,
+          "authorityTransactions": 4,
+          "authorityProtocolCalls": 6,
+          "sqlSumMs": 534.04,
+          "sqlUnionMs": 534.04,
+          "metadataSumMs": 463.08,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 4,
+              "ms": 441.39
+            },
+            "assertCentralSchema": {
+              "calls": 4,
+              "ms": 373.22
+            },
+            "assertAuthoritySecurity": {
+              "calls": 4,
+              "ms": 124.69999999999999
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 40,
+              "ms": 35.05949999997392,
+              "maxMs": 1.4329999999899883
+            },
+            "authority/transaction": {
+              "calls": 16,
+              "ms": 19.498099999982514,
+              "maxMs": 4.569799999997485
+            },
+            "authority/metadata": {
+              "calls": 72,
+              "ms": 463.08289999999397,
+              "maxMs": 36.33640000000014
+            },
+            "authority/authority-lock": {
+              "calls": 4,
+              "ms": 3.9390999999741325,
+              "maxMs": 1.9642999999923632
+            },
+            "authority/authority-protocol": {
+              "calls": 6,
+              "ms": 12.502999999996973,
+              "maxMs": 2.243900000001304
+            }
+          }
+        }
+      ]
+    },
+    {
+      "httpMs": 9463.04,
+      "responseMs": 9458.88,
+      "sqlSumMs": 8270.68,
+      "sqlUnionMs": 8147.67,
+      "overlapMs": 123.01,
+      "outsideQueryMs": 1311.21,
+      "metadataUnionMs": 7006.57,
+      "stages": [
+        {
+          "name": "report",
+          "wallMs": 3588.66,
+          "queries": 913,
+          "authorityTransactions": 15,
+          "authorityProtocolCalls": 71,
+          "sqlSumMs": 3228.65,
+          "sqlUnionMs": 3105.64,
+          "metadataSumMs": 2735.67,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 15,
+              "ms": 1798.06
+            },
+            "assertCentralSchema": {
+              "calls": 15,
+              "ms": 1501.16
+            },
+            "assertAuthoritySecurity": {
+              "calls": 15,
+              "ms": 465.2300000000001
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1111.8
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 150,
+              "ms": 163.65830000011192,
+              "maxMs": 18.450400000001537
+            },
+            "authority/transaction": {
+              "calls": 60,
+              "ms": 76.06989999991492,
+              "maxMs": 4.74649999999383
+            },
+            "authority/metadata": {
+              "calls": 270,
+              "ms": 1823.7143000001379,
+              "maxMs": 39.21130000000994
+            },
+            "authority/authority-lock": {
+              "calls": 15,
+              "ms": 37.53970000000845,
+              "maxMs": 25.519599999999627
+            },
+            "authority/authority-protocol": {
+              "calls": 71,
+              "ms": 136.51899999998568,
+              "maxMs": 3.2269000000087544
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 13.86270000001241,
+              "maxMs": 3.126300000003539
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 12.25680000000284,
+              "maxMs": 2.13739999999234
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 911.9568999998883,
+              "maxMs": 20.883399999991525
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 24.76540000004752,
+              "maxMs": 1.7308000000048196
+            },
+            "tenant/application-selection": {
+              "calls": 1,
+              "ms": 15.893400000000838,
+              "maxMs": 15.893400000000838
+            },
+            "tenant/audit-prepare": {
+              "calls": 5,
+              "ms": 5.092499999998836,
+              "maxMs": 1.3702000000048429
+            },
+            "tenant/audit-append": {
+              "calls": 5,
+              "ms": 7.274099999980535,
+              "maxMs": 1.7329000000027008
+            }
+          }
+        },
+        {
+          "name": "privateSummary",
+          "wallMs": 2734.21,
+          "queries": 656,
+          "authorityTransactions": 8,
+          "authorityProtocolCalls": 54,
+          "sqlSumMs": 2383.33,
+          "sqlUnionMs": 2383.33,
+          "metadataSumMs": 2074.1,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 8,
+              "ms": 1004.4000000000001
+            },
+            "assertCentralSchema": {
+              "calls": 8,
+              "ms": 858.4
+            },
+            "assertAuthoritySecurity": {
+              "calls": 8,
+              "ms": 275.6
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1181.0900000000001
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 80,
+              "ms": 80.51510000004782,
+              "maxMs": 3.80460000000312
+            },
+            "authority/transaction": {
+              "calls": 32,
+              "ms": 51.199299999992945,
+              "maxMs": 4.816399999996065
+            },
+            "authority/metadata": {
+              "calls": 144,
+              "ms": 1059.0716000000539,
+              "maxMs": 35.98200000000361
+            },
+            "authority/authority-lock": {
+              "calls": 8,
+              "ms": 6.805500000002212,
+              "maxMs": 0.9275999999954365
+            },
+            "authority/authority-protocol": {
+              "calls": 54,
+              "ms": 107.22109999998065,
+              "maxMs": 3.267999999996391
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 19.565800000040326,
+              "maxMs": 3.5658000000112224
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 14.134500000014668,
+              "maxMs": 3.0798000000067987
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 1015.0253000000375,
+              "maxMs": 21.203300000008312
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 26.587500000037835,
+              "maxMs": 1.939299999998184
+            },
+            "tenant/audit-prepare": {
+              "calls": 1,
+              "ms": 1.384699999995064,
+              "maxMs": 1.384699999995064
+            },
+            "tenant/audit-append": {
+              "calls": 1,
+              "ms": 1.8019999999960419,
+              "maxMs": 1.8019999999960419
+            }
+          }
+        },
+        {
+          "name": "centralSummary",
+          "wallMs": 15,
+          "queries": 8,
+          "authorityTransactions": 0,
+          "authorityProtocolCalls": 0,
+          "sqlSumMs": 14.55,
+          "sqlUnionMs": 14.55,
+          "metadataSumMs": 8.87,
+          "checkpoints": {},
+          "roles": {
+            "catalog/metadata": {
+              "calls": 3,
+              "ms": 8.870599999994738,
+              "maxMs": 4.34769999999844
+            },
+            "catalog/transaction": {
+              "calls": 4,
+              "ms": 3.360000000000582,
+              "maxMs": 1.0610999999917112
+            },
+            "catalog/other": {
+              "calls": 1,
+              "ms": 2.3148000000073807,
+              "maxMs": 2.3148000000073807
+            }
+          }
+        },
+        {
+          "name": "dashboardContext",
+          "wallMs": 2483.72,
+          "queries": 706,
+          "authorityTransactions": 9,
+          "authorityProtocolCalls": 67,
+          "sqlSumMs": 2088.36,
+          "sqlUnionMs": 2088.36,
+          "metadataSumMs": 1787.46,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 9,
+              "ms": 910.6400000000002
+            },
+            "assertCentralSchema": {
+              "calls": 9,
+              "ms": 753.0999999999999
+            },
+            "assertAuthoritySecurity": {
+              "calls": 9,
+              "ms": 251.94
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1057.56
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 90,
+              "ms": 77.60059999999066,
+              "maxMs": 1.5534000000043306
+            },
+            "authority/transaction": {
+              "calls": 36,
+              "ms": 55.86410000009346,
+              "maxMs": 4.885900000008405
+            },
+            "authority/metadata": {
+              "calls": 162,
+              "ms": 922.8427000000665,
+              "maxMs": 34.552999999999884
+            },
+            "authority/authority-lock": {
+              "calls": 9,
+              "ms": 6.689099999988684,
+              "maxMs": 1.0003999999898952
+            },
+            "authority/authority-protocol": {
+              "calls": 67,
+              "ms": 104.05819999998494,
+              "maxMs": 3.794399999998859
+            },
+            "central-reader/other": {
+              "calls": 5,
+              "ms": 13.474799999996321,
+              "maxMs": 3.4302000000025146
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 12.517700000054901,
+              "maxMs": 2.338100000008126
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 864.6137000000745,
+              "maxMs": 19.487099999998463
+            },
+            "tenant/other": {
+              "calls": 22,
+              "ms": 23.42930000006163,
+              "maxMs": 2.1371000000071945
+            },
+            "tenant/audit-prepare": {
+              "calls": 4,
+              "ms": 2.9835999999922933,
+              "maxMs": 0.883799999995972
+            },
+            "tenant/audit-append": {
+              "calls": 4,
+              "ms": 4.366500000003725,
+              "maxMs": 1.2354000000050291
+            }
+          }
+        },
+        {
+          "name": "request-outside-stages",
+          "wallMs": 637.29,
+          "queries": 138,
+          "authorityTransactions": 4,
+          "authorityProtocolCalls": 6,
+          "sqlSumMs": 555.79,
+          "sqlUnionMs": 555.79,
+          "metadataSumMs": 484.48,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 4,
+              "ms": 469.85
+            },
+            "assertCentralSchema": {
+              "calls": 4,
+              "ms": 396.37
+            },
+            "assertAuthoritySecurity": {
+              "calls": 4,
+              "ms": 124.66
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 40,
+              "ms": 36.741100000057486,
+              "maxMs": 1.6595999999990454
+            },
+            "authority/transaction": {
+              "calls": 16,
+              "ms": 18.24810000001162,
+              "maxMs": 4.319999999992433
+            },
+            "authority/metadata": {
+              "calls": 72,
+              "ms": 484.4784000000218,
+              "maxMs": 32.93249999999534
+            },
+            "authority/authority-lock": {
+              "calls": 4,
+              "ms": 3.173799999989569,
+              "maxMs": 0.9624999999941792
+            },
+            "authority/authority-protocol": {
+              "calls": 6,
+              "ms": 13.160800000012387,
+              "maxMs": 2.7014000000053784
+            }
+          }
+        }
+      ]
+    },
+    {
+      "httpMs": 7909.82,
+      "responseMs": 7906.79,
+      "sqlSumMs": 7028.39,
+      "sqlUnionMs": 6902.65,
+      "overlapMs": 125.74,
+      "outsideQueryMs": 1004.14,
+      "metadataUnionMs": 5908.53,
+      "stages": [
+        {
+          "name": "report",
+          "wallMs": 3398.2,
+          "queries": 913,
+          "authorityTransactions": 15,
+          "authorityProtocolCalls": 71,
+          "sqlSumMs": 3022.11,
+          "sqlUnionMs": 2896.37,
+          "metadataSumMs": 2538,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 15,
+              "ms": 1692.2900000000002
+            },
+            "assertCentralSchema": {
+              "calls": 15,
+              "ms": 1419.2700000000002
+            },
+            "assertAuthoritySecurity": {
+              "calls": 15,
+              "ms": 418.2
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1056.95
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 150,
+              "ms": 143.4484000000666,
+              "maxMs": 11.997199999997974
+            },
+            "authority/transaction": {
+              "calls": 60,
+              "ms": 77.22950000003038,
+              "maxMs": 5.0115000000078
+            },
+            "authority/metadata": {
+              "calls": 270,
+              "ms": 1697.9267999999138,
+              "maxMs": 35.13860000000568
+            },
+            "authority/authority-lock": {
+              "calls": 15,
+              "ms": 38.599099999977625,
+              "maxMs": 27.26140000000305
+            },
+            "authority/authority-protocol": {
+              "calls": 71,
+              "ms": 140.4629000001005,
+              "maxMs": 14.406199999997625
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 13.51459999999497,
+              "maxMs": 3.1317999999882886
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 12.216400000004796,
+              "maxMs": 2.6031999999977415
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 840.0735999998142,
+              "maxMs": 19.613100000002305
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 23.266699999992852,
+              "maxMs": 1.7721000000019558
+            },
+            "tenant/application-selection": {
+              "calls": 1,
+              "ms": 19.954299999997602,
+              "maxMs": 19.954299999997602
+            },
+            "tenant/audit-prepare": {
+              "calls": 5,
+              "ms": 6.543400000024121,
+              "maxMs": 1.6576999999961117
+            },
+            "tenant/audit-append": {
+              "calls": 5,
+              "ms": 8.859799999991083,
+              "maxMs": 1.9174999999959255
+            }
+          }
+        },
+        {
+          "name": "privateSummary",
+          "wallMs": 2205.73,
+          "queries": 656,
+          "authorityTransactions": 8,
+          "authorityProtocolCalls": 54,
+          "sqlSumMs": 1943.85,
+          "sqlUnionMs": 1943.85,
+          "metadataSumMs": 1696.01,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 8,
+              "ms": 760.8
+            },
+            "assertCentralSchema": {
+              "calls": 8,
+              "ms": 643.81
+            },
+            "assertAuthoritySecurity": {
+              "calls": 8,
+              "ms": 203.92000000000002
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 1021.56
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 80,
+              "ms": 67.12470000007306,
+              "maxMs": 1.9082000000053085
+            },
+            "authority/transaction": {
+              "calls": 32,
+              "ms": 41.45119999999588,
+              "maxMs": 4.178400000004331
+            },
+            "authority/metadata": {
+              "calls": 144,
+              "ms": 794.0452999999543,
+              "maxMs": 35.21940000000177
+            },
+            "authority/authority-lock": {
+              "calls": 8,
+              "ms": 5.514200000005076,
+              "maxMs": 1.0253000000084285
+            },
+            "authority/authority-protocol": {
+              "calls": 54,
+              "ms": 75.77949999996054,
+              "maxMs": 3.319499999997788
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 20.052499999990687,
+              "maxMs": 4.863299999997253
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 13.125599999999395,
+              "maxMs": 2.6661000000021886
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 901.9671999999555,
+              "maxMs": 22.34100000000035
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 23.032400000010966,
+              "maxMs": 1.8766999999934342
+            },
+            "tenant/audit-prepare": {
+              "calls": 1,
+              "ms": 0.7884999999951106,
+              "maxMs": 0.7884999999951106
+            },
+            "tenant/audit-append": {
+              "calls": 1,
+              "ms": 0.9999000000098022,
+              "maxMs": 0.9999000000098022
+            }
+          }
+        },
+        {
+          "name": "centralSummary",
+          "wallMs": 11.29,
+          "queries": 8,
+          "authorityTransactions": 0,
+          "authorityProtocolCalls": 0,
+          "sqlSumMs": 10.9,
+          "sqlUnionMs": 10.9,
+          "metadataSumMs": 6.46,
+          "checkpoints": {},
+          "roles": {
+            "catalog/metadata": {
+              "calls": 3,
+              "ms": 6.461800000004587,
+              "maxMs": 3.173000000009779
+            },
+            "catalog/transaction": {
+              "calls": 4,
+              "ms": 2.9248999999981606,
+              "maxMs": 0.8801999999996042
+            },
+            "catalog/other": {
+              "calls": 1,
+              "ms": 1.5146999999997206,
+              "maxMs": 1.5146999999997206
+            }
+          }
+        },
+        {
+          "name": "dashboardContext",
+          "wallMs": 1716.47,
+          "queries": 706,
+          "authorityTransactions": 9,
+          "authorityProtocolCalls": 67,
+          "sqlSumMs": 1538.2,
+          "sqlUnionMs": 1538.2,
+          "metadataSumMs": 1303.63,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 9,
+              "ms": 665.1000000000001
+            },
+            "assertCentralSchema": {
+              "calls": 9,
+              "ms": 576.49
+            },
+            "assertAuthoritySecurity": {
+              "calls": 9,
+              "ms": 186.78
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 660.29
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 90,
+              "ms": 58.09200000001874,
+              "maxMs": 1.5782000000035623
+            },
+            "authority/transaction": {
+              "calls": 36,
+              "ms": 46.47120000002906,
+              "maxMs": 7.186300000001211
+            },
+            "authority/metadata": {
+              "calls": 162,
+              "ms": 720.5379000001121,
+              "maxMs": 22.605100000000675
+            },
+            "authority/authority-lock": {
+              "calls": 9,
+              "ms": 4.684300000008079,
+              "maxMs": 0.7749999999941792
+            },
+            "authority/authority-protocol": {
+              "calls": 67,
+              "ms": 84.3297000000166,
+              "maxMs": 3.1376000000018394
+            },
+            "central-reader/other": {
+              "calls": 5,
+              "ms": 8.993399999992107,
+              "maxMs": 2.138699999995879
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 8.768400000000838,
+              "maxMs": 2.1507000000128755
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 583.0926999996882,
+              "maxMs": 12.51260000000184
+            },
+            "tenant/other": {
+              "calls": 22,
+              "ms": 15.135699999984354,
+              "maxMs": 1.7568999999930384
+            },
+            "tenant/audit-prepare": {
+              "calls": 4,
+              "ms": 3.271100000012666,
+              "maxMs": 1.3392000000021653
+            },
+            "tenant/audit-append": {
+              "calls": 4,
+              "ms": 4.907899999976507,
+              "maxMs": 1.5476999999955297
+            }
+          }
+        },
+        {
+          "name": "request-outside-stages",
+          "wallMs": 575.1,
+          "queries": 138,
+          "authorityTransactions": 4,
+          "authorityProtocolCalls": 6,
+          "sqlSumMs": 513.33,
+          "sqlUnionMs": 513.33,
+          "metadataSumMs": 450.23,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 4,
+              "ms": 421.12
+            },
+            "assertCentralSchema": {
+              "calls": 4,
+              "ms": 363.56
+            },
+            "assertAuthoritySecurity": {
+              "calls": 4,
+              "ms": 117.14
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 40,
+              "ms": 32.236200000028475,
+              "maxMs": 1.1626000000105705
+            },
+            "authority/transaction": {
+              "calls": 16,
+              "ms": 16.95230000000447,
+              "maxMs": 3.463400000007823
+            },
+            "authority/metadata": {
+              "calls": 72,
+              "ms": 450.23119999995106,
+              "maxMs": 33.62269999999262
+            },
+            "authority/authority-lock": {
+              "calls": 4,
+              "ms": 2.4380999999993946,
+              "maxMs": 0.7497000000003027
+            },
+            "authority/authority-protocol": {
+              "calls": 6,
+              "ms": 11.446700000000419,
+              "maxMs": 2.9904999999998836
+            }
+          }
+        }
+      ]
+    },
+    {
+      "httpMs": 6243.34,
+      "responseMs": 6241,
+      "sqlSumMs": 5688.6,
+      "sqlUnionMs": 5611.8,
+      "overlapMs": 76.8,
+      "outsideQueryMs": 629.2,
+      "metadataUnionMs": 4823.03,
+      "stages": [
+        {
+          "name": "report",
+          "wallMs": 2254.58,
+          "queries": 913,
+          "authorityTransactions": 15,
+          "authorityProtocolCalls": 71,
+          "sqlSumMs": 2105.28,
+          "sqlUnionMs": 2028.48,
+          "metadataSumMs": 1796.49,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 15,
+              "ms": 1042.5400000000002
+            },
+            "assertCentralSchema": {
+              "calls": 15,
+              "ms": 917
+            },
+            "assertAuthoritySecurity": {
+              "calls": 15,
+              "ms": 311.96999999999997
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 735.25
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 150,
+              "ms": 84.70689999996102,
+              "maxMs": 4.749599999995553
+            },
+            "authority/transaction": {
+              "calls": 60,
+              "ms": 51.731000000057975,
+              "maxMs": 4.201100000005681
+            },
+            "authority/metadata": {
+              "calls": 270,
+              "ms": 1161.670899999881,
+              "maxMs": 25.13729999998759
+            },
+            "authority/authority-lock": {
+              "calls": 15,
+              "ms": 27.050600000016857,
+              "maxMs": 20.230799999990268
+            },
+            "authority/authority-protocol": {
+              "calls": 71,
+              "ms": 83.42769999992743,
+              "maxMs": 2.4342000000033295
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 10.716300000000047,
+              "maxMs": 2.5121000000071945
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 9.613799999948242,
+              "maxMs": 1.9689999999973224
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 634.821699999753,
+              "maxMs": 15.299700000003213
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 17.79729999997653,
+              "maxMs": 1.4377999999996973
+            },
+            "tenant/application-selection": {
+              "calls": 1,
+              "ms": 14.776299999997718,
+              "maxMs": 14.776299999997718
+            },
+            "tenant/audit-prepare": {
+              "calls": 5,
+              "ms": 3.416400000001886,
+              "maxMs": 1.1398999999946682
+            },
+            "tenant/audit-append": {
+              "calls": 5,
+              "ms": 5.806900000025053,
+              "maxMs": 1.6962000000057742
+            }
+          }
+        },
+        {
+          "name": "privateSummary",
+          "wallMs": 1856.47,
+          "queries": 656,
+          "authorityTransactions": 8,
+          "authorityProtocolCalls": 54,
+          "sqlSumMs": 1672.65,
+          "sqlUnionMs": 1672.65,
+          "metadataSumMs": 1445.48,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 8,
+              "ms": 698.41
+            },
+            "assertCentralSchema": {
+              "calls": 8,
+              "ms": 616.1200000000001
+            },
+            "assertAuthoritySecurity": {
+              "calls": 8,
+              "ms": 199.59
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 758.05
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 80,
+              "ms": 54.48559999999998,
+              "maxMs": 1.5048999999999069
+            },
+            "authority/transaction": {
+              "calls": 32,
+              "ms": 42.95689999999013,
+              "maxMs": 4.580199999996694
+            },
+            "authority/metadata": {
+              "calls": 144,
+              "ms": 774.595799999981,
+              "maxMs": 29.163100000005215
+            },
+            "authority/authority-lock": {
+              "calls": 8,
+              "ms": 4.562900000004447,
+              "maxMs": 0.7878000000055181
+            },
+            "authority/authority-protocol": {
+              "calls": 54,
+              "ms": 77.46639999999024,
+              "maxMs": 3.1074999999982538
+            },
+            "central-reader/other": {
+              "calls": 6,
+              "ms": 14.871799999993527,
+              "maxMs": 3.2678000000014435
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 10.80830000001879,
+              "maxMs": 2.565199999997276
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 670.885499999873,
+              "maxMs": 13.009699999995064
+            },
+            "tenant/other": {
+              "calls": 23,
+              "ms": 18.82170000001497,
+              "maxMs": 1.6301999999996042
+            },
+            "tenant/audit-prepare": {
+              "calls": 1,
+              "ms": 1.4082999999955064,
+              "maxMs": 1.4082999999955064
+            },
+            "tenant/audit-append": {
+              "calls": 1,
+              "ms": 1.8591000000014901,
+              "maxMs": 1.8591000000014901
+            }
+          }
+        },
+        {
+          "name": "centralSummary",
+          "wallMs": 8.84,
+          "queries": 8,
+          "authorityTransactions": 0,
+          "authorityProtocolCalls": 0,
+          "sqlSumMs": 8.57,
+          "sqlUnionMs": 8.57,
+          "metadataSumMs": 5.56,
+          "checkpoints": {},
+          "roles": {
+            "catalog/metadata": {
+              "calls": 3,
+              "ms": 5.555200000002515,
+              "maxMs": 2.742599999997765
+            },
+            "catalog/transaction": {
+              "calls": 4,
+              "ms": 1.889100000000326,
+              "maxMs": 0.5891000000119675
+            },
+            "catalog/other": {
+              "calls": 1,
+              "ms": 1.1296000000002095,
+              "maxMs": 1.1296000000002095
+            }
+          }
+        },
+        {
+          "name": "dashboardContext",
+          "wallMs": 1736.17,
+          "queries": 706,
+          "authorityTransactions": 9,
+          "authorityProtocolCalls": 67,
+          "sqlSumMs": 1548.89,
+          "sqlUnionMs": 1548.89,
+          "metadataSumMs": 1319.44,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 9,
+              "ms": 661.54
+            },
+            "assertCentralSchema": {
+              "calls": 9,
+              "ms": 581.8399999999999
+            },
+            "assertAuthoritySecurity": {
+              "calls": 9,
+              "ms": 191.41000000000003
+            },
+            "observeTenantRuntimeMetadata": {
+              "calls": 3,
+              "ms": 681.5
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 90,
+              "ms": 57.036199999958626,
+              "maxMs": 1.4530999999988126
+            },
+            "authority/transaction": {
+              "calls": 36,
+              "ms": 43.09399999998277,
+              "maxMs": 4.410499999998137
+            },
+            "authority/metadata": {
+              "calls": 162,
+              "ms": 732.2932999998593,
+              "maxMs": 31.797399999995832
+            },
+            "authority/authority-lock": {
+              "calls": 9,
+              "ms": 5.0741000000271015,
+              "maxMs": 0.8491000000067288
+            },
+            "authority/authority-protocol": {
+              "calls": 67,
+              "ms": 79.61250000000291,
+              "maxMs": 1.9095999999990454
+            },
+            "central-reader/other": {
+              "calls": 5,
+              "ms": 9.868299999987357,
+              "maxMs": 2.105199999990873
+            },
+            "tenant/transaction": {
+              "calls": 13,
+              "ms": 9.1475999999966,
+              "maxMs": 2.531199999997625
+            },
+            "tenant/metadata": {
+              "calls": 294,
+              "ms": 587.1456000000617,
+              "maxMs": 11.889300000009825
+            },
+            "tenant/other": {
+              "calls": 22,
+              "ms": 16.00349999993341,
+              "maxMs": 1.333599999998114
+            },
+            "tenant/audit-prepare": {
+              "calls": 4,
+              "ms": 3.7397000000055414,
+              "maxMs": 1.0384999999951106
+            },
+            "tenant/audit-append": {
+              "calls": 4,
+              "ms": 5.717899999988731,
+              "maxMs": 1.9104999999981374
+            }
+          }
+        },
+        {
+          "name": "request-outside-stages",
+          "wallMs": 384.94,
+          "queries": 138,
+          "authorityTransactions": 4,
+          "authorityProtocolCalls": 6,
+          "sqlSumMs": 353.21,
+          "sqlUnionMs": 353.21,
+          "metadataSumMs": 305.6,
+          "checkpoints": {
+            "assertAuthorityAdmission": {
+              "calls": 4,
+              "ms": 273.09000000000003
+            },
+            "assertCentralSchema": {
+              "calls": 4,
+              "ms": 242.25
+            },
+            "assertAuthoritySecurity": {
+              "calls": 4,
+              "ms": 81.08
+            }
+          },
+          "roles": {
+            "authority/other": {
+              "calls": 40,
+              "ms": 21.432299999971292,
+              "maxMs": 0.8950000000040745
+            },
+            "authority/transaction": {
+              "calls": 16,
+              "ms": 14.739800000039395,
+              "maxMs": 4.572799999994459
+            },
+            "authority/metadata": {
+              "calls": 72,
+              "ms": 305.6047000000108,
+              "maxMs": 20.637799999996787
+            },
+            "authority/authority-lock": {
+              "calls": 4,
+              "ms": 1.8277999999845633,
+              "maxMs": 0.4743999999918742
+            },
+            "authority/authority-protocol": {
+              "calls": 6,
+              "ms": 9.643500000034692,
+              "maxMs": 2.0525000000052387
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Observer adds ALS/hash/Promise/timestamp overhead; no isolated estimate of that overhead.",
+    "SQL intervals measure driver calls, not PostgreSQL CPU time.",
+    "Nested checkpoint spans are inclusive and must not be added to parent spans.",
+    "Outside-query time is a residual, not exclusively JavaScript CPU or network time.",
+    "Warmup excluded; C1 has four samples."
+  ]
+}

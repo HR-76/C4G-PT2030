@@ -1,0 +1,133 @@
+{
+  "startedAt": "2026-10-27T00:06:32.533Z",
+  "status": "PASS",
+  "checks": [
+    "current central migrations and security preflight",
+    "two physical tenants migrated and published through real directory",
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real Authorization Code PKCE login and secure HttpOnly SameSite cookies",
+    "organization POST returns confirmed user organization and fresh CSRF",
+    "concurrent membership revocation prevents a stale real tenant read",
+    "revoked central membership denies subsequent real HTTP reads"
+  ],
+  "measurements": [],
+  "failures": [
+    {
+      "code": "ORGANIZATION_MISMATCH",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    }
+  ],
+  "limits": [
+    "Synthetic data and local Docker; no productive SLO or capacity claim.",
+    "Central non-authority reads use a bootstrap pg_read_all_data login; exact production central privilege parity is not claimed.",
+    "Keycloak development mode with TLS and the existing trusted local test certificate."
+  ],
+  "scope": "revocation",
+  "stage": "real-authority-revocation",
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "032_single_organization_membership",
+  "keycloak": "26.8.0",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "browser": "156.0.8078.47",
+  "node": "v24.13.1",
+  "concurrentRevocation": {
+    "databaseReadBlocked": true,
+    "blockedAt": "tenant-admission",
+    "writerRegistered": true,
+    "committedBeforeRelease": true,
+    "readStatus": 503,
+    "readMs": 1654
+  },
+  "finishedAt": "2026-10-27T00:07:22.909Z"
+}

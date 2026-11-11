@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-28",
+  "scope": "Third explicitly authorized isolated execution",
+  "exitCode": 1,
+  "status": "FAIL",
+  "setupDiagnostic": {
+    "phase": "TENANT_ENSURE",
+    "tenant": "A",
+    "status": "FAILED",
+    "classification": "TENANT_MIGRATION",
+    "errorCode": "DATABASE_CONFIGURATION_MISMATCH",
+    "localCleanup": "COMPLETED",
+    "substep": "MIGRATION",
+    "substepStatus": "FAILED",
+    "substepFailure": {
+      "classification": "TENANT_MIGRATION",
+      "errorCode": "DATABASE_CONFIGURATION_MISMATCH"
+    }
+  },
+  "cleanup": {
+    "environmentClosed": false,
+    "containerRemoved": true,
+    "errors": []
+  },
+  "containerAbsenceConfirmedByIdAndLabel": true,
+  "independentVolumeInventory": false,
+  "reEvaluation": "FAIL",
+  "sourceManifestVerified": true,
+  "repositoryCases": 0,
+  "authorityCases": 0,
+  "capacitySamples": 0,
+  "warmups": 0,
+  "performanceMeasurements": null,
+  "codeChanged": false,
+  "testsAdded": 0,
+  "suitesAndBuildRerun": false,
+  "runtimeIntegrated": false,
+  "diagnosis": {
+    "confirmedCode": "DATABASE_CONFIGURATION_MISMATCH",
+    "configurationMismatchFieldKnown": false,
+    "hypothesis": "Existing pooled session predates ALTER DATABASE TimeZone default",
+    "hypothesisConfirmedByObservedSettings": false,
+    "independentReadOnlyReview": true
+  },
+  "preservation": {
+    "status": "PASS",
+    "branch": "feat/f13-organizational-profile",
+    "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baselineFiles": 30983,
+    "currentFiles": 30987,
+    "baselineWorktreeEntries": 2609,
+    "currentWorktreeEntries": 2613,
+    "added": [
+      "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/README.md",
+      "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/evidence.json",
+      "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/sources.json",
+      "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md"
+    ],
+    "removed": [],
+    "unexpected": [],
+    "previousTwoFailuresUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  }
+}

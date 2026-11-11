@@ -1,0 +1,7 @@
+{
+  "test/integration/http-contention/instrumentation.js": "b4d6e4caebad49ae37291b0068f71a1317606f5c614bf35f591877410da32e5a",
+  "test/integration/http-contention/profile.js": "4a7d1d44380569e2fbcaae72d8999eb84a0de90d69265d613055cd447bd267d9",
+  "test/integration/http-contention/profile.ps1": "7097c0c263bc16fd40be0539ab47751e265d6c649a1dedbcb440d5d3947a2bf3",
+  "test/integration/http-contention/README.md": "e34b06c0002ceca6b580877e5247bf33f45df8af0b1c272387daf21b4467435c",
+  "test/integration/http-contention/summarize.js": "69421323992d09d46f269dc7cc54731470a23122eaa72b687fdb9c630edd3b77"
+}

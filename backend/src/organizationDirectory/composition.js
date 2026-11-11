@@ -1,0 +1,119 @@
+'use strict';
+const {AsyncLocalStorage}=require('node:async_hooks');
+const {createAuthorityDataRepository}=require('../authorization/authorityDataRepository');
+const {createTaxonomySessionAuthority}=require('../security/authenticatedAuthority');
+const {createTaxonomyAuthorization}=require('../authorization/resourceAuthorization');
+const {createTenantRuntime}=require('../security/tenantRuntime');
+const {createAuthorizedTenantOperationCatalog}=require('../security/tenantOperationCatalog');
+const {preparedAuthorityBinding,isPreparedTenantTransaction}=require('../security/tenantLeaseExecutor');
+const {createTenantAuthorityRecovery}=require('../security/tenantAuthorityRecovery');
+const {tenantFailure}=require('../security/tenantRuntimeErrors');
+const {createEditorialUiAudit}=require('../organizationalProfile/editorialUiAudit');
+const {createPq1UiTokens}=require('../organizationalProfile/pq1UiTokens');
+const {createAuditEvent}=require('../audit/event');
+const {createAppendService}=require('../audit/appendService');
+const {PostgresAppendRepository}=require('../audit/postgresAppendRepository');
+const {createDirectoryRepository}=require('./repository');
+const {createCentralOrganizationReader,createCentralMembershipReader}=require('./centralOrganizationReader');
+const {parse,uuid,fail}=require('./contracts');
+const READ=new Set(['context','units','people','peopleWithResearchAreas','person','self','memberships']);
+const DIRECTORY_SCHEMA_VERSIONS=Object.freeze(['025_organization_directory','026_personal_profile','027_application_lifecycle','028_application_partners','029_application_alerts','030_organization_notices','031_application_document_transport','032_document_worker_runtime','033_organizational_opportunity_interests',require('../security/opportunityV2MigrationPackage').tenantAddition.version]);
+const operation=method=>method==='self'?'PERSONAL_PROFILE_READ':method==='selfEdit'?'PERSONAL_PROFILE_EDIT':`ORGANIZATION_DIRECTORY_${READ.has(method)&&method!=='memberships'?'READ':'EDIT'}`;
+function createDirectoryComposition({sessionStore,sessionRegistry,authorityCoordinator:coordinator,centralPool,authorizationCatalogs:catalogs,
+ assurancePolicyVersion:policyVersion,recentMfaRequirement,tenantRuntimeDependencies:dependencies,tokenKeys,tokenKeyId,
+ clock={now:()=>new Date()},onFailure=()=>{},registrationService=null}){
+ const data=createAuthorityDataRepository({coordinator,catalogs,policyVersion,recentMfaRequirement});
+ const authority=createTaxonomySessionAuthority({sessionStore,sessionRegistry,authorityCoordinator:coordinator,...data,policyVersion,clock});
+ const scope=new AsyncLocalStorage(),inputs=new WeakMap(),tokens=createPq1UiTokens({keys:tokenKeys,currentKeyId:tokenKeyId,clock:()=>clock.now().getTime()});
+ const baseAudit=createEditorialUiAudit({scope,catalogs,clock,policyVersion});
+ const auditPort={accept(event){const s=scope.getStore();if(!s)throw Error('DIRECTORY_AUDIT_SCOPE_REQUIRED');const task=(s.auditTail||Promise.resolve()).then(()=>baseAudit.accept(event));s.auditTail=task;task.catch(()=>{});return task}};
+ const drain=()=>scope.getStore()?.auditTail||Promise.resolve();
+ const authorization=createTaxonomyAuthorization({exactResourceScope:false,catalogs,...data,assurancePolicyVersion:policyVersion,recentMfaRequirement,clock,authorizationAuditPort:auditPort});
+ const authorizeRegistration=require('../entityAdmission/registrationAuthorization').createRegistrationAuthorization({catalogs,data,clock,policyVersion,recentMfaRequirement});
+ const guard=coordinator.bindAuthority({sessionAuthority:authority,authorization,operationCatalog:catalogs.operationCatalog,permissionCatalog:catalogs.permissionCatalog,recentMfaRequirement});
+ const append=createAppendService({appendPort:new PostgresAppendRepository()}),adapters={};
+ const entries=['ORGANIZATION_DIRECTORY_READ','ORGANIZATION_DIRECTORY_EDIT','PERSONAL_PROFILE_READ','PERSONAL_PROFILE_EDIT'].map(operationCode=>{
+  const action=operationCode.endsWith('READ')?'READ':'EDIT';
+  const queryModule=Object.freeze({moduleCode:operationCode,requiresAuditWrite:true,
+   async execute({client,input}){try{return await run(client,inputs.get(input))}catch(error){onFailure(error);
+    const conflict=['23505','23503','23514'].includes(error.code)||(error.code==='P0001'&&/^(ORGANIZATIONAL_SCOPE_|DIRECTORY_)/.test(error.message));
+    throw tenantFailure(conflict?'STATE_CONFLICT':error.publicCode||error.code||'SERVICE_UNAVAILABLE','TENANT_OPERATION_UNAVAILABLE')}},
+   beforeCommit:({client})=>client.query('RESET ROLE'),authorityGuard:Object.freeze({assert({client,input}){const s=inputs.get(input);coordinator.assert(s.guard,client,preparedAuthorityBinding(client).transactionId)},
+    async complete({input,outcome}){const s=inputs.get(input);if(s?.guard)await coordinator.complete(s.guard,outcome)}})});
+  adapters[operationCode]=Object.freeze({operationCode,queryModule});
+  return Object.freeze({operationCode,ownerModule:'ORGANIZATION_DIRECTORY',accessMode:action==='READ'?'READ':'WRITE',workload:'API',workloadClass:'FUNCTIONAL',queryModule,
+   compatibleSchemaVersions:DIRECTORY_SCHEMA_VERSIONS,requiredCapabilities:Object.freeze(['ORGANIZATION_DIRECTORY','F13_P1_ORGANIZATIONAL_SCOPE','F7_AUDIT_LEDGER','F4_RUNTIME_METADATA_ACCESS']),
+   allowedCompatibilityStates:Object.freeze(['COMPATIBLE']),readOnlyEligible:false,inputSchema:Object.freeze({validate:v=>inputs.has(v)}),resultSchema:Object.freeze({validate:v=>v!==undefined}),
+   requiredPermission:operationCode,limits:Object.freeze({maxPageSize:1000,maxRows:2000,maxBytes:1048576}),timeoutMs:10000});
+ });
+ const runtime=createTenantRuntime({...dependencies,operationCatalog:createAuthorizedTenantOperationCatalog(Object.freeze({catalogVersion:'organization-directory-v1',operations:Object.freeze(entries)}),catalogs.operationCatalog)});
+ async function audit(client,s,entry){
+  const event=createAuditEvent({clock:()=>clock.now(),trustedContext:{organizationId:s.context.actor.organizationId,tenantId:s.context.actor.organizationId,
+   operationAuthority:'TENANT',operationCode:'ORGANIZATION_DIRECTORY_EDIT',catalogVersion:'f13-editorial-events-v1',source:'API',channel:'APPLICATION',synchronous:true},
+   input:{eventCode:entry.eventCode,actor:{type:'HUMAN',id:s.context.actor.id,membershipId:s.context.actor.membershipId,serviceActorCode:null,supportGrantId:null},
+    subject:null,resource:{type:entry.resourceType,id:entry.resourceId},decision:'ACCEPT',outcome:'SUCCESS',observedAt:clock.now().toISOString(),
+    correlationId:s.context.correlationId,causationId:null,idempotencyKey:`DIRECTORY:${s.method}:${entry.idempotencyKey}`,streamType:'DATA',payload:{detailCode:entry.eventCode}}});
+  await append.append(event,client);
+ }
+ async function run(client,s){
+  await client.query('SET LOCAL ROLE c4g_opportunity_tenant_runtime');
+  s.context=await authority.resolve(s.handle);const org=s.context.actor.organizationId;
+  await client.query("SELECT set_config('app.organization_id',$1,true)",[org]);
+  // Same tree lock as F13-P1: links cannot race a unit archive/reparent.
+  if(!READ.has(s.method))await client.query("SELECT pg_advisory_xact_lock(hashtextextended('F13-P1:' || $1::text,43001301))",[org]);
+  return scope.run({client,organizationId:org,sequence:0,...(s.method==='context'?{readAuditPolicy:'DIRECTORY_CONTEXT',tenantId:preparedAuthorityBinding(client).tenantId}:{})},async()=>{try{
+   let contextAuthorization;
+   const authorizeContext=async(op,target)=>{
+    const assertCurrent=()=>coordinator.assert(s.guard,client,preparedAuthorityBinding(client).transactionId);
+    if(s.method==='context'){
+     assertCurrent();
+     contextAuthorization ||= createTaxonomyAuthorization({exactResourceScope:false,catalogs,
+      ...require('../applications/protectedAuthoritySnapshot').createProtectedAuthoritySnapshot({actor:s.context.actor,data,withAuthority:coordinator.withAuthority,assertCurrent,clock}),
+      assurancePolicyVersion:policyVersion,recentMfaRequirement,clock,authorizationAuditPort:auditPort});
+    }
+    const result=await (s.method==='context'?contextAuthorization:authorization).authorize(op,s.context,target);await drain();
+    if(s.method==='context'){
+     assertCurrent();
+     if(!result.allowed&&/AUDIT|UNAVAILABLE|STALE|MEMBERSHIP|POLICY_INVALID/.test(result.reasonCode))fail('SERVICE_UNAVAILABLE');
+    }
+    return result.allowed;
+   };
+   const repository=createDirectoryRepository({organizationId:org,actor:s.context.actor,tokens,clock,
+    supportsStrategy:isPreparedTenantTransaction(client,{organizationId:org,tenantId:preparedAuthorityBinding(client).tenantId,
+     workload:'API',requiredCapabilities:['ORGANIZATION_STRATEGY']}),
+    registration:registrationService?()=>registrationService.read(org):null,
+    organization:createCentralOrganizationReader({pool:centralPool,organizationId:org}),
+    memberships:createCentralMembershipReader({pool:centralPool,organizationId:org}),
+    authorize:authorizeContext,
+    protect:async args=>{const result=await guard.protect(client,{handle:s.handle,...args});s.guard=result.token;await drain();return result},audit:(c,e)=>audit(c,s,e)});
+   if(s.method.startsWith('unit')&&!READ.has(s.method))return await repository.unitWrite(client,s.method,s.input,s.id,s.context);
+   if(['personCreate','personEdit'].includes(s.method))return await repository.personWrite(client,s.method,s.input,s.id);
+   return await repository[s.method](client,s.input,s.id);
+  }finally{await drain()}});
+ }
+ async function attempt(s){const input=Object.freeze({});inputs.set(input,s);try{
+  const lease=await runtime.resolve({correlationId:s.context.correlationId,operationAdapter:adapters[operation(s.method)],
+   organizationContext:{organizationId:s.context.actor.organizationId,membershipId:s.context.actor.membershipId,membershipVersion:s.context.actor.membershipVersion}});
+  return await lease.execute(input);
+ }catch(error){onFailure(error);if(error.internalCode==='COMMIT_UNCERTAIN')return {uncertain:true};throw Object.assign(new Error('Directory unavailable'),{code:error.internalCode||error.code||'SERVICE_UNAVAILABLE'})}
+ finally{inputs.delete(input)}}
+ return Object.freeze({async execute(method,raw,id,request){
+  try{
+   if(method==='registrationContacts'||method==='registrationProfile'){
+   if(!registrationService)fail('RESOURCE_NOT_AVAILABLE');
+   const org=uuid(request.headers?.['x-c4g-organization']),handle=await authority.captureAuthenticatedRequest(request),trusted=await authority.resolve(handle);
+   if(trusted.actor.organizationId!==org)fail('CONTEXT_CHANGED');
+    return method==='registrationContacts'?registrationService.contacts(org,raw,request,trusted,authorizeRegistration):registrationService.saveForEntity(org,raw,request,trusted,authorizeRegistration);
+  }
+  const input=parse(method,raw),exactId=id?uuid(id):null;
+  const expectedOrg=uuid(request.headers?.['x-c4g-organization']);
+  const {handle,context}=await coordinator.withAuthority(async()=>{const handle=await authority.captureAuthenticatedRequest(request);return {handle,context:await authority.resolve(handle)};});
+  if(context.actor.organizationId!==expectedOrg)fail('CONTEXT_CHANGED');
+  coordinator.registerRecovery(expectedOrg,createTenantAuthorityRecovery(dependencies));
+  const s={method,input,id:exactId,handle,context,guard:null};let result=await attempt(s);
+  if(result?.uncertain){await coordinator.reconcile(s.guard);s.context=await authority.resolve(handle);s.guard=null;result=await attempt(s);if(result?.uncertain)fail('SERVICE_UNAVAILABLE')}
+  return result;
+  }catch(error){onFailure(error);throw error;}
+ }});
+}
+module.exports={createDirectoryComposition,DIRECTORY_SCHEMA_VERSIONS};

@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-28",
+  "scope": "Harness-only domain and substep diagnostics; no Docker or PostgreSQL execution",
+  "branch": "feat/f13-organizational-profile",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "baselineFiles": 30974,
+  "baselineWorktreeEntries": 2600,
+  "tdd": {
+    "initialRed": "New modules absent",
+    "functionalRed": [
+      "Environment branded migration was UNKNOWN",
+      "Synchronous ownership refusal attributed to unlock",
+      "Frozen factory Proxy invariant",
+      "Release failure attributed to unlock"
+    ],
+    "newTests": 27
+  },
+  "tests": {
+    "focused": {
+      "pass": 186,
+      "fail": 0,
+      "skip": 0
+    },
+    "diagnosticGroup": {
+      "pass": 34,
+      "fail": 0
+    },
+    "backend": {
+      "pass": 1524,
+      "fail": 0,
+      "skip": 7,
+      "total": 1531
+    },
+    "frontend": {
+      "pass": 346,
+      "files": 55
+    },
+    "build": "PASS",
+    "syntaxFiles": 6,
+    "preexistingSkips": 7,
+    "preexistingWarnings": [
+      "jsdom navigation",
+      "Synthetic chunk failure"
+    ]
+  },
+  "independentReview": {
+    "performed": true,
+    "findingsResolved": [
+      "Frozen factories require separate facade",
+      "Publication method failures need observation",
+      "Synchronous release attribution"
+    ],
+    "preexistingFinding": "Outer preflight lacks required timeoutMs"
+  },
+  "preexistingPreflightCheck": {
+    "errorType": "TypeError",
+    "connectionAttempts": 0,
+    "corrected": false,
+    "explainsObservedEnsureFailure": false
+  },
+  "sourceManifest": {
+    "files": 1013,
+    "verified": true,
+    "reviewedChanges": [
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/provisioningDiagnostic.js",
+      "test/integration/partner-portal/setupErrorDiagnostic.js"
+    ]
+  },
+  "logs": [
+    {
+      "name": "partner-ensure-diagnostic-focused.log",
+      "sha256": "ff8ecd5a46db78505022f7987528a5b5c042d82323a637a35231179d0ea745ef"
+    },
+    {
+      "name": "partner-ensure-diagnostic-backend.log",
+      "sha256": "8af786dec06a809d2a9769771b1af44047f3164cee0331096a56c5b55f515ebb"
+    },
+    {
+      "name": "partner-ensure-diagnostic-frontend.log",
+      "sha256": "d32c320a960ea1a1c2e7a8d1f8c50d39dd3499ba4e2facd9191f5caf057f8d55"
+    },
+    {
+      "name": "partner-ensure-diagnostic-build.log",
+      "sha256": "3626dbda34ebeee04eef98bc1fc7b190dac632912b0d154bf9b5d81c7f625cdb"
+    },
+    {
+      "name": "partner-ensure-diagnostic-new.log",
+      "sha256": "706bbd198724349488ab0b071c306910642ff4e4061927721504e40ca3ab2a3b"
+    }
+  ],
+  "sourceHashChecks": [
+    {
+      "path": "backend/src/applications/partners.js",
+      "sha256": "3272B2BFBFAA54AA3C4F35C5B9F4AFC3818BBB2BDDDE261F0A0286EA78AC9342",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/composition.js",
+      "sha256": "0F51E47FEE7E6016FC25F6A82DCDFFBE446CF25F6AC8B3C9D0D9F9F4E0F61CDF",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/browseSql.js",
+      "sha256": "7D3AF38C0C106324FFB1C5AB19C30D38AC303EE372651CEB80D6115037D8C287",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/routes/applicationSliceRoutes.js",
+      "sha256": "7573E7A1D682DEF64CAFD1498EFA2B764382F00F7C713A4D076134DB55376DAC",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/pq1UiTokens.js",
+      "sha256": "1A10A1D109AD967B9922CCF0DBB164D45E7608B20E28B229305CEF67E19B3F64",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/canonicalization.js",
+      "sha256": "641A6980C356699FE4B3989DC9B1968E438835626933217F19A58BEAB7FEBF63",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/api/api.js",
+      "sha256": "F6BAC2DE291D63935E1B4A136DDD06532C2C8F1A5DF483D273B9A6B66BE7238B",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/pages/Partners.jsx",
+      "sha256": "AF49B44AC114AB287ADDED4A4D99FA8C73F7D1067D6FF7FC958B58DD7DC38FB4",
+      "unchanged": true
+    }
+  ],
+  "postgresExecuted": false,
+  "dockerExecuted": false,
+  "originalEnsureCauseKnown": false,
+  "runtimeIntegrated": false,
+  "measurements": {
+    "postgresBeforeAfter": null,
+    "syntheticOperationTraceEquivalent": true,
+    "additionalQueriesInSyntheticTrace": 0
+  },
+  "preservation": {
+    "allowedFiles": [
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/provisioningDiagnostic.js",
+      "test/integration/partner-portal/setupErrorDiagnostic.js",
+      "test/integration/partner-portal/sources.json",
+      "test/integration/partner-portal/README.md",
+      "backend/test/partnerEnsureDiagnostic.test.js",
+      "backend/test/partnerSetupErrorDiagnostic.test.js",
+      "backend/test/partnerSetupDiagnostic.test.js",
+      "context/features/partner-postgres-gate.md",
+      "context/current-work.md",
+      "context/reviews/partner-ensure-diagnostic/README.md",
+      "context/reviews/partner-ensure-diagnostic/verification.json"
+    ],
+    "status": "PASS",
+    "added": [
+      "backend/test/partnerEnsureDiagnostic.test.js",
+      "backend/test/partnerSetupErrorDiagnostic.test.js",
+      "context/reviews/partner-ensure-diagnostic/README.md",
+      "context/reviews/partner-ensure-diagnostic/verification.json",
+      "test/integration/partner-portal/provisioningDiagnostic.js",
+      "test/integration/partner-portal/setupErrorDiagnostic.js"
+    ],
+    "changed": [
+      "backend/test/partnerSetupDiagnostic.test.js",
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md",
+      "test/integration/partner-portal/README.md",
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/sources.json"
+    ],
+    "unexpected": [],
+    "removed": [],
+    "generatedBuildAndCache": 65,
+    "branchAndHeadUnchanged": true,
+    "currentFiles": 30980,
+    "currentWorktreeEntries": 2606,
+    "previousTwoExecutionArtifactsUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  }
+}

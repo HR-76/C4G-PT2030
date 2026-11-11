@@ -1,0 +1,131 @@
+{
+    "schema_version":  "1.0",
+    "date":  "2026-10-27",
+    "branch":  "feat/f13-organizational-profile",
+    "head":  "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baseline_file_count":  30923,
+    "baseline_worktree_entries":  2549,
+    "scope":  "Contract and characterization tests only; no SQL candidate implemented",
+    "tests":  {
+                  "new":  25,
+                  "reusable_scenarios":  16,
+                  "negative_controls":  3,
+                  "http":  6,
+                  "focused":  {
+                                  "fail":  0,
+                                  "pass":  31
+                              },
+                  "backend_before":  {
+                                         "skip":  7,
+                                         "pass":  1344,
+                                         "fail":  0,
+                                         "source":  "Previous increment final suite"
+                                     },
+                  "backend_after":  {
+                                        "skip":  7,
+                                        "pass":  1369,
+                                        "fail":  0,
+                                        "total":  1376
+                                    },
+                  "frontend":  {
+                                   "files":  55,
+                                   "pass":  346,
+                                   "fail":  0
+                               },
+                  "build":  "PASS",
+                  "syntax_files":  4
+              },
+    "golden":  {
+                   "projection_rows":  26,
+                   "sha256":  "ac97db797317226f80c125e8770f8250ae6432b8333f0a565fe1eb7273361e21",
+                   "independently_reproduced":  true,
+                   "production_credentials":  false,
+                   "utf8_canonical_bytes":  15289
+               },
+    "environment":  {
+                        "node":  "v24.13.1",
+                        "cldr":  "48.0",
+                        "icu":  "78.2",
+                        "unicode":  "17.0"
+                    },
+    "independent_review":  "Completed; no blocking findings in current scope",
+    "sql_equivalence_proven":  false,
+    "postgres_rls_concurrency_gates_executed":  false,
+    "performance_comparison":  "Not applicable: runtime unchanged; future measurements specified in contract",
+    "sourceHashChecks":  [
+                             {
+                                 "path":  "backend/src/applications/partners.js",
+                                 "sha256Before":  "3272B2BFBFAA54AA3C4F35C5B9F4AFC3818BBB2BDDDE261F0A0286EA78AC9342",
+                                 "sha256After":  "3272B2BFBFAA54AA3C4F35C5B9F4AFC3818BBB2BDDDE261F0A0286EA78AC9342",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "backend/src/applications/composition.js",
+                                 "sha256Before":  "0F51E47FEE7E6016FC25F6A82DCDFFBE446CF25F6AC8B3C9D0D9F9F4E0F61CDF",
+                                 "sha256After":  "0F51E47FEE7E6016FC25F6A82DCDFFBE446CF25F6AC8B3C9D0D9F9F4E0F61CDF",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "backend/src/applications/browseSql.js",
+                                 "sha256Before":  "7D3AF38C0C106324FFB1C5AB19C30D38AC303EE372651CEB80D6115037D8C287",
+                                 "sha256After":  "7D3AF38C0C106324FFB1C5AB19C30D38AC303EE372651CEB80D6115037D8C287",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "backend/src/routes/applicationSliceRoutes.js",
+                                 "sha256Before":  "7573E7A1D682DEF64CAFD1498EFA2B764382F00F7C713A4D076134DB55376DAC",
+                                 "sha256After":  "7573E7A1D682DEF64CAFD1498EFA2B764382F00F7C713A4D076134DB55376DAC",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "backend/src/organizationalProfile/pq1UiTokens.js",
+                                 "sha256Before":  "1A10A1D109AD967B9922CCF0DBB164D45E7608B20E28B229305CEF67E19B3F64",
+                                 "sha256After":  "1A10A1D109AD967B9922CCF0DBB164D45E7608B20E28B229305CEF67E19B3F64",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "backend/src/organizationalProfile/canonicalization.js",
+                                 "sha256Before":  "641A6980C356699FE4B3989DC9B1968E438835626933217F19A58BEAB7FEBF63",
+                                 "sha256After":  "641A6980C356699FE4B3989DC9B1968E438835626933217F19A58BEAB7FEBF63",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "frontend/src/api/api.js",
+                                 "sha256Before":  "F6BAC2DE291D63935E1B4A136DDD06532C2C8F1A5DF483D273B9A6B66BE7238B",
+                                 "sha256After":  "F6BAC2DE291D63935E1B4A136DDD06532C2C8F1A5DF483D273B9A6B66BE7238B",
+                                 "unchanged":  true
+                             },
+                             {
+                                 "path":  "frontend/src/pages/Partners.jsx",
+                                 "sha256Before":  "AF49B44AC114AB287ADDED4A4D99FA8C73F7D1067D6FF7FC958B58DD7DC38FB4",
+                                 "sha256After":  "AF49B44AC114AB287ADDED4A4D99FA8C73F7D1067D6FF7FC958B58DD7DC38FB4",
+                                 "unchanged":  true
+                             }
+                         ],
+    "preservation":  {
+                         "unexpectedChanges":  [
+
+                                               ],
+                         "protectedChanges":  [
+
+                                              ],
+                         "removedFiles":  [
+
+                                          ],
+                         "headUnchanged":  true,
+                         "branchUnchanged":  true,
+                         "fileMetadataErrorsChanged":  false,
+                         "changedTestsAndDocumentation":  [
+                                                              "backend/test/partnerPaginationContract.test.js",
+                                                              "backend/test/partnerPaginationHttpContract.test.js",
+                                                              "backend/test/support/partnerBrowseContract.js",
+                                                              "backend/test/support/partnerBrowseReferenceHarness.js",
+                                                              "context/features/partner-sql-pagination.md",
+                                                              "context/reviews/partner-sql-pagination-contract/README.md",
+                                                              "context/reviews/partner-sql-pagination-contract/verification.json",
+                                                              "context/current-work.md"
+                                                          ],
+                         "generatedBuildAndCacheChanges":  65,
+                         "scope":  "Filesystem metadata plus eight selected source hashes; no external data snapshot; no Dev/database/deploy or mutable Git operations"
+                     }
+}

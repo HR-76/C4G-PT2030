@@ -1,0 +1,49 @@
+{
+  "at": "2026-10-27T21:03:55.247Z",
+  "baselineFiles": 2713,
+  "unchanged": 2711,
+  "changed": [
+    "context/current-work.md",
+    "context/features/http-flows-performance.md"
+  ],
+  "missing": [],
+  "headUnchanged": true,
+  "branchUnchanged": true,
+  "groups": {
+    "runtime": {
+      "files": 466,
+      "changed": []
+    },
+    "frontend": {
+      "files": 179,
+      "changed": []
+    },
+    "httpProfile": {
+      "files": 5,
+      "changed": []
+    },
+    "httpGate": {
+      "files": 9,
+      "changed": []
+    },
+    "stageObserver": {
+      "files": 4,
+      "changed": []
+    },
+    "database": {
+      "files": 136,
+      "changed": []
+    }
+  },
+  "sourceHashes": {
+    "test/integration/c6-alternating/preload.js": "178cbf817575dd0877b94c8806d53df199441b18df381aa236b11a455ab1e5c2",
+    "test/integration/c6-alternating/hostCheck.js": "9d476e4947e40f6cf539bf86abb436e4ab49f89684e955eddfbfc2f1551c283b",
+    "test/integration/c6-alternating/analyze.js": "0e55a44ba4cf3ddbd7a2a074ae45bfa31a1126c47c7571b9653ea39d1e5eea44",
+    "test/integration/c6-alternating/run.ps1": "b1f8afe5807338f5fc8d140d367cc0ea960614c5f1477f3fb95412568d4374ae",
+    "test/integration/c6-alternating/README.md": "9245a3be739676e008369b224e7143a019dc57c58a842ae65dab1371f4a90c7e"
+  },
+  "limits": [
+    "Sequential hash comparison of the recorded inventory, not an atomic snapshot of ignored files or database state."
+  ],
+  "status": "PASS"
+}

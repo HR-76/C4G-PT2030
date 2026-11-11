@@ -1,0 +1,25 @@
+const crypto = require('node:crypto');
+const { Readable } = require('node:stream');
+const { LIMITS } = require('../../src/documents/constants');
+
+function createF11ObjectStorageDouble({ clock=()=>new Date(), maxMemoryBytes=LIMITS.maxMemoryBytes, faults={} }={}) {
+  const objects=new Map(); const writes=new Map(); let allocated=0; let closed=false;
+  function fail(operation){const value=faults[operation];if(value)throw Object.assign(new Error('Injected storage failure.'),{code:value});}
+  function open(){if(closed)throw new Error('STORAGE_DOUBLE_CLOSED');}
+  const port={
+    async beginWrite({objectId,storageClass,conditionalCreate,expectedSize}){open();fail('beginWrite');if(!/^[0-9a-f-]{36}$/i.test(objectId)||!['DOCUMENTS','QUARANTINE'].includes(storageClass)||conditionalCreate!==true||!Number.isInteger(expectedSize)||expectedSize<1)throw new TypeError('Storage write request is invalid.');if(objects.has(objectId)||writes.has(objectId))throw new Error('STORAGE_CONDITIONAL_CREATE_FAILED');const handle=Object.freeze({objectId,storageClass,id:crypto.randomUUID()});writes.set(objectId,{handle,chunks:[],size:0,parts:new Map(),aborted:false});return handle;},
+    async write(handle,source,{signal}={}){open();fail('write');const pending=writes.get(handle.objectId);if(!pending||pending.handle.id!==handle.id)throw new Error('STORAGE_WRITE_NOT_FOUND');for await(const raw of source){if(signal?.aborted){pending.aborted=true;throw Object.assign(new Error('Storage write aborted.'),{code:'ABORTED'});}const chunk=Buffer.from(raw);if(allocated+pending.size+chunk.length>maxMemoryBytes)throw new Error('STORAGE_MEMORY_LIMIT');pending.chunks.push(Buffer.from(chunk));pending.size+=chunk.length;await new Promise(resolve=>setImmediate(resolve));}return Object.freeze({size:pending.size});},
+    async beginMultipart(options){const handle=await this.beginWrite(options);const pending=writes.get(handle.objectId);const multipart=Object.freeze({...handle,multipartSessionId:crypto.randomUUID()});pending.handle=multipart;return multipart;},
+    async writePart(handle,partNumber,source,options={}){if(!Number.isInteger(partNumber)||partNumber<1||partNumber>LIMITS.maxParts)throw new Error('STORAGE_PART_INVALID');const pending=writes.get(handle.objectId);if(!pending)throw new Error('STORAGE_WRITE_NOT_FOUND');const chunks=[];for await(const raw of source)chunks.push(Buffer.from(raw));const part=Buffer.concat(chunks);pending.parts.set(partNumber,part);return Object.freeze({partNumber,size:part.length,sha256:crypto.createHash('sha256').update(part).digest('hex')});},
+    async commit(handle,metadata){open();fail('commit');const pending=writes.get(handle.objectId);if(!pending||pending.aborted)throw new Error('STORAGE_WRITE_NOT_FOUND');const data=pending.parts.size?Buffer.concat([...pending.parts.entries()].sort(([a],[b])=>a-b).map(([,v])=>v)):Buffer.concat(pending.chunks);const sha256=crypto.createHash('sha256').update(data).digest('hex');if(metadata.size!==data.length||metadata.sha256!==sha256)throw new Error('STORAGE_COMMIT_MISMATCH');objects.set(handle.objectId,Object.freeze({data,metadata:Object.freeze({...metadata}),storageClass:handle.storageClass,createdAt:clock().toISOString()}));allocated+=data.length;writes.delete(handle.objectId);return Object.freeze({objectId:handle.objectId,size:data.length,sha256});},
+    async abort(handle){const pending=writes.get(handle.objectId);if(pending){pending.aborted=true;writes.delete(handle.objectId);}return Object.freeze({aborted:true});},
+    async abortMultipartSession({objectId,providerUploadId}){if(!/^[0-9a-f-]{36}$/i.test(objectId||'')||typeof providerUploadId!=='string'||!providerUploadId)throw new Error('STORAGE_MULTIPART_SESSION_INVALID');writes.delete(objectId);return Object.freeze({aborted:true});},
+    async head({objectId}){open();fail('head');const value=objects.get(objectId);return value?Object.freeze({objectId,size:value.data.length,sha256:value.metadata.sha256,mime:value.metadata.mime,storageClass:value.storageClass,etag:`double-${value.metadata.sha256}`}):null;},
+    async readRange({objectId,start=0,end=null,etag=null}){open();fail('readRange');const value=objects.get(objectId);if(!value)throw new Error('STORAGE_OBJECT_NOT_FOUND');if(etag!==null&&etag!==`double-${value.metadata.sha256}`)throw new Error('STORAGE_PRECONDITION_FAILED');const last=end===null?value.data.length-1:end;if(!Number.isInteger(start)||!Number.isInteger(last)||start<0||last<start||last>=value.data.length||last-start+1>LIMITS.maxRangeBytes)throw new Error('STORAGE_RANGE_INVALID');return Readable.from([value.data.subarray(start,last+1)]);},
+    async createDownloadCapability({objectId,expiresAt,range}){open();if(!objects.has(objectId))throw new Error('STORAGE_OBJECT_NOT_FOUND');return Object.freeze({kind:'ABSTRACT_DOWNLOAD_CAPABILITY',objectId,expiresAt,range:range||null});},
+    async health(){return Object.freeze({ready:!closed,adapter:'f11-object-storage-double-v1',r2Equivalent:false});},
+    async shutdown(){closed=true;objects.clear();writes.clear();allocated=0;}
+  };
+  return Object.freeze(port);
+}
+module.exports={createF11ObjectStorageDouble};

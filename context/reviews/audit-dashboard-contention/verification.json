@@ -1,0 +1,79 @@
+{
+  "checkedAt": "2026-10-27T00:18:10.424Z",
+  "scope": "Audit lock retention and per-request dashboard admission scheduling",
+  "focused": {
+    "pass": 91,
+    "fail": 0,
+    "newTests": 25,
+    "log": "focused.log"
+  },
+  "backend": {
+    "total": 1294,
+    "pass": 1284,
+    "fail": 3,
+    "skip": 7,
+    "log": "backend-suite-final.log",
+    "knownFailures": [
+      "f11RealTransportAdapters.test.js:209 - ClamAV lifecycle cancellation",
+      "f12Composition.test.js:20 - F12/F11 ObjectStoragePort fixture",
+      "f5AuthorityCommitGuard.test.js:18 - pinned closed SQL catalog"
+    ]
+  },
+  "postgres": {
+    "status": "PASS",
+    "checks": 10,
+    "report": "postgres-proof.json",
+    "limits": "Real PostgreSQL roles/RLS, executor, F7 append and durable central guards; synthetic authorization evidence in query module; membership/fence/clock negative observations injected after real row-lock wait."
+  },
+  "httpOidcRevocation": {
+    "status": "PASS",
+    "checks": 9,
+    "report": "results-revocation.json",
+    "limits": "Real central membership revocation while blocked at tenant admission, not every finalization race."
+  },
+  "contention": {
+    "standard": {
+      "successes": 36,
+      "total": 36
+    },
+    "capacity": {
+      "successes": 6,
+      "total": 6
+    },
+    "failedAdmissions": 0,
+    "afterResponseQueryCompletions": 0,
+    "report": "comparison.json"
+  },
+  "syntax": {
+    "jsFiles": 11,
+    "powershellFiles": 1,
+    "pass": true,
+    "report": "syntax.json"
+  },
+  "preservation": {
+    "pass": true,
+    "report": "preservation.json"
+  },
+  "artifactScan": {
+    "pass": true,
+    "report": "artifact-scan.json"
+  },
+  "ownedContainerCleanup": {
+    "checked": true,
+    "remaining": 0,
+    "filters": [
+      "c4g.http-proof",
+      "c4g.audit-dashboard-proof"
+    ],
+    "method": "docker ps -a filtered by owned test labels returned no containers"
+  },
+  "frontend": {
+    "changedFiles": 0,
+    "filesHashChecked": 179,
+    "testsAndBuildRepeated": false,
+    "reason": "Backend-only increment; client endpoint/payload confirmed unchanged."
+  },
+  "fullHttpGate108Repeated": false,
+  "productionPerformanceApproved": false,
+  "status": "Focused implementation and contention matrix PASS; increment in Review, global feature remains In Progress."
+}

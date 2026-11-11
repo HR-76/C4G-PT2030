@@ -1,0 +1,19 @@
+﻿{
+    "at":  "2026-10-27T21:43:18.6935465Z",
+    "status":  "PASS",
+    "services":  [
+                     {
+                         "name":  "/c4g-postgres17-dev",
+                         "running":  true,
+                         "paused":  false,
+                         "health":  "healthy"
+                     },
+                     {
+                         "name":  "/c4g-collabora-code",
+                         "running":  true,
+                         "paused":  false,
+                         "health":  "healthy"
+                     }
+                 ],
+    "remainingHttpProofContainers":  0
+}

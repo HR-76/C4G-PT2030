@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-27T20:16:39.743Z",
+  "files": 21,
+  "patterns": [
+    "database-url",
+    "private-key",
+    "jwt",
+    "credential-value"
+  ],
+  "matches": [],
+  "pass": true,
+  "limits": "Heuristic scan of new diagnostic artifacts, scripts and research document, including UTF-16 logs. Not a repository-wide secret audit."
+}

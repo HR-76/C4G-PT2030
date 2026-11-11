@@ -1,0 +1,16 @@
+{
+  "result": "PASS",
+  "realOidcMfa": true,
+  "environment": "http://localhost:5189",
+  "organizations": 2,
+  "profileAndForms": true,
+  "emptyDirectory": true,
+  "currentOpportunities": 4,
+  "preservedOpportunities": 9,
+  "applicationStatuses": [
+    200,
+    404
+  ],
+  "businessWrites": 0,
+  "pageErrors": 0
+}

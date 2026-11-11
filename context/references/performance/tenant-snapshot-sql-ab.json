@@ -1,0 +1,578 @@
+{
+  "schemaVersion": 1,
+  "kind": "TENANT_SNAPSHOT_SQL_AB_RESULT",
+  "createdAt": "2026-10-31T22:50:52.494Z",
+  "status": "METADATA_GAIN_HTTP_PROTOCOL_FAILED",
+  "protocolApproved": false,
+  "identity": {
+    "id": "tenant-snapshot-ab-75babcee99ce418a",
+    "manifestPath": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/ab.json",
+    "manifestSha256": "f646bd89ae53c24846618a4627706fc80714a7612c2dd084c2f4ba6a3568c7ec",
+    "sourceSetDigest": "75babcee99ce418a4ba25da7a539dbbb247062b911e19d62d553fd59001f5e58",
+    "harnessDigest": "1e43d3a6e7dc220dcf58e26f9542f3a0fc26d667f44ce40d74026abfccb95b3f",
+    "parent": {
+      "kind": "AB_VARIANT",
+      "id": "central-snapshot-ab-58f2f8910abee80f",
+      "variant": "B",
+      "sourceSetDigest": "30005d5709224972d241530ff197282a75826ada308f7a3699e07b73002c952c",
+      "manifest": {
+        "path": "provenance/parent-ab.json",
+        "sha256": "252c80d48081fe9768d02e9d393060b89d1e32864b62943903aae9bcb9691278"
+      },
+      "archive": {
+        "path": "provenance/parent-B-sources.zip",
+        "sha256": "fc894493de32c39e747753aeeed919cac17134f1e2653e8fc6ef22b3d8267277"
+      }
+    },
+    "variants": {
+      "A": {
+        "sourceCount": 1844,
+        "sourceSetDigest": "30005d5709224972d241530ff197282a75826ada308f7a3699e07b73002c952c",
+        "archiveSha256": "fc894493de32c39e747753aeeed919cac17134f1e2653e8fc6ef22b3d8267277"
+      },
+      "B": {
+        "sourceCount": 1845,
+        "sourceSetDigest": "fca8ee8341b57ef78f3cada9ecf14494e01c72973ed01447d75e55e3ce19e986",
+        "archiveSha256": "8bf4ed8d0dfa2c91622b3facc73e96ab15ed71491a957a1124d962fb9ff30d47"
+      }
+    },
+    "overlays": {
+      "backend/src/security/tenantSchemaFingerprint.js": {
+        "before": "d0baa7265dbf86ada926fe783cf52d110f84dbdbbfe415c1df4ab07f89a972bf",
+        "after": "cca3fb20fd8ce602f5e660caf5756b37bf92abbe53ad371c96bbe01345f35311"
+      }
+    },
+    "testOverlays": {
+      "backend/test/dashboardLoadingObserver.test.js": {
+        "before": "9e1d871ac44d57d330360262eff622345cfd56ce888f78e0951c629d2744188a",
+        "after": "dee65912768800271b533a759bfcf68141a3b43ef62ea14d4eed08f99ef27add"
+      },
+      "backend/test/tenantSchemaCatalogBatch.test.js": {
+        "before": "41cdd87d1cf5a01e99d7bc38ab79371f3410be58baea1d6f7f266231c0b47f13",
+        "after": "fedf93d5dd46f8b2c2100c9ab507d4d056724b999a7c9f70d754ed6670a54e43"
+      },
+      "backend/test/tenantSchemaSqlOptimization.test.js": {
+        "before": null,
+        "after": "f36d8c9d3c3e84958468133b92e222662cdc25963b1157dc17999e1cd25a9b5e"
+      },
+      "test/integration/dashboard-loading/observer.cjs": {
+        "before": "7a666ae00983126beeb1b2bb45955ed443cd64072af34b9de07685bb5c64262f",
+        "after": "d774d5833de237dc234e1a1e0d0bb131285c01a7dfd1452d89c6d35442976613"
+      }
+    }
+  },
+  "scope": {
+    "central": "043",
+    "tenant": "034",
+    "canonicalNotNullProjectionOnly": true,
+    "securityQueriesPerSnapshot": 24,
+    "totalQueriesPerSnapshot": 25,
+    "cacheAdded": false,
+    "authorityAfterLockPreserved": true,
+    "tenantObservationBeforeAndAfterRestrictedFunctionPreserved": true,
+    "limitsChanged": false,
+    "habitualEnvironmentAccess": false,
+    "writerActive": false,
+    "commitOrDeploy": false
+  },
+  "validation": {
+    "candidate": {
+      "backendPass": 2264,
+      "backendSkip": 7,
+      "backendFail": 0,
+      "frontendPass": 494,
+      "build": "PASS",
+      "inputCount": 1847
+    },
+    "workspace": {
+      "backendPass": 2359,
+      "backendSkip": 7,
+      "backendFail": 0,
+      "frontendPass": 496,
+      "build": "PASS",
+      "scope": "RECORDED_LOCAL_SUITE_INPUT_SNAPSHOT"
+    },
+    "readiness": {
+      "status": "PASS",
+      "tenantDriftCases": 60,
+      "tenantAfterFunctionProofs": 8,
+      "centralAuthorityPostLockProofs": 8,
+      "httpControls": 34,
+      "initialAttempt": "FAIL_PRESERVED_CAUSE_UNKNOWN",
+      "correctedCommonObservability": true
+    },
+    "historicalContractResolution": {
+      "sha256": "835ce99e19b605396088441b182158aef7f5c3d2c32b42702c3a51befd87f762",
+      "archivedPath": "output/tenant-snapshot-sql-development/contract-before-implementation.md",
+      "note": "Implementation report records the contract hash at that time; this byte-identical copy preserves the earlier contents after documented harness amendments."
+    }
+  },
+  "metadata": {
+    "status": "PASS",
+    "measured": 2400,
+    "warmups": 240,
+    "measuredPerArmPerTenant": 600,
+    "pairs": 12,
+    "pairsBFasterP50": 12,
+    "pairsBFasterP95": 11,
+    "populations": [
+      {
+        "tenantIndex": 0,
+        "A": {
+          "n": 600,
+          "missing": 0,
+          "minimum": 93.55189999999129,
+          "p50": 101.97900000000664,
+          "p95": 114.63390000000072,
+          "maximum": 166.15589999999793,
+          "mean": 103.42341999999971
+        },
+        "B": {
+          "n": 600,
+          "missing": 0,
+          "minimum": 86.1880999999994,
+          "p50": 95.15590000001248,
+          "p95": 107.07459999999264,
+          "maximum": 133.92900000000373,
+          "mean": 96.36095899999965
+        },
+        "p50ChangePercent": -6.690691220735356
+      },
+      {
+        "tenantIndex": 1,
+        "A": {
+          "n": 600,
+          "missing": 0,
+          "minimum": 92.79079999998794,
+          "p50": 103.73709999996936,
+          "p95": 116.08389999999781,
+          "maximum": 138.9658000000054,
+          "mean": 105.07046033333293
+        },
+        "B": {
+          "n": 600,
+          "missing": 0,
+          "minimum": 88.13839999999618,
+          "p50": 95.90100000001257,
+          "p95": 109.75410000002012,
+          "maximum": 133.04279999999562,
+          "mean": 97.49372249999996
+        },
+        "p50ChangePercent": -7.553806690141807
+      }
+    ]
+  },
+  "http": {
+    "status": "FAIL",
+    "recordedAttempts": 288,
+    "successes": 287,
+    "errors": 1,
+    "warmups": 56,
+    "warmupFailures": 0,
+    "readinessControls": 136,
+    "matchedAttempts": 272,
+    "unpairedAttempts": 16,
+    "failedAttempt": {
+      "arm": "A",
+      "stageIndex": 7,
+      "scenario": "dashboard-c4",
+      "attempt": 2,
+      "status": 503,
+      "httpCode": "SERVICE_UNAVAILABLE",
+      "observedFailureCode": "LEASE_TIMEOUT"
+    },
+    "dashboardC1P95ObservedChangePercent": 45.689912184219224,
+    "repeatExecuted": false
+  },
+  "analysis": {
+    "status": "INVALID_OR_INCOMPLETE",
+    "validationIssues": 17,
+    "summary": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/summary.json",
+    "compactSummary": "context/reviews/tenant-snapshot-sql-performance/measurement-summary.json",
+    "independentReview": "context/reviews/tenant-snapshot-sql-performance/independent-review.json",
+    "numericalOrProvenanceBlockers": [],
+    "approved": false
+  },
+  "closure": {
+    "status": "PASS",
+    "ownedContainersAbsent": 34,
+    "childExitsVerified": 17,
+    "sourceIntegrity": "PASS"
+  },
+  "limitations": [
+    "Local metadata gain does not approve HTTP reliability or global performance.",
+    "Initial readiness failure remains of unknown cause; the measured HTTP failure has a separately observed LEASE_TIMEOUT.",
+    "The HTTP failure and all outliers remain in the raw population; the affected pair is not silently replaced.",
+    "Audit/Central contention is an investigation hypothesis, not an exclusively proven cause.",
+    "Host not reserved; driver intervals include transport and waits, not database CPU.",
+    "Frozen043/034 results do not prove performance of the parallel live044 implementation.",
+    "Dependency versions and lockfiles are verified; installed dependency bytes are not archived."
+  ],
+  "nextStep": "Investigate audit and Central-completion durations, including contention, then reduce cost with identical authority and limits before a new complete H.",
+  "refs": {
+    "context/reviews/tenant-snapshot-sql-performance.md": {
+      "sha256": "ca727c4e0727bc049b9d1f38236871b5440144809f38203f86c2a48e2188522f",
+      "bytes": 14814
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/analyze.cjs": {
+      "sha256": "34a0dff9e1fc431984927e76f1c968928c3e9da0bb68e7da6f69c486848bf29a",
+      "bytes": 79489
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/equivalence-plans.csv": {
+      "sha256": "d437c85531b3bbd3ae2ae2116288848eaecb675947db626ded8597de7e53c1a4",
+      "bytes": 1714
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-checkpoint-counts.csv": {
+      "sha256": "a3bbe5ea30226ccb330092b768ceac0805b7cfe5329c4292b8e5c4275c8236d4",
+      "bytes": 12604
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-pairs.csv": {
+      "sha256": "0e3f7fe3d22b4c1d7df0156111656fc201ac242b9f59e79df9a636b43deb3c19",
+      "bytes": 56687
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-populations.csv": {
+      "sha256": "ddbb5862675beb668c26cd9481c7673c5eeb6f6b1218989ed073283b537154c4",
+      "bytes": 1064079
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-query-costs.csv": {
+      "sha256": "fa655123e042f382cc719e79f180de811ee3acdc8d4d5d4fc2d524e1d283c8f2",
+      "bytes": 1712290
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-requests.csv": {
+      "sha256": "699211c6dc477be80575fda1bd1fc1ca46fa193dac402519081a83e33be71f6d",
+      "bytes": 219022
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-sampler-phases.csv": {
+      "sha256": "50a60f2b568b4a20fd74aaac06a896ad6f8ca3f3344fce1cc8911f7286067838",
+      "bytes": 175196
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-sampler.csv": {
+      "sha256": "1d42e418435174860ec8a4d36ac0125155c93c29014e7616268e0b58bc2987a8",
+      "bytes": 2095180
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-scenarios.csv": {
+      "sha256": "b9e91d998419c683bb6d1fd8615c098f7f2ded1730efec16a0cb45bd8aaca35d",
+      "bytes": 9537
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-warmups.csv": {
+      "sha256": "49830a12222384d135bd98e71dafea60e39e64d4035a993094ac4ab3d98f4bc6",
+      "bytes": 7302
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-blocks.csv": {
+      "sha256": "f09d3628e0a6eb209bae74e3abb1eb5a814ec4efa6828ef247fb2be9ba6eccf2",
+      "bytes": 20683
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-pairs.csv": {
+      "sha256": "ac55a18c810ace7608c25b0d2085fa11c4067e2769c7ca114f0ab21f9f7c74d7",
+      "bytes": 3196
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-samples.csv": {
+      "sha256": "0a743a24d0f44b2a1fab92c44bed344363bdc497493548923d98ad41d5149280",
+      "bytes": 608969
+    },
+    "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/summary.json": {
+      "sha256": "1f20d3ff9421cb057078d9e0ceb20939d57658d1ce9b199addd84e436ae819ee",
+      "bytes": 6879621
+    },
+    "context/reviews/tenant-snapshot-sql-performance/http-failure-diagnosis.json": {
+      "sha256": "bd40f34f127a880b50c381ad118e6ff5687b2ea67ad16374c563f5d5b0c6a65d",
+      "bytes": 25842
+    },
+    "context/reviews/tenant-snapshot-sql-performance/independent-review.json": {
+      "sha256": "b6ae9deff7d01208d6dca2bf673bf1019252fd87a601b6a559965e9ad877a42b",
+      "bytes": 44943
+    },
+    "context/reviews/tenant-snapshot-sql-performance/measurement-summary.json": {
+      "sha256": "194405cf873c670be85d24a0c09ea7b038f62fc5d47ee4721ff948dddbf8c56a",
+      "bytes": 35501
+    },
+    "context/reviews/tenant-snapshot-sql-performance/resource-source-verification.json": {
+      "sha256": "cfcbfc3e60611f594f8ad8a647f3537239c9f69a9f155f0def6b747f5dee2e5d",
+      "bytes": 15779
+    },
+    "context/reviews/tenant-snapshot-sql-performance/workspace-task-verification.json": {
+      "sha256": "74cdba9f6947dcfc2dde027a7eb434ff33930fdfc8cdf8feeafce29a3124db0f",
+      "bytes": 5631
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources.zip": {
+      "sha256": "fc894493de32c39e747753aeeed919cac17134f1e2653e8fc6ef22b3d8267277",
+      "bytes": 15682700
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/B/sources.zip": {
+      "sha256": "8bf4ed8d0dfa2c91622b3facc73e96ab15ed71491a957a1124d962fb9ff30d47",
+      "bytes": 15696904
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/ab.json": {
+      "sha256": "f646bd89ae53c24846618a4627706fc80714a7612c2dd084c2f4ba6a3568c7ec",
+      "bytes": 486285
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/common.zip": {
+      "sha256": "af3faa9753920e4b680e18421f2c25b5e889baae3f6503ea1155db5ae00ee453",
+      "bytes": 258649
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/common/context/features/tenant-snapshot-sql-performance.md": {
+      "sha256": "c1ee5e4edeb29ce4a6fb1def5f386b2ed0a8d5bbce1f35ddbf1b5f32b6803652",
+      "bytes": 8545
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/report.json": {
+      "sha256": "23aede86f14eb82064369ecf008c295807d58e06b13c8a0a16223f87083c66f0",
+      "bytes": 16906389
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/552a6cecd0f849aeb35873adba590b73/report.json": {
+      "sha256": "cf651f12f5c3621ac08009a73c5663666b1fec629a4fb0ea642f226ad8e4519b",
+      "bytes": 23775062
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/report.json": {
+      "sha256": "0e74c14a84a6921a2b3364dd90a50a8e2f112443fa452ff9dc56c852b3360d4c",
+      "bytes": 368214286
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/validation-reuse.json": {
+      "sha256": "5db4330620fdb7fb527bacaafd76bd19579a76670ae7f133d3081a3d97c359dd",
+      "bytes": 1994
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/provenance/parent-B-sources.zip": {
+      "sha256": "fc894493de32c39e747753aeeed919cac17134f1e2653e8fc6ef22b3d8267277",
+      "bytes": 15682700
+    },
+    "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/provenance/parent-ab.json": {
+      "sha256": "252c80d48081fe9768d02e9d393060b89d1e32864b62943903aae9bcb9691278",
+      "bytes": 484959
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/A/sources.zip": {
+      "sha256": "fc894493de32c39e747753aeeed919cac17134f1e2653e8fc6ef22b3d8267277",
+      "bytes": 15682700
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/B/sources.zip": {
+      "sha256": "8bf4ed8d0dfa2c91622b3facc73e96ab15ed71491a957a1124d962fb9ff30d47",
+      "bytes": 15696904
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/ab.json": {
+      "sha256": "6d520c67c3f334983ceb31deb949e2b5bd585bcbda8d3a9ae2438de79bced839",
+      "bytes": 486008
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/common.zip": {
+      "sha256": "852d69f18cb33648e29044426a19ff4dc25e9d0e845c61342cda1e49c06e6330",
+      "bytes": 229554
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/evidence/cceaeeb58642414f9611d8f8ff1a373d/report.json": {
+      "sha256": "30280d9739be0ae58022b569dddec2f70b6b6b0ebf2333a6538c1115e78bb4b7",
+      "bytes": 4408403
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/evidence/local-validation/result.json": {
+      "sha256": "307babd5a2a3dc0a0044f6ec86ab8272ec5315dba3eef6f9498f881d0c262c6e",
+      "bytes": 6378
+    },
+    "output/tenant-snapshot-ab-f17648b8254449cca9f0039db628b2d0/validation/manifest.json": {
+      "sha256": "7d5f7089890c65950a81a175869bef961a2373128bfe07234a2b558067aa032e",
+      "bytes": 229396
+    },
+    "output/tenant-snapshot-sql-development/analysis-console.log": {
+      "sha256": "1151aac87ce961cb9fc580709ea885f041d85b8ba064f2db055e88cfb2871654",
+      "bytes": 532
+    },
+    "output/tenant-snapshot-sql-development/analysis-location.json": {
+      "sha256": "679672d8b66e2a6341994bc8b375a7f85b011c122a65d8a3a23881613efd5a72",
+      "bytes": 190
+    },
+    "output/tenant-snapshot-sql-development/candidate-catalog-test.diff": {
+      "sha256": "7db52271812bbdb4272772e1180db469a0db96eb1f6d4246ee619850776dc013",
+      "bytes": 4154
+    },
+    "output/tenant-snapshot-sql-development/candidate-focused-green.log": {
+      "sha256": "2e488d840c33a5da14b6887612985ea46712b89ab4c5e686c6e332c16b187a79",
+      "bytes": 8230
+    },
+    "output/tenant-snapshot-sql-development/candidate-focused-validation.json": {
+      "sha256": "c28e4962bc8f566982ea470169d33cee499c1e1f7fb397b162ae88036508ae8e",
+      "bytes": 1499
+    },
+    "output/tenant-snapshot-sql-development/candidate-observer-green.log": {
+      "sha256": "469bf843daad8c60494ecac878eeb10b8f708ce13291a000247e99269567c623",
+      "bytes": 2162
+    },
+    "output/tenant-snapshot-sql-development/candidate-observer-red.log": {
+      "sha256": "a33a4f41d9caa78d484a622f000456a26dfdeee6b24c5665e8e49c2deb6b7aba",
+      "bytes": 11798
+    },
+    "output/tenant-snapshot-sql-development/candidate-runtime.diff": {
+      "sha256": "d305b79837d9467c80d0fee6dc398b761e49f8e6f9a742441a5961d846c2ed10",
+      "bytes": 3610
+    },
+    "output/tenant-snapshot-sql-development/capture-corrected-result.json": {
+      "sha256": "e744613c52d510541fa9805f9828801d62f4f60d95cc8a08e1051a84d8d6044e",
+      "bytes": 8952
+    },
+    "output/tenant-snapshot-sql-development/capture-result.json": {
+      "sha256": "90fd08ef4102f483b50c15b8a64130ff9156581c1b24d4be6a3ba4effcff1882",
+      "bytes": 8952
+    },
+    "output/tenant-snapshot-sql-development/common-final.log": {
+      "sha256": "df375c7e9e1c5b85c39026ae9673471c0fa1e6453cae8c522c1598140acc5c7c",
+      "bytes": 11456
+    },
+    "output/tenant-snapshot-sql-development/common-focused.log": {
+      "sha256": "967b56ca0ed9e60dede3f588134da234a21f0581314904b1287924a2c785b622",
+      "bytes": 6276
+    },
+    "output/tenant-snapshot-sql-development/contract-before-implementation.md": {
+      "sha256": "835ce99e19b605396088441b182158aef7f5c3d2c32b42702c3a51befd87f762",
+      "bytes": 5667
+    },
+    "output/tenant-snapshot-sql-development/dashboardLoadingObserver.test.js.frozen-before": {
+      "sha256": "9e1d871ac44d57d330360262eff622345cfd56ce888f78e0951c629d2744188a",
+      "bytes": 10392
+    },
+    "output/tenant-snapshot-sql-development/dashboardLoadingObserver.test.js.workspace-before": {
+      "sha256": "d1cf0906d965165b8bef11d96bf935d5fba2a7b542367d191bd5e48338c9381e",
+      "bytes": 11042
+    },
+    "output/tenant-snapshot-sql-development/failed-readiness-diagnosis.json": {
+      "sha256": "1213931e1668b676bfc2225d8b95c9d98e8598ad32e5e677c5d3750494302bfc",
+      "bytes": 2546
+    },
+    "output/tenant-snapshot-sql-development/implementation-verification.json": {
+      "sha256": "8266335ae96318bed7a8907f374e9e888480f3b9478f49f70fc421cf0d14146b",
+      "bytes": 5674
+    },
+    "output/tenant-snapshot-sql-development/independent-preflight-review.json": {
+      "sha256": "7dd51c3c090930bae370d480b7d3fdeaa2f39fb4c94f022ff47154674e13384d",
+      "bytes": 2138
+    },
+    "output/tenant-snapshot-sql-development/observability-final.log": {
+      "sha256": "dd7894cbefae63bc8df0dab627a920ff1e96ef5a44d67cc2dd57d57b4b95f41b",
+      "bytes": 4784
+    },
+    "output/tenant-snapshot-sql-development/observability-validation.json": {
+      "sha256": "f07ebae0d1dc88426054efa01ee79927c6ace2ea355a2580d92e20b252297565",
+      "bytes": 2779
+    },
+    "output/tenant-snapshot-sql-development/observer-before.json": {
+      "sha256": "2a342c989a197dbd1e5ac762f84d8b68516102ac9975c757ddcc0a1e7273e254",
+      "bytes": 453
+    },
+    "output/tenant-snapshot-sql-development/observer-candidate-helper.diff": {
+      "sha256": "c4955c828694fea1ff6bade85cc3f86221bd4f58764a2b10fce1acae1d09ba79",
+      "bytes": 8400
+    },
+    "output/tenant-snapshot-sql-development/observer-candidate-test.diff": {
+      "sha256": "0f3ca915dfa4579f2b5fdbf7e8ad25b9481ff22e48cfc0f968a8e38dfa0eeb46",
+      "bytes": 13374
+    },
+    "output/tenant-snapshot-sql-development/observer-green.log": {
+      "sha256": "a7b410019a8fd8ddec357aaa63732a8fc20d46641aacdb8869e266847cee59eb",
+      "bytes": 2156
+    },
+    "output/tenant-snapshot-sql-development/observer-red.log": {
+      "sha256": "dbdf8c5ed6415108c4435f9c4ae87b8e36e8fa4b51ece0882a6a90a33688463e",
+      "bytes": 10418
+    },
+    "output/tenant-snapshot-sql-development/observer-runtime-green.log": {
+      "sha256": "6f03be991860cce5b4ece7e95dae3579a2b8b7191d80f9f2cf7653f0518218c3",
+      "bytes": 2352
+    },
+    "output/tenant-snapshot-sql-development/observer-syntax.json": {
+      "sha256": "5b8cccd2af93b349c7fc910299228b20ba4f48d21e4505535d868530b6fb446a",
+      "bytes": 646
+    },
+    "output/tenant-snapshot-sql-development/observer-verification.json": {
+      "sha256": "bc09856c35779ed6b8ccb43992fd2deb53540646fc9e4b26a346a63b104f9bc6",
+      "bytes": 8588
+    },
+    "output/tenant-snapshot-sql-development/observer-workspace-helper.diff": {
+      "sha256": "7864e32e9ebf19f845847866dd2c7d2de7dd7088dcdc4ed3c674468d04701350",
+      "bytes": 8216
+    },
+    "output/tenant-snapshot-sql-development/observer-workspace-test.diff": {
+      "sha256": "60d9b7bb37acbda0b783dcce0d175073007bbfe65cf6b24dcbca8d1d2212a109",
+      "bytes": 13210
+    },
+    "output/tenant-snapshot-sql-development/observer.cjs.frozen-before": {
+      "sha256": "7a666ae00983126beeb1b2bb45955ed443cd64072af34b9de07685bb5c64262f",
+      "bytes": 6300
+    },
+    "output/tenant-snapshot-sql-development/observer.cjs.workspace-before": {
+      "sha256": "7a666ae00983126beeb1b2bb45955ed443cd64072af34b9de07685bb5c64262f",
+      "bytes": 6300
+    },
+    "output/tenant-snapshot-sql-development/readiness-analysis-green.log": {
+      "sha256": "9cdd97fd650f75fde5453d7f0328cd3b0a96a01224766d240070fb03930a79a2",
+      "bytes": 4654
+    },
+    "output/tenant-snapshot-sql-development/readiness-analysis-red.log": {
+      "sha256": "8d976597792e356e706ec88027783e2ad9105d1cf350d4e93baecb31ce7d3f14",
+      "bytes": 3424
+    },
+    "output/tenant-snapshot-sql-development/readiness-runner-green.log": {
+      "sha256": "872234aa75354998c4be279e6bcfc56e4f386b85b9b8576ffab228731766423c",
+      "bytes": 1370
+    },
+    "output/tenant-snapshot-sql-development/readiness-runner-red.log": {
+      "sha256": "72b3ddc11855166f6db27d222176dc2e3e2ddec606738a528d97a97218605061",
+      "bytes": 5486
+    },
+    "output/tenant-snapshot-sql-development/syntax.json": {
+      "sha256": "dcda2e9e425adbdcfb345e6810c5d061349bf802d4aacded4797f6b68dfdc756",
+      "bytes": 801
+    },
+    "output/tenant-snapshot-sql-development/tenant-focused-green.log": {
+      "sha256": "cbc873a2251881e04cdb2a1e4e3a6f723f03d542469012be193e39c2bd71537f",
+      "bytes": 12578
+    },
+    "output/tenant-snapshot-sql-development/tenant-sql-green.log": {
+      "sha256": "13ba3bc207f3ef8e3f1373d5c6a60df801e7fd2de0dc62605d5b2d0f1ed4e43c",
+      "bytes": 3422
+    },
+    "output/tenant-snapshot-sql-development/tenant-sql-red.log": {
+      "sha256": "778c856be7a81ac66efcde49622baaec307f7d11cd22ce734aafe90ed1c5da6a",
+      "bytes": 9152
+    },
+    "output/tenant-snapshot-sql-development/tenantSchemaCatalogBatch-workspace-before.cjs": {
+      "sha256": "18c8c98f7ab784993c222943389380697f69b85e62cfbbca262e933f041c28b2",
+      "bytes": 12580
+    },
+    "output/tenant-snapshot-sql-development/tenantSchemaFingerprint-frozen-before.cjs": {
+      "sha256": "d0baa7265dbf86ada926fe783cf52d110f84dbdbbfe415c1df4ab07f89a972bf",
+      "bytes": 24969
+    },
+    "output/tenant-snapshot-sql-development/tenantSchemaFingerprint-workspace-before.cjs": {
+      "sha256": "6876998c3d37a255333a90c0bad3eeff784797e3ec82a08242c2785bbbc748d5",
+      "bytes": 25921
+    },
+    "output/tenant-snapshot-sql-development/workspace-backend-final.log": {
+      "sha256": "73946ed0b4fe17fc5953e1e83c22b9a131586dec0e8548650f3c3123d3ad0cd5",
+      "bytes": 446952
+    },
+    "output/tenant-snapshot-sql-development/workspace-backend.log": {
+      "sha256": "0a5e6f3f222bf67725a76515b335f1c2c4a6eccf05ca58f16cb5436a24c312ec",
+      "bytes": 453136
+    },
+    "output/tenant-snapshot-sql-development/workspace-before-final.json": {
+      "sha256": "11fdc22954a66f871ae5e31fb23d666cd83a1e65f16c95671da19ccb6b1b5c97",
+      "bytes": 157968
+    },
+    "output/tenant-snapshot-sql-development/workspace-before.json": {
+      "sha256": "260356a2a4f65153d3b72477b54ee0b3398de09559025b693482b98e96eaa034",
+      "bytes": 157323
+    },
+    "output/tenant-snapshot-sql-development/workspace-build.log": {
+      "sha256": "b3e7ffac4522f69b506f49f7052d0fa7b8ecda508a7652caac5fc60d5ca3efe8",
+      "bytes": 13202
+    },
+    "output/tenant-snapshot-sql-development/workspace-catalog-test.diff": {
+      "sha256": "9b854ae527984bb46772202d7ae6d95fd9d45e70625bc795cbc2a187d91272a5",
+      "bytes": 3834
+    },
+    "output/tenant-snapshot-sql-development/workspace-frontend.log": {
+      "sha256": "07e5a243682b6c3a1654b477454fc1bf6a9a3adf511d62e428780fbe536eda0a",
+      "bytes": 18680
+    },
+    "output/tenant-snapshot-sql-development/workspace-runtime.diff": {
+      "sha256": "33175918bb51cf05b835d976ac3c6f6828dafa6ba6845cd12fb6aaa631b09785",
+      "bytes": 3426
+    },
+    "output/tenant-snapshot-sql-development/workspace-validation.json": {
+      "sha256": "833f728d7af171552da695d9943f8df423ab10a85b5aabaf7c346cec4a236e3a",
+      "bytes": 4971
+    }
+  }
+}

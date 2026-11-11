@@ -1,0 +1,68 @@
+'use strict';
+const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
+const BASIC_NEXT=Object.freeze({IDENTIFIED:Object.freeze(['PREPARATION','CANCELLED','ARCHIVED']),PREPARATION:Object.freeze(['CANCELLED','ARCHIVED']),CANCELLED:Object.freeze([]),ARCHIVED:Object.freeze([])});
+const NEXT=Object.freeze(Object.fromEntries(Object.entries({
+ IDENTIFIED:['PREPARATION','SUBMITTED','CANCELLED','ARCHIVED'],
+ 
+ PREPARATION:['IDENTIFIED','SUBMITTED','CANCELLED','ARCHIVED'],
+ SUBMITTED:['IDENTIFIED','PREPARATION','APPROVED','REJECTED','CANCELLED','ARCHIVED'],
+ APPROVED:['ARCHIVED'],REJECTED:['ARCHIVED'],CANCELLED:[],ARCHIVED:[]
+}).map(([key,values])=>[key,Object.freeze(values)])));
+const currentStatus=status=>status==='INTENTION'?'IDENTIFIED':status;
+const OPTIONAL_FIELDS=['notes','totalBudget','organizationBudget'];
+function fail(code='INVALID_INPUT'){throw Object.assign(new Error('Application refused'),{code})}
+function uuid(value){if(typeof value!=='string'||!UUID.test(value))fail();return value.toLowerCase()}
+function exact(value,keys){if(!value||Array.isArray(value)||Object.getPrototypeOf(value)!==Object.prototype||Object.keys(value).sort().join(',')!==[...keys].sort().join(','))fail();return value}
+function title(value){if(typeof value!=='string'||value!==value.trim()||value.length<1||value.length>200)fail();return value}
+function deadline(value){if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value)||Number.isNaN(Date.parse(value+'T00:00:00Z'))||new Date(value+'T00:00:00Z').toISOString().slice(0,10)!==value)fail();return value}
+function revision(value){if(!Number.isSafeInteger(value)||value<1)fail();return value}
+// Decimal strings avoid binary floating point and preserve null versus zero.
+function money(value){if(value===null)return null;if(typeof value!=='string'||! /^(0|[1-9]\d{0,13})(\.\d{1,2})?$/.test(value))fail();return value}
+function fields(value){const out={};for(const key of OPTIONAL_FIELDS){if(!Object.hasOwn(value,key))continue;
+ if(key==='notes'){if(value[key]!==null&&(typeof value[key]!=='string'||value[key].length>10000))fail();out[key]=value[key]}
+ else out[key]=money(value[key]);}return out}
+function withFields(value,keys){if(!value||typeof value!=='object')fail();exact(value,[...keys,...OPTIONAL_FIELDS.filter(key=>Object.hasOwn(value,key))])}
+function unitIds(value){if(!Array.isArray(value)||value.length>50)fail();const ids=value.map(uuid);if(new Set(ids).size!==ids.length)fail();return ids.sort()}
+function command(method,value){
+ if(method==='create'||method==='edit'){
+  if(!value||typeof value!=='object')fail();
+  const creating=method==='create',central=creating&&value.origin==='CENTRAL';
+  const extra=['unitIds',...(creating?['sourceInterestId','sourceInterestRevision','includeResponsibleInTeam']:[])].filter(k=>Object.hasOwn(value,k));
+  const keys=creating?['opportunityId','evaluationId','title','responsibleMembershipId','deadline','idempotencyKey',...(central?['origin','centralRevisionId']:[])]:['title','responsibleMembershipId','deadline','expectedRevision','idempotencyKey'];
+  withFields(value,[...keys,...extra]);
+  const result=creating?{opportunityId:uuid(value.opportunityId),evaluationId:value.evaluationId===null?null:uuid(value.evaluationId)}:{};
+  Object.assign(result,{title:title(value.title),responsibleMembershipId:uuid(value.responsibleMembershipId),deadline:deadline(value.deadline),...(creating?{}:{expectedRevision:revision(value.expectedRevision)}),idempotencyKey:uuid(value.idempotencyKey),...fields(value)});
+  if(central){if(value.evaluationId!==null)fail();Object.assign(result,{origin:'CENTRAL',centralRevisionId:uuid(value.centralRevisionId)})}
+  if(Object.hasOwn(value,'unitIds'))result.unitIds=unitIds(value.unitIds);
+  if(extra.includes('sourceInterestId')||extra.includes('sourceInterestRevision')){
+   if(!central||!extra.includes('sourceInterestId')||!extra.includes('sourceInterestRevision')||!extra.includes('unitIds'))fail();
+   Object.assign(result,{sourceInterestId:uuid(value.sourceInterestId),sourceInterestRevision:revision(value.sourceInterestRevision)});
+  }
+  if(extra.includes('includeResponsibleInTeam')){if(typeof value.includeResponsibleInTeam!=='boolean')fail();result.includeResponsibleInTeam=value.includeResponsibleInTeam}
+  return result;
+ }
+ if(method==='transition'){exact(value,['status','reason','expectedRevision','idempotencyKey']);if(!Object.hasOwn(NEXT,value.status)||typeof value.reason!=='string'||value.reason!==value.reason.trim()||value.reason.length<1||value.reason.length>500)fail();return {status:value.status,reason:value.reason,expectedRevision:revision(value.expectedRevision),idempotencyKey:uuid(value.idempotencyKey)}}
+ fail();
+}
+function query(method,value){
+ if(method==='dashboard'){
+  exact(value,['today','asOf']);deadline(value.today);
+  if(typeof value.asOf!=='string'||!Number.isFinite(Date.parse(value.asOf))||new Date(value.asOf).toISOString()!==value.asOf||value.asOf.slice(0,10)!==value.today)fail();
+  return {...value};
+ }
+ if(method==='dashboardContext'){exact(value,['unitsAvailable']);if(typeof value.unitsAvailable!=='boolean')fail();return {...value};}
+ if(method==='browse')return require('./browse').parse(value);
+ if(method==='report'||method==='reportExport')return require('./report').parse(method,value);
+ if(method==='opportunitySummaries'){
+  exact(value,['opportunityIds']);
+  if(typeof value.opportunityIds!=='string'||value.opportunityIds.length>924)fail();
+  const ids=value.opportunityIds.split(',').map(uuid);
+  if(ids.length<1||ids.length>25||new Set(ids).size!==ids.length)fail();
+  return {opportunityIds:ids};
+ }
+ if(method==='list'){if(Object.keys(value).some(k=>!['cursor','opportunityId'].includes(k)))fail();return {cursor:value.cursor?String(value.cursor):null,opportunityId:value.opportunityId?uuid(value.opportunityId):null}}
+ if(method==='history'){if(Object.keys(value).some(k=>k!=='cursor'))fail();return {cursor:value.cursor?String(value.cursor):null}}
+ if(method==='responsibles'){if(Object.keys(value).some(k=>k!=='cursor'))fail();return {cursor:value.cursor?uuid(value.cursor):null}}
+ if(Object.keys(value).length)fail();return {};
+}
+module.exports={currentStatus,UUID,NEXT,BASIC_NEXT,OPTIONAL_FIELDS,fail,uuid,command,query};

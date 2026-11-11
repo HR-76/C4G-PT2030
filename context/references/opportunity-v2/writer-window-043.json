@@ -1,0 +1,115 @@
+{
+  "status": "PASS",
+  "state": "HABITUAL_043_PREPARED_AUTHENTICATED_NOT_EXECUTED",
+  "verifiedAt": "2026-10-31T16:10:28.168Z",
+  "windowId": "d439a44e-e005-4a79-bb9d-c18c5b65b4b6",
+  "planDigest": "5ab4ef3642754b35f3c4ce6452bc3cc5f7485f0f01b194da8eefc1ad578caaf7",
+  "expiresAt": "2026-10-31T17:09:44.661Z",
+  "scope": "PREPARATION_ONLY",
+  "package": {
+    "packageId": "opportunity-eu-writer-v2",
+    "packageDigest": "2bdae82ddd6516e3b31bf33699f5213adaf6c36ae038a59c59f2123752033ee7",
+    "sqlSha256": "68562ede29f9c6063105c132331d7defb7b776d6ad5e928b3b1e843925af3f62"
+  },
+  "baselines": {
+    "central": "042_opportunity_eu_source_control_v2",
+    "tenant": "034_application_snapshot_v2"
+  },
+  "source": {
+    "state": "QUIESCED",
+    "fence": 3,
+    "acceptedV2": 1,
+    "pendingRuns": 0
+  },
+  "expected": {
+    "opportunityId": "01a14a80-9143-7177-ba86-9fa72d09fb64",
+    "revisionId": "f6fe19fd-12d7-4c38-920a-b456dd74e9a9",
+    "rowVersion": 5
+  },
+  "controlledCycle": {
+    "source": "EU_FUNDING_TENDERS",
+    "maxCycles": 1,
+    "observationWindowSeconds": 300,
+    "finishState": "QUIESCED",
+    "automaticNewIdentities": false,
+    "automaticV1Migrations": false
+  },
+  "backup": {
+    "id": "4fd2b7d6-88ba-414c-99ad-03dd46ffbd83",
+    "privatePath": ".tmp\\local-platform\\opportunity-v2-backup-4fd2b7d6-88ba-414c-99ad-03dd46ffbd83",
+    "tables": 236,
+    "rows": 54664,
+    "configFiles": 7,
+    "restorePassed": true,
+    "cleanup": true,
+    "noSourceDriftDuringPause": true
+  },
+  "pauseSeconds": 60.698,
+  "approval": {
+    "provider": "OIDC",
+    "sessionFabricated": false,
+    "eventId": "01a192b9-b907-7066-9094-05580c96441e",
+    "eventHash": "18b181a1fa98a62d4745f7764103324625e839a2d0f09c32f24737d0a0b41582",
+    "acceptedAt": "2026-10-31T16:10:08.362Z",
+    "replayVerified": true
+  },
+  "preservation": {
+    "catalogTables": 34,
+    "tenantBusinessTables": 129,
+    "configFiles": 7,
+    "allHashesMatch": true
+  },
+  "facts11145": {
+    "amount": "120000.00000000",
+    "type": "numeric",
+    "currencyState": "NOT_FOUND",
+    "cutoffs": 7
+  },
+  "tests": {
+    "backend": {
+      "passed": 2235,
+      "failed": 0,
+      "skipped": 7
+    },
+    "frontend": {
+      "passed": 495,
+      "failed": 0
+    },
+    "operational": {
+      "passed": 15,
+      "failed": 0
+    },
+    "build": "PASS",
+    "syntax": 18
+  },
+  "gate": {
+    "path": "output/opportunity-v2-writer-d0c97da917724e6691acd8bb5b51059c/verification.json",
+    "sha256": "819aa968cd68059d575372b792b41bc713245e5d6833e367140c7063952e7782",
+    "checks": 27,
+    "inputHashes": 854,
+    "cleanup": true
+  },
+  "habitualEffects": {
+    "migration043": false,
+    "writerSelected": false,
+    "euResumed": false,
+    "collected": false,
+    "acceptedRevision": false,
+    "authenticationAndApprovalAudit": true
+  },
+  "evidence": {
+    "output/opportunity-eu-writer-window-d439a44e-e005-4a79-bb9d-c18c5b65b4b6/window.json": "89d6b7d34d2c10aa8f6bc42ef82147605e3eb70dfc4fc69bb2eeb779dec46d69",
+    "output/opportunity-eu-writer-window-d439a44e-e005-4a79-bb9d-c18c5b65b4b6/plan.json": "71df72fdecab9117d34967e167ed29fc3f40decf300dfb26e6450bbf1328e0a9",
+    "output/opportunity-eu-writer-window-d439a44e-e005-4a79-bb9d-c18c5b65b4b6/approval-eeb33a84-850b-4049-9c2e-4884fe09a0bf.json": "eda82860f1075afc8590bf3b6b48e53c9955fd9c1566fdcd4ccd8ea41ae2983a",
+    "output/opportunity-eu-writer-window-d439a44e-e005-4a79-bb9d-c18c5b65b4b6/after.json": "22214254f44e635a1721d3b733c23aecc618c7d0d34332bce5b5b559e024c306",
+    "output/opportunity-v2-window/preview-f6adadcd-41f0-4890-a199-682587daaa7b/writer-habitual-preview.json": "bd99b2b530bf684d668df112f0fdeabfa667ce624d1db5b6ef172b621aca8cf2",
+    "output/opportunity-v2-window/d439a44e-e005-4a79-bb9d-c18c5b65b4b6/backup-restore-4fd2b7d6-88ba-414c-99ad-03dd46ffbd83.json": "a0130844f2040b5864a38bfda3572e76bc53617e84a14139c3b0f7111556aa8b",
+    "output/opportunity-eu-writer-window-validation-b8df682c-44d5-446e-a31a-4564ebb9347f/validation.json": "eb70da0e5280956be02bb947ffe49ac58e82ebd6212f5ecc78df8eee877300f8"
+  },
+  "limitations": [
+    "Preparation approval expires and is invalidated by input/state drift; it is not a maintenance lease.",
+    "Execution must revalidate physical baselines, authority, configuration and current backup.",
+    "Restore proof is logical, not credential recovery on a new destination or reconciliation of later writes.",
+    "Isolated worker proof used owner orchestration and a separately tested restricted helper, not a newly provisioned least-privileged worker login."
+  ]
+}

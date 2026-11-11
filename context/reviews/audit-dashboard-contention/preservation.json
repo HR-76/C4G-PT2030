@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-27T00:17:36.641Z",
+  "baselineFileCount": 2629,
+  "unchangedFileCount": 2621,
+  "changedExistingFiles": [
+    "backend/src/applications/composition.js",
+    "backend/src/authorization/audit.js",
+    "backend/src/opportunities/httpComposition.js",
+    "backend/src/organizationalProfile/editorialUiAudit.js",
+    "backend/src/routes/organizationDashboardRoutes.js",
+    "backend/src/security/tenantLeaseExecutor.js",
+    "context/current-work.md",
+    "context/features/http-flows-performance.md"
+  ],
+  "missingFiles": [],
+  "unexpectedChangedFiles": [],
+  "expectedUnchangedFiles": [],
+  "headUnchanged": true,
+  "branchUnchanged": true,
+  "baselineStatusEntries": 2179,
+  "finalStatusEntries": 2198,
+  "protectedFilesChecked": 219,
+  "protectedFilesChanged": [],
+  "frontendFilesChecked": 179,
+  "frontendFilesChanged": [],
+  "limits": "Hash comparison covers baseline inventory, not an immutable snapshot of all possible files or live databases. Test runners used owned disposable fixtures only.",
+  "pass": true
+}

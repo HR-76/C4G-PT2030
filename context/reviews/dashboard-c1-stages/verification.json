@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-27T20:16:39.701Z",
+  "scope": "Research with test-process observation; no runtime implementation.",
+  "execution": {
+    "status": "COMPLETE",
+    "exitCode": 0,
+    "checks": 5,
+    "successes": 36,
+    "samples": 36,
+    "errors": 0,
+    "admissionErrors": 0,
+    "afterResponseQueryCompletions": 0,
+    "cleanupError": null,
+    "report": "results.json"
+  },
+  "observerValidation": {
+    "stageOrder": true,
+    "noStageOverlap": true,
+    "queryCountsMatchOriginal": true,
+    "authorityTransactionCountsMatchOriginal": true,
+    "allQueryIntervalsPresent": true,
+    "allScenarioQueryCountsMatchPrevious": true,
+    "allDashboardStageQueryCountsMatch": true,
+    "independentObserverReview": "No blocker; branded authority objects preserved, args/results/error/order unchanged. Added timing overhead documented.",
+    "independentIntervalReview": "Raw C1 unions recalculated independently; rounding difference at most 0.01ms."
+  },
+  "syntax": {
+    "pass": true,
+    "report": "syntax.json"
+  },
+  "preservation": {
+    "pass": true,
+    "report": "preservation.json"
+  },
+  "ownedContainerCleanup": {
+    "remaining": 0,
+    "method": "docker ps -a filtered by c4g.http-proof and c4g.audit-dashboard-proof returned no names after the runner completed."
+  },
+  "initialAttempt": {
+    "reason": "Node preload could not resolve a Windows backslash path in NODE_OPTIONS; no measured requests.",
+    "resolution": "Only new wrapper path normalized to forward slashes; preload smoke and repeated run passed.",
+    "log": "preload-failure.log"
+  },
+  "full108GateRepeated": false,
+  "unitSuitesOrBuildRepeated": false,
+  "reason": "No runtime edits; previous integral gate preserved.",
+  "recommendation": {
+    "implemented": false,
+    "predictedAuthorityTransactions": 36,
+    "currentAuthorityTransactions": 42,
+    "predictedPgCalls": 2421,
+    "currentPgCalls": 2619,
+    "latencyGainMeasured": false,
+    "independentReview": "No material issue. Clarified that guard identity/context pair runs during the lease and ends before prepare, and a shared callback deadline can be more restrictive without changing configured limits."
+  },
+  "productionPerformanceApproved": false
+}

@@ -1,0 +1,15 @@
+﻿{
+    "checks":  [
+                   "base backup created before later transactions",
+                   "archived WAL replay reached named restore point",
+                   "committed row before target recovered",
+                   "row after target excluded",
+                   "recovery remains paused at target"
+               ],
+    "run":  "83671a141de34339b217309dfd4dc47a",
+    "cleanup":  "PASS",
+    "limitations":  [
+                        "Synthetic single-cluster PostgreSQL recovery; no application schema, objects, production WAL, RPO or RTO claim."
+                    ],
+    "status":  "PASS"
+}

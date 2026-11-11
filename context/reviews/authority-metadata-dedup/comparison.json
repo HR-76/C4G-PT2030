@@ -1,0 +1,736 @@
+{
+  "at": "2026-10-26T23:57:46.568Z",
+  "authoritySqlHash": "d865a98c5b469f9c",
+  "scenarios": [
+    {
+      "name": "report-c1",
+      "before": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 5606.95,
+        "p95Ms": 6353.36,
+        "meanMetadataMs": 4574.14,
+        "meanAuditPrepareMs": 6.63,
+        "meanCentralLockCallMs": 47.67,
+        "maxActive": 1,
+        "maxQueued": 0,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          1159,
+          1159,
+          1159,
+          1159
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 4,
+          "maxWaitMs": 0.12,
+          "maxHeldMs": 4547.77,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 1
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 4286.83,
+        "p95Ms": 4416.84,
+        "meanMetadataMs": 3098.87,
+        "meanAuditPrepareMs": 5.16,
+        "meanCentralLockCallMs": 42.47,
+        "maxActive": 1,
+        "maxQueued": 0,
+        "authorityCollections": [
+          42,
+          42,
+          42,
+          42
+        ],
+        "queries": [
+          1117,
+          1117,
+          1117,
+          1117
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 4,
+          "maxWaitMs": 0.12,
+          "maxHeldMs": 3382.58,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 1
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": -30.48
+    },
+    {
+      "name": "report-c2",
+      "before": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 5337.68,
+        "p95Ms": 7455.41,
+        "meanMetadataMs": 4136.31,
+        "meanAuditPrepareMs": 517.44,
+        "meanCentralLockCallMs": 79.83,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          1159,
+          1159,
+          1159,
+          1159
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 4,
+          "maxWaitMs": 56.41,
+          "maxHeldMs": 6009.96,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 2
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 5852.07,
+        "p95Ms": 6708.81,
+        "meanMetadataMs": 3797.15,
+        "meanAuditPrepareMs": 417.45,
+        "meanCentralLockCallMs": 198.21,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "authorityCollections": [
+          42,
+          42,
+          42,
+          42
+        ],
+        "queries": [
+          1117,
+          1117,
+          1117,
+          1117
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 4,
+          "maxWaitMs": 49.97,
+          "maxHeldMs": 5293.88,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 2
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": -10.01
+    },
+    {
+      "name": "report-c4",
+      "before": {
+        "successes": 7,
+        "samples": 8,
+        "errors": 1,
+        "p50Ms": 9083.59,
+        "p95Ms": 10893.36,
+        "meanMetadataMs": 4649.92,
+        "meanAuditPrepareMs": 3234.54,
+        "meanCentralLockCallMs": 188.3,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          1159,
+          1159,
+          1159,
+          1159,
+          1159,
+          1159,
+          1159,
+          1159
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 12825.71
+          }
+        ],
+        "physicalTenant": {
+          "count": 8,
+          "maxWaitMs": 16.61,
+          "maxHeldMs": 10668.32,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 8,
+        "samples": 8,
+        "errors": 0,
+        "p50Ms": 7838.8,
+        "p95Ms": 11089.68,
+        "meanMetadataMs": 3806.12,
+        "meanAuditPrepareMs": 2801.39,
+        "meanCentralLockCallMs": 189.09,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "authorityCollections": [
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42
+        ],
+        "queries": [
+          1117,
+          1117,
+          1117,
+          1117,
+          1117,
+          1117,
+          1117,
+          1117
+        ],
+        "transactions": [
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          21
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 8,
+          "maxWaitMs": 19.25,
+          "maxHeldMs": 9643.56,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": 1.8
+    },
+    {
+      "name": "dashboard-c1",
+      "before": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 8403.06,
+        "p95Ms": 9127.96,
+        "meanMetadataMs": 8843.26,
+        "meanAuditPrepareMs": 11.44,
+        "meanCentralLockCallMs": 149.43,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "authorityCollections": [
+          168,
+          168,
+          168,
+          168
+        ],
+        "queries": [
+          2703,
+          2703,
+          2703,
+          2703
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 12,
+          "maxWaitMs": 0.04,
+          "maxHeldMs": 4043.19,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 4,
+        "samples": 4,
+        "errors": 0,
+        "p50Ms": 6344.5,
+        "p95Ms": 7401.16,
+        "meanMetadataMs": 6729.49,
+        "meanAuditPrepareMs": 10.92,
+        "meanCentralLockCallMs": 130.1,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          2619,
+          2619,
+          2619,
+          2619
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 12,
+          "maxWaitMs": 0.04,
+          "maxHeldMs": 3526.88,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": -18.92
+    },
+    {
+      "name": "dashboard-c4",
+      "before": {
+        "successes": 8,
+        "samples": 8,
+        "errors": 0,
+        "p50Ms": 15177.18,
+        "p95Ms": 15640.93,
+        "meanMetadataMs": 9638.81,
+        "meanAuditPrepareMs": 4234.7,
+        "meanCentralLockCallMs": 1621.92,
+        "maxActive": 5,
+        "maxQueued": 3,
+        "authorityCollections": [
+          168,
+          168,
+          168,
+          168,
+          168,
+          168,
+          168,
+          168
+        ],
+        "queries": [
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 24,
+          "maxWaitMs": 41.72,
+          "maxHeldMs": 10130.89,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 8,
+        "samples": 8,
+        "errors": 0,
+        "p50Ms": 15621.89,
+        "p95Ms": 18375.89,
+        "meanMetadataMs": 9481.45,
+        "meanAuditPrepareMs": 4364.95,
+        "meanCentralLockCallMs": 2259.63,
+        "maxActive": 5,
+        "maxQueued": 3,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 24,
+          "maxWaitMs": 32.89,
+          "maxHeldMs": 9333.36,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": 17.49
+    },
+    {
+      "name": "dashboard-two-tenants-c4",
+      "before": {
+        "successes": 8,
+        "samples": 8,
+        "errors": 0,
+        "p50Ms": 13480.07,
+        "p95Ms": 16956.62,
+        "meanMetadataMs": 13566.91,
+        "meanAuditPrepareMs": 870.24,
+        "meanCentralLockCallMs": 2013.92,
+        "maxActive": 8,
+        "maxQueued": 0,
+        "authorityCollections": [
+          168,
+          168,
+          168,
+          168,
+          168,
+          168,
+          168,
+          168
+        ],
+        "queries": [
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703,
+          2703
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": null,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 24,
+          "maxWaitMs": 26.98,
+          "maxHeldMs": 9341.05,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": false
+      },
+      "after": {
+        "successes": 8,
+        "samples": 8,
+        "errors": 0,
+        "p50Ms": 12090.65,
+        "p95Ms": 15227.6,
+        "meanMetadataMs": 10985.55,
+        "meanAuditPrepareMs": 819.57,
+        "meanCentralLockCallMs": 2497.56,
+        "maxActive": 8,
+        "maxQueued": 0,
+        "authorityCollections": [
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619,
+          2619
+        ],
+        "transactions": [
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 0,
+        "failedRequests": [],
+        "physicalTenant": {
+          "count": 24,
+          "maxWaitMs": 104.01,
+          "maxHeldMs": 8599.49,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": -10.2
+    },
+    {
+      "name": "dashboard-c6",
+      "before": {
+        "successes": 2,
+        "samples": 6,
+        "errors": 4,
+        "p50Ms": 18103.34,
+        "p95Ms": 18831.79,
+        "meanMetadataMs": 7415.07,
+        "meanAuditPrepareMs": 3500.83,
+        "meanCentralLockCallMs": 1308.82,
+        "maxActive": 5,
+        "maxQueued": 7,
+        "authorityCollections": [
+          96,
+          40,
+          40,
+          120,
+          168,
+          168
+        ],
+        "queries": [
+          1289,
+          397,
+          397,
+          1871,
+          2703,
+          2703
+        ],
+        "transactions": [
+          24,
+          10,
+          10,
+          30,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 772,
+        "admissionTimeouts": 5,
+        "failedRequests": [
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8656.65
+          },
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8666.46
+          },
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8793.95
+          },
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 14126.86
+          }
+        ],
+        "physicalTenant": {
+          "count": 9,
+          "maxWaitMs": 68.96,
+          "maxHeldMs": 10849.83,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": true
+      },
+      "after": {
+        "successes": 4,
+        "samples": 6,
+        "errors": 2,
+        "p50Ms": 16055.42,
+        "p95Ms": 17576,
+        "meanMetadataMs": 6843.4,
+        "meanAuditPrepareMs": 2832.5,
+        "meanCentralLockCallMs": 1859.45,
+        "maxActive": 5,
+        "maxQueued": 7,
+        "authorityCollections": [
+          20,
+          20,
+          84,
+          84,
+          84,
+          84
+        ],
+        "queries": [
+          377,
+          377,
+          2619,
+          2619,
+          2619,
+          2619
+        ],
+        "transactions": [
+          10,
+          10,
+          42,
+          42,
+          42,
+          42
+        ],
+        "afterResponseQueryCompletions": 0,
+        "admissionTimeouts": 4,
+        "failedRequests": [
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8331.56
+          },
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8417.98
+          }
+        ],
+        "physicalTenant": {
+          "count": 12,
+          "maxWaitMs": 64.21,
+          "maxHeldMs": 8949.26,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        },
+        "admissionTelemetry": true
+      },
+      "p95DeltaPercent": -6.67
+    }
+  ],
+  "limitations": [
+    "Success-only quantiles, four/eight standard samples and six burst samples; no productive inference.",
+    "Old standard predates explicit admission telemetry; no before/after logical timeout comparison there.",
+    "The second tenant is initially cold in both standard runs.",
+    "Query timings include overlapping activity and cannot be summed as exclusive HTTP time."
+  ]
+}

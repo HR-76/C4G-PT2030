@@ -1,0 +1,21 @@
+{
+  "designVersion": "opportunity-persistence-v2.0",
+  "status": "DESIGN_ONLY",
+  "executable": false,
+  "migrationVersion": null,
+  "migrationChecksum": null,
+  "schemaFingerprint": null,
+  "repositoryBaseline": "035_funding_source_resolution",
+  "baselineIsLiveDatabaseAttestation": false,
+  "authority": "CENTRAL",
+  "stagingRequiresExistingCatalogIdentity": false,
+  "tenantMigrations": [],
+  "preserveHistoricalVersions": [1],
+  "newSnapshotVersion": 2,
+  "snapshotLimitBytes": 262144,
+  "decimal": { "precision": 32, "scale": 8, "jsonRepresentation": "CANONICAL_DECIMAL_STRING", "preCastValidation": true },
+  "existingTablesToExtend": ["opportunity_catalog.opportunity", "opportunity_catalog.revision"],
+  "newTables": ["source_identity_v2", "source_alias_v2", "source_observation_v2", "revision_evidence_v2", "revision_allocation_v2", "revision_financial_detail_v2", "revision_concept_v2", "revision_allocation_concept_v2", "revision_deadline_v2", "source_candidate_v2"],
+  "requiredGates": ["G1_CONTRACT", "G2_ISOLATED_SQL", "G3_EXACT_MONEY_CALENDAR", "G4_CONCURRENCY_REPLAY", "G5_AUTHORITY_ISOLATION", "G6_SOURCE_CONSUMERS", "G7_OPERATIONAL_ACTIVATION"],
+  "runtimeActivationIncluded": false
+}

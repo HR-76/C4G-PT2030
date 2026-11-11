@@ -1,0 +1,11 @@
+LOCK TABLE async_exec.outbox,async_exec.execution,async_exec.dead_letter,async_exec.replay_request IN ACCESS EXCLUSIVE MODE;
+DO $$ BEGIN IF EXISTS(SELECT 1 FROM async_exec.outbox WHERE lineage_version=1) OR EXISTS(SELECT 1 FROM async_exec.execution WHERE lineage_version=1) OR EXISTS(SELECT 1 FROM async_exec.dead_letter WHERE lineage_version=1) OR EXISTS(SELECT 1 FROM async_exec.replay_request) THEN RAISE EXCEPTION 'F9_LINEAGE_ROLLBACK_REQUIRES_NO_V1'; END IF; END $$;
+DROP TABLE async_exec.replay_request;
+DROP FUNCTION async_exec.guard_replay_request_transition();
+DROP TYPE async_exec.replay_request_state;
+DROP INDEX async_exec.f9_dead_letter_replay_request_v1; ALTER TABLE async_exec.dead_letter DROP CONSTRAINT dead_letter_lineage_check,DROP COLUMN replay_execution_id,DROP COLUMN replay_request_id,DROP COLUMN lineage_version;
+DROP TRIGGER guard_execution_lineage_v1 ON async_exec.execution;
+DROP FUNCTION async_exec.guard_execution_lineage_v1();
+DROP INDEX async_exec.f9_execution_replay_request_v1; ALTER TABLE async_exec.execution DROP CONSTRAINT execution_lineage_shape_check,DROP COLUMN replay_request_id,DROP COLUMN envelope_digest,DROP COLUMN content_digest,DROP COLUMN previous_execution_id,DROP COLUMN root_execution_id,DROP COLUMN delivery_kind,DROP COLUMN lineage_version; ALTER TABLE async_exec.execution ALTER COLUMN attempt SET NOT NULL;
+DROP INDEX async_exec.f9_central_outbox_replay_request_v1; DROP INDEX async_exec.f9_central_outbox_execution_v1; ALTER TABLE async_exec.outbox DROP CONSTRAINT outbox_lineage_shape_check,DROP CONSTRAINT outbox_lineage_version_check,DROP COLUMN replay_request_id,DROP COLUMN envelope_digest,DROP COLUMN content_digest,DROP COLUMN previous_execution_id,DROP COLUMN root_execution_id,DROP COLUMN attempt,DROP COLUMN delivery_kind,DROP COLUMN lineage_version;
+DROP TYPE async_exec.delivery_kind;

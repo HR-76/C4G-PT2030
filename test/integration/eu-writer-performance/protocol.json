@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "eu-writer-performance-executors-2026-10-31-v2",
+  "parentProtocol": "context/references/performance/eu-writer-v2-protocol.json",
+  "contract": "context/features/eu-writer-performance-executors.md",
+  "runner": "test/integration/eu-writer-performance/run.cjs",
+  "sourcePolicy": "IMMUTABLE_PARENT_PLUS_TWO_TENANT034_OVERLAYS_CLOSED_RESPONSIBLE_DIRECTORY_AND_DECLARED_EXECUTORS",
+  "defaultMode": null,
+  "readiness": {"explicitFlag": "--readiness", "revisions": ["043", "042"], "httpRevision": "043", "metadataMode": "functional", "loadMatrixExecuted": false},
+  "metadata": {"explicitFlag": "--measure-metadata", "runner": "metadata.cjs", "requiresMatchingReadinessReport": true},
+  "http": {"explicitFlag": "--measure-http", "runner": "http.cjs", "requiresMatchingReadinessReport": true, "newFixturePerReplica": true, "replicas": 3, "attempts": 108, "warmups": 21},
+  "normalization": {"removedRecursiveFields": ["asOf", "generatedAt"], "cursorProjection": "POSITION_AND_CONTEXT_WITHOUT_EXPIRY_OR_SIGNATURE; REAL_HTTP_PAGINATION_AND_TAMPER_REFUSAL_IN_READINESS", "businessFieldsRemoved": false},
+  "metrics": {"clock": "MONOTONIC", "quantile": "NEAREST_RANK", "roundBeforeDecision": false, "queryCoverage": "UNION_OF_INTERVALS", "querySums": "OBSERVED_DRIVER_WORK_NOT_SQL_CPU", "samplerIntervalMs": 100, "missingMetricsPreventPass": true},
+  "images": {"selection": "EXISTING_LOCAL_CONTENT_ADDRESSED_IDS", "postgresSourceTag": "postgres:18-alpine", "keycloakSourceTag": "quay.io/keycloak/keycloak:26.8.0", "pullAllowed": false},
+  "infrastructure": {"network": "LOOPBACK_ONLY", "ownership": "EXACT_ID_NAME_RUN_LABEL", "postgresMemoryBytes": 2147483648, "keycloakMemoryBytes": 2147483648, "cleanupRequired": true, "tls": "EXISTING_ISOLATED_TEST_CERTIFICATES_EXTERNAL_TO_SOURCE_ARCHIVE"},
+  "writerInterference": {"enabled": false, "reason": "OPTIONAL_WORKLOAD_NOT_PART_OF_THIS_INCREMENT"},
+  "futureC6": {"enabled": false, "reason": "NO_CODE_OPTIMIZATION_CANDIDATE"},
+  "executionPerformedByPreparation": false
+}

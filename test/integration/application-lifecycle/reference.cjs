@@ -1,0 +1,26 @@
+'use strict';
+// Original pilot source, with synthetic responses; never connects to a legacy DB.
+const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
+const root=path.resolve(__dirname,'../../..'),ref=path.join(root,'.tmp/application-lifecycle-reference/frontend'),out=path.join(root,'output/playwright/c4g-application-lifecycle');
+const esbuild=require('../../../frontend/node_modules/esbuild'),{chromium}=require('../../../frontend/test-harness/node_modules/playwright');
+async function main(){
+ fs.mkdirSync(out,{recursive:true});fs.cpSync(path.join(root,'.tmp/pilot-visual-reference/frontend'),ref,{recursive:true});
+ for(const name of ['ApplicationForm','ApplicationDetail','ApplicationsList'])fs.writeFileSync(path.join(ref,`src/pages/Applications/${name}.jsx`),execFileSync('git',['show',`3a79b25539040c2024051cf9ab6295680b760277:frontend/src/pages/Applications/${name}.jsx`],{cwd:root,encoding:'utf8',windowsHide:true}));
+ const app={id:1,title:'Candidatura de ensaio visual',opportunity_id:1,opportunity_title:'Oportunidade de ensaio',coordinator_id:1,coordinator_name:'Synthetic',status:'APROVADO',internal_deadline:'2026-12-31',closing_date:null,total_budget:'120000.67',university_budget:'45000.23',notes:'Preparar a candidatura com a equipa.\nConfirmar os documentos necessários.',created_at:'2026-10-17T10:00:00Z',status_changed_at:'2026-10-17T10:00:00Z',members:[],partners:[],attachments:[],status_history:[]};
+ fs.writeFileSync(path.join(ref,'src/contexts/AuthContext.jsx'),`export const useAuth=()=>({user:{id:1,name:'Synthetic'},isAdmin:true,logout:()=>{}});`);
+ fs.writeFileSync(path.join(ref,'src/api/api.js'),`const ok=data=>Promise.resolve({data});export const applicationsApi={get:()=>ok(${JSON.stringify(app)}),list:()=>ok({data:[${JSON.stringify(app)}],total:1,total_pages:1,counts_by_status:{APROVADO:1}}),availableMembers:()=>ok([])};export const opportunitiesApi={get:()=>ok({id:1,title:'Oportunidade de ensaio'}),list:()=>ok({data:[]})};export const authApi={};export const notificationsApi={list:()=>ok({total:0})};`);
+ fs.writeFileSync(path.join(ref,'entry.jsx'),`import React from 'react';import {createRoot} from 'react-dom/client';import {BrowserRouter,Routes,Route} from 'react-router-dom';import Layout from './src/components/Layout/Layout';import ApplicationForm from './src/pages/Applications/ApplicationForm';import ApplicationDetail from './src/pages/Applications/ApplicationDetail';import ApplicationsList from './src/pages/Applications/ApplicationsList';import {ToastProvider} from './src/components/ToastProvider';import './src/index.css';createRoot(document.getElementById('root')).render(<BrowserRouter><ToastProvider><Routes><Route element={<Layout/>}><Route path="/formulario" element={<ApplicationForm opportunityId={1} onCancel={()=>{}} onSave={()=>{}}/>}/><Route path="/candidaturas" element={<ApplicationsList/>}/><Route path="/candidaturas/:id" element={<ApplicationDetail/>}/></Route></Routes></ToastProvider></BrowserRouter>);`);
+ await esbuild.build({entryPoints:[path.join(ref,'entry.jsx')],bundle:true,outfile:path.join(ref,'reference.js'),jsx:'automatic',nodePaths:[path.join(root,'frontend/node_modules')],loader:{'.png':'dataurl','.jpg':'dataurl'},define:{'process.env.NODE_ENV':'"production"'}});
+ const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+ try{
+  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.route('**/*',async route=>{const pathname=new URL(route.request().url()).pathname;const asset=pathname==='/reference.js'?path.join(ref,'reference.js'):pathname==='/reference.css'?path.join(ref,'reference.css'):path.join(ref,'public',pathname.slice(1));if(fs.existsSync(asset)&&fs.statSync(asset).isFile())return route.fulfill({path:asset});return route.fulfill({contentType:'text/html',body:'<!doctype html><html lang="pt"><head><meta charset="UTF-8"><link rel="stylesheet" href="/reference.css"></head><body><div id="root"></div><script src="/reference.js"></script></body></html>'})});
+  for(const [name,url] of [['form','/formulario'],['detail','/candidaturas/1'],['list','/candidaturas']]){
+   await page.goto('http://application-reference.invalid'+url);
+   if(name==='form'){await page.locator('input[type=text]').last().fill(app.title);await page.locator('input[type=date]').fill(app.internal_deadline);await page.locator('input[type=number]').first().fill('120000.67');await page.locator('input[type=number]').last().fill('0');await page.locator('textarea').fill(app.notes)}else await page.getByText(app.title,{exact:true}).first().waitFor();
+   await page.screenshot({path:path.join(out,`pilot-${name}-1440.png`),fullPage:true});
+  }
+  if(errors.length)throw Error(errors.join(';'));console.log('APPLICATION_PILOT_REFERENCE_PASS');
+ }finally{await browser.close()}
+}
+main().catch(error=>{console.error(error);process.exitCode=1});

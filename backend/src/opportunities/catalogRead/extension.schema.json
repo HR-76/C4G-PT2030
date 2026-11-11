@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gcni:revision-extension:1.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "gcni-revision-extension/1.0"
+    },
+    "extensionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "opportunityId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revisionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sourceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "acceptanceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kind": {
+      "anyOf": [
+        {
+          "enum": [
+            "planned_notice",
+            "published_notice",
+            "grant_topic",
+            "cascade_call",
+            "call_for_proposals",
+            "unknown"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "windows": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/Window"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "documents": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/DocumentVersion"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "fundingRules": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/FundingRule"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "conflicts": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/Conflict"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/Relationship"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/Event"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "$ref": "urn:gcni:catalog-read:g2:1.0#/$defs/Evidence"
+          }
+        }
+      },
+      "required": [
+        "completeness",
+        "items"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "version",
+    "extensionId",
+    "opportunityId",
+    "revisionId",
+    "sourceDigest",
+    "acceptanceDigest",
+    "recordedAt",
+    "kind",
+    "windows",
+    "documents",
+    "fundingRules",
+    "conflicts",
+    "relationships",
+    "history",
+    "evidence"
+  ],
+  "additionalProperties": false
+}

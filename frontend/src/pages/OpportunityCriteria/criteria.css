@@ -1,0 +1,5 @@
+.criteria-panel { overflow-wrap: anywhere; }
+.criteria-panel label { display:block; margin: .5rem 0; }
+.criteria-panel textarea,.criteria-panel select { display:block; width:100%; max-width:100%; box-sizing:border-box; }
+.criteria-panel fieldset { min-width:0; margin:.75rem 0; }
+.criteria-panel button { margin:.25rem; }

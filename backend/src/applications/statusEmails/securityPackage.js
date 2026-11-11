@@ -1,0 +1,5 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const entries={"worker":{"file":"application_status_simulation_worker.up.sql","checksum":"24dcf629d74e2554659da5df62117e4faa713d731a18b4a33e7f96ba5216f9e9"},"simulation":{"file":"application_status_simulation.up.sql","checksum":"5c46a166a49057587dd970e5496cbd8165563f872fb01221d402bee7714549c6"},"central": {"file": "application_status_capture.up.sql", "checksum": "dc1fb8b32b0f02d553b9a5c39d8f9fc33ca7d9ce76f9d922a2c6ef3c5bad4297"}, "tenant": {"file": "application_status_outbox.up.sql", "checksum": "58e158a3fa2eae1310015e2dde8b87aa12b2679046f434a162f9f2042b564794"}};
+function load(scope){const entry=entries[scope];if(!entry)throw Error('STATUS_SECURITY_SCOPE');const sql=fs.readFileSync(path.join(__dirname,'../../../database',['simulation','worker'].includes(scope)?'tenant':scope,'candidates',entry.file),'utf8').replace(/\r\n/g,'\n');if(crypto.createHash('sha256').update(sql).digest('hex')!==entry.checksum)throw Error('STATUS_SECURITY_CHECKSUM');return {...entry,sql};}
+module.exports={load};

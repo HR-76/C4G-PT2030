@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-28",
+  "scope": "Initial UTC session configuration in isolated gate only",
+  "branch": "feat/f13-organizational-profile",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "baselineFiles": 30987,
+  "baselineWorktreeEntries": 2613,
+  "tdd": {
+    "redBeforeImplementation": true,
+    "initialRed": {
+      "pass": 7,
+      "fail": 1,
+      "reason": "Unchanged validator rejected positive path without startup UTC"
+    },
+    "newTests": 8
+  },
+  "fix": {
+    "startupOptions": "-c timezone=UTC",
+    "strictValidatorUnchanged": true,
+    "publicCredentialShapeUnchanged": true,
+    "additionalQueries": 0
+  },
+  "tests": {
+    "focused": {
+      "pass": 195,
+      "fail": 0,
+      "skip": 0
+    },
+    "targetedAfterReview": {
+      "pass": 8,
+      "fail": 0
+    },
+    "backend": {
+      "pass": 1533,
+      "fail": 0,
+      "skip": 7,
+      "total": 1540
+    },
+    "frontend": {
+      "pass": 346,
+      "files": 55
+    },
+    "build": "PASS",
+    "syntaxFiles": 2,
+    "preexistingSkips": 7,
+    "preexistingWarnings": [
+      "jsdom navigation",
+      "Synthetic chunk failure"
+    ]
+  },
+  "independentReview": {
+    "status": "PASS",
+    "improvements": [
+      "Balanced acquisitions/releases",
+      "Negative control independent of host PGOPTIONS"
+    ]
+  },
+  "sourceManifest": {
+    "files": 1013,
+    "verified": true,
+    "reviewedChanges": [
+      "test/integration/partner-portal/environment.js"
+    ]
+  },
+  "logs": [
+    {
+      "name": "partner-session-config-focused.log",
+      "sha256": "4c486a1ec516c3065a9e7b99bb59c20f8f46a7ac1884f40b64bcda6348e56736"
+    },
+    {
+      "name": "partner-session-config-backend.log",
+      "sha256": "e48ab5668d1bc28a29099bdfee91083d0bd842f9bf8d95a96e27828dfff56cea"
+    },
+    {
+      "name": "partner-session-config-frontend.log",
+      "sha256": "05f7d3276aef5e8c64c888a2916adee2018d5af8864393859c77a1b72c9db146"
+    },
+    {
+      "name": "partner-session-config-build.log",
+      "sha256": "8ddff9149173bfd807b3717fa0e969b2c49d0b0845cbbc806925970a2d9d459a"
+    }
+  ],
+  "modelComparison": {
+    "beforeSessionTimezone": "Etc/UTC",
+    "afterSessionTimezone": "UTC",
+    "beforeContract": "REJECTED",
+    "afterContract": "ACCEPTED",
+    "independentNegativeControls": 6,
+    "originalPostgresMismatchFieldConfirmed": false
+  },
+  "postgresExecuted": false,
+  "dockerExecuted": false,
+  "runtimeIntegrated": false,
+  "performanceMeasurements": null,
+  "preservation": {
+    "allowedFiles": [
+      "test/integration/partner-portal/environment.js",
+      "backend/test/partnerSessionConfiguration.test.js",
+      "test/integration/partner-portal/sources.json",
+      "test/integration/partner-portal/README.md",
+      "context/features/partner-postgres-gate.md",
+      "context/current-work.md",
+      "context/reviews/partner-session-configuration/README.md",
+      "context/reviews/partner-session-configuration/verification.json"
+    ],
+    "status": "PASS",
+    "added": [
+      "backend/test/partnerSessionConfiguration.test.js",
+      "context/reviews/partner-session-configuration/README.md",
+      "context/reviews/partner-session-configuration/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md",
+      "test/integration/partner-portal/README.md",
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/sources.json"
+    ],
+    "unexpected": [],
+    "removed": [],
+    "generatedBuildAndCache": 65,
+    "branchAndHeadUnchanged": true,
+    "currentFiles": 30990,
+    "currentWorktreeEntries": 2616,
+    "previousThreeExecutionArtifactsUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  }
+}

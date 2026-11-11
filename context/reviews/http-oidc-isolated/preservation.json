@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T22:52:14.790Z",
+  "baselineFiles": 2555,
+  "unchanged": 2552,
+  "changed": [
+    {
+      "file": "context/features/http-flows-performance.md",
+      "before": "d272eaf009d790e2d8271cc403a5df3cff20a263263322692d4700d372bd4620",
+      "after": "464a6693a351f500b56af467dad79c1676b06cfa280e8b4c5738b7ac6026ffc7"
+    },
+    {
+      "file": "context/reviews/http-flows-performance/README.md",
+      "before": "93a1f48ba7830230ae3883bab0a934eca0f6728b0ab9ef2f6af0321e28c99ef3",
+      "after": "bb13ded81ee5dd322e3e475c285b99e60dc5c627bb03e88ea21a79a85449425d"
+    },
+    {
+      "file": "context/current-work.md",
+      "before": "7ec79cb62bc1a648165d4cdbf25dca3ca5152e9605733c4d3c6434a9a71fad17",
+      "after": "645da250e01c76d2c3fbce85b41beb4a25d3970d060e6bbb3523ae440bcbdbb3"
+    }
+  ],
+  "missing": [],
+  "unexpected": [],
+  "protectedChanged": []
+}

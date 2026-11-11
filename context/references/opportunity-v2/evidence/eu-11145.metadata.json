@@ -1,0 +1,48 @@
+{
+  "evidenceVersion": 1,
+  "observedAt": "2026-10-30T22:45:39.461Z",
+  "sourceNamespace": "EU_FUNDING_TENDERS",
+  "externalIdentifier": "CASCADE:11145",
+  "officialUrl": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/11145",
+  "request": {
+    "method": "POST",
+    "endpoint": "https://api.tech.ec.europa.eu/search-api/prod/rest/search",
+    "queryParameters": {
+      "text": "***",
+      "language": "en",
+      "pageSize": 5,
+      "pageNumber": 1
+    },
+    "multipartJsonParts": {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "type": "8"
+              }
+            },
+            {
+              "term": {
+                "callccm2Id": "11145"
+              }
+            }
+          ]
+        }
+      },
+      "languages": [
+        "en"
+      ]
+    },
+    "note": "Public application parameter omitted from stored request metadata."
+  },
+  "response": {
+    "status": 200,
+    "apiVersion": "2.157.1",
+    "totalResults": 1,
+    "bytes": 20544,
+    "sha256": "21e07eb79a478de23ca126fd8377733f82c6731ac24fe91313a79b2ed186f2a6",
+    "file": "eu-11145.json"
+  },
+  "scope": "Public source observation only. Does not prove APP persistence or visual portal rendering."
+}

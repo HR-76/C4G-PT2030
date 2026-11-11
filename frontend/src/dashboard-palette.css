@@ -1,0 +1,90 @@
+/* Approved C4G palette, scoped to navigation and dashboards. */
+.sidebar,
+.organization-dashboard,
+.platform-dashboard {
+  --vivid-petrol: var(--color-action);
+  --vivid-green: var(--color-brand);
+  --vivid-lime: var(--color-brand);
+  --vivid-turquoise: var(--color-focus);
+  --vivid-amber: var(--color-warning);
+  --vivid-ink: var(--color-text-primary);
+  --vivid-border: var(--color-border);
+  --vivid-surface: var(--color-background);
+}
+
+.sidebar { background: var(--color-surface); }
+.sidebar .nav-item { margin: 3px 10px; padding: 9px 12px; border-radius: 7px; }
+.sidebar .sidebar-nav .nav-item.active { background: var(--color-surface); color: var(--color-text-primary); border-left-color: var(--vivid-lime); font-weight: 650; }
+.sidebar .nav-item:not(.active):hover { background: var(--color-success); color: var(--color-surface); }
+.sidebar .nav-item:focus-visible,
+.sidebar button:focus-visible { outline-color: var(--vivid-lime); outline-offset: 3px; }
+.sidebar .nav-divider { color: var(--color-border-strong); }
+.sidebar .avatar { background: var(--color-success); color: var(--color-surface); }
+
+.organization-dashboard,
+.platform-dashboard { --border: var(--vivid-border); --bg: var(--vivid-surface); color: var(--vivid-ink); }
+.main-area:has(.organization-dashboard),
+.main-area:has(.platform-dashboard) { background: var(--color-surface); }
+.organization-dashboard .btn-primary,
+.platform-dashboard .btn-primary { background: var(--action-primary-emphasis); color: var(--color-surface); font-weight: 650; }
+.organization-dashboard .btn-primary:hover:not(:disabled),
+.platform-dashboard .btn-primary:hover:not(:disabled) { background: var(--action-primary-hover); color: var(--color-surface); }
+.organization-dashboard .dashboard-tabs .tab-btn.active { color: var(--vivid-petrol); border-color: var(--vivid-turquoise); background: var(--color-success-soft); }
+.organization-dashboard .dashboard-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; background: transparent; border: 0; border-radius: 0; overflow: visible; }
+.organization-dashboard .dashboard-stats .stat-item { background: var(--color-surface); border: 1px solid var(--vivid-border); border-radius: 10px; }
+.organization-dashboard .dashboard-stats .stat-num { max-width: 100%; color: var(--vivid-ink); font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
+.organization-dashboard .dashboard-stats .stat-item { min-width:0; }
+.organization-dashboard .dashboard-stats .stat-item :is(.stat-lbl, small) { overflow-wrap:anywhere; }
+.organization-dashboard .dashboard-stats .stat-lbl { text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+.organization-dashboard .dashboard-tabs .tab-btn:not(.active),
+.organization-dashboard .dashboard-stats .stat-item :is(.stat-lbl, small) { color: var(--color-text-primary); }
+.organization-dashboard .dashboard-stats a:hover { box-shadow: inset 0 0 0 2px var(--vivid-turquoise); }
+.organization-dashboard .dash-section { border-color: var(--vivid-border); border-radius: 10px; }
+.organization-dashboard .section-hd > svg { color: var(--vivid-turquoise); }
+.organization-dashboard .metric-bar { border: 0; background: var(--color-success-soft); }
+.organization-dashboard .metric-bar i { background: var(--application-state-accent, var(--vivid-turquoise)); }
+.organization-dashboard .dashboard-deadlines li > span:last-child { background: var(--color-warning-soft); color: var(--color-warning); border-radius: 5px; padding: 3px 8px; }
+.organization-dashboard .dashboard-next { margin-bottom:18px; }
+.organization-dashboard .dashboard-next .section-hd > a { color:var(--color-success); font-size:13px; }
+.organization-dashboard .dashboard-indicator-context { display:flex; align-items:center; gap:8px; margin:0 0 12px; font-size:14px; font-weight:600; }
+
+.platform-dashboard .admin-totals { gap: 12px; border: 0; background: transparent; overflow: visible; }
+.platform-dashboard .admin-metric { background: var(--color-surface); border: 1px solid var(--vivid-border); border-radius: 10px; }
+
+.platform-dashboard .admin-metric > div { color: var(--color-text-primary); }
+.platform-dashboard .admin-metric > div svg { color: var(--vivid-turquoise); }
+.platform-dashboard .admin-metric:hover { box-shadow: inset 0 0 0 2px var(--vivid-turquoise); }
+.platform-dashboard .admin-catalog-summary > strong { color: var(--color-focus); }
+.platform-dashboard .admin-bar-active { background: var(--vivid-lime); }
+.platform-dashboard .admin-bar-stale { background: var(--vivid-amber); }
+.platform-dashboard .admin-shortcuts svg { color: var(--vivid-turquoise); }
+
+@media (max-width: 768px) {
+  .organization-dashboard .dashboard-stats { gap: 10px; }
+}
+
+.organization-dashboard .dashboard-stat-action { display:inline-flex; align-items:center; gap:5px; margin-top:8px; color:var(--color-action); font-size:.8rem; font-weight:650; }
+.organization-dashboard a.metric-row { text-decoration:none; color:inherit; }
+.organization-dashboard a.metric-row:hover span { text-decoration:underline; }
+.organization-dashboard :is(a.metric-row,a.stat-item):focus-visible { outline:2px solid var(--color-info); outline-offset:-2px; }
+.approval-timeline { margin-top: 16px; }
+.approval-timeline select { font: inherit; }
+.approval-periods { list-style: none; padding: 0; margin: 0; }
+.approval-periods li { display: grid; grid-template-columns: 6em minmax(1em,1fr) minmax(8em,auto); align-items: center; gap: 10px; padding: 5px 0; font-variant-numeric: tabular-nums; }
+.approval-periods li > span { text-align: right; overflow-wrap: anywhere; }
+.approval-periods small { display: block; }
+.approval-track { height: 8px; background: var(--color-neutral-soft); border-radius: 4px; overflow: hidden; }
+.approval-track i { display: block; height: 100%; background: var(--color-success); }
+.organization-dashboard .dashboard-stats .stat-item[href="#approval-timeline"] { background: var(--color-success-soft); border-color: var(--color-success); }
+/* Dashboard da entidade: cor para leitura e ações, sem alterar a sidebar. */
+.organization-dashboard{--dashboard-blue:var(--ui-action);--dashboard-violet:#7953ae;--dashboard-ink:#26344b;--dashboard-border:#e1e7f0;--dashboard-track:#edf1f7;color:var(--dashboard-ink)}
+.organization-dashboard .dashboard-intro h1,.organization-dashboard .chart-panel h2,.organization-dashboard .section-hd h2{color:var(--dashboard-ink)}
+.organization-dashboard .dashboard-tabs .tab-btn.active{color:var(--ui-action);border-color:var(--ui-action);background:var(--ui-action-soft)}
+.organization-dashboard :is(.dash-section,.chart-panel,.dashboard-stats .stat-item){border-color:var(--dashboard-border);background:#fff;box-shadow:0 2px 6px #293b580b}
+.organization-dashboard .section-hd>svg,.organization-dashboard .dashboard-stat-action,.organization-dashboard .dashboard-next .section-hd>a{color:var(--dashboard-blue)}
+.organization-dashboard :is(.chart-budget a,.chart-legend a,.dashboard-list a,.section-hd a){color:var(--ui-action)}
+.organization-dashboard .chart-track,.organization-dashboard .approval-track,.organization-dashboard .metric-bar{background:var(--dashboard-track)}
+.organization-dashboard .approval-track i{background:var(--dashboard-blue)}
+.organization-dashboard .dashboard-stats a:hover{box-shadow:inset 0 0 0 2px var(--action-primary-border)}
+.organization-dashboard :is(a,button,select):focus-visible{outline:3px solid var(--ui-action);outline-offset:2px}

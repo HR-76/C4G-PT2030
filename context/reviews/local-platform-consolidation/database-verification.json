@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-17T17:33:19.882Z",
+  "catalogDigestMatches": true,
+  "catalogCounts": {
+    "opportunity_catalog.opportunity": 9,
+    "opportunity_catalog.revision": 17,
+    "opportunity_catalog.provenance": 17,
+    "opportunity_catalog.idempotency_record": 17,
+    "opportunity_catalog.duplicate_candidate": 0,
+    "opportunity_catalog.funding_run": 4,
+    "opportunity_catalog.funding_run_item": 18,
+    "opportunity_catalog.funding_identity": 9,
+    "opportunity_catalog.funding_observation": 18,
+    "audit.event_identity": 25,
+    "audit.event": 25,
+    "audit.chain_head": 1,
+    "audit.checkpoint": 0
+  },
+  "units": [
+    {
+      "label": "Departamento de Formação",
+      "lifecycle": "ACTIVE",
+      "parent_scope_id": null
+    },
+    {
+      "label": "Departamento Internacional",
+      "lifecycle": "ACTIVE",
+      "parent_scope_id": null
+    },
+    {
+      "label": "Gabinete de Projetos e Investimentos",
+      "lifecycle": "ACTIVE",
+      "parent_scope_id": null
+    }
+  ],
+  "people": [
+    {
+      "name": "Hugo Romão",
+      "function_label": "Contacto de projetos",
+      "active": true
+    }
+  ],
+  "tenantAuditStreams": [
+    {
+      "valid": true,
+      "events": 286
+    },
+    {
+      "valid": true,
+      "events": 15
+    }
+  ],
+  "directoryReceipts": 2,
+  "unitReceipts": 3,
+  "pendingJobs": 0
+}

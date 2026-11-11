@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0",
+  "observedAt": "2026-10-27T23:31:00.923Z",
+  "scope": "Local Node observations only; no PostgreSQL execution",
+  "runtime": {
+    "node": "v24.13.1",
+    "icu": "78.2",
+    "cldr": "48.0",
+    "unicode": "17.0",
+    "collatorPt": {
+      "locale": "pt",
+      "usage": "sort",
+      "sensitivity": "variant",
+      "ignorePunctuation": false,
+      "collation": "default",
+      "numeric": false,
+      "caseFirst": "false"
+    },
+    "collatorDefault": {
+      "locale": "pt-PT",
+      "usage": "sort",
+      "sensitivity": "variant",
+      "ignorePunctuation": false,
+      "collation": "default",
+      "numeric": false,
+      "caseFirst": "false"
+    }
+  },
+  "collation": {
+    "pairs": [
+      {
+        "left": "ab",
+        "right": "a­b",
+        "leftCodePoints": [
+          "U+0061",
+          "U+0062"
+        ],
+        "rightCodePoints": [
+          "U+0061",
+          "U+00AD",
+          "U+0062"
+        ],
+        "leftNfc": true,
+        "rightNfc": true,
+        "comparePt": 0,
+        "utf8Equal": false,
+        "utf8Compare": -1
+      },
+      {
+        "left": "ab",
+        "right": "a‍b",
+        "leftCodePoints": [
+          "U+0061",
+          "U+0062"
+        ],
+        "rightCodePoints": [
+          "U+0061",
+          "U+200D",
+          "U+0062"
+        ],
+        "leftNfc": true,
+        "rightNfc": true,
+        "comparePt": 0,
+        "utf8Equal": false,
+        "utf8Compare": -1
+      },
+      {
+        "left": "A",
+        "right": "A️",
+        "leftCodePoints": [
+          "U+0041"
+        ],
+        "rightCodePoints": [
+          "U+0041",
+          "U+FE0F"
+        ],
+        "leftNfc": true,
+        "rightNfc": true,
+        "comparePt": 0,
+        "utf8Equal": false,
+        "utf8Compare": -1
+      }
+    ],
+    "nodeOrder": [
+      "00000000-0000-4000-8000-000000000001",
+      "00000000-0000-4000-8000-000000000002"
+    ],
+    "simulatedByteTieOrder": [
+      "00000000-0000-4000-8000-000000000002",
+      "00000000-0000-4000-8000-000000000001"
+    ],
+    "byteTieSimulationIsPostgresMeasurement": false,
+    "stableCountries": [
+      "a­b",
+      "ab"
+    ]
+  },
+  "legacyDigest": {
+    "rows": 26,
+    "canonicalUtf8Bytes": 15289,
+    "sha256": "ac97db797317226f80c125e8770f8250ae6432b8333f0a565fe1eb7273361e21",
+    "matchesExistingGolden": true
+  },
+  "sqlExecuted": false
+}

@@ -1,0 +1,16 @@
+{
+  "backend/src/applications/composition.js": "da796d81cc24c36acbe00577401f9d137fc15f842916c0a2d9a5441e4d48f3f9",
+  "backend/src/security/catalogReaderSchema.js": "8605b8a36601d4ba2c4d95b93ddd721fbbb5ba1b1ae7881b65aa2036d3d56217",
+  "backend/test/applicationResponsiblesAuthority.test.js": "748a9c88fdf5fa5f78b53276f6e084f078c1f42955b7a01167a8cf0f2c4ce72d",
+  "context/features/http-flows-performance.md": "e97adb2c1673fa71f563b94782d700d0962d40da0d5fdde976eb7ad6adf712e4",
+  "test/integration/http-oidc/README.md": "4730e64be5cfd89b6c8641ad56d171bd9bae23658430f9bec8d472c21083a0b7",
+  "test/integration/http-oidc/gate.js": "5ecf3cdb74e2139199397ccaf18b86f3a6de042348afeff922d44d1ca921c9e1",
+  "test/integration/http-oidc/gate.ps1": "737f96efa0af43c9356122b262f46fcd9398431722878941537e53e227c210f6",
+  "backend/src/security/authenticatedAuthority.js": "80a8e114eafb5e4668ff085fb9f66a39d7b7459fa8d4022468134098ad8e1943",
+  "backend/src/security/authorityCoordinator.js": "e62ca2e17a9cd9872feaa75edc44a03f4b01f0824f2a3542d561a947b77d457b",
+  "backend/src/security/sessionSecurity.js": "b825c4e35dd66e855e3cbaaefc4c6795cd446148916a38a0563a0ee368493254",
+  "context/current-work.md": "fbdcf1523de592f120ee723cfe5e044967c39c4c076f03ed525c2896873881de",
+  "backend/src/security/coordinatedSessionStore.js": "dcdcca281bd14f4852f0da6512087e10f8474a05b66013f87e3b13051dd7240c",
+  "backend/test/coordinatedSessionStore.test.js": "f161fb627719e900a635256768c08043d875763709d08752ce96031242c3453e",
+  "test/integration/http-oidc/sessionEpochProof.js": "561dc84a9758e2987d6fce814b241f0a0256ce359b2262873c4e0c85185ef42a"
+}

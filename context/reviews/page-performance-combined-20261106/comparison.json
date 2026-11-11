@@ -1,0 +1,249 @@
+{
+  "runs": [
+    {
+      "name": "a1",
+      "directory": "page-performance-combined-a1-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T21:54:16.966Z",
+      "finishedAt": "2026-11-06T21:56:07.744Z"
+    },
+    {
+      "name": "b1",
+      "directory": "page-performance-combined-b1-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T21:56:12.832Z",
+      "finishedAt": "2026-11-06T21:57:50.605Z"
+    },
+    {
+      "name": "b2",
+      "directory": "page-performance-combined-b2-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T21:57:55.848Z",
+      "finishedAt": "2026-11-06T21:59:33.413Z"
+    },
+    {
+      "name": "a2",
+      "directory": "page-performance-combined-a2-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T21:59:38.514Z",
+      "finishedAt": "2026-11-06T22:01:26.279Z"
+    }
+  ],
+  "images": [
+    "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+    "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+  ],
+  "totalPageMeasurements": 36,
+  "rows": [
+    {
+      "mode": "load",
+      "route": "/dashboard",
+      "before": {
+        "n": 4,
+        "medianMs": 7964.376400000001,
+        "minMs": 7465.6524999999965,
+        "maxMs": 8201.553799999994,
+        "valuesMs": [
+          8201.553799999994,
+          7970.5148000000045,
+          7958.237999999998,
+          7465.6524999999965
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4123.478750000002,
+        "minMs": 3926.405399999996,
+        "maxMs": 4450.184500000003,
+        "valuesMs": [
+          4450.184500000003,
+          3984.3278000000064,
+          4262.629699999998,
+          3926.405399999996
+        ]
+      },
+      "reductionPercent": 48.22596845121482,
+      "settledMedianMs": {
+        "before": 8410.252149999997,
+        "after": 6559.230300000003
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 4,
+        "medianMs": 7356.159400000004,
+        "minMs": 7100.698499999999,
+        "maxMs": 7611.682000000001,
+        "valuesMs": [
+          7611.682000000001,
+          7442.049500000008,
+          7270.2693,
+          7100.698499999999
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4780.890399999997,
+        "minMs": 4690.514300000003,
+        "maxMs": 4933.288099999998,
+        "valuesMs": [
+          4690.514300000003,
+          4726.883600000001,
+          4933.288099999998,
+          4834.897199999992
+        ]
+      },
+      "reductionPercent": 35.008336007509655,
+      "settledMedianMs": {
+        "before": 8280.40985,
+        "after": 8124.109899999996
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/candidaturas",
+      "before": {
+        "n": 4,
+        "medianMs": 4503.815150000002,
+        "minMs": 4340.227700000003,
+        "maxMs": 4543.433300000004,
+        "valuesMs": [
+          4537.318400000004,
+          4543.433300000004,
+          4470.311900000001,
+          4340.227700000003
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4748.619849999999,
+        "minMs": 4424.714200000002,
+        "maxMs": 4861.025200000004,
+        "valuesMs": [
+          4424.714200000002,
+          4802.811900000001,
+          4694.427799999998,
+          4861.025200000004
+        ]
+      },
+      "reductionPercent": -5.435496170396714,
+      "settledMedianMs": {
+        "before": 6959.013750000002,
+        "after": 7217.982049999999
+      }
+    },
+    {
+      "mode": "navigation",
+      "route": "/dashboard",
+      "before": {
+        "n": 2,
+        "medianMs": 6737.149700000002,
+        "minMs": 6712.423500000004,
+        "maxMs": 6761.875899999999,
+        "valuesMs": [
+          6761.875899999999,
+          6712.423500000004
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3137.1596000000063,
+        "minMs": 3062.141800000012,
+        "maxMs": 3212.1774000000005,
+        "valuesMs": [
+          3062.141800000012,
+          3212.1774000000005
+        ]
+      },
+      "reductionPercent": 53.434913283877215
+    },
+    {
+      "mode": "navigation",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 2,
+        "medianMs": 6278.400700000006,
+        "minMs": 6194.9319000000105,
+        "maxMs": 6361.869500000001,
+        "valuesMs": [
+          6361.869500000001,
+          6194.9319000000105
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3887.223149999998,
+        "minMs": 3862.7246999999916,
+        "maxMs": 3911.7216000000044,
+        "valuesMs": [
+          3911.7216000000044,
+          3862.7246999999916
+        ]
+      },
+      "reductionPercent": 38.08577477382107
+    },
+    {
+      "mode": "navigation",
+      "route": "/candidaturas",
+      "before": {
+        "n": 2,
+        "medianMs": 3368.8098000000027,
+        "minMs": 3276.1177999999927,
+        "maxMs": 3461.5018000000127,
+        "valuesMs": [
+          3461.5018000000127,
+          3276.1177999999927
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3369.8954000000012,
+        "minMs": 3309.1235000000015,
+        "maxMs": 3430.667300000001,
+        "valuesMs": [
+          3430.667300000001,
+          3309.1235000000015
+        ]
+      },
+      "reductionPercent": -0.0322250309292782
+    }
+  ],
+  "securityChecks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection",
+    "combined dashboard binds organization before publishing",
+    "combined dashboard refuses missing application.read",
+    "combined dashboard refuses missing opportunity.read",
+    "optional directory denial removes unit data",
+    "synchronous audit failure prevents combined dashboard publication",
+    "revocation waits for the protected dashboard commit and denies subsequent reads",
+    "four concurrent dashboards retain complete totals and successful guarded commits"
+  ],
+  "concurrentDashboard": [
+    {
+      "status": 200,
+      "total": 1000,
+      "ms": 4864.91
+    },
+    {
+      "status": 200,
+      "total": 1000,
+      "ms": 3627.89
+    },
+    {
+      "status": 200,
+      "total": 1000,
+      "ms": 4440.96
+    },
+    {
+      "status": 200,
+      "total": 1000,
+      "ms": 4001.57
+    }
+  ]
+}

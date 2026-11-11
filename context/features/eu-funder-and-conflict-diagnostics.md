@@ -1,0 +1,17 @@
+# Atribuição do financiador e diagnóstico EU de conflitos
+
+31/10/2026. Incremento da normalização de oportunidades, posterior à [auditoria factual](../reviews/opportunity-data-standardization/eu-pending-audit.md). O código atual preenche `funderName: European Commission` para qualquer registo pesquisado no Funding & Tenders. A chamada 11145 e dois arquivos em revisão demonstram que publicar no portal não prova que a Comissão concede o apoio. Os cinco conflitos existentes não conservaram motivo causal no checkpoint.
+
+## Âmbito e critérios
+
+1. A normalização v1 deixa `funderName` ausente quando a observação não identifica o concedente direto. O v2 continua a usar `parties[]` com papel e evidência. Snapshots históricos, correções manuais e identidades não são reescritos automaticamente.
+2. Cada lookup EU que termine `CONFLICT` devolve códigos causais estáveis para: resultado truncado, variantes divergentes, estado publicado não reconhecido, divergência entre `content` e `callTitle`, outros conflitos do adaptador v2 e resolução histórica protegida divergente. Vários motivos podem coexistir. Não incluir texto ou payload arbitrário da fonte nos códigos.
+3. O checkpoint durável do lookup `KNOWN` e o de `DISCOVERY_DETAIL` conservam os códigos no `next_cursor` JSONB existente, sob o limite de 2048 bytes, sem os confundir com um cursor de paginação. Na ausência de código de um produtor antigo, guardar `UNCLASSIFIED_SOURCE_CONFLICT`, sem inventar causa específica.
+4. A escrita exige a identidade/run/fase atuais e segue o fence e a transação existentes. Em falha de validação ou SQL, o estado `CONFLICT` e o diagnóstico não podem divergir. Replay e sucessor de fila não alteram os códigos já gravados.
+5. A leitura dos cinco conflitos históricos continua honesta: o motivo não é reconstituído a partir dos contadores. Uma observação oficial nova pode fornecer diagnóstico atual sem aceitar candidatos ou retomar a fonte.
+6. Acrescentar regressões RED→GREEN para parser, motivos distintos, persistência dos dois tipos de checkpoint, entrada malformada, fase divergente e preservação de histórico. Executar testes focados, suites completas, sintaxe e build. Um ensaio SQL isolado fica necessário antes de produção se a prova unitária não alcançar os limites físicos do JSONB/transação.
+7. Na configuração operacional com controlo de fonte EU, não admitir nem reclamar runs EU/CORDIS/Erasmus sem escritor v2. Um caminho legado sem `funderName` comprovado não pode criar ou atualizar uma revisão v1. A recusa tem código estável, antecede qualquer escrita de catálogo e conserva o motivo para diagnóstico operacional.
+8. A dotação normativa 11145 deve manter igualdade entre `metadata.budget`, candidato v2, leitura comum e coluna SQL `numeric(32,8)`: `120000`/`120000.00000000`. O estado da moeda é `NOT_FOUND` enquanto a API não publicar uma moeda associada à dotação. O `€` associado ao apoio mensal não deve ser promovido por inferência. A verificação deve conservar proveniência, prazos, financiador direto e estatuto de revisão.
+9. Para os cinco conflitos históricos, conservar a nova observação oficial com timestamp, fingerprint e comparação com resolução protegida separada do run antigo. Não reescrever retroativamente o checkpoint histórico. A futura aceitação exige evidência e decisão por identidade, autoridade autenticada e validação de CAS.
+
+Não se criam novas identidades, aprovações, revisão v2 ou migrações SQL neste incremento. EU permanece suspensa enquanto se valida a correção.

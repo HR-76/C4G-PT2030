@@ -1,0 +1,567 @@
+{
+  "status": "COMPLETE",
+  "startedAt": "2026-10-26T23:37:29.234Z",
+  "finishedAt": "2026-10-26T23:38:46.872Z",
+  "sampleCount": 261,
+  "sampleQueryMeanMs": 4.41,
+  "sampleQueryMaxMs": 60.59,
+  "policies": [
+    {
+      "globalLimit": 20,
+      "perTenantLimit": 5,
+      "operationalReserve": 2,
+      "globalQueueLimit": 40,
+      "perTenantQueueLimit": 10,
+      "operationalQueueReserve": 2,
+      "acquireTimeoutMs": 5000,
+      "leaseTimeoutMs": 15000,
+      "idleTimeoutMs": 30000,
+      "drainTimeoutMs": 10000,
+      "circuitFailureThreshold": 3,
+      "circuitResetMs": 10000,
+      "backoffBaseMs": 25,
+      "maxBackoffMs": 250
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "dashboard-c6",
+      "samples": 6,
+      "successes": 2,
+      "errors": 4,
+      "p50Ms": 18103.34,
+      "p95Ms": 18831.79,
+      "successThroughputPerSecond": 0.11,
+      "drainMs": 0,
+      "authorityTransactions": [
+        24,
+        10,
+        10,
+        30,
+        42,
+        42
+      ],
+      "queryCount": [
+        1289,
+        397,
+        397,
+        1871,
+        2703,
+        2703
+      ],
+      "meanMetadataMs": 7415.07,
+      "meanApplicationSelectionMs": 16.39,
+      "meanAuditPrepareMs": 3500.83,
+      "meanCentralLockCallMs": 1308.82,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 158,
+          "maxWaitMs": 263.23,
+          "maxHeldMs": 718.87,
+          "maxWaitingAtEntry": 3,
+          "maxPoolTotalAtEntry": 8
+        },
+        "tenant": {
+          "count": 9,
+          "maxWaitMs": 68.96,
+          "maxHeldMs": 10849.83,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        }
+      },
+      "logicalAdmissions": {
+        "count": 14,
+        "maxWaitMs": 5001.92,
+        "errors": [
+          {
+            "before": {
+              "active": 5,
+              "queued": 2,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 5000.99,
+            "after": {
+              "active": 5,
+              "queued": 4,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 1,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "error": "POOL_EXHAUSTED"
+          },
+          {
+            "before": {
+              "active": 5,
+              "queued": 3,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 5000.17,
+            "after": {
+              "active": 5,
+              "queued": 3,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 1,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "error": "POOL_EXHAUSTED"
+          },
+          {
+            "before": {
+              "active": 5,
+              "queued": 4,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 5001.24,
+            "after": {
+              "active": 5,
+              "queued": 2,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 1,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "error": "POOL_EXHAUSTED"
+          },
+          {
+            "before": {
+              "active": 5,
+              "queued": 5,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 5001.92,
+            "after": {
+              "active": 5,
+              "queued": 1,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 1,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "error": "POOL_EXHAUSTED"
+          },
+          {
+            "before": {
+              "active": 5,
+              "queued": 6,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 5000.89,
+            "after": {
+              "active": 5,
+              "queued": 0,
+              "pools": 1,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 1,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "error": "POOL_EXHAUSTED"
+          }
+        ]
+      },
+      "sampledFrames": 176,
+      "maxActive": 5,
+      "maxQueued": 7,
+      "framesQueued": 49,
+      "auditBlockedFrames": 112,
+      "centralBlockedFrames": 41,
+      "auditWaitEvents": [
+        "transactionid"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 3
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 2
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 5
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 2
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 3
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 2
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 772,
+      "failedRequests": [
+        {
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "ms": 8656.65,
+          "failures": [
+            {
+              "code": "POOL_EXHAUSTED"
+            }
+          ],
+          "sqlErrors": [],
+          "auditPrepareMs": 3755.55,
+          "applicationSelectionMs": 24.76,
+          "admissions": [
+            {
+              "before": {
+                "active": 5,
+                "queued": 1,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 4820.87,
+              "after": {
+                "active": 5,
+                "queued": 5,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "leaseRemainingMs": 15000
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 2,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5000.99,
+              "after": {
+                "active": 5,
+                "queued": 4,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            }
+          ],
+          "tenantCheckouts": []
+        },
+        {
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "ms": 8666.46,
+          "failures": [
+            {
+              "code": "POOL_EXHAUSTED"
+            },
+            {
+              "code": "POOL_EXHAUSTED"
+            }
+          ],
+          "sqlErrors": [],
+          "auditPrepareMs": 0,
+          "applicationSelectionMs": 0,
+          "admissions": [
+            {
+              "before": {
+                "active": 5,
+                "queued": 3,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5000.17,
+              "after": {
+                "active": 5,
+                "queued": 3,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 4,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5001.24,
+              "after": {
+                "active": 5,
+                "queued": 2,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            }
+          ],
+          "tenantCheckouts": []
+        },
+        {
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "ms": 8793.95,
+          "failures": [
+            {
+              "code": "POOL_EXHAUSTED"
+            },
+            {
+              "code": "POOL_EXHAUSTED"
+            }
+          ],
+          "sqlErrors": [],
+          "auditPrepareMs": 0,
+          "applicationSelectionMs": 0,
+          "admissions": [
+            {
+              "before": {
+                "active": 5,
+                "queued": 5,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5001.92,
+              "after": {
+                "active": 5,
+                "queued": 1,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 6,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5000.89,
+              "after": {
+                "active": 5,
+                "queued": 0,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            }
+          ],
+          "tenantCheckouts": []
+        },
+        {
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "ms": 14126.86,
+          "failures": [
+            {
+              "code": "LEASE_TIMEOUT"
+            }
+          ],
+          "sqlErrors": [
+            {
+              "code": "Error",
+              "category": "transaction",
+              "hash": "587fa628a9fe4642"
+            }
+          ],
+          "auditPrepareMs": 5512.45,
+          "applicationSelectionMs": 25.46,
+          "admissions": [
+            {
+              "before": {
+                "active": 2,
+                "queued": 0,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 69.25,
+              "after": {
+                "active": 4,
+                "queued": 0,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "leaseRemainingMs": 15000
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 0,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 3765.8,
+              "after": {
+                "active": 5,
+                "queued": 6,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "leaseRemainingMs": 15000
+            }
+          ],
+          "tenantCheckouts": [
+            {
+              "waitMs": 68.96,
+              "holdMs": 10849.83,
+              "max": 5,
+              "total": 2,
+              "idle": 0,
+              "waiting": 0,
+              "role": "tenant-1",
+              "discard": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "startedAt": "2026-11-09T21:30:53.717Z",
+  "mode": "standard",
+  "status": "COMPLETE",
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection"
+  ],
+  "scenarios": [],
+  "limits": [
+    "Local synthetic data; no production capacity claim.",
+    "Instrumentation adds timing and 100ms PostgreSQL sampling overhead.",
+    "Central non-authority reader uses fixture pg_read_all_data.",
+    "No changes to pool limits, deadlines or security checks.",
+    "Standard mixed-tenant scenario warms tenant A only; first tenant B access can be cold."
+  ],
+  "variant": "B",
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "050_billing_private_documents",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "fixture": {
+    "applications": 10000,
+    "people": 250,
+    "storedAlerts": 6,
+    "dueApplications": 2,
+    "hiddenRecipientAlerts": 1
+  },
+  "pages": [
+    {
+      "route": "/candidaturas",
+      "mode": "load",
+      "repetition": 0,
+      "ms": 4298.052000000003,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 364.7390000000014
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 276.66629999999714
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 609.0800999999992
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2751.4159999999974
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3539.5804999999964
+        }
+      ],
+      "settledMs": 4740.124199999998
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "load",
+      "repetition": 1,
+      "ms": 4033.5894000000044,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 364.8842999999979
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 278.2595000000001
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 546.362000000001
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2538.486300000004
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3255.6840999999986
+        }
+      ],
+      "settledMs": 4477.5697
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "load",
+      "repetition": 2,
+      "ms": 4044.783000000003,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 348.00670000000537
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 269.96940000000177
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 518.7286000000022
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2557.0587000000014
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3280.8098000000027
+        }
+      ],
+      "settledMs": 4471.481400000004
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "navigation",
+      "ms": 2856.0826000000015
+    }
+  ],
+  "instrumentation": {
+    "queries": [],
+    "policies": [
+      {
+        "globalLimit": 20,
+        "perTenantLimit": 5,
+        "operationalReserve": 2,
+        "globalQueueLimit": 40,
+        "perTenantQueueLimit": 10,
+        "operationalQueueReserve": 2,
+        "acquireTimeoutMs": 5000,
+        "leaseTimeoutMs": 15000,
+        "idleTimeoutMs": 30000,
+        "drainTimeoutMs": 10000,
+        "circuitFailureThreshold": 3,
+        "circuitResetMs": 10000,
+        "backoffBaseMs": 25,
+        "maxBackoffMs": 250
+      }
+    ],
+    "samples": []
+  },
+  "integrity": {
+    "unchanged": true
+  },
+  "finishedAt": "2026-11-09T21:31:52.875Z"
+}

@@ -1,0 +1,198 @@
+{
+  "version": "opportunity-v2-registered-window-11145-v1",
+  "status": "REGISTERED_PREPARATION_VALIDATED_INSTALLATION_PENDING",
+  "packageId": "opportunity-v2-activation-11145",
+  "packageDigest": "4f83267f1c2d3f41c604453f3489136397f661fbc06a99de8b79ed2980674e7a",
+  "registered": true,
+  "automaticInstallation": false,
+  "habitualInstalled": false,
+  "habitualApproved": false,
+  "habitualAccepted": false,
+  "baseline": {
+    "central": "035_funding_source_resolution",
+    "tenant": "033_organizational_opportunity_interests"
+  },
+  "centralSequence": [
+    {
+      "ordinal": 36,
+      "version": "036_funding_canonical_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "035_funding_source_resolution",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "c729f6d1048a6ccf5592cf903e6e717a16bccca108aa3c307ab1837f4a742a75",
+      "schemaFingerprint": "4e7fb2b1fcef69b3dec9b050010c1df49aa74833521d5ae63f82a2b10e98b130",
+      "authoritySecurityFingerprint": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 37,
+      "version": "037_manual_opportunity_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "036_funding_canonical_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "07302055a705a30b4b6e5fb3ab537e1b9e6b1c8031988d5bcdfec155538ec990",
+      "schemaFingerprint": "dd02376be9e6fb329afb87f7b3371218600ab2f9fe1620776b8b427699412b0d",
+      "authoritySecurityFingerprint": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 38,
+      "version": "038_pt2030_plan_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "037_manual_opportunity_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "fb9d9e46ea2382dd9086343c5b6f685a946519942065c459975d872d922c45d5",
+      "schemaFingerprint": "bcf9730df2dcc1ef4b94c87067be5c2dd248958aeb47b6deaeb6c9991c300b61",
+      "authoritySecurityFingerprint": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 39,
+      "version": "039_opportunity_persistence_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "038_pt2030_plan_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "fb2b973a11b8be7909452287416050ed2199f6b1bfd0b2d2b419a09f8f1d9f2c",
+      "schemaFingerprint": "aff5929a7773753bc63c32ec7d3e0cf72e59711804b10ddb3c18a6a12a47e049",
+      "authoritySecurityFingerprint": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 40,
+      "version": "040_opportunity_activation_authority_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "039_opportunity_persistence_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "06cfde591666f079bfd97db3e2ba0c3504770541ab7bd1c82139c8567c0108d5",
+      "schemaFingerprint": "8ff6a715a925b13d78fe181973032f0620acd6de8202f4fc4bfcbd24e360b956",
+      "authoritySecurityFingerprint": "acb6daf8d58e240e14b5ce57e2228eb857ac37229b4700b735385576c0521286",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 41,
+      "version": "041_opportunity_activation_approval_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "040_opportunity_activation_authority_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "b75daef91a24886fe42baf2a79823f0cb121fa22ca6a1785dba404dd36d0e879",
+      "schemaFingerprint": "a90a0f06dddf1f33d71bc5076771e97b91c0e9d8313d3f0823a694971059af15",
+      "authoritySecurityFingerprint": "acb6daf8d58e240e14b5ce57e2228eb857ac37229b4700b735385576c0521286",
+      "catalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+    },
+    {
+      "ordinal": 42,
+      "version": "042_opportunity_eu_source_control_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "041_opportunity_activation_approval_v2",
+      "requiresCatalogSecurityFingerprint": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5",
+      "upChecksum": "c4b371d8a75f89567645c08f83e244ffa49fb386639175c8c2a53e526288b747",
+      "schemaFingerprint": "0cb6ef8f6e00cc8e9209864addab966c9772a9bb5d886b0165d49a67e1d21e82",
+      "authoritySecurityFingerprint": "acb6daf8d58e240e14b5ce57e2228eb857ac37229b4700b735385576c0521286",
+      "catalogSecurityFingerprint": "b981504c0b991748fc33f2c073c5a4d9538f7038da821dbc8bd5fe906ee0574e"
+    }
+  ],
+  "tenant": {
+    "version": "034_application_snapshot_v2",
+    "ordinal": 34,
+    "irreversible": true,
+    "sqlChecksum": "5be4eba00f11eb28b4756ec5d8a29fc08191a8e74133f25056a5315b244c77d7",
+    "schemaFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3",
+    "capability": "APPLICATION_OPPORTUNITY_SNAPSHOT_V2"
+  },
+  "gate": {
+    "file": "output/opportunity-v2-registered-61e834cd2ad74d1484de4e1c40928342/verification.json",
+    "sha256": "e85f4c07dfe239ecdb662d5abe9be7a90a085653b3ef352375449bbd24440077",
+    "checks": 12,
+    "inputHashes": 388,
+    "final": {
+      "centralVersion": "042_opportunity_eu_source_control_v2",
+      "centralFingerprint": "0cb6ef8f6e00cc8e9209864addab966c9772a9bb5d886b0165d49a67e1d21e82",
+      "tenantVersion": "034_application_snapshot_v2",
+      "tenantFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3",
+      "auditEvents": 9,
+      "auditChainValid": true,
+      "accepted": false
+    },
+    "cleanup": true
+  },
+  "window": {
+    "file": "output/opportunity-v2-window/window-87ab4ccd-2822-40f5-957f-fb8e4d68bfc8.json",
+    "sha256": "ec92d2273959b09cda7487c5af29173e61d7ef812c02141c89d1cb9a8e40fd2e",
+    "windowId": "87ab4ccd-2822-40f5-957f-fb8e4d68bfc8",
+    "pausedAt": "2026-10-31T01:28:25.165Z",
+    "resumedAt": "2026-10-31T01:29:22.387Z",
+    "secondsPaused": 57.222,
+    "backup": ".tmp\\local-platform\\opportunity-v2-backup-47147a0a-8f46-4241-bed8-e2439ecb6403",
+    "restoreSeconds": 32.98,
+    "restoreScope": "LOGICAL_DATA_SCHEMA_ACL_SEQUENCES_CONFIGURATION_NOT_APPLICATION_AUTHENTICATION",
+    "noDriftDuringPause": true
+  },
+  "preview": {
+    "file": "output/opportunity-v2-window/preview-3bec3a40-a795-4752-a5ac-a378ae787fdf/habitual-preview.json",
+    "sha256": "d9faad8b65e90c6eb68ab2a82df98d10beb8fea95a8e961b9daa4f1b60d9b1db",
+    "expected": {
+      "opportunityId": "01a14a80-9143-7177-ba86-9fa72d09fb64",
+      "revisionId": "01a184d1-0c76-714d-bff6-b141fd140159",
+      "rowVersion": 4
+    },
+    "action": "CHANGE_REQUIRES_APPROVAL",
+    "source": {
+      "version": 1,
+      "source": "EU_FUNDING_TENDERS",
+      "externalIdentifier": "CASCADE:11145",
+      "officialUrl": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/11145",
+      "endpoint": "https://api.tech.ec.europa.eu/search-api/prod/rest/search",
+      "method": "POST",
+      "observedAt": "2026-10-31T01:28:19.554Z",
+      "status": 200,
+      "bytes": 20580,
+      "sha256": "f66977fa509f025b28f2e059909baac1d35a720a484a0d15f400c31f121e2110",
+      "totalResults": 1,
+      "applicationParameterStored": false
+    },
+    "normativeComparison": {
+      "sameIdentity": true,
+      "changed": false,
+      "action": "UNCHANGED",
+      "changedFields": [],
+      "retainedFields": [],
+      "conflictFields": [],
+      "reasonCodes": [],
+      "previousDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6",
+      "incomingDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6"
+    },
+    "requiresFreshRevalidation": true
+  },
+  "runbook": "context/references/opportunity-v2/window-11145-runbook.md",
+  "postResume": {
+    "file": "output/opportunity-v2-window/post-resume.json",
+    "sha256": "b9133f80a3b757d712502f1167279bf3b820c17de84b5ed8666613632bac439b"
+  },
+  "runtime": {
+    "canonicalArchiveWired": false,
+    "acceptanceHttpEndpoint": false,
+    "approvalControlOptIn": true,
+    "defaultProvisioningTenantVersion": "033_organizational_opportunity_interests"
+  },
+  "remainingExecutionRequirements": [
+    "BOUNDED_11145_CANONICAL_ARCHIVE_EXECUTOR_AND_PROOF",
+    "RENEW_CONSISTENT_INSTALLATION_WINDOW_AND_BACKUPS",
+    "EXPLICIT_REGISTERED_PACKAGE_INSTALLATION",
+    "FRESH_ARCHIVED_OBSERVATION_AND_AUTHENTICATED_PLAN_APPROVAL",
+    "CURRENT_SOURCE_QUIESCENCE_AND_FENCES"
+  ],
+  "limitations": [
+    "Habitual installation and factual approval/acceptance remain pending.",
+    "The preparation pause ended; repeat consistency checks and renew backups in the installation window.",
+    "Logical isolated restore does not certify service login, OIDC or external document recovery.",
+    "The current worker does not yet wire canonicalV2Enabled/candidateArchive; the control flag alone is insufficient.",
+    "Legacy EU writers must remain suspended after the first v2 acceptance."
+  ]
+}

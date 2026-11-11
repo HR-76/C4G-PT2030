@@ -1,0 +1,4 @@
+const {F11_EVENTS}=require('../audit/eventCatalog');
+const FORBIDDEN=/(?:objectKey|signedUrl|token|filename|content|email|secret|credential|dsn|stack|message)/i;
+function createDocumentAuditPort(f7){if(!f7||typeof f7.accept!=='function')throw new TypeError('F11 requires the F7 audit port.');async function send(eventCode,input,critical){if((!Object.hasOwn(F11_EVENTS,eventCode)&&eventCode!=='DOCUMENT_ALLOWED')||!input||Reflect.ownKeys(input).some(key=>FORBIDDEN.test(key)))throw new TypeError('Document audit event is not allowlisted.');const result=await f7.accept({eventCode,...input});if(critical&&(!result||!['ACCEPTED','APPENDED','DUPLICATE'].includes(result.status)))throw new Error('DOCUMENT_CRITICAL_AUDIT_UNAVAILABLE');return result;}return Object.freeze({accept:(code,input)=>send(code,input,true),emit:(code,input)=>send(code,input,false)});}
+module.exports={createDocumentAuditPort};

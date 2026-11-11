@@ -1,0 +1,11 @@
+﻿{
+    "status":  "PASS",
+    "oldOverloadResult":  0,
+    "correctedOverloadResult":  0.125,
+    "negativeDelta":  0,
+    "actualSamples":  5,
+    "maxCpuPercent":  6.718130590870973,
+    "limits":  [
+                   "Controlled activity checks nonzero telemetry; it does not calibrate every host process counter."
+               ]
+}

@@ -1,0 +1,25 @@
+﻿{
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "file":  "gate.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "gate.test.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "slo.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "slo.test.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "run.ps1"
+                   }
+               ],
+    "status":  "PASS"
+}

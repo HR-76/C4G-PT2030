@@ -1,0 +1,48 @@
+{
+  "id": "c6-admission-v1",
+  "scope": "Local C6 regression; not a production SLO",
+  "slo": {
+    "approvalStatus": "APPROVED_BY_USER",
+    "p95WaitMsMaximum": 3000,
+    "maxWaitMsMaximum": 4000,
+    "minObservedHeadroomMs": 1000,
+    "admissionErrorsMaximum": 0,
+    "httpFailuresMaximum": 0
+  },
+  "order": ["before", "after", "after", "before", "before", "after", "after", "before", "before", "after", "after", "before"],
+  "variantPaths": [
+    "backend/src/applications/composition.js",
+    "backend/src/opportunities/httpComposition.js",
+    "backend/src/security/authorityCoordinator.js"
+  ],
+  "pool": {
+    "globalLimit": 20,
+    "perTenantLimit": 5,
+    "operationalReserve": 2,
+    "globalQueueLimit": 40,
+    "perTenantQueueLimit": 10,
+    "operationalQueueReserve": 2,
+    "acquireTimeoutMs": 5000,
+    "leaseTimeoutMs": 15000,
+    "idleTimeoutMs": 30000,
+    "drainTimeoutMs": 10000,
+    "circuitFailureThreshold": 3,
+    "circuitResetMs": 10000,
+    "backoffBaseMs": 25,
+    "maxBackoffMs": 250
+  },
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection"
+  ],
+  "host": {
+    "counterVersion": "fractional-double-v2",
+    "backgroundCpuMeanMaximum": 5,
+    "backgroundCpuSampleMaximum": 10,
+    "sampleIntervalMaximumMs": 5000,
+    "freeMemoryMinimumGiB": 4
+  }
+}

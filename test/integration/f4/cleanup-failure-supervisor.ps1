@@ -1,0 +1,8 @@
+$ErrorActionPreference='Stop';$runId=([Guid]::NewGuid().ToString('N')).Substring(0,24);$token=[Guid]::NewGuid().ToString('N');$prefix="c4g-f41-failure-$runId";$child=Join-Path $PSScriptRoot 'cleanup-failure-child.ps1'
+$output=& powershell -NoProfile -ExecutionPolicy Bypass -File $child -RunId $runId -OwnershipToken $token 2>&1;$code=$LASTEXITCODE
+if($code-ne 17){throw "Cleanup child returned unexpected exit $code`: $output"}
+if(($output-join "`n")-notmatch 'EXPECTED_INTERNAL_FAILURE_F4_CLEANUP' -or ($output-join "`n")-notmatch 'EXPECTED_DATABASE_CREATED'){throw "Cleanup child did not prove the injected failure/database: $output"}
+$remaining=@();foreach($kind in @('container','network','volume')){$name="$prefix-$kind";$exists=switch($kind){'container'{& docker ps -a --filter "name=^/$name$" --format '{{.Names}}'};'network'{& docker network ls --filter "name=^$name$" --format '{{.Name}}'};'volume'{& docker volume ls --filter "name=^$name$" --format '{{.Name}}'}};if($exists){$remaining+="$kind`:$name"}}
+if($remaining.Count){throw "Disposable cleanup leaked: $($remaining -join ', ')"}
+$ownedContainers=@(& docker ps -a --filter "label=c4g.f41.owner=$token" --format '{{.Names}}');$ownedNetworks=@(& docker network ls --filter "label=c4g.f41.owner=$token" --format '{{.Name}}');$ownedVolumes=@(& docker volume ls --filter "label=c4g.f41.owner=$token" --format '{{.Name}}');if($ownedContainers.Count+$ownedNetworks.Count+$ownedVolumes.Count-ne 0){throw "Owned resources remain for token $token"}
+Write-Output "F4.1 cleanup failure supervisor passed for run $runId; child exit 17 and all owned resources removed."

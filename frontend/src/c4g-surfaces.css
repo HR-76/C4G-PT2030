@@ -1,0 +1,90 @@
+/* Shared visual language for the C4G content area and portalled dialogs. */
+:root {
+  --ui-action: var(--color-primary);
+  --ui-action-hover: var(--color-primary-hover);
+  --ui-action-soft: var(--color-primary-soft);
+  --ui-turquoise: #148b87;
+  --ui-violet: #7953ae;
+  --ui-amber: #b7771e;
+  --ui-ink: #273534;
+  --ui-muted: #5f706c;
+  --ui-border: #dfe7e5;
+  --ui-control: #80908c;
+  --ui-heading-surface: #f7f9f8;
+  --ui-radius: 12px;
+}
+
+.c4g-shell .main-area,
+.form-modal,
+.billing-dialog {
+  --color-action: var(--ui-action);
+  --color-action-hover: var(--ui-action-hover);
+  --color-focus: var(--ui-action);
+  --action-subtle: var(--ui-action-soft);
+  --focus-ring: var(--ui-action);
+  --border-control: var(--ui-control);
+}
+
+.c4g-shell .page-content {
+  background: #fff;
+}
+
+.c4g-shell .page-content :where(.table-wrap, .cr-table-scroll) {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius);
+}
+
+.c4g-shell .page-content :where(.data-table, .catalog-read table) thead th {
+  background: var(--ui-heading-surface);
+  color: var(--ui-muted);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.c4g-shell .page-content :where(.data-table, .catalog-read table) td {
+  border-bottom-color: var(--ui-border);
+}
+
+.c4g-shell .page-content :where(.data-table, .catalog-read table) tbody tr:focus-within {
+  box-shadow: inset 3px 0 var(--ui-action);
+}
+
+.c4g-shell .page-content :where(.organization-card, .directory-register, .billing-register, .account-security-panel, .account-security-guide, .cr-section, .cr-call-information) {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: #fff;
+}
+
+.c4g-shell .page-content .empty-state-panel {
+  border: 1px dashed var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: #fff;
+  padding: 24px;
+}
+
+.c4g-shell .page-content .empty-state-panel-title {
+  color: var(--ui-ink);
+}
+
+.c4g-shell .page-content .empty-state-panel-text {
+  color: var(--ui-muted);
+  max-width: 65ch;
+}
+
+.c4g-shell .page-content :where(.directory-pagination, .billing-pagination, .pagination, .cr-pages) {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .c4g-shell .page-content .mobile-card-table td::before {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ui-muted);
+  }
+
+  .c4g-shell .page-content :where(.directory-pagination, .billing-pagination, .pagination, .cr-pages) button {
+    min-height: 44px;
+  }
+}

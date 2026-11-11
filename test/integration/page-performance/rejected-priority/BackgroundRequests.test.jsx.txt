@@ -1,0 +1,43 @@
+import {it,expect,vi,afterEach} from 'vitest'
+import {createContextRequestCoordinator} from '../api/requestConcurrency'
+afterEach(()=>vi.useRealTimers())
+it('does not cancel or repeat an auxiliary write that has already started',async()=>{
+ vi.useFakeTimers()
+ const c=createContextRequestCoordinator({quietMs:10,drainMs:20})
+ const pending=c.acquire({background:true});await vi.advanceTimersByTimeAsync(10);const write=await pending
+ const change=c.change(async()=>{}).catch(error=>error);await vi.advanceTimersByTimeAsync(20)
+ expect((await change).code).toBe('SESSION_BUSY');expect(write.signal.aborted).toBe(false);write.release()
+ await c.change(async()=>{})
+})
+it('keeps auxiliary work pending until foreground requests and a quiet interval finish',async()=>{
+ vi.useFakeTimers()
+ const c=createContextRequestCoordinator({quietMs:100}),foreground=await c.acquire({read:true})
+ let background
+ const pending=c.acquire({read:true,background:true}).then(lease=>{background=lease})
+ await vi.advanceTimersByTimeAsync(1000);expect(background).toBeUndefined()
+ foreground.release();await vi.advanceTimersByTimeAsync(50)
+ const next=await c.acquire({read:true});await vi.advanceTimersByTimeAsync(150);expect(background).toBeUndefined()
+ next.release();await vi.advanceTimersByTimeAsync(100);await pending;expect(background).toBeTruthy();background.release()
+})
+it('cancels a queued auxiliary write before a session change without sending it',async()=>{
+ vi.useFakeTimers()
+ const c=createContextRequestCoordinator(),foreground=await c.acquire({read:true})
+ const pending=c.acquire({background:true}).catch(error=>error)
+ const rotation=c.change(async()=>{});foreground.release();await vi.advanceTimersByTimeAsync(250);await rotation
+ expect((await pending).code).toBe('ERR_CANCELED')
+})
+it('aborting queued background work releases its waiter and lets later work start',async()=>{
+ vi.useFakeTimers()
+ const c=createContextRequestCoordinator({quietMs:10}),controller=new AbortController()
+ const pending=c.acquire({read:true,background:true,signal:controller.signal}).catch(error=>error)
+ controller.abort();expect((await pending).code).toBe('ERR_CANCELED')
+ const next=c.acquire({read:true,background:true});await vi.advanceTimersByTimeAsync(10);(await next).release()
+})
+it('serializes auxiliary work but admits a foreground read immediately',async()=>{
+ vi.useFakeTimers()
+ const c=createContextRequestCoordinator({quietMs:10})
+ const a=c.acquire({read:true,background:true});await vi.advanceTimersByTimeAsync(10);const first=await a
+ let second;const b=c.acquire({read:true,background:true}).then(value=>{second=value})
+ const foreground=await c.acquire({read:true});await vi.advanceTimersByTimeAsync(50);expect(second).toBeUndefined()
+ first.release();foreground.release();await vi.advanceTimersByTimeAsync(10);await b;second.release()
+})

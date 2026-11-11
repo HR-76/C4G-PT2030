@@ -1,0 +1,56 @@
+{
+  "realm": "c4g-test",
+  "loginTheme": "c4g",
+  "accountTheme": "c4g",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": { "realm": [{ "name": "C4G_ADMIN" }] },
+  "clients": [{
+    "clientId": "c4g-local",
+    "enabled": true,
+    "publicClient": true,
+    "standardFlowEnabled": true,
+    "directAccessGrantsEnabled": false,
+    "redirectUris": ["https://localhost:8443/api/auth/oidc/callback"],
+    "webOrigins": ["https://localhost:8443"],
+    "attributes": {
+      "pkce.code.challenge.method": "S256",
+      "post.logout.redirect.uris": "https://localhost:8443/login"
+    }
+  }],
+  "users": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "username": "researcher",
+      "email": "researcher@example.invalid",
+      "firstName": "Synthetic",
+      "lastName": "Researcher",
+      "clientRoles": { "account": ["manage-account"] },
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "${F2_USER_PASSWORD}", "temporary": false }]
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "username": "admin",
+      "email": "admin@example.invalid",
+      "firstName": "Synthetic",
+      "lastName": "Administrator",
+      "clientRoles": { "account": ["manage-account"] },
+      "enabled": true,
+      "emailVerified": true,
+      "realmRoles": ["C4G_ADMIN"],
+      "credentials": [
+        { "type": "password", "value": "${F2_ADMIN_PASSWORD}", "temporary": false },
+        {
+          "type": "otp",
+          "userLabel": "F2 disposable",
+          "secretData": "{\"value\":\"${F2_ADMIN_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"counter\":0,\"period\":30,\"algorithm\":\"HmacSHA1\",\"secretEncoding\":\"BASE32\"}"
+        }
+      ]
+    }
+  ]
+}

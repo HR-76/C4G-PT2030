@@ -1,0 +1,6 @@
+-- Isolated worker role; no login, role inheritance or provider configuration.
+CREATE ROLE c4g_status_simulation_worker NOLOGIN NOINHERIT;
+GRANT USAGE ON SCHEMA opportunity_catalog TO c4g_status_simulation_worker;
+GRANT SELECT ON opportunity_catalog.application_status_event,opportunity_catalog.application_status_delivery,opportunity_catalog.application_status_simulation TO c4g_status_simulation_worker;
+GRANT INSERT ON opportunity_catalog.application_status_simulation TO c4g_status_simulation_worker;
+GRANT UPDATE(state,reason,lease_until,fence) ON opportunity_catalog.application_status_simulation TO c4g_status_simulation_worker;

@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-28",
+  "scope": "Safe setup diagnostics only; no Docker or PostgreSQL execution",
+  "branch": "feat/f13-organizational-profile",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "baselineFiles": 30967,
+  "baselineWorktreeEntries": 2593,
+  "tdd": {
+    "initialRed": {
+      "pass": 0,
+      "fail": 4,
+      "reason": "Diagnostic missing in existing setup"
+    },
+    "additionalRed": [
+      "Missing runner classifier",
+      "Setup timeout obscured by primary failure"
+    ],
+    "finalNewTests": 7
+  },
+  "tests": {
+    "focused": {
+      "pass": 159,
+      "fail": 0,
+      "skip": 0
+    },
+    "backend": {
+      "pass": 1497,
+      "fail": 0,
+      "skip": 7
+    },
+    "frontend": {
+      "pass": 346,
+      "files": 55
+    },
+    "build": "PASS",
+    "syntaxFiles": 3,
+    "preexistingSkips": 7,
+    "preexistingWarnings": [
+      "jsdom navigation",
+      "Synthetic chunk failure"
+    ]
+  },
+  "logs": [
+    {
+      "name": "partner-setup-diagnostic-focused.log",
+      "sha256": "87983758ca7777dbb61269518f948cd2c5b85aec43e44cad711640fa2cc515fe"
+    },
+    {
+      "name": "partner-setup-diagnostic-backend.log",
+      "sha256": "37ed24280df0cf347a1a2309ceb247d6c2dd2436e8af149fadd282db9bfee85d"
+    },
+    {
+      "name": "partner-setup-diagnostic-frontend.log",
+      "sha256": "29b2ea334861f6b22dd7bf206a8c84ae0719387df22dea1c977cd0a892553bf2"
+    },
+    {
+      "name": "partner-setup-diagnostic-build.log",
+      "sha256": "80a16895e57d3be39b0d7769dd4d6a7a03a508e51ca59602699fd55ea72fa09c"
+    }
+  ],
+  "sourceManifest": {
+    "files": 1011,
+    "verified": true,
+    "reviewedCodeChanges": [
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/gate.js"
+    ]
+  },
+  "postgresExecuted": false,
+  "dockerExecuted": false,
+  "performanceMeasurements": null,
+  "originalSetupCauseKnown": false,
+  "runtimeIntegrated": false,
+  "preservation": {
+    "allowedFiles": [
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/gate.js",
+      "test/integration/partner-portal/sources.json",
+      "test/integration/partner-portal/README.md",
+      "backend/test/partnerSetupDiagnostic.test.js",
+      "context/features/partner-postgres-gate.md",
+      "context/current-work.md",
+      "context/reviews/partner-setup-diagnostic/README.md",
+      "context/reviews/partner-setup-diagnostic/verification.json"
+    ],
+    "status": "PASS",
+    "added": [
+      "backend/test/partnerSetupDiagnostic.test.js",
+      "context/reviews/partner-setup-diagnostic/README.md",
+      "context/reviews/partner-setup-diagnostic/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md",
+      "test/integration/partner-portal/README.md",
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/gate.js",
+      "test/integration/partner-portal/sources.json"
+    ],
+    "unexpected": [],
+    "removed": [],
+    "generatedBuildAndCache": 65,
+    "branchAndHeadUnchanged": true,
+    "currentWorktreeEntries": 2596,
+    "currentFiles": 30970,
+    "previousEvidenceUnchanged": true,
+    "runtimeMigrationsPermissionsDevUnchanged": true
+  }
+}

@@ -1,0 +1,18 @@
+'use strict';
+function createApplicationAlertRouter({express,service,authenticate,organizationMiddleware}){
+ const router=express.Router();
+ router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()},authenticate,organizationMiddleware.requireServerSession,organizationMiddleware.resolveOrganizationContext,organizationMiddleware.requireOrganizationContext);
+ for(const [verb,path,method] of [['get','/communication/context','noticesContext'],['get','/communication/history','noticesHistory'],['get','/communication/:id','noticesGet'],['post','/communication','noticesSend'],['get','/','alertsList'],['patch','/read-all','alertsReadAll'],['patch','/:id/read','alertsRead'],['post','/check-deadlines','alertsRefresh'],['post','/refresh-list','alertsRefreshList']])router[verb](path,async(req,res)=>{
+  try{
+   if((verb==='get'&&req.body&&Object.keys(req.body).length)||(verb!=='get'&&Object.keys(req.query).length))throw Object.assign(new Error(),{code:'INVALID_INPUT'});
+   res.json(await service.execute(method,verb==='get'?{...req.query}:req.body||{},req.params.id,req));
+  }catch(error){let code=error.code;
+   if(['AUTHORITY_DENIED','AUTHORIZATION_DENIED'].includes(code))code='RESOURCE_NOT_AVAILABLE';
+   const statuses={INVALID_INPUT:400,INVALID_CURSOR:400,RECIPIENT_UNAVAILABLE:409,IDEMPOTENCY_CONFLICT:409,SESSION_REQUIRED:401,NOT_AUTHORIZED:403,RESOURCE_NOT_AVAILABLE:404,SCHEMA_UPGRADE_REQUIRED:409,LIMIT_EXCEEDED:409};
+   if(!Object.hasOwn(statuses,code))code='SERVICE_UNAVAILABLE';
+   res.status(statuses[code]||503).json({error:{code}});
+  }
+ });
+ router.use((req,res)=>res.status(405).json({error:{code:'OPERATION_NOT_AVAILABLE'}}));return router;
+}
+module.exports={createApplicationAlertRouter};

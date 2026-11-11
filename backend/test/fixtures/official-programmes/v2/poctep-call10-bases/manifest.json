@@ -1,0 +1,21 @@
+{
+  "scope": "Public POCTEP call 10 bases only; research evidence, no ingestion or PDF scraper",
+  "entries": [
+    {
+      "filename": "Bases_Convo10_PT_VF.pdf",
+      "url": "https://www.poctep.eu/wp-content/uploads/2026/07/Bases_Convo10_PT_VF.pdf",
+      "mime": "application/pdf",
+      "observedAt": "2026-10-30T23:44:04.437Z",
+      "sha256": "223d8e02453eecab6b1c286467559987a3fbca5af79fdad448ee3a8f9c87965b",
+      "bytes": 418879
+    },
+    {
+      "filename": "Bases_Convo10_ES_VF.pdf",
+      "url": "https://www.poctep.eu/wp-content/uploads/2026/07/Bases_Convo10_ES_VF.pdf",
+      "mime": "application/pdf",
+      "observedAt": "2026-10-30T23:44:05.039Z",
+      "sha256": "fe755ffc42aac1ed203f3fbb41e36c1eb3a00c603d2a8ce787ee627b91d1d61f",
+      "bytes": 417115
+    }
+  ]
+}

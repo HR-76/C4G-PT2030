@@ -1,0 +1,51 @@
+.directory-workspace .directory-heading { align-items:center; margin-bottom:24px; }
+.directory-workspace h1 { font-size:28px; letter-spacing:-.6px; }
+.directory-workspace .directory-tabs { display:inline-flex; gap:4px; padding:4px; background:var(--color-border); border:1px solid var(--color-border-strong); border-radius:8px; margin:0 0 16px; }
+.directory-workspace .directory-tabs a { display:flex; align-items:center; gap:9px; padding:10px 20px; border:0; border-radius:5px; color:var(--color-action); font-weight:500; }
+.directory-workspace .directory-tabs a[aria-current] { background:var(--action-primary-soft); color:var(--action-primary-hover); }
+.directory-workspace .directory-tabs a:not([aria-current]):hover { background:var(--ui-action-soft); }
+.directory-workspace .directory-availability { margin:0 0 24px; padding:0; border:0; background:transparent; font-size:13px; color:var(--color-text-secondary); }
+.directory-workspace .entity-invitations { margin:0 0 28px; border:1px solid var(--color-border-strong); border-radius:10px; background:var(--color-surface); }
+.directory-workspace .entity-invitations > .entity-users-heading { margin:0; padding:22px 24px; background:var(--ui-heading-surface); border-radius:9px 9px 0 0; border-bottom:1px solid var(--color-border-strong); align-items:center; }
+.directory-workspace .entity-users-heading h2 { color:var(--color-text-primary); }
+.directory-workspace .entity-users-heading p { margin-top:6px; font-size:13px; max-width:76ch; }
+.directory-workspace .entity-users-heading > button { flex-shrink:0; }
+.directory-workspace .entity-activation-list { margin:0; padding:20px 24px; border:0; border-radius:0; }
+.directory-workspace .entity-activation-list > .invitation-list-heading { padding:0 0 16px; }
+.directory-workspace .entity-activation-list > p { margin-left:0; margin-right:0; }
+.directory-workspace .invitation-list-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.directory-workspace .invitation-list-heading h3 { font-size:14px; font-weight:600; }
+.directory-workspace .entity-activation-list > p { padding:18px; background:var(--color-background); border:1px dashed var(--color-border-strong); border-radius:6px; color:var(--color-text-secondary); font-size:13px; }
+.directory-workspace .entity-invitations > :is(.entity-user-form,p,button) { margin:20px 24px; }
+.directory-workspace .directory-register { background:var(--color-surface); border:1px solid var(--color-border); border-radius:10px; padding:24px; min-width:0; }
+.directory-workspace .directory-register-heading { margin-bottom:20px; }
+.directory-workspace .directory-register-heading h2 { margin:0; color:var(--color-text-primary); font-size:18px; }
+.directory-workspace .directory-register-heading p { margin:4px 0 0; color:var(--color-text-secondary); font-size:13px; }
+.directory-workspace .directory-filters { margin:0 0 20px; padding-bottom:20px; border-bottom:1px solid var(--color-border); gap:12px; }
+.directory-workspace .directory-filters .btn { min-height:40px; }
+.directory-workspace .directory-filters label:nth-child(2) { min-width:180px; }
+.directory-workspace .directory-result { margin:0 0 12px; font-size:13px; font-weight:500; color:var(--color-action); }
+.directory-workspace .table-wrap { border-color:var(--color-border); border-radius:8px; }
+.directory-workspace .data-table th { color:var(--color-action); text-transform:none; letter-spacing:0; font-size:12px; font-weight:600; padding:13px 16px; }
+.directory-workspace .data-table td { padding:16px; vertical-align:middle; }
+.directory-workspace .data-table tbody tr:hover { background:var(--ui-action-soft); }
+.directory-workspace .directory-table strong { color:var(--color-text-primary); font-size:14px; }
+.directory-workspace .directory-table small { margin-top:5px; }
+.directory-workspace .directory-table td[data-label="Acessos ativos"] { font-variant-numeric:tabular-nums; font-weight:600; }
+.directory-workspace .directory-pagination { margin-top:20px; padding-top:16px; border-top:1px solid var(--color-border); gap:12px; flex-wrap:wrap; color:var(--color-text-secondary); }
+.directory-workspace .directory-empty { border:1px dashed var(--color-border-strong); border-radius:6px; background:var(--color-background); }
+.directory-workspace .directory-empty p { margin-top:6px; }
+@media(max-width:700px) {
+ .directory-workspace h1 { font-size:24px; }
+ .directory-workspace .directory-heading { gap:12px; margin-bottom:20px; }
+ .directory-workspace .entity-invitations > .entity-users-heading { padding:18px; align-items:flex-start; }
+ .directory-workspace .entity-activation-list,.directory-workspace .directory-register { padding:18px; }
+ .directory-workspace .entity-users-heading > button { width:100%; justify-content:center; }
+ .directory-workspace .directory-filters { gap:14px 10px; }
+ .directory-workspace .directory-filters > button { flex:1; justify-content:center; }
+ .directory-workspace .directory-register-heading { margin-bottom:16px; }
+ .directory-workspace .directory-pagination { justify-content:center; gap:10px; }
+ .directory-workspace .directory-pagination span { flex-basis:100%; text-align:center; order:-1; }
+ .directory-workspace .directory-table td { padding:12px; }
+ .directory-workspace .entity-invitations > :is(.entity-user-form,p,button) { margin:18px; }
+}

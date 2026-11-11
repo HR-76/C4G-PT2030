@@ -1,0 +1,36 @@
+/* Scoped adaptation of the Metronic Card surface and muted table header. */
+.private-opportunity-pilot {
+  --pilot-ink: var(--color-info);
+  --pilot-rule: var(--color-border);
+  --pilot-muted: var(--color-background);
+  min-width: 0;
+}
+.private-opportunity-pilot .page-header {
+  padding: 12px 0 20px;
+  border-bottom: 2px solid var(--color-success);
+}
+.private-opportunity-pilot .page-header h1 { color:var(--color-text-primary); letter-spacing: -.035em; }
+.private-opportunity-pilot .pilot-entity { margin: 6px 0 0; color: var(--color-text-secondary); }
+.private-opportunity-pilot .filter-bar,
+.private-opportunity-pilot .opportunity-table-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--pilot-rule);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-action-hover) 6%, transparent);
+}
+.private-opportunity-pilot .table-meta { color: var(--pilot-ink); font-size: 1rem; font-weight: 650; margin: 24px 0 10px; }
+.private-opportunity-pilot .opportunity-analysis-table th { color: var(--color-text-secondary); text-transform: none; letter-spacing: normal; }
+.private-opportunity-pilot .col-title .link-cell { color: var(--color-success); font-size: 1rem; line-height: 1.4; font-weight: 650; }
+.private-opportunity-pilot td[data-label="Fecho"] .opportunity-cell-content { font-weight: 650; color: var(--pilot-ink); font-variant-numeric: tabular-nums; }
+@media (max-width: 768px) {
+  .private-opportunity-pilot .page-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .private-opportunity-pilot .filter-bar { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); padding: 14px; }
+  .private-opportunity-pilot .filter-note { grid-column: 1 / -1; }
+  .private-opportunity-pilot .opportunity-table-wrap { background: transparent; border: 0; box-shadow: none; }
+  .private-opportunity-pilot .opportunity-analysis-table tr { border-radius: 12px; overflow: hidden; }
+  .private-opportunity-pilot .opportunity-analysis-table .col-title { background: var(--pilot-muted); }
+}
+@media (max-width: 768px) {
+  .private-opportunity-pilot .filter-bar.filter-bar.recovered-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .private-opportunity-pilot .filter-bar.filter-bar.recovered-filters > * { width: 100%; min-width: 0; }
+}

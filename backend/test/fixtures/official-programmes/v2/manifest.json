@@ -1,0 +1,20 @@
+[
+  {
+    "name": "calendar.json",
+    "url": "https://www.poctep.eu/wp-json/wp/v2/pages/2831",
+    "observedAt": "2026-10-30T23:42:37.384Z",
+    "status": 200,
+    "mediaType": "application/json; charset=UTF-8",
+    "bytes": 35906,
+    "sha256": "65ff02d0dbf24d32d6970627bb6e0d4dd2cd27da9be7d1bc58225f3dc8317215"
+  },
+  {
+    "name": "open.json",
+    "url": "https://www.poctep.eu/wp-json/wp/v2/pages/9396",
+    "observedAt": "2026-10-30T23:42:37.703Z",
+    "status": 200,
+    "mediaType": "application/json; charset=UTF-8",
+    "bytes": 38806,
+    "sha256": "1f2e3f312c2a042f40c540ae6de6834757360df1505d8f3dbda97f5d556d6e30"
+  }
+]

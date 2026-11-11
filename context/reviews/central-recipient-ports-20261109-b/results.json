@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "checks": [
+    "active organization query returns matching row and no missing row",
+    "production organization reader refuses another organization before issuing SQL",
+    "directory query includes active and suspended, excludes foreign organization",
+    "production membership reader returns scoped query rows",
+    "alerts query excludes foreign, suspended, future and actor",
+    "notices query filters foreign, suspended and future memberships",
+    "production recipient readers use scoped SQL",
+    "read-only role refuses write and unrelated identity table",
+    "ungranted columns and SELECT star denied",
+    "directory query propagates a database privilege failure",
+    "directory and notices SQL bound results to 1001 under excess synthetic members"
+  ],
+  "limitations": [
+    "Column-level fixture proof for four queries only; not an HTTP authorization or complete production privilege proof.",
+    "Column grants do not enforce organization row isolation."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

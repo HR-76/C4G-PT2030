@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "repeatable-read snapshot excludes mutation during iteration; next snapshot rejects stale cursor",
+    "1501 synthetic rows across 16 pages equal global ranking",
+    "independent Central and tenant style snapshots can combine states that never coexisted"
+  ],
+  "limits": [
+    "Synthetic ranking in one database; cross-database test uses two synthetic databases in the same PostgreSQL cluster. No product matching HTTP, RLS, permissions or solution for cross-database consistency.",
+    "No durable snapshots, operational budgets, lifecycle or production pagination implemented."
+  ]
+}

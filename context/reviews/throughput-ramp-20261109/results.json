@@ -1,0 +1,3128 @@
+{
+  "startedAt": "2026-11-09T23:35:33.733Z",
+  "status": "PASS",
+  "checks": [
+    "current central migrations and security preflight",
+    "two physical tenants migrated and published through real directory",
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "catalog reader accepts current real central schema",
+    "real Authorization Code PKCE login and secure HttpOnly SameSite cookies",
+    "organization POST returns confirmed user organization and fresh CSRF",
+    "idle renewal preserves the session authority epoch",
+    "parallel HTTP renewals extend idle expiry with unchanged auth physical expiry and epochs",
+    "real triggers still reject auth or physical expiry mutations without write permits",
+    "real SQL session adapter caps idle renewal at absolute expiry and refuses expired sessions",
+    "logout writer advances epochs and stale SQL touch or save cannot resurrect its SID",
+    "real revocation prevents idle renewal and remains invalid in the central registry",
+    "idle expiry crossing during real central validation is rejected at renewal finalization",
+    "actual AuthProvider applies POST despite failed optional session revalidation",
+    "real CSRF_INVALID refreshes cached token and retries exactly once",
+    "second real CSRF rejection stops retries",
+    "held real session GET canceled before organization POST",
+    "held real session GET canceled before logout POST",
+    "logout invalidates the real persisted session",
+    "real HTTP rotation invalidates the old SID and advances its authority epoch",
+    "HTTP /api/applications/browse",
+    "HTTP /api/applications/report",
+    "HTTP /api/organizations/:organization/dashboard/summary",
+    "HTTP /api/organization-directory/matching?origin=PRIVATE&opportunityId=:opportunity",
+    "foreign application hidden by HTTP",
+    "real HTTP identities cannot select or request another organization dashboard",
+    "application POST commits through real authority and audit",
+    "concurrent membership revocation prevents a stale real tenant read",
+    "revoked central membership denies subsequent real HTTP reads",
+    "dashboard remains denied after real central membership revocation",
+    "real browse keeps one application data selection and 25 details at every volume"
+  ],
+  "measurements": [
+    {
+      "name": "browse",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 1,
+      "warmups": 1,
+      "p50Ms": 1922.54,
+      "p95Ms": 2063.88,
+      "p99Ms": 2091.62,
+      "errorP95Ms": null,
+      "elapsedMs": 77372,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22025,
+        "max": 22025
+      },
+      "sqlCalls": {
+        "min": 614,
+        "max": 614
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 614,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 135,
+            "totalMs": 66.35029999993276,
+            "maxMs": 1.147499999991851
+          },
+          "authority/transaction": {
+            "calls": 60,
+            "totalMs": 55.16369999993185,
+            "maxMs": 4.039499999998952
+          },
+          "authority/metadata": {
+            "calls": 135,
+            "totalMs": 817.3180000000866,
+            "maxMs": 27.58980000000156
+          },
+          "authority/authority-protocol": {
+            "calls": 70,
+            "totalMs": 72.40730000000622,
+            "maxMs": 1.7805999999982305
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.513600000005681,
+            "maxMs": 1.985899999999674
+          },
+          "tenant/transaction": {
+            "calls": 14,
+            "totalMs": 8.711599999980535,
+            "maxMs": 1.8726999999926193
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 526.6861999999237,
+            "maxMs": 37.17719999999099
+          },
+          "tenant/other": {
+            "calls": 26,
+            "totalMs": 19.718299999978626,
+            "maxMs": 1.9222000000008848
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 121.02999999999884,
+            "maxMs": 121.02999999999884
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 121,
+            "hash": "072bf559df164937"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/browse"
+    },
+    {
+      "name": "browse",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 2,
+      "warmups": 1,
+      "p50Ms": 2101.45,
+      "p95Ms": 2208.72,
+      "p99Ms": 2251.01,
+      "errorP95Ms": null,
+      "elapsedMs": 42291,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22025,
+        "max": 22025
+      },
+      "sqlCalls": {
+        "min": 614,
+        "max": 614
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 614,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 135,
+            "totalMs": 75.0637999997416,
+            "maxMs": 8.707699999999022
+          },
+          "authority/transaction": {
+            "calls": 60,
+            "totalMs": 93.49249999993481,
+            "maxMs": 27.70669999998063
+          },
+          "authority/metadata": {
+            "calls": 135,
+            "totalMs": 859.0720000001311,
+            "maxMs": 48.59159999998519
+          },
+          "authority/authority-protocol": {
+            "calls": 70,
+            "totalMs": 77.40419999998994,
+            "maxMs": 2.8950999999942724
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.259400000009919,
+            "maxMs": 1.8162000000011176
+          },
+          "tenant/transaction": {
+            "calls": 14,
+            "totalMs": 7.637700000021141,
+            "maxMs": 1.904000000009546
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 455.06330000032904,
+            "maxMs": 28.27070000002277
+          },
+          "tenant/other": {
+            "calls": 26,
+            "totalMs": 18.352399999974295,
+            "maxMs": 2.5552000000025146
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 124.49229999998352,
+            "maxMs": 124.49229999998352
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 124,
+            "hash": "072bf559df164937"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/browse"
+    },
+    {
+      "name": "browse",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 4,
+      "warmups": 1,
+      "p50Ms": 2369.02,
+      "p95Ms": 2757.52,
+      "p99Ms": 3392.54,
+      "errorP95Ms": null,
+      "elapsedMs": 24562,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22025,
+        "max": 22025
+      },
+      "sqlCalls": {
+        "min": 614,
+        "max": 614
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 614,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 135,
+            "totalMs": 244.0030000002007,
+            "maxMs": 48.23989999998594
+          },
+          "authority/transaction": {
+            "calls": 60,
+            "totalMs": 87.1313000000664,
+            "maxMs": 9.734500000020489
+          },
+          "authority/metadata": {
+            "calls": 135,
+            "totalMs": 959.7084000000614,
+            "maxMs": 57.2844000000041
+          },
+          "authority/authority-protocol": {
+            "calls": 70,
+            "totalMs": 100.54699999993318,
+            "maxMs": 7.510900000022957
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 9.49920000002021,
+            "maxMs": 2.4838000000163447
+          },
+          "tenant/transaction": {
+            "calls": 14,
+            "totalMs": 7.86789999998291,
+            "maxMs": 1.8337999999930616
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 651.3590999997978,
+            "maxMs": 48.171799999981886
+          },
+          "tenant/other": {
+            "calls": 26,
+            "totalMs": 21.168999999936204,
+            "maxMs": 2.9505999999819323
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 129.02129999999306,
+            "maxMs": 129.02129999999306
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "metadata",
+            "ms": 57,
+            "hash": "0ac62896dcae5330"
+          },
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 129,
+            "hash": "072bf559df164937"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/browse"
+    },
+    {
+      "name": "browse",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 6,
+      "warmups": 1,
+      "p50Ms": 3110.78,
+      "p95Ms": 4078.07,
+      "p99Ms": 5044.49,
+      "errorP95Ms": null,
+      "elapsedMs": 22239,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22025,
+        "max": 22025
+      },
+      "sqlCalls": {
+        "min": 614,
+        "max": 614
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 614,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 135,
+            "totalMs": 425.67920000012964,
+            "maxMs": 79.02900000000955
+          },
+          "authority/transaction": {
+            "calls": 60,
+            "totalMs": 107.86889999982668,
+            "maxMs": 19.558999999979278
+          },
+          "authority/metadata": {
+            "calls": 135,
+            "totalMs": 971.8846000001649,
+            "maxMs": 35.915500000002794
+          },
+          "authority/authority-protocol": {
+            "calls": 70,
+            "totalMs": 89.84390000009444,
+            "maxMs": 9.330900000000838
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 10.798300000053132,
+            "maxMs": 2.689700000017183
+          },
+          "tenant/transaction": {
+            "calls": 14,
+            "totalMs": 31.24710000003688,
+            "maxMs": 23.387400000006892
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 661.2228000000177,
+            "maxMs": 40.28890000001411
+          },
+          "tenant/other": {
+            "calls": 26,
+            "totalMs": 22.777899999928195,
+            "maxMs": 3.5791999999783
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 126.54950000002282,
+            "maxMs": 126.54950000002282
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 78,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 55,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 79,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 127,
+            "hash": "072bf559df164937"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/browse"
+    },
+    {
+      "name": "report",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 1,
+      "warmups": 1,
+      "p50Ms": 3077.31,
+      "p95Ms": 3298.77,
+      "p99Ms": 3305.37,
+      "errorP95Ms": null,
+      "elapsedMs": 124470,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 21002,
+        "max": 21002
+      },
+      "sqlCalls": {
+        "min": 673,
+        "max": 673
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 673,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 67.62249999967753,
+            "maxMs": 0.9628999999840744
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 51.776299999823095,
+            "maxMs": 3.9751000000105705
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 920.4252999999444,
+            "maxMs": 28.734900000010384
+          },
+          "authority/authority-protocol": {
+            "calls": 78,
+            "totalMs": 74.03850000008242,
+            "maxMs": 1.611300000018673
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 7.83099999994738,
+            "maxMs": 1.6577999999863096
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 8.487599999993108,
+            "maxMs": 2.815100000007078
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 447.9148999998579,
+            "maxMs": 27.343699999997625
+          },
+          "tenant/other": {
+            "calls": 34,
+            "totalMs": 23.659999999799766,
+            "maxMs": 1.6986999999789987
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1162.0039000000106,
+            "maxMs": 1162.0039000000106
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1162,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/report"
+    },
+    {
+      "name": "report",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 2,
+      "warmups": 1,
+      "p50Ms": 3121.55,
+      "p95Ms": 3197.5,
+      "p99Ms": 3562.27,
+      "errorP95Ms": null,
+      "elapsedMs": 63023,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 21002,
+        "max": 21002
+      },
+      "sqlCalls": {
+        "min": 673,
+        "max": 673
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 673,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 87.51829999976326,
+            "maxMs": 5.476699999999255
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 77.16759999998612,
+            "maxMs": 15.330900000000838
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 977.8333999997703,
+            "maxMs": 31.941899999976158
+          },
+          "authority/authority-protocol": {
+            "calls": 78,
+            "totalMs": 86.18419999990147,
+            "maxMs": 6.558699999994133
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.964500000001863,
+            "maxMs": 2.208199999993667
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 7.850000000093132,
+            "maxMs": 1.986399999994319
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 525.1041999996523,
+            "maxMs": 32.15969999996014
+          },
+          "tenant/other": {
+            "calls": 34,
+            "totalMs": 25.163799999805633,
+            "maxMs": 2.6445999999996275
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1252.3597999999765,
+            "maxMs": 1252.3597999999765
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1252,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/report"
+    },
+    {
+      "name": "report",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 4,
+      "warmups": 1,
+      "p50Ms": 3654.97,
+      "p95Ms": 3898.56,
+      "p99Ms": 4600.89,
+      "errorP95Ms": null,
+      "elapsedMs": 37332,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 21002,
+        "max": 21002
+      },
+      "sqlCalls": {
+        "min": 673,
+        "max": 673
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 673,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 243.0205000001588,
+            "maxMs": 51.55940000002738
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 84.3784000002197,
+            "maxMs": 15.1081000000122
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1018.5593999997363,
+            "maxMs": 36.20229999994626
+          },
+          "authority/authority-protocol": {
+            "calls": 78,
+            "totalMs": 101.22040000016568,
+            "maxMs": 4.360400000005029
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.311099999991711,
+            "maxMs": 1.7665999999735504
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 8.827599999902304,
+            "maxMs": 1.8404999999911524
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 609.8350000000792,
+            "maxMs": 41.72200000000885
+          },
+          "tenant/other": {
+            "calls": 34,
+            "totalMs": 36.297899999888614,
+            "maxMs": 6.086399999971036
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1260.5677000000142,
+            "maxMs": 1260.5677000000142
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 52,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1261,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/report"
+    },
+    {
+      "name": "report",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 6,
+      "warmups": 1,
+      "p50Ms": 4100.86,
+      "p95Ms": 5546.32,
+      "p99Ms": 7290.79,
+      "errorP95Ms": null,
+      "elapsedMs": 31172,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 21002,
+        "max": 21002
+      },
+      "sqlCalls": {
+        "min": 673,
+        "max": 673
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 673,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 444.9941999997827,
+            "maxMs": 90.29489999997895
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 79.14990000036778,
+            "maxMs": 4.807900000014342
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1076.4808999995003,
+            "maxMs": 43.53409999998985
+          },
+          "authority/authority-protocol": {
+            "calls": 78,
+            "totalMs": 94.90150000026915,
+            "maxMs": 3.0146999999997206
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.692199999990407,
+            "maxMs": 2.302999999956228
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 19.78080000000773,
+            "maxMs": 5.872800000011921
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 640.9969999996247,
+            "maxMs": 39.695400000025984
+          },
+          "tenant/other": {
+            "calls": 34,
+            "totalMs": 42.50310000003083,
+            "maxMs": 6.73609999998007
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1311.4897999999812,
+            "maxMs": 1311.4897999999812
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 90,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 90,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1311,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/applications/report"
+    },
+    {
+      "name": "dashboard",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 1,
+      "warmups": 1,
+      "p50Ms": 3153.47,
+      "p95Ms": 3490.33,
+      "p99Ms": 3710.28,
+      "errorP95Ms": null,
+      "elapsedMs": 128248,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22636,
+        "max": 22636
+      },
+      "sqlCalls": {
+        "min": 686,
+        "max": 686
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 686,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 69.88770000031218,
+            "maxMs": 1.3350999999674968
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 61.21919999993406,
+            "maxMs": 4.1252000000094995
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 924.6244999995106,
+            "maxMs": 29.72219999996014
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "totalMs": 74.61729999980889,
+            "maxMs": 1.4244000000180677
+          },
+          "catalog/metadata": {
+            "calls": 3,
+            "totalMs": 4.526499999978114,
+            "maxMs": 2.167799999995623
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "totalMs": 2.138800000073388,
+            "maxMs": 0.9766999999992549
+          },
+          "catalog/other": {
+            "calls": 1,
+            "totalMs": 12.706999999994878,
+            "maxMs": 12.706999999994878
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.252199999988079,
+            "maxMs": 1.8013000000501052
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 7.227899999998044,
+            "maxMs": 1.9744999999529682
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 451.27879999997094,
+            "maxMs": 27.48480000003474
+          },
+          "tenant/other": {
+            "calls": 37,
+            "totalMs": 38.50729999982286,
+            "maxMs": 13.540399999998044
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1213.5578000000096,
+            "maxMs": 1213.5578000000096
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1214,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/organizations/:id/dashboard/summary"
+    },
+    {
+      "name": "dashboard",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 2,
+      "warmups": 1,
+      "p50Ms": 3340.34,
+      "p95Ms": 3975.97,
+      "p99Ms": 4071.64,
+      "errorP95Ms": null,
+      "elapsedMs": 68095,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22636,
+        "max": 22636
+      },
+      "sqlCalls": {
+        "min": 686,
+        "max": 686
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 686,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 138.30090000049677,
+            "maxMs": 18.516700000036508
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 94.04179999988992,
+            "maxMs": 17.50289999996312
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1068.468899999396,
+            "maxMs": 35.21500000008382
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "totalMs": 99.14599999971688,
+            "maxMs": 7.034800000023097
+          },
+          "catalog/metadata": {
+            "calls": 3,
+            "totalMs": 6.44220000016503,
+            "maxMs": 3.027500000083819
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "totalMs": 3.028099999995902,
+            "maxMs": 0.9644000000553206
+          },
+          "catalog/other": {
+            "calls": 1,
+            "totalMs": 18.994899999932386,
+            "maxMs": 18.994899999932386
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 9.584999999962747,
+            "maxMs": 2.673300000024028
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 14.077999999863096,
+            "maxMs": 6.57909999997355
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 607.7767999989446,
+            "maxMs": 36.34719999996014
+          },
+          "tenant/other": {
+            "calls": 37,
+            "totalMs": 44.043699999456294,
+            "maxMs": 15.539999999920838
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1395.903099999996,
+            "maxMs": 1395.903099999996
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1396,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/organizations/:id/dashboard/summary"
+    },
+    {
+      "name": "dashboard",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 4,
+      "warmups": 1,
+      "p50Ms": 3736.09,
+      "p95Ms": 4061.07,
+      "p99Ms": 4704.82,
+      "errorP95Ms": null,
+      "elapsedMs": 38286,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22636,
+        "max": 22636
+      },
+      "sqlCalls": {
+        "min": 686,
+        "max": 686
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 686,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 255.51059999887366,
+            "maxMs": 41.7160000000149
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 84.2963999992935,
+            "maxMs": 5.825499999918975
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1030.9056999993045,
+            "maxMs": 39.916399999987334
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "totalMs": 109.96030000050087,
+            "maxMs": 6.259599999990314
+          },
+          "catalog/metadata": {
+            "calls": 3,
+            "totalMs": 4.444399999920279,
+            "maxMs": 2.274299999931827
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "totalMs": 10.152699999976903,
+            "maxMs": 9.195700000040233
+          },
+          "catalog/other": {
+            "calls": 1,
+            "totalMs": 13.5293000000529,
+            "maxMs": 13.5293000000529
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.354099999996834,
+            "maxMs": 1.8229000000283122
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 11.171900000073947,
+            "maxMs": 2.5562999999383464
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 556.9833999992115,
+            "maxMs": 29.349000000045635
+          },
+          "tenant/other": {
+            "calls": 37,
+            "totalMs": 44.08990000025369,
+            "maxMs": 13.162600000039674
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1372.2776000000304,
+            "maxMs": 1372.2776000000304
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1372,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/organizations/:id/dashboard/summary"
+    },
+    {
+      "name": "dashboard",
+      "volume": 10000,
+      "people": 1000,
+      "samples": 40,
+      "concurrency": 6,
+      "warmups": 1,
+      "p50Ms": 4552.56,
+      "p95Ms": 5730.54,
+      "p99Ms": 7748.71,
+      "errorP95Ms": null,
+      "elapsedMs": 32383,
+      "errors": 0,
+      "statuses": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "payloadBytes": {
+        "min": 22636,
+        "max": 22636
+      },
+      "sqlCalls": {
+        "min": 686,
+        "max": 686
+      },
+      "applicationSelections": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "peopleBatchSelections": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "firstProfile": {
+        "sqlCalls": 686,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 467.4589999993332,
+            "maxMs": 91.74420000007376
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 77.77810000046156,
+            "maxMs": 4.383400000049733
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1100.4814000001643,
+            "maxMs": 39.14040000003297
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "totalMs": 112.80620000034105,
+            "maxMs": 3.7303000000538304
+          },
+          "catalog/metadata": {
+            "calls": 3,
+            "totalMs": 6.558799999998882,
+            "maxMs": 2.9851000000489876
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "totalMs": 2.2364000000525266,
+            "maxMs": 0.9597000000067055
+          },
+          "catalog/other": {
+            "calls": 1,
+            "totalMs": 12.655399999930523,
+            "maxMs": 12.655399999930523
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 9.706099999835715,
+            "maxMs": 3.404799999902025
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 9.723000000347383,
+            "maxMs": 2.091000000014901
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 641.9353999999585,
+            "maxMs": 41.29420000000391
+          },
+          "tenant/other": {
+            "calls": 37,
+            "totalMs": 70.77779999980703,
+            "maxMs": 20.8165999999037
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 1486.4040000000969,
+            "maxMs": 1486.4040000000969
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 54,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 54,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "authority",
+            "category": "other",
+            "ms": 92,
+            "hash": "e457b9e54eecca47"
+          },
+          {
+            "role": "tenant",
+            "category": "application-selection",
+            "ms": 1486,
+            "hash": "03381c3f527b5778"
+          }
+        ]
+      },
+      "successes": 40,
+      "route": "/api/organizations/:id/dashboard/summary"
+    }
+  ],
+  "failures": [
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "ORGANIZATION_MISMATCH",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    }
+  ],
+  "limits": [
+    "Synthetic data and local Docker; no productive SLO or capacity claim.",
+    "Central non-authority reads use a bootstrap pg_read_all_data login; exact production central privilege parity is not claimed.",
+    "Keycloak development mode with TLS and the existing trusted local test certificate."
+  ],
+  "scope": "all",
+  "stage": "concurrent-http-measurement",
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution",
+  "keycloak": "26.8.0",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "browser": "156.0.8078.81",
+  "node": "v24.13.1",
+  "sessionTouch": {
+    "sameCookie": true,
+    "epochAdvanced": false,
+    "epochDelta": 0
+  },
+  "sessionRenewal": {
+    "parallelRequests": 4,
+    "idleExtended": true,
+    "physicalExpiryUnchanged": true,
+    "authUnchanged": true,
+    "epochUnchanged": true,
+    "criticalSqlMutationsRejected": true
+  },
+  "csrfRecoveryStatuses": [
+    200,
+    403,
+    200
+  ],
+  "csrfDoubleRejectionStatuses": [
+    403,
+    403
+  ],
+  "sessionRotations": [
+    {
+      "operation": "organization",
+      "heldReadCanceled": true,
+      "durationMs": 1366
+    },
+    {
+      "operation": "logout",
+      "heldReadCanceled": true,
+      "durationMs": 540
+    }
+  ],
+  "domain": [
+    {
+      "route": "/api/applications/browse",
+      "status": 200,
+      "code": null,
+      "ms": 1997,
+      "bytes": 21503,
+      "sql": {
+        "sqlCalls": 614,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 135,
+            "totalMs": 70.81209999996645,
+            "maxMs": 1.2930000000051223
+          },
+          "authority/transaction": {
+            "calls": 60,
+            "totalMs": 60.727500000015425,
+            "maxMs": 4.371099999996659
+          },
+          "authority/metadata": {
+            "calls": 135,
+            "totalMs": 866.2982999999731,
+            "maxMs": 29.447299999999814
+          },
+          "authority/authority-protocol": {
+            "calls": 70,
+            "totalMs": 84.91869999998744,
+            "maxMs": 2.6418999999950756
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 14.680199999995239,
+            "maxMs": 7.283999999999651
+          },
+          "tenant/transaction": {
+            "calls": 14,
+            "totalMs": 8.493899999986752,
+            "maxMs": 2.0587000000014086
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 583.15960000005,
+            "maxMs": 59.186399999998685
+          },
+          "tenant/other": {
+            "calls": 26,
+            "totalMs": 22.052199999998265,
+            "maxMs": 2.422900000005029
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 4.48689999999624,
+            "maxMs": 4.48689999999624
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "metadata",
+            "ms": 59,
+            "hash": "88fbf505d4a23ec8"
+          }
+        ]
+      }
+    },
+    {
+      "route": "/api/applications/report",
+      "status": 200,
+      "code": null,
+      "ms": 2162,
+      "bytes": 20536,
+      "sql": {
+        "sqlCalls": 673,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 81.25950000005105,
+            "maxMs": 1.0178999999989173
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 65.6809999999823,
+            "maxMs": 4.191599999998289
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 1000.9815000000235,
+            "maxMs": 30.920100000003004
+          },
+          "authority/authority-protocol": {
+            "calls": 78,
+            "totalMs": 91.20560000000114,
+            "maxMs": 2.156600000002072
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.980900000002293,
+            "maxMs": 2.101199999997334
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 8.402999999998428,
+            "maxMs": 1.9615000000048894
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 598.0481999999538,
+            "maxMs": 56.53040000000328
+          },
+          "tenant/other": {
+            "calls": 34,
+            "totalMs": 27.41979999998148,
+            "maxMs": 2.312899999997171
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 7.986099999994622,
+            "maxMs": 7.986099999994622
+          }
+        },
+        "slow": [
+          {
+            "role": "tenant",
+            "category": "metadata",
+            "ms": 57,
+            "hash": "88fbf505d4a23ec8"
+          }
+        ]
+      }
+    },
+    {
+      "route": "/api/organizations/:organization/dashboard/summary",
+      "status": 200,
+      "code": null,
+      "ms": 2329,
+      "bytes": 22124,
+      "sql": {
+        "sqlCalls": 698,
+        "applicationSelections": 1,
+        "peopleBatchSelections": 0,
+        "profile": {
+          "authority/other": {
+            "calls": 153,
+            "totalMs": 81.05689999996684,
+            "maxMs": 3.5898999999990338
+          },
+          "authority/transaction": {
+            "calls": 68,
+            "totalMs": 60.007800000035786,
+            "maxMs": 4.062100000002829
+          },
+          "authority/metadata": {
+            "calls": 153,
+            "totalMs": 991.9451000000408,
+            "maxMs": 30.435599999997066
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "totalMs": 91.34860000003391,
+            "maxMs": 4.878000000004249
+          },
+          "catalog/metadata": {
+            "calls": 15,
+            "totalMs": 124.71490000001359,
+            "maxMs": 52.718400000005204
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "totalMs": 2.407099999996717,
+            "maxMs": 0.8450999999986379
+          },
+          "catalog/other": {
+            "calls": 1,
+            "totalMs": 21.011899999997695,
+            "maxMs": 21.011899999997695
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "totalMs": 8.496500000001106,
+            "maxMs": 1.897000000004482
+          },
+          "tenant/transaction": {
+            "calls": 13,
+            "totalMs": 7.550200000005134,
+            "maxMs": 1.8799999999973807
+          },
+          "tenant/metadata": {
+            "calls": 168,
+            "totalMs": 531.7691000000414,
+            "maxMs": 36.25770000000193
+          },
+          "tenant/other": {
+            "calls": 37,
+            "totalMs": 42.501799999998184,
+            "maxMs": 17.014499999997497
+          },
+          "tenant/application-selection": {
+            "calls": 1,
+            "totalMs": 5.95669999999518,
+            "maxMs": 5.95669999999518
+          }
+        },
+        "slow": [
+          {
+            "role": "catalog",
+            "category": "metadata",
+            "ms": 53,
+            "hash": "0ac62896dcae5330"
+          }
+        ]
+      }
+    },
+    {
+      "route": "/api/organization-directory/matching?origin=PRIVATE&opportunityId=:opportunity",
+      "status": 200,
+      "code": null,
+      "ms": 6990,
+      "bytes": 14296,
+      "sql": {
+        "sqlCalls": 2163,
+        "applicationSelections": 0,
+        "peopleBatchSelections": 1,
+        "profile": {
+          "authority/other": {
+            "calls": 423,
+            "totalMs": 203.17499999984284,
+            "maxMs": 4.004000000000815
+          },
+          "authority/transaction": {
+            "calls": 188,
+            "totalMs": 342.9436000000205,
+            "maxMs": 86.8044000000009
+          },
+          "authority/metadata": {
+            "calls": 423,
+            "totalMs": 2659.3956000000107,
+            "maxMs": 31.875899999999092
+          },
+          "authority/authority-protocol": {
+            "calls": 253,
+            "totalMs": 271.6385999999984,
+            "maxMs": 4.733599999999569
+          },
+          "central-reader/other": {
+            "calls": 23,
+            "totalMs": 39.172699999988254,
+            "maxMs": 2.3359999999956926
+          },
+          "tenant/transaction": {
+            "calls": 55,
+            "totalMs": 38.772399999979825,
+            "maxMs": 7.562900000004447
+          },
+          "tenant/metadata": {
+            "calls": 672,
+            "totalMs": 2056.3482000000004,
+            "maxMs": 38.72739999999612
+          },
+          "tenant/other": {
+            "calls": 126,
+            "totalMs": 89.7019000000073,
+            "maxMs": 3.7704999999987194
+          }
+        },
+        "slow": [
+          {
+            "role": "authority",
+            "category": "transaction",
+            "ms": 87,
+            "hash": "79663c1d3b43ceaf"
+          }
+        ]
+      }
+    }
+  ],
+  "concurrentRevocation": {
+    "databaseReadBlocked": true,
+    "blockedAt": "tenant-admission",
+    "writerRegistered": true,
+    "committedBeforeRelease": true,
+    "readStatus": 503,
+    "readMs": 1105
+  },
+  "revokedDashboard": {
+    "status": 409,
+    "code": "ORGANIZATION_SELECTION_REQUIRED"
+  },
+  "finishedAt": "2026-11-09T23:48:46.324Z"
+}

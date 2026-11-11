@@ -1,0 +1,17 @@
+[
+  {
+    "path": "backend/src/organizationDirectory/composition.js",
+    "snapshot": "test/integration/profile-performance/before/backend__src__organizationDirectory__composition.js.txt",
+    "sha256": "9c35877e59a1ab350b14fbb6d26ca0b774ff310e47a8e09ae965817081e18079"
+  },
+  {
+    "path": "backend/src/applications/composition.js",
+    "snapshot": "test/integration/profile-performance/before/backend__src__applications__composition.js.txt",
+    "sha256": "3c4187354ef24d1d6613144ecef0e391347a93dae4c97c80e26895846f84f90f"
+  },
+  {
+    "path": "backend/src/security/tenantLeaseExecutor.js",
+    "snapshot": "test/integration/profile-performance/before/backend__src__security__tenantLeaseExecutor.js.txt",
+    "sha256": "a0f4455098e2c840ec3b41ca962d5f52152a0323e8b9f96946a8234456c5a884"
+  }
+]

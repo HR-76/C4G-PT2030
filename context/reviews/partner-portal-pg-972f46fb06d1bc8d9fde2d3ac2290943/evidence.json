@@ -1,0 +1,2446 @@
+{
+  "schemaVersion": 1,
+  "runId": "972f46fb06d1bc8d9fde2d3ac2290943",
+  "imageId": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+  "execution": "NOT_RUN",
+  "sourceVerification": true,
+  "sourceManifestHash": "0a17d2587fd5e2bc1b4b80adf9e6e13c7541f40a557a819d87252f5607abe5c3",
+  "localDockerContext": "desktop-linux",
+  "daemonId": "33c5d206-32e9-4cc2-8415-536547768f8a",
+  "startedAt": "2026-10-28T00:33:51.725Z",
+  "cleanup": {
+    "environmentClosed": false,
+    "containerRemoved": true,
+    "errors": []
+  },
+  "containerId": "fb73996766dc1c4b4bbd29e32acb1862a36e3ef7648a7803f97acae21405b286",
+  "postgresMajor": 17,
+  "isolation": "read committed",
+  "setupDiagnostic": {
+    "phase": "TENANT_ENSURE",
+    "tenant": "A",
+    "status": "FAILED",
+    "classification": "TENANT_MIGRATION",
+    "errorCode": "DATABASE_CONFIGURATION_MISMATCH",
+    "localCleanup": "COMPLETED",
+    "substep": "MIGRATION",
+    "substepStatus": "FAILED",
+    "substepFailure": {
+      "classification": "TENANT_MIGRATION",
+      "errorCode": "DATABASE_CONFIGURATION_MISMATCH"
+    }
+  },
+  "errorCode": "ENVIRONMENT_SETUP_FAILED",
+  "finishedAt": "2026-10-28T00:33:59.938Z",
+  "verdict": {
+    "status": "FAIL",
+    "failures": [
+      "EXECUTION_ERROR",
+      "CLEANUP_NOT_PROVEN"
+    ],
+    "incomplete": [
+      "POSTGRESQL_NOT_EXECUTED",
+      "MISSING_PROBE_GROUP:repository",
+      "MISSING_PROBE_GROUP:authority",
+      "UNVERIFIED_CAPACITY_ENVIRONMENT",
+      "MISSING_CAPACITY_OBSERVER_STATUS",
+      "MISSING_WARMUPS",
+      "CAPACITY_INCOMPLETE"
+    ],
+    "capacity": {
+      "status": "INCOMPLETE",
+      "failures": [
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-0",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-0",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-25",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-25",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-26",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-26",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-100",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-100",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-101",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-101",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 2
+        }
+      ],
+      "scenarios": [
+        {
+          "scenarioId": "volume-0",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-25",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-26",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-100",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-101",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10000",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10001",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-denied",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-shared-origin",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-distinct-origins",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-selective",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-historical-people",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-large-payload",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        }
+      ],
+      "limits": {
+        "operationMs": 10000,
+        "admissionMs": 5000,
+        "responseBytes": 1048576,
+        "candidates": 10000
+      },
+      "productionCapacityApproved": false
+    },
+    "productionCapacityApproved": false,
+    "integrationAuthorized": false
+  }
+}

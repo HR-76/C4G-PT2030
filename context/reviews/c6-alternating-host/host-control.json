@@ -1,0 +1,124 @@
+﻿{
+    "startedAt":  "2026-10-27T20:53:07.2436563Z",
+    "order":  [
+                  "before",
+                  "after",
+                  "before",
+                  "after",
+                  "before",
+                  "after"
+              ],
+    "initial":  {
+                    "docker":  "24|33344757760|29.7.2",
+                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                },
+    "externalContainerCount":  2,
+    "runs":  [
+                 {
+                     "index":  1,
+                     "variant":  "before",
+                     "report":  "c6-ab-1-before",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  0.09,
+                     "startedAt":  "2026-10-27T20:53:12.6494462Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T20:54:36.1653712Z",
+                     "exitCode":  0
+                 },
+                 {
+                     "index":  2,
+                     "variant":  "after",
+                     "report":  "c6-ab-2-after",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  3.02,
+                     "startedAt":  "2026-10-27T20:54:50.4529345Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T20:56:13.6404174Z",
+                     "exitCode":  0
+                 },
+                 {
+                     "index":  3,
+                     "variant":  "before",
+                     "report":  "c6-ab-3-before",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  0.11,
+                     "startedAt":  "2026-10-27T20:56:19.7261179Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T20:57:36.3077856Z",
+                     "exitCode":  0
+                 },
+                 {
+                     "index":  4,
+                     "variant":  "after",
+                     "report":  "c6-ab-4-after",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  0.17,
+                     "startedAt":  "2026-10-27T20:57:41.8890142Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T20:59:00.6845765Z",
+                     "exitCode":  0
+                 },
+                 {
+                     "index":  5,
+                     "variant":  "before",
+                     "report":  "c6-ab-5-before",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  0.09,
+                     "startedAt":  "2026-10-27T20:59:06.8646398Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T21:00:29.0314500Z",
+                     "exitCode":  0
+                 },
+                 {
+                     "index":  6,
+                     "variant":  "after",
+                     "report":  "c6-ab-6-after",
+                     "config":  {
+                                    "docker":  "24|33344757760|29.7.2",
+                                    "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                                    "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                                    "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+                                },
+                     "externalCpuBefore":  0.04,
+                     "startedAt":  "2026-10-27T21:00:35.0827262Z",
+                     "status":  "COMPLETE",
+                     "finishedAt":  "2026-10-27T21:01:57.1963865Z",
+                     "exitCode":  0
+                 }
+             ],
+    "status":  "COMPLETE",
+    "final":  {
+                  "docker":  "24|33344757760|29.7.2",
+                  "powerPlan":  "381b4222-f694-41f0-9685-ff5bb260df2e",
+                  "postgresImage":  "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+                  "keycloakImage":  "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+              },
+    "finishedAt":  "2026-10-27T21:01:58.0133223Z"
+}

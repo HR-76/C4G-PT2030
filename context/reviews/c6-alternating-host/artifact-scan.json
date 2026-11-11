@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-27T21:04:22.817Z",
+  "status": "PASS",
+  "directories": [
+    "c6-alternating-host",
+    "c6-ab-1-before",
+    "c6-ab-2-after",
+    "c6-ab-3-before",
+    "c6-ab-4-after",
+    "c6-ab-5-before",
+    "c6-ab-6-after"
+  ],
+  "files": 45,
+  "bytes": 8885278,
+  "findings": [],
+  "limits": [
+    "Pattern scan of report artifacts, not a guarantee against every form of sensitive data.",
+    "UTF-8 and UTF-16LE logs included; matched text is neither printed nor persisted."
+  ]
+}

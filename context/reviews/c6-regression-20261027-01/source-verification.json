@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-27T22:19:00.813Z",
+  "status": "PASS",
+  "sourceHashes": {
+    "test/integration/c6-dedicated/analyze.js": "9437b479a8b434120dba051a0a624c859290a4519d9f407357887c65d31a022a",
+    "test/integration/c6-dedicated/background.ps1": "e8ac1d0be943f0b3bfd49ed8c88863f80dff55705508b6b271f42b61df5ac032",
+    "test/integration/c6-dedicated/gate.js": "e2e19a458e06964beabe2e7c6a5cf9affe6a7de37f3fcf638ae4b68d8400b0af",
+    "test/integration/c6-dedicated/gate.test.js": "8bf276bba8c20f87e00942cd73cc38788adae36dd0830d05a19795762ce9121f",
+    "test/integration/c6-dedicated/hostCheck.js": "9d476e4947e40f6cf539bf86abb436e4ab49f89684e955eddfbfc2f1551c283b",
+    "test/integration/c6-dedicated/observer.test.ps1": "5883aaaf3b6de6e3ec8b4120092bf895e9f4902abf945055c42bddc5831bf3a0",
+    "test/integration/c6-dedicated/policy.json": "a6188d931d406e54258bc01c0b06b208dc407708c1081e43a2ee1ae96e4e40ec",
+    "test/integration/c6-dedicated/preload.js": "190294af3e405ebfcee016c0f7e2dc4be8c60925f50c90fab8fb34be5837f71e",
+    "test/integration/c6-dedicated/run.ps1": "96c91e5541489d5809d15d9bf0ba025132900b103189aac9188a3a43c4209ce0",
+    "test/integration/c6-dedicated/slo.js": "04eff98eed8fe83ccfd556bb47047d8adee54c08239b2edf667870ba738eaa7b",
+    "test/integration/c6-dedicated/slo.test.js": "f3c25e1cd6a8e561868467111d082ec2b14a30dec5a15209096d3a1a8b01a0b4"
+  },
+  "previousProtocolSha256": "d30fde49ccf1ef079f0b493b9c5d0c40be1503e8ee33e3b3bbeab1da41b2cfb4"
+}

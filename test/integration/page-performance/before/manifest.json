@@ -1,0 +1,47 @@
+[
+  {
+    "path": "frontend/src/api/requestConcurrency.js",
+    "snapshot": "test/integration/page-performance/before/requestConcurrency.js.txt",
+    "sha256": "11be3ce7aa0bf1cc9e6ea2b2492d5effea1fc19c5e91845647266758e7f8fca1"
+  },
+  {
+    "path": "frontend/src/api/api.js",
+    "snapshot": "test/integration/page-performance/before/api.js.txt",
+    "sha256": "0bc56e1419e8d612a5dd8e19b2c10d024ebc1f727f3f81514f2210a5efc14b93"
+  },
+  {
+    "path": "frontend/src/components/Layout/Header.jsx",
+    "snapshot": "test/integration/page-performance/before/Header.jsx.txt",
+    "sha256": "8c84c2958f66c9e6ad4e062a6075243b725c20456adc5e77ba32da68573512b3"
+  },
+  {
+    "path": "frontend/src/components/Layout/Sidebar.jsx",
+    "snapshot": "test/integration/page-performance/before/Sidebar.jsx.txt",
+    "sha256": "336fa837571500c19d0ce70ae28b9a10f4826f863fb016ff7138be225087194d"
+  },
+  {
+    "path": "frontend/src/pages/Applications/ApplicationBrowse.jsx",
+    "snapshot": "test/integration/page-performance/before/ApplicationBrowse.jsx.txt",
+    "sha256": "058e15a5469001017b852f51c9409af71eb9d2c9a1b3ea54549661068ae34738"
+  },
+  {
+    "path": "backend/src/applications/composition.js",
+    "snapshot": "test/integration/page-performance/before/composition.js.txt",
+    "sha256": "fb819b3e460bc741d80b265392dfe05ac2fa6dbab60b8e6d1a3de94cbc823248"
+  },
+  {
+    "path": "backend/src/applications/contracts.js",
+    "snapshot": "test/integration/page-performance/before/contracts.js.txt",
+    "sha256": "ccf33d05bc8537ab6a0560a1625641492c29cbb538e16588864f2c699db47cb7"
+  },
+  {
+    "path": "backend/src/routes/organizationDashboardRoutes.js",
+    "snapshot": "test/integration/page-performance/before/organizationDashboardRoutes.js.txt",
+    "sha256": "5e476afc90cbc46698e751595f3a46f025ffb81396ae7f453a5c9099fc6f189a"
+  },
+  {
+    "path": "frontend/src/pages/Organization/OrganizationProfile.jsx",
+    "snapshot": "test/integration/page-performance/before/OrganizationProfile.jsx.txt",
+    "sha256": "b29143caa93f40968b93fbad0680adb02e27be747ce622e490fcf3ae4a401726"
+  }
+]

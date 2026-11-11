@@ -1,0 +1,21 @@
+{
+  "backend/src/security/authoritySecurityManifest.js": "a4cd6a121ad874605ab18e2a81b2bc6d77831e604cb02fdc750bb47968f14d1d",
+  "backend/src/security/centralSchemaManifest.js": "4b48e1b6f0c3be95346fb7620c257db4cc9fb8cb60d1d352009651df75d04fba",
+  "backend/src/security/catalogReaderSchema.js": "95c67fccd3f6613ea30cc969e763eba06168b529312e4cd22ea1951b4a97eae4",
+  "backend/test/authorityMetadataDedup.test.js": "6da1b043b316579ca6bb0ee64f99f328f98b1b86a8bda8d3e5cae9fd77e75fe6",
+  "test/integration/authority-metadata/proof.js": "8688a456bebfa6e86af6b5c6ea0ec601f58919fa1edac73652f0e382b25f205d",
+  "test/integration/authority-metadata/proof.ps1": "b1377bd032cff9dbd98df227008395bf09c57d488677b7287ed28d63a07b8ad0",
+  "test/integration/authority-metadata/README.md": "0ec77439f16f8289e07809f349d1d61bc105f007d2bc4254b1104faf9b4c25fc",
+  "backend/src/security/authorityCoordinator.js": "e62ca2e17a9cd9872feaa75edc44a03f4b01f0824f2a3542d561a947b77d457b",
+  "backend/src/security/centralMigrationPreflight.js": "768444f4c39e9b0eae62e0427d1e87110579ffe4b457e37629dc25213ba61959",
+  "backend/src/security/centralMigrationManifest.js": "501e6050ab32d815d48416cb51e75d8713d7c2af5a0bc2a1ab0c4d34bd683741",
+  "backend/src/security/catalogSecurityManifest.js": "2c7bbf7d8629c71593b93c772866e18e3448008fc791f52b84ea4bef6a0a979b",
+  "backend/src/security/catalogReaderSecurity.js": "618ed3e0a36aace8d6f1e7ec65c0e20c260f50bc30c84534e2b3cd22ddf7813b",
+  "backend/src/security/authenticatedAuthority.js": "80a8e114eafb5e4668ff085fb9f66a39d7b7459fa8d4022468134098ad8e1943",
+  "backend/src/security/tenantLeaseExecutor.js": "f870e07e679359d480c71d02f5c9ab2694aa065dbf4b4ac55d1d754dda01d283",
+  "backend/src/security/tenantPoolManager.js": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9",
+  "test/integration/http-contention/profile.js": "4a7d1d44380569e2fbcaae72d8999eb84a0de90d69265d613055cd447bd267d9",
+  "test/integration/http-contention/profile.ps1": "7097c0c263bc16fd40be0539ab47751e265d6c649a1dedbcb440d5d3947a2bf3",
+  "test/integration/http-contention/instrumentation.js": "b4d6e4caebad49ae37291b0068f71a1317606f5c614bf35f591877410da32e5a",
+  "test/integration/http-contention/summarize.js": "69421323992d09d46f269dc7cc54731470a23122eaa72b687fdb9c630edd3b77"
+}

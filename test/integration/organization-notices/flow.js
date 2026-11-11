@@ -1,0 +1,61 @@
+'use strict';
+const assert=require('node:assert/strict'),{randomUUID}=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
+async function run({central,tenants,base,http,actor,failures,failAudit,loseNextCommit}){
+ const [a,b]=tenants,permissions=['notification.read','organization_notice.manage'];
+ const setupUser=await actor(a.org,['application.read'],null,{displayName:'Membro de ensaio',profileCode:'CONTRIBUTOR'});
+ const grantInput={coordinator:central.coordinator,catalogs:central.catalogs,organizationId:a.org,membershipId:setupUser.membershipId,policyVersion:'c4g-assurance-v1',requirement:central.requirement,installationId:randomUUID()};
+ const {grantNoticeAccess}=require('../../../backend/scripts/localPlatform/noticeGrants');
+ assert.equal((await grantNoticeAccess(grantInput)).added,1);assert.equal((await grantNoticeAccess(grantInput)).added,0);
+ const setupGrants=(await central.pool.query('SELECT grants FROM public.authority_f5_state WHERE membership_id=$1',[setupUser.membershipId])).rows[0].grants;
+ assert.deepEqual(setupGrants.map(g=>g.permission),['application.read','notification.read']);
+ const grantAudit=(await central.pool.query("SELECT count(*)::int n FROM audit.event WHERE event_code='GRANT_CHANGED' AND event_data->'resource'->>'id'=$1",[setupUser.membershipId])).rows[0].n;assert.equal(grantAudit,1);
+ const admin=await actor(a.org,[],null,{displayName:'Ana Administradora'}),member=await actor(a.org,['notification.read'],null,{displayName:'Joana Equipa',profileCode:'CONTRIBUTOR'}),other=await actor(b.org,permissions),manager=await actor(a.org,permissions,null,{displayName:'Pedro Gestor',profileCode:'FUNDING_MANAGER'});
+ assert.equal((await grantNoticeAccess({...grantInput,membershipId:admin.membershipId})).added,2);
+ assert.equal((await grantNoticeAccess({...grantInput,membershipId:admin.membershipId})).added,0);
+ const command=()=>({title:'Aviso de ensaio',message:'Reuniao da equipa na sexta-feira. Dados de ensaio.',recipientMembershipIds:[member.membershipId],idempotencyKey:randomUUID()});
+ const send=(user,input)=>http(user,'/api/notifications/communication','POST',input);
+ const ok=result=>{assert.equal(result.status,200,JSON.stringify({result,failures:failures.slice(-3)}));return result.data};
+ if(process.env.NOTICE_VISUAL_ONLY==='1'){
+  ok(await send(admin,command()));ok(await send(admin,command()));ok(await http(member,'/api/notifications/read-all','PATCH',{}));
+  await require('./browser').run({base,admin,member,other});return;
+ }
+ assert.equal(ok(await http(admin,'/api/notifications/communication/context')).canManage,true);
+ assert.deepEqual(ok(await http(member,'/api/notifications/communication/context')),{canManage:false,recipients:[]});
+ assert.deepEqual(ok(await http(manager,'/api/notifications/communication/context')),{canManage:false,recipients:[]});
+ assert.equal((await send(manager,command())).status,403);
+ assert.equal((await send(member,command())).status,404);
+ assert.equal((await http(member,'/api/notifications/communication/history')).status,404);
+ const input=command(),first=ok(await send(admin,input));assert.deepEqual(ok(await send(admin,input)),first);
+ assert.equal((await send(admin,{...input,title:'Outra intencao'})).status,409);
+ assert.equal((await send(admin,{...command(),recipientMembershipIds:[member.membershipId,other.membershipId]})).status,409);
+ const count=async()=>Number((await a.pool.query('SELECT count(*) FROM opportunity_catalog.organization_notice')).rows[0].count);
+ assert.equal(await count(),1);
+ failAudit(true);try{assert.equal((await send(admin,command())).status,503)}finally{failAudit(false)}assert.equal(await count(),1);
+ loseNextCommit();const uncertain=command(),recovered=ok(await send(admin,uncertain));assert.deepEqual(ok(await send(admin,uncertain)),recovered);assert.equal(await count(),2);
+ assert.equal(ok(await http(admin,'/api/notifications')).notifications.length,0);
+ assert.equal(ok(await http(other,'/api/notifications')).notifications.length,0);
+ const inbox=ok(await http(member,'/api/notifications'));assert.equal(inbox.unread_count,2);assert.ok(inbox.notifications.every(n=>n.type==='BROADCAST'&&!n.related_application_id));
+ assert.equal((await http(admin,`/api/notifications/${inbox.notifications[0].id}/read`,'PATCH',{})).status,404);
+ assert.equal((await http(other,`/api/notifications/${inbox.notifications[0].id}/read`,'PATCH',{})).status,404);
+ assert.equal((await http(other,`/api/notifications/communication/${first.noticeId}`)).status,404);
+ const detail=ok(await http(admin,`/api/notifications/communication/${first.noticeId}`));assert.equal(detail.recipients.length,1);assert.ok(!JSON.stringify(detail).includes('read_at'));
+ failAudit(true);try{assert.equal((await http(member,`/api/notifications/${inbox.notifications[0].id}/read`,'PATCH',{})).status,503)}finally{failAudit(false)}
+ assert.equal(ok(await http(member,'/api/notifications')).unread_count,2);
+ ok(await http(member,`/api/notifications/${inbox.notifications[0].id}/read`,'PATCH',{}));ok(await http(member,`/api/notifications/${inbox.notifications[0].id}/read`,'PATCH',{}));
+ assert.equal(ok(await http(member,'/api/notifications')).unread_count,1);
+ ok(await http(member,'/api/notifications/read-all','PATCH',{}));ok(await http(member,'/api/notifications/read-all','PATCH',{}));assert.equal(ok(await http(member,'/api/notifications')).unread_count,0);
+ assert.equal(ok(await http(admin,'/api/notifications/communication/history')).items.length,2);
+ if(process.env.NOTICE_SKIP_BROWSER!=='1')await require('./browser').run({base,admin,member,other});
+ await require('../../../backend/src/security/membershipRepository').createMembershipRepository(central.coordinator.pool,central.coordinator).changeStatus({membershipId:member.membershipId,status:'SUSPENDED',reason:'NOTICE_SYNTHETIC_TEST'});
+ assert.equal((await send(admin,command())).status,409);assert.equal(await count(),process.env.NOTICE_SKIP_BROWSER==='1'?2:3);
+ assert.notEqual((await http(member,'/api/notifications')).status,200);
+ const state=(await central.pool.query('SELECT * FROM public.authority_f5_state WHERE membership_id=$1',[admin.membershipId])).rows[0];
+ await central.data.change({organizationId:a.org,membershipId:admin.membershipId,expectedVersion:Number(state.authorization_version),grants:state.grants.filter(g=>g.permission!=='organization_notice.manage'),assuranceRequirements:state.assurance_requirements});
+ assert.equal((await send(admin,command())).status,404);assert.equal((await http(admin,'/api/notifications/communication/history')).status,404);
+ assert.equal(ok(await http(admin,'/api/notifications/communication/context')).canManage,false);
+ const events=(await a.pool.query("SELECT event_code,count(*)::int AS n FROM audit.event WHERE event_code IN ('ORGANIZATION_NOTICE_SENT','ORGANIZATION_NOTICE_READ') GROUP BY event_code")).rows;
+ assert.equal(events.find(r=>r.event_code==='ORGANIZATION_NOTICE_SENT').n,process.env.NOTICE_SKIP_BROWSER==='1'?2:3);
+ assert.equal(events.find(r=>r.event_code==='ORGANIZATION_NOTICE_READ').n,process.env.NOTICE_SKIP_BROWSER==='1'?2:3);
+ const out=path.resolve(__dirname,'../../../output/playwright/c4g-notices');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'verification.json'),JSON.stringify({result:'PASS',observedAt:new Date().toISOString(),activeMembershipsOnly:true,adminRoleAndExplicitGrant:true,grantRevocation:true,ownInboxWithoutApplicationPermission:true,organizationIsolation:true,atomicAuditRollback:true,readAuditRollback:true,commitUncertainRecovered:true,replayNoDuplicates:true,immutableHistory:true,events},null,2));console.log('ORGANIZATION_NOTICES_HTTP_PASS');
+}
+module.exports={run};

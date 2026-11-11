@@ -1,0 +1,24 @@
+{
+  "name": "c4g-funding-platform",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node scripts/start-local.cjs",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:worker": "npm --prefix backend run worker:local",
+    "dev:web": "npm --prefix frontend run dev",
+    "setup:local": "npm --prefix backend run setup:local",
+    "billing:prepare-local": "npm --prefix backend run db:billing:prepare-local",
+    "billing:apply-local": "npm --prefix backend run db:billing:apply-local",
+    "build": "npm --prefix frontend run build",
+    "test:dashboard-regression": "npm run build && npm run regression:dashboard-global && npm run regression:oidc-pending",
+    "test:oidc-pending": "npm run build && npm run regression:oidc-pending",
+    "regression:oidc-pending": "node test/integration/dashboard/global-budget-regression.cjs --inherit-guard && node test/integration/dashboard/global-budget-regression.cjs --pending-login",
+    "test:dashboard-global": "npm run build && npm run regression:dashboard-global",
+    "regression:dashboard-global": "node test/integration/dashboard/global-budget-regression.cjs",
+    "test:local-dev": "node --test test/local-dev-supervisor.test.cjs"
+  },
+  "engines": {
+    "node": ">=24.5.0"
+  }
+}

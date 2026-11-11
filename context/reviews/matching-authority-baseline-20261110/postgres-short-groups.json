@@ -1,0 +1,158 @@
+{
+  "startedAt": "2026-11-10T00:19:36.215Z",
+  "status": "FAIL",
+  "checks": [
+    "current real limited authority LOGIN cannot directly read central application tables"
+  ],
+  "pairs": [
+    {
+      "name": "capture plus resolve keeps every F3 query and uses one real authority transaction",
+      "before": {
+        "sqlCalls": 58,
+        "authorityTransactions": 2,
+        "securityCollections": 0,
+        "protocolCalls": 14,
+        "protocolSequence": [
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f",
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae",
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3",
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c",
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e",
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356",
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203",
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356",
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203",
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f",
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae",
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3",
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c",
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e"
+        ],
+        "unrecognizedProtocolCalls": 0,
+        "failedQueries": 0,
+        "sqlHashes": {
+          "6ec438bce08867f4678fdebb9c914dc636cefe42500d1c2aed7c6aaccba6991a": 2,
+          "3eb12e5bafe877f825399d2905523e26201831b46d6ebc54e734cdb0961a8fd5": 2,
+          "74c89290b5bc032445a01a4282143ea150f0d91c091fc22149c631abe9d3c1e2": 2,
+          "6de0ab5ecc04997d35555777a4b04b25d533eae5e25be56ba4035cda87e60b8a": 2,
+          "1785d86a000b9d26baeaec983ac667457971610cebeefd54a3db88b969df9fc8": 2,
+          "5132894cb05b955059dcef6c132bf04062c9d0e4a87e098011112bc447c2c2bb": 2,
+          "0ac62896dcae533056201e3bd612b22cf9e514dd9b420f3e309fce51dfec7590": 2,
+          "cfcd1108ca0c6a9f7b27bf825fb6b245baf12b782f49fa64532acce087cdbaa3": 4,
+          "e99a77f79a35884c3a2efeb023c5213956b40e8b82b3f92902495dfac85e0af8": 2,
+          "0d2fc793022bceffb8337e2ebe73438226cfb78d9a2b6d606278405f72bf44b3": 2,
+          "5f3202c8e2710e9384d3fd7d2fa2560bcfcf709bb8689f31b8901248af85c41e": 2,
+          "933e3ba410cb335c4db5d0ec0323602a5e91e88fe395d74220dc6f7f774a0e41": 2,
+          "134e69c66f0f2132d61b3c8ef527ea6e208b9272e1476a8393ea480aeae3bcc6": 2,
+          "ad488789c5b185d7d7648601d0f2a65c57d6a3adf0b85e52c33c9c4b7b3abfd7": 2,
+          "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f": 4,
+          "a8402858d4f1e1d27afee976520485ebb4b96a5387355b823f0d0b8079729032": 2,
+          "832bdaa8fc857473455442b7ca706f38f5389ee290785b552b17c3e49cb4e3ee": 2,
+          "18d98c1612e167519a45a1d796fab3c37664910347c21269cc7ab5015d7e28bb": 2,
+          "bcd937c3e242e10dc1820acd6da3f697899882c364d4708295fbfc98e4c1901a": 2,
+          "e457b9e54eecca4743d376a4d9b73d6adcd17603842a4fc0018b002fb94fddc7": 2,
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f": 2,
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae": 2,
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3": 2,
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c": 2,
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e": 2,
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356": 2,
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203": 2
+        }
+      },
+      "after": {
+        "sqlCalls": 36,
+        "authorityTransactions": 1,
+        "securityCollections": 0,
+        "protocolCalls": 14,
+        "protocolSequence": [
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f",
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae",
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3",
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c",
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e",
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356",
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203",
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356",
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203",
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f",
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae",
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3",
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c",
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e"
+        ],
+        "unrecognizedProtocolCalls": 0,
+        "failedQueries": 0,
+        "sqlHashes": {
+          "6ec438bce08867f4678fdebb9c914dc636cefe42500d1c2aed7c6aaccba6991a": 1,
+          "3eb12e5bafe877f825399d2905523e26201831b46d6ebc54e734cdb0961a8fd5": 1,
+          "74c89290b5bc032445a01a4282143ea150f0d91c091fc22149c631abe9d3c1e2": 1,
+          "6de0ab5ecc04997d35555777a4b04b25d533eae5e25be56ba4035cda87e60b8a": 1,
+          "1785d86a000b9d26baeaec983ac667457971610cebeefd54a3db88b969df9fc8": 1,
+          "5132894cb05b955059dcef6c132bf04062c9d0e4a87e098011112bc447c2c2bb": 1,
+          "0ac62896dcae533056201e3bd612b22cf9e514dd9b420f3e309fce51dfec7590": 1,
+          "cfcd1108ca0c6a9f7b27bf825fb6b245baf12b782f49fa64532acce087cdbaa3": 2,
+          "e99a77f79a35884c3a2efeb023c5213956b40e8b82b3f92902495dfac85e0af8": 1,
+          "0d2fc793022bceffb8337e2ebe73438226cfb78d9a2b6d606278405f72bf44b3": 1,
+          "5f3202c8e2710e9384d3fd7d2fa2560bcfcf709bb8689f31b8901248af85c41e": 1,
+          "933e3ba410cb335c4db5d0ec0323602a5e91e88fe395d74220dc6f7f774a0e41": 1,
+          "134e69c66f0f2132d61b3c8ef527ea6e208b9272e1476a8393ea480aeae3bcc6": 1,
+          "ad488789c5b185d7d7648601d0f2a65c57d6a3adf0b85e52c33c9c4b7b3abfd7": 1,
+          "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f": 2,
+          "a8402858d4f1e1d27afee976520485ebb4b96a5387355b823f0d0b8079729032": 1,
+          "832bdaa8fc857473455442b7ca706f38f5389ee290785b552b17c3e49cb4e3ee": 1,
+          "18d98c1612e167519a45a1d796fab3c37664910347c21269cc7ab5015d7e28bb": 1,
+          "bcd937c3e242e10dc1820acd6da3f697899882c364d4708295fbfc98e4c1901a": 1,
+          "e457b9e54eecca4743d376a4d9b73d6adcd17603842a4fc0018b002fb94fddc7": 1,
+          "41706f3ccefc32bd6d1558243ff74f72c605c9fce4e1e01d2605c3695398316f": 2,
+          "46213380e14843ceab21381826d6648aa5e0a652dd21a64f214e64c9580456ae": 2,
+          "0613a2ca06c8fdf08c0266abc7a05d51a5ccf3ce173b35e0f7755ff262a9c5e3": 2,
+          "00fa59892ea5041d202eef591e4b4504317750bbbae76d13b97c0fe160514b5c": 2,
+          "749a4adebedc7411db44580ea7a0370d4d2d1ad7b617e6588f80abc015c9987e": 2,
+          "523dd2bc066f061b9c611d4f1458fc8b666f71f8bbdcd5fecfa4b8984e732356": 2,
+          "9a1e115779b97f604319c133faba4e721470cc702efeb0d0196298a871013203": 2
+        }
+      },
+      "verified": false,
+      "beforeError": null,
+      "afterError": null
+    }
+  ],
+  "boundaries": [],
+  "cleanupErrors": [],
+  "limits": [
+    "Exclusive disposable PostgreSQL using the current Central fixture also used by the HTTP/OIDC gate; no Dev connection is read.",
+    "Real limited authority LOGIN, session registry, persisted sessions, membership/F5 repositories and authority coordinator; synthetic identities, no OIDC browser.",
+    "Pair probes invoke the unchanged F3 methods inside the same short withAuthority callback used by production. Actual composition callsites and HTTP totals are verified by the separate unchanged HTTP/profile gates.",
+    "Prepare probes use a synthetic binding and an owned PostgreSQL client, and stop before issuing a guard. They prove fresh Central rejection, not a tenant commit or physical F4 binding.",
+    "The existing audit-dashboard proof covers tenant durability and commit uncertainty separately; the authority-metadata proof covers an actual advisory-lock wait and committed post-lock drift.",
+    "Clock advances below are deterministic dependency injections in this test process, not elapsed-time performance measurements.",
+    "Only SQL hashes and counts are persisted. No SID, query parameters, connection URL, credentials or authority tokens are written to the report."
+  ],
+  "postgres": "17.11",
+  "failure": {
+    "stage": "capture and resolve pair",
+    "code": "ERR_ASSERTION",
+    "frames": [
+      {
+        "file": "test/integration/authority-short-groups/proof.js",
+        "line": 86,
+        "column": 9
+      },
+      {
+        "file": "test/integration/authority-short-groups/proof.js",
+        "line": 103,
+        "column": 2
+      },
+      {
+        "file": "test/integration/authority-short-groups/proof.js",
+        "line": 224,
+        "column": 2
+      }
+    ],
+    "assertionOperator": "strictEqual",
+    "actual": 0,
+    "expected": 4
+  },
+  "finishedAt": "2026-11-10T00:19:39.598Z"
+}

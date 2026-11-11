@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-28",
+  "kind": "OFFLINE_SYNTHETIC_OBSERVER_MICROBENCHMARK",
+  "callsPerSample": 20000,
+  "warmups": [
+    {
+      "enabled": false,
+      "pair": 0,
+      "order": 0,
+      "warmup": true,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 4.895000000000003
+    },
+    {
+      "enabled": true,
+      "pair": 0,
+      "order": 0,
+      "warmup": true,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 22.3489
+    }
+  ],
+  "samples": [
+    {
+      "enabled": false,
+      "pair": 1,
+      "order": 1,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 2.2058999999999997
+    },
+    {
+      "enabled": true,
+      "pair": 1,
+      "order": 2,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 18.6507
+    },
+    {
+      "enabled": true,
+      "pair": 2,
+      "order": 1,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 11.904800000000009
+    },
+    {
+      "enabled": false,
+      "pair": 2,
+      "order": 2,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 1.3341000000000065
+    },
+    {
+      "enabled": false,
+      "pair": 3,
+      "order": 1,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 1.2916999999999916
+    },
+    {
+      "enabled": true,
+      "pair": 3,
+      "order": 2,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 11.19080000000001
+    },
+    {
+      "enabled": true,
+      "pair": 4,
+      "order": 1,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 11.765299999999996
+    },
+    {
+      "enabled": false,
+      "pair": 4,
+      "order": 2,
+      "warmup": false,
+      "calls": 20000,
+      "allowed": 20000,
+      "ms": 1.1974000000000018
+    }
+  ],
+  "summary": {
+    "disabledMeanMs": 1.507275,
+    "enabledMeanMs": 13.377900000000004,
+    "additionalMeanMs": 11.870625000000004,
+    "additionalMicrosecondsPerCall": 0.5935312500000002
+  },
+  "sqlQueries": 0,
+  "postgresExecuted": false,
+  "limitations": [
+    "Synthetic successful cache-path callbacks, no actual coordinator guard or SQL",
+    "Measures active collector overhead relative to the same wrappers without a collection context",
+    "Shared local host and JIT variance; not application latency, capacity or PostgreSQL overhead"
+  ]
+}

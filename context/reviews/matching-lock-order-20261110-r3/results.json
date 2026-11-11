@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "cross-database opposing lock order hits timeout; aborting writer releases the waiting capture",
+    "unrelated synthetic tenant remains unchanged",
+    "shared marker blocks a cooperating writer until release and then permits the update"
+  ],
+  "limits": [
+    "Synthetic markers and synthetic lock ordering in three databases on one PostgreSQL server; no product writers, authority coordinator, OIDC, RLS or runtime pagination.",
+    "Synthetic interleaving proves a possible protocol cycle, not a demonstrated deadlock in current production."
+  ]
+}

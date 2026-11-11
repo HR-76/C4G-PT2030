@@ -1,0 +1,45 @@
+'use strict';
+const {publicApplicationError,requireApplicationOrganizationContext}=require('./applicationSliceRoutes');
+const {uuid,fail}=require('../applications/contracts');
+const emptyMoney=()=>({total:'0.00',missing:0,count:0});
+const emptyMetrics=()=>({total:0,active:0,submitted:0,approved:0,rejected:0,decisions:0,successRate:null,totalBudget:emptyMoney(),organizationBudget:emptyMoney(),approvedBudget:emptyMoney(),submittedBudget:emptyMoney()});
+function dashboardProjection(report,central,privateSummary,catalogDay=report.today){
+ const metrics=report.metrics,by_status=Object.fromEntries(Object.entries(report.states).map(([state,value])=>[state,value.total]));
+ return {role:'ORGANIZATION',today:report.today,report,applications:{...metrics,by_status},
+  opportunities:{total:central.total+privateSummary.total,open:central.open+privateSummary.open,closing_soon:central.closing_soon+privateSummary.closing_soon,...Object.fromEntries(['planned','upcoming','closed','cancelled','unknown'].map(key=>[key,(central[key]||0)+(privateSummary[key]||0)]))},
+  catalogIndicators:{total:central.total,open:central.open,closingSoon:central.closing_soon,asOfDay:catalogDay},
+  budget:{approved:metrics.approvedBudget.total,total:metrics.organizationBudget.total,approvedMissing:metrics.approvedBudget.missing,missing:metrics.organizationBudget.missing},
+  budget_by_status:Object.entries(report.states).map(([status,value])=>({status,...value.organizationBudget})),
+  deadlines:report.deadlines,deadline_total:report.deadlineTotal,
+  source_totals:[...central.sources,...privateSummary.sources].sort((a,b)=>a.source.localeCompare(b.source)),
+  recent_opportunities:[...central.recent,...privateSummary.recent].sort((a,b)=>(a.closing_date==null)-(b.closing_date==null)||String(a.closing_date||'').localeCompare(String(b.closing_date||''))||a.id.localeCompare(b.id)).slice(0,10),
+  unit_totals:report.unitsAvailable?report.units.map(unit=>({...unit,...(report.unitMetrics.find(row=>row.unitId===unit.unitId)?.metrics||emptyMetrics())})):null};
+}
+function createOrganizationDashboardRouter({express,applications,opportunities,central,authenticate,organizationMiddleware,clock=()=>new Date()}){
+ const router=express.Router();
+ router.use(authenticate,organizationMiddleware.requireServerSession,organizationMiddleware.resolveOrganizationContext,requireApplicationOrganizationContext(organizationMiddleware));
+ router.get('/:organizationId/dashboard/summary',async(req,res)=>{
+  const disconnected=()=>req.aborted||res.destroyed;
+  if(disconnected())return;
+  res.set('Cache-Control','no-store');
+  try{
+   const org=uuid(req.params.organizationId);
+   if(Object.keys(req.query).length||Object.keys(req.body||{}).length)fail();
+   if(req.organizationContext?.organization?.id!==org)fail('RESOURCE_NOT_AVAILABLE');
+   if(!central?.dashboardSummary)fail('SERVICE_UNAVAILABLE');
+   // Opportunity collection, catalog filters and civil-only deadlines use the
+   // same UTC reference day. Application reporting keeps its own business day.
+   const asOf=clock().toISOString(),today=asOf.slice(0,10);
+   // Read the central catalogue first. Both tenant summaries then share one
+   // protected lease, including all application/opportunity/directory checks
+   // and the existing final authority guard. Never leave sibling work running.
+   const publicSummary=await central.dashboardSummary(today,asOf);
+   if(disconnected())return;
+   const {report,privateSummary}=await applications.execute('dashboard',{today,asOf},null,req);
+   if(disconnected())return;
+   if(report.organizationId!==org)fail('RESOURCE_NOT_AVAILABLE');
+   return res.json(dashboardProjection(report,publicSummary,privateSummary,today));
+  }catch(error){if(disconnected())return;const {code,status}=publicApplicationError(error);return res.status(status).json({error:{code}});}
+ });return router;
+}
+module.exports={createOrganizationDashboardRouter,dashboardProjection,emptyMetrics};

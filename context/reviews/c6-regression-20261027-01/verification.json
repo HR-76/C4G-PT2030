@@ -1,0 +1,117 @@
+{
+  "at": "2026-10-27T22:35:34.531Z",
+  "executionComplete": true,
+  "gate": {
+    "policy": "c6-admission-v1",
+    "verdict": "FAIL",
+    "reason": "INVALID_ENVIRONMENT"
+  },
+  "runnerExit": 1,
+  "startedAt": "2026-10-27T22:19:25.6379346Z",
+  "finishedAt": "2026-10-27T22:34:46.2066662Z",
+  "measuredRequests": 72,
+  "successes": 72,
+  "admissions": 216,
+  "sqlErrors": 0,
+  "failures": 0,
+  "protocolCalls": [
+    198
+  ],
+  "auditPrepares": [
+    10
+  ],
+  "auditAppends": [
+    10
+  ],
+  "afterResponseQueries": 0,
+  "sourceIntegrity": true,
+  "cleanupErrors": [],
+  "environment": [
+    {
+      "run": 1,
+      "variant": "before",
+      "meanCpuPercent": 4.913361138163706,
+      "maxCpuPercent": 9.425102514363651,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 2,
+      "variant": "after",
+      "meanCpuPercent": 3.8980368718358185,
+      "maxCpuPercent": 7.7245774993764575,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 3,
+      "variant": "after",
+      "meanCpuPercent": 3.917470895954642,
+      "maxCpuPercent": 6.574565376939362,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 4,
+      "variant": "before",
+      "meanCpuPercent": 4.870690995574438,
+      "maxCpuPercent": 7.774590119103332,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 5,
+      "variant": "before",
+      "meanCpuPercent": 3.4060097837328818,
+      "maxCpuPercent": 4.949086264060509,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 6,
+      "variant": "after",
+      "meanCpuPercent": 3.5824856869565633,
+      "maxCpuPercent": 9.370558505197472,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 7,
+      "variant": "after",
+      "meanCpuPercent": 2.8246875445940782,
+      "maxCpuPercent": 3.8558536140007207,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 8,
+      "variant": "before",
+      "meanCpuPercent": 4.478556542721577,
+      "maxCpuPercent": 9.37778692823048,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 9,
+      "variant": "before",
+      "meanCpuPercent": 4.995455986327969,
+      "maxCpuPercent": 11.185464540454902,
+      "controlledChecksPass": false
+    },
+    {
+      "run": 10,
+      "variant": "after",
+      "meanCpuPercent": 3.6964052995727936,
+      "maxCpuPercent": 4.853715989429616,
+      "controlledChecksPass": true
+    },
+    {
+      "run": 11,
+      "variant": "after",
+      "meanCpuPercent": 6.033454539927948,
+      "maxCpuPercent": 17.276708951158113,
+      "controlledChecksPass": false
+    },
+    {
+      "run": 12,
+      "variant": "before",
+      "meanCpuPercent": 4.7669060778458805,
+      "maxCpuPercent": 6.7939508835397255,
+      "controlledChecksPass": true
+    }
+  ],
+  "backgroundCounter": "fractional-double-v2",
+  "backgroundSamples": 872
+}

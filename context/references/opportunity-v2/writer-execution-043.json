@@ -1,0 +1,317 @@
+{
+  "kind": "eu-writer-execution-043-result-v1",
+  "recordedAt": "2026-10-31T16:48:33.483Z",
+  "status": "EXECUTED_SUSPENDED_REQUIRES_RECONCILIATION",
+  "validationStatus": "INCOMPLETE_CODE_DRIFT",
+  "dataVerificationStatus": "PASS",
+  "executionId": "f8a24684-e5d7-4d8f-942e-bf61b7071a1d",
+  "windowId": "c361d18a-254c-43e9-af7f-520cbdd57016",
+  "planDigest": "52a497cafd8b484891114b341a2e722e6aba4154c042b87460daaec1552492ed",
+  "packageDigest": "2bdae82ddd6516e3b31bf33699f5213adaf6c36ae038a59c59f2123752033ee7",
+  "installation": {
+    "centralVersion": "043_opportunity_eu_writer_v2",
+    "tenantVersion": "034_application_snapshot_v2",
+    "centralFingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591",
+    "tenantFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3"
+  },
+  "approval": {
+    "eventId": "01a192cc-9edb-7e3e-8758-f556ef694690",
+    "eventHash": "cb39b6bee1c0e2d5271f692f6965a774e6300e54e927b832b348fb7aa21e17c8",
+    "actorId": "e933bc9c-3ba0-40bc-bdb0-59359604be18",
+    "normalOidc": true,
+    "persistedAuthorityRevalidatedAtInstall": true
+  },
+  "backup": {
+    "path": "output/opportunity-v2-window/f8a24684-e5d7-4d8f-942e-bf61b7071a1d/backup-restore-cff1439f-b2b4-442b-8cc9-1eafffa083d6.json",
+    "sha256": "687abcf7d9907350c7ccbe501b21da55d06e94deeb0e4c4a7e6cd2a6ce24fa21",
+    "backupId": "cff1439f-b2b4-442b-8cc9-1eafffa083d6",
+    "status": "PASS",
+    "tables": 236,
+    "rows": 55775,
+    "configurationFiles": 7,
+    "restore": "PASS",
+    "cleanup": true,
+    "noSourceDrift": true
+  },
+  "pauseSeconds": {
+    "preparation": 65.583,
+    "execution": 67.378
+  },
+  "control": {
+    "originalStatus": "FAIL",
+    "failure": "CONTROLLED_HTTP_UNCERTAIN",
+    "cleanupFailure": "CONTROLLED_HTTP_UNCERTAIN",
+    "recoveryStatus": "PASS",
+    "finalSuspensionVerified": true,
+    "newEnqueuesDuringRecovery": 0,
+    "deadlineGuaranteeMet": false
+  },
+  "source": {
+    "fence": 7,
+    "state": "QUIESCED",
+    "family": "EU_FUNDING_TENDERS",
+    "acceptedV2": 1,
+    "queuedRuns": 0,
+    "writerMode": "CANONICAL_V2",
+    "pendingRuns": 1,
+    "writerPolicy": "eu-existing-v2.0",
+    "activeRunLeases": 0,
+    "otherPendingRuns": 0,
+    "activeInboxLeases": 0,
+    "activeOutboxLeases": 0,
+    "expiredPendingRuns": 1,
+    "writerMappingDigest": "5419c2beb24ee5131e9291107d45f4f3b47397bb9894bd32d90ba89462616d7a",
+    "incompatiblePendingRuns": 0,
+    "unrecoverablePendingRuns": 1
+  },
+  "health": {
+    "httpStatus": 200,
+    "ready": true,
+    "workerReady": true,
+    "admissionReady": true
+  },
+  "cycle": {
+    "runId": "7266ad6b-8880-4ec1-9399-4751187831c5",
+    "status": "RUNNING",
+    "logicalCyclesRequested": 1,
+    "batches": 189,
+    "terminal": false,
+    "complete": false,
+    "discovery": {
+      "pagesObserved": 45,
+      "remoteTotal": 1120,
+      "received": 1120,
+      "paginationReachedEnd": true,
+      "sourceTotalStable": true,
+      "enumerationCountConsistent": true,
+      "completeEnumeration": true
+    },
+    "archivedCandidates": 138,
+    "allPersistedCandidatesRederived": true,
+    "acceptedDecisions": 1,
+    "reviewDecisions": 137,
+    "reviewReasons": {
+      "LEGACY_MIGRATION_REQUIRES_REVIEW": 137,
+      "MAPPING_BASELINE_UNAVAILABLE": 137
+    },
+    "targets": [
+      {
+        "state": "CONFLICT",
+        "total": 5
+      },
+      {
+        "state": "DISCOVERED",
+        "total": 391
+      },
+      {
+        "state": "PENDING",
+        "total": 2
+      },
+      {
+        "state": "REVIEW",
+        "total": 137
+      },
+      {
+        "state": "UNCHANGED",
+        "total": 1
+      }
+    ],
+    "sourceControlEvents": [
+      {
+        "action": "CONFIGURE",
+        "eventId": "01a192ce-54f5-7775-88b0-4dfe353c9864",
+        "sourceFence": 4
+      },
+      {
+        "action": "RESUME",
+        "eventId": "01a192ce-5cd6-726d-b12e-b411b4b8dda6",
+        "sourceFence": 5
+      },
+      {
+        "action": "SUSPEND",
+        "eventId": "01a192d6-fbab-7739-bc05-0db67dd1a55e",
+        "sourceFence": 6
+      },
+      {
+        "action": "QUIESCE",
+        "eventId": "01a192d7-394d-7874-ab09-06f09bccb238",
+        "sourceFence": 7
+      }
+    ],
+    "serviceAuditEvents": 138
+  },
+  "call11145": {
+    "expected": {
+      "opportunityId": "01a14a80-9143-7177-ba86-9fa72d09fb64",
+      "revisionId": "f6fe19fd-12d7-4c38-920a-b456dd74e9a9",
+      "rowVersion": 5
+    },
+    "contentDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6",
+    "snapshotDigest": "1fa2ae06ce45942735d07a1cd9c393242a0fe757342c8f17b228f8c1da029eb7",
+    "amount": 120000,
+    "amountSqlType": "numeric",
+    "currencyState": "NOT_FOUND",
+    "deadlineCount": 7,
+    "totals": {
+      "total": 538,
+      "v1": 537,
+      "v2": 1
+    },
+    "observedInThisCycle": true,
+    "outcome": "UNCHANGED"
+  },
+  "preservation": {
+    "heads": 538,
+    "revisions": 1502,
+    "otherHeadsFullRows": 537,
+    "tenantTables": 129,
+    "historicalRuns": 1216,
+    "audit": {
+      "DATA": {
+        "valid": true,
+        "events": 4457,
+        "lastHash": "e0a2c617af7d275bd62922eacb241b78b6cf8254c662831641ddb29dbdc9d07a"
+      },
+      "OPERATIONS": {
+        "valid": true,
+        "events": 2,
+        "lastHash": "cb39b6bee1c0e2d5271f692f6965a774e6300e54e927b832b348fb7aa21e17c8"
+      }
+    }
+  },
+  "currentCodeParityCertified": false,
+  "currentApprovalParityCertified": false,
+  "codeDrift": [
+    {
+      "file": "backend/src/apiBootstrap.js",
+      "expectedSha256": "c17ecf56e1d7309c5071f763b71e0d44fa180325d7bd3c6e03a4f26facdd56ac",
+      "actualSha256": null,
+      "status": "MISSING"
+    },
+    {
+      "file": "backend/src/security/tenantSchemaFingerprint.js",
+      "expectedSha256": "d0baa7265dbf86ada926fe783cf52d110f84dbdbbfe415c1df4ab07f89a972bf",
+      "actualSha256": "6876998c3d37a255333a90c0bad3eeff784797e3ec82a08242c2785bbbc748d5",
+      "status": "CHANGED"
+    },
+    {
+      "file": "backend/src/utils/errorResponse.js",
+      "expectedSha256": "6fdfb1c2655fbbb8ab8dfa2b256981a5dd852b45ac31e6b21041505036bf2572",
+      "actualSha256": null,
+      "status": "MISSING"
+    },
+    {
+      "file": "backend/src/utils/notificationVisibility.js",
+      "expectedSha256": "15ed6bad34c045a09ab774636b463378574bb10f26809ec54a195861ea4745a8",
+      "actualSha256": null,
+      "status": "MISSING"
+    },
+    {
+      "file": "backend/src/utils/opportunityStatus.js",
+      "expectedSha256": "e9808ef1ef39147b4af5b1f4385c396c0356d4ff5cfaf1f281c07f88b6e808ea",
+      "actualSha256": null,
+      "status": "MISSING"
+    },
+    {
+      "file": "backend/src/utils/platformUrl.js",
+      "expectedSha256": "51f9be6315b122be6d2c2b57606c85385ae52f3244414fc7a9259e9d38427bb3",
+      "actualSha256": null,
+      "status": "MISSING"
+    }
+  ],
+  "validation": {
+    "tests": {
+      "backend": {
+        "passed": 2255,
+        "failed": 0,
+        "skipped": 7
+      },
+      "frontend": {
+        "passed": 495,
+        "failed": 0
+      },
+      "operational": {
+        "passed": 32,
+        "failed": 0
+      },
+      "build": "PASS",
+      "syntax": 12
+    },
+    "gateChecks": 32,
+    "gateInputHashes": 863,
+    "isolatedCleanup": true,
+    "recoveryTests": 4,
+    "diagnosticTests": 11,
+    "normativeArtifacts": 16,
+    "priorSqlFilesUnchanged": 149
+  },
+  "evidence": {
+    "plan": {
+      "path": "output/opportunity-eu-writer-window-c361d18a-254c-43e9-af7f-520cbdd57016/plan.json",
+      "sha256": "1b147cf0b1c806ec62afdbb61af93c9d70e8e44710d130de2cb7cd9d77baf365"
+    },
+    "approval": {
+      "path": "output/opportunity-eu-writer-window-c361d18a-254c-43e9-af7f-520cbdd57016/approval-b6059269-57db-4944-8924-e08495656eda.json",
+      "sha256": "e806ca6b536f4e29f0b9cc7aedb3369b061e334a25addce3d68f087029b27551",
+      "eventId": "01a192cc-9edb-7e3e-8758-f556ef694690",
+      "eventHash": "cb39b6bee1c0e2d5271f692f6965a774e6300e54e927b832b348fb7aa21e17c8",
+      "actorId": "e933bc9c-3ba0-40bc-bdb0-59359604be18"
+    },
+    "window": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/window.json",
+      "sha256": "0c6fed7522eea52c1e70d5d7e3d9291416ec305df6b65b0e36bd0f5ef53b73d2"
+    },
+    "before": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/before-cycle.json",
+      "sha256": "643c5abd5ae315b5a11cd17f968c0bbb659e80c35db2bc96ca28ea67ab6108ba"
+    },
+    "cycle": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/controlled-cycle.json",
+      "sha256": "e243d7de184935acc77d065dada3eae34a96655055f3719a0776562a4303bbc0"
+    },
+    "recovery": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/recovery.json",
+      "sha256": "125683e3f39b99743cbcb6bc231293070709677d805a9ddbdf0b843a7f3de970"
+    },
+    "strictAfter": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/after.json",
+      "sha256": "f14f7fbbf29b661ecc2a83d9582995b2f7ccdaf2bfe6d1f46e261dd3e237e068"
+    },
+    "dataAfter": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/after-diagnostic.json",
+      "sha256": "89328e5eb06528f2666037be9fb27ab9dc44db1efcfac17b0edfbe2e670dcb0a"
+    },
+    "incident": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/incident.json",
+      "sha256": "3bdc2294db35cc1cc02cda08038e7cd9f0a885f63fecf1fecdfa64fa810897d6"
+    },
+    "finalState": {
+      "path": "output/opportunity-eu-writer-execution-f8a24684-e5d7-4d8f-942e-bf61b7071a1d/final-state.json",
+      "sha256": "4d38954bdd0c4ea9adc42703beb1152a0ee0197b2d081f997baa872d4c8b9c20"
+    },
+    "validation": {
+      "path": "output/opportunity-eu-writer-window-validation-3d74f556-5cdf-486c-8766-b4d3ad19d790/validation.json",
+      "sha256": "0d281d68d1c7ffcdc9bc76fce560e25751e8f6ae0869484ee84e7c7110318c65"
+    },
+    "gate": {
+      "path": "output/opportunity-v2-writer-1d50edb180944b7fa988aebab2b54b3f/verification.json",
+      "sha256": "8d4c4450b72baf0aa69d32c95b5425920ba7d5474850b43ca773720e8d25ffad"
+    }
+  },
+  "limitations": [
+    "Global result remains INCOMPLETE_CODE_DRIFT. APP verification modules match original plan hashes; installed external dependencies such as pg are not re-certified. Current application code and approval parity are not certified.",
+    "This report performs only read-only PostgreSQL observations; it does not resume or dispatch work.",
+    "Per-database repeatable-read snapshots are not a distributed maintenance lock.",
+    "The stored 11145 head remains 120000 with currency NOT_FOUND and seven deadlines; that alone does not prove this cycle fetched 11145.",
+    "Only persisted canonical candidate archives are rederived; missing, invalid, deferred or unvisited source records are not certified.",
+    "A quiescent source may retain pending or expired runs. The operation status and pending counters are reported separately from verification success.",
+    "Normal OIDC use is declared by the approved browser executor; persisted HUMAN audit events bind the resulting operations to the administrator. This verifier does not independently replay the OIDC provider exchange.",
+    "Only hashes and counts of private tenant rows leave PostgreSQL; session identifiers, cookies and credentials are never exported."
+  ],
+  "requiredBeforeAnotherResume": [
+    "RECONCILE_EXPIRED_RUN_WITHOUT_FABRICATING_SUCCESS_OR_NEW_ENQUEUE",
+    "FREEZE_AND_REVALIDATE_CURRENT_CODE_AND_AUTHORITY",
+    "REVIEW_137_LEGACY_CANDIDATES_AND_5_CONFLICT_TARGETS",
+    "PLAN_REMAINING_393_TARGETS_WITH_NEW_BOUNDED_AUTHORIZATION"
+  ]
+}

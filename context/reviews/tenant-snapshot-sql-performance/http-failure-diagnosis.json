@@ -1,0 +1,642 @@
+{
+  "schemaVersion": 1,
+  "status": "OBSERVED_LEASE_TIMEOUT_WITH_RECONSTRUCTED_POST_COMMIT_DEADLINE",
+  "generatedAt": "2026-10-31T22:46:38.389Z",
+  "scope": "READ_ONLY_SINGLE_FAILED_CHILD_TRACE",
+  "inputs": {
+    "raw": {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-7-043-A.json",
+      "sha256": "3fde0c1f8b1ec100c2d6bce9d1c32992058eb2d2719dbcf307fa57f0a4641cb8",
+      "bytes": 39392901
+    },
+    "historicalTimeline": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/timeline-corrected.json",
+      "sha256": "8861db3576be14d81c05f65f55ab391ece2c3a6537a5ffd6b770cf7a7236dda9",
+      "bytes": 14647
+    },
+    "historicalDeterministicProof": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/deterministic-result.json",
+      "sha256": "df6395d4195b46cbc89b59568bf6700cb79e2405d7bcffdfda880c6fca196fb3",
+      "bytes": 20640
+    }
+  },
+  "identity": {
+    "abId": "tenant-snapshot-ab-75babcee99ce418a",
+    "sourceSetDigest": "75babcee99ce418a4ba25da7a539dbbb247062b911e19d62d553fd59001f5e58",
+    "manifestSha256": "f646bd89ae53c24846618a4627706fc80714a7612c2dd084c2f4ba6a3568c7ec",
+    "harnessDigest": "1e43d3a6e7dc220dcf58e26f9542f3a0fc26d667f44ce40d74026abfccb95b3f",
+    "variantDigests": {
+      "A": "30005d5709224972d241530ff197282a75826ada308f7a3699e07b73002c952c",
+      "B": "fca8ee8341b57ef78f3cada9ecf14494e01c72973ed01447d75e55e3ce19e986"
+    },
+    "arm": "A",
+    "index": 7
+  },
+  "stage": {
+    "status": "FAIL",
+    "cleanup": true,
+    "sourceIntegrityAfter": "PASS",
+    "measured": 36,
+    "successes": 35,
+    "errors": 1,
+    "warmups": 7,
+    "warmupFailures": 0,
+    "readiness": "PASS",
+    "phaseLabel": "HTTP_READY_DRAIN_AND_FINAL_SCHEMAS",
+    "phaseLabelLimitation": "The outer phase label remains the final readiness check; failed request identification comes from http.attempts.",
+    "failure": {
+      "code": "ERR_ASSERTION",
+      "name": "AssertionError",
+      "reason": null
+    }
+  },
+  "request": {
+    "pointer": "/http/attempts/20",
+    "scenario": "dashboard-c4",
+    "attempt": 2,
+    "replica": 7,
+    "tenant": 0,
+    "status": 503,
+    "publicCode": "SERVICE_UNAVAILABLE",
+    "observedFailureCodes": [
+      "LEASE_TIMEOUT"
+    ],
+    "clientMs": 11879.1587,
+    "serverResponseMs": 11847.040900000022,
+    "queryCount": 1195,
+    "transactionCount": 52,
+    "queryEventsComplete": true,
+    "pendingQueries": 0,
+    "sqlErrors": [],
+    "afterResponseQueryCount": 0,
+    "metricSummary": null,
+    "instrumentationPass": false,
+    "metricsLimitation": "The normal success summary is null for this503; the diagnosis uses retained raw events and recomputes intervals."
+  },
+  "directEvidence": {
+    "admissions": [
+      {
+        "before": {
+          "active": 3,
+          "queued": 0,
+          "pools": 1,
+          "tenants": 1,
+          "circuitsOpen": 0,
+          "credentialDisposalsPending": 0,
+          "credentialCleanupTimeouts": 0,
+          "credentialCleanupFailures": 0,
+          "cleanupFailures": 0
+        },
+        "ms": 8.808400000008987,
+        "after": {
+          "active": 4,
+          "queued": 0,
+          "pools": 1,
+          "tenants": 1,
+          "circuitsOpen": 0,
+          "credentialDisposalsPending": 0,
+          "credentialCleanupTimeouts": 0,
+          "credentialCleanupFailures": 0,
+          "cleanupFailures": 0
+        }
+      }
+    ],
+    "tenantCheckouts": [
+      {
+        "startMs": 951.4452000000165,
+        "waitMs": 8.615699999994831,
+        "holdMs": 10717.391400000022,
+        "max": 5,
+        "role": "tenant",
+        "index": 6
+      }
+    ],
+    "statementTimeout": {
+      "label": "SET LOCAL statement_timeout 10000ms",
+      "sha256": "b5297617afb2db1d5daead45f7931fa8b593c3248942af7ab94669e37cc95a8a",
+      "events": [
+        {
+          "startMs": 1995.8873000000021,
+          "endMs": 1998.2656000000134,
+          "role": "tenant",
+          "category": "transaction",
+          "hash": "b5297617afb2db1d5daead45f7931fa8b593c3248942af7ab94669e37cc95a8a",
+          "afterResponse": false,
+          "index": 410,
+          "durationMs": 2.3783000000112224
+        }
+      ],
+      "selectedOperationBudgetMs": 10000,
+      "interpretation": "The executor uses the same remainingMs for its JS timer and per-statement PostgreSQL setting; these are distinct deadline mechanisms."
+    },
+    "tenantCommits": [
+      {
+        "startMs": 1477.171000000002,
+        "endMs": 1478.763100000011,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false,
+        "index": 309,
+        "durationMs": 1.5921000000089407
+      },
+      {
+        "startMs": 11632.491200000019,
+        "endMs": 11633.215800000005,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false,
+        "index": 1125,
+        "durationMs": 0.7245999999868218
+      }
+    ],
+    "tenantRollbacks": [],
+    "preparationFinalAuthorityCommit": {
+      "startMs": 1669.289300000004,
+      "endMs": 1672.1143000000156,
+      "role": "authority",
+      "category": "transaction",
+      "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "afterResponse": false,
+      "index": 342,
+      "durationMs": 2.8250000000116415
+    },
+    "firstAuthorityCheckoutAfterPreparation": {
+      "startMs": 1672.3936000000103,
+      "waitMs": 0.01920000000973232,
+      "holdMs": 145.35939999998664,
+      "max": 8,
+      "role": "authority"
+    },
+    "tenantMetadataSpans": [
+      {
+        "name": "observeTenantRuntimeMetadata",
+        "startMs": 975.7245000000112,
+        "endMs": 1476.3744000000006,
+        "durationMs": 500.64989999998943
+      },
+      {
+        "name": "observeTenantRuntimeMetadata",
+        "startMs": 2006.6102000000246,
+        "endMs": 2385.4260000000068,
+        "durationMs": 378.8157999999821
+      },
+      {
+        "name": "observeTenantRuntimeMetadata",
+        "startMs": 8992.935600000026,
+        "endMs": 11326.511900000012,
+        "durationMs": 2333.576299999986
+      }
+    ],
+    "postCommitSpans": [
+      {
+        "name": "assertAuthorityAdmission",
+        "startMs": 11633.309700000013,
+        "endMs": 11739.633600000001
+      },
+      {
+        "name": "assertCentralSchema",
+        "startMs": 11644.590600000025,
+        "endMs": 11737.916800000006
+      },
+      {
+        "name": "assertAuthorityAdmission",
+        "startMs": 11678.477100000018,
+        "endMs": 11789.56700000001
+      },
+      {
+        "name": "assertCentralSchema",
+        "startMs": 11690.86870000002,
+        "endMs": 11788.909900000028
+      },
+      {
+        "name": "assertAuthoritySecurity",
+        "startMs": 11742.667400000006,
+        "endMs": 11755.33070000002
+      },
+      {
+        "name": "assertAuthoritySecurity",
+        "startMs": 11817.251600000018,
+        "endMs": 11831.501400000008
+      }
+    ],
+    "lastQuery": {
+      "startMs": 11836.19200000001,
+      "endMs": 11846.357000000018,
+      "role": "authority",
+      "category": "transaction",
+      "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "afterResponse": false,
+      "index": 1194,
+      "durationMs": 10.165000000008149
+    },
+    "authorityLocks": {
+      "count": 25,
+      "heldWallUnionMs": 641.3219999999274,
+      "maximumHeldMs": 58.84979999999632,
+      "acquisitionObservedWorkMs": 274.63300000005984,
+      "maximumAcquisitionObservedMs": 38.18869999999879
+    },
+    "queryCosts": [
+      {
+        "kind": "authority:other",
+        "count": 308,
+        "observedWorkMs": 429.53799999979674,
+        "wallUnionMs": 424.3979999998701,
+        "maximumMs": 38.0342000000237
+      },
+      {
+        "kind": "authority:transaction",
+        "count": 100,
+        "observedWorkMs": 91.32190000000992,
+        "wallUnionMs": 90.52130000005127,
+        "maximumMs": 10.165000000008149
+      },
+      {
+        "kind": "authority:metadata",
+        "count": 450,
+        "observedWorkMs": 2779.994500000146,
+        "wallUnionMs": 2614.7032000001927,
+        "maximumMs": 83.16909999999916
+      },
+      {
+        "kind": "authority:authority-lock",
+        "count": 25,
+        "observedWorkMs": 274.63300000005984,
+        "wallUnionMs": 258.9808000000485,
+        "maximumMs": 38.18869999999879
+      },
+      {
+        "kind": "tenant:transaction",
+        "count": 13,
+        "observedWorkMs": 52.747000000061234,
+        "wallUnionMs": 52.747000000061234,
+        "maximumMs": 17.083500000007916
+      },
+      {
+        "kind": "tenant:metadata",
+        "count": 267,
+        "observedWorkMs": 3002.0234000003256,
+        "wallUnionMs": 3002.0234000003256,
+        "maximumMs": 536.0180999999866
+      },
+      {
+        "kind": "tenant:other",
+        "count": 27,
+        "observedWorkMs": 293.02650000009453,
+        "wallUnionMs": 293.02650000009453,
+        "maximumMs": 134.31560000000172
+      },
+      {
+        "kind": "tenant:audit-prepare",
+        "count": 5,
+        "observedWorkMs": 4641.838099999994,
+        "wallUnionMs": 4641.838099999994,
+        "maximumMs": 4615.3782000000065
+      }
+    ],
+    "largestQueries": [
+      {
+        "startMs": 4214.292300000001,
+        "endMs": 8829.670500000007,
+        "role": "tenant",
+        "category": "audit-prepare",
+        "hash": "1130bb78a9ac28aa34d397fde27b8d2111362d4083c87a168e705acc93abfb41",
+        "afterResponse": false,
+        "index": 952,
+        "durationMs": 4615.3782000000065
+      },
+      {
+        "startMs": 9609.809200000018,
+        "endMs": 10145.827300000004,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "9a999fda0752ffa76b33c1ece525acab41163aa5fe311d5310e81fb19b0c5924",
+        "afterResponse": false,
+        "index": 975,
+        "durationMs": 536.0180999999866
+      },
+      {
+        "startMs": 8992.946100000001,
+        "endMs": 9395.705300000001,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+        "afterResponse": false,
+        "index": 969,
+        "durationMs": 402.7592000000004
+      },
+      {
+        "startMs": 10947.217700000008,
+        "endMs": 11139.079200000007,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+        "afterResponse": false,
+        "index": 1003,
+        "durationMs": 191.86149999999907
+      },
+      {
+        "startMs": 3776.5583000000042,
+        "endMs": 3910.873900000006,
+        "role": "tenant",
+        "category": "other",
+        "hash": "aec57e0240867827f325396630de31e3692f23d1d627937b2f4d67c3f9852811",
+        "afterResponse": false,
+        "index": 885,
+        "durationMs": 134.31560000000172
+      },
+      {
+        "startMs": 10386.805200000003,
+        "endMs": 10517.126300000004,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "c04ffc8a62856622ae470789d8f4380ba726d36f74fb44d29ec342139dc7839e",
+        "afterResponse": false,
+        "index": 983,
+        "durationMs": 130.32110000000102
+      },
+      {
+        "startMs": 975.7326000000176,
+        "endMs": 1105.7146000000066,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+        "afterResponse": false,
+        "index": 219,
+        "durationMs": 129.98199999998906
+      },
+      {
+        "startMs": 10156.433400000009,
+        "endMs": 10253.614100000006,
+        "role": "tenant",
+        "category": "metadata",
+        "hash": "a525a086cb51cc5d199e28df9c9c4b106100d226d29e2f57a32dae1c9fc641b9",
+        "afterResponse": false,
+        "index": 978,
+        "durationMs": 97.18069999999716
+      }
+    ]
+  },
+  "reconstruction": {
+    "operation": "APPLICATION_READ/report (APPLICATION_REPORT audited-read policy)",
+    "operationEvidence": "Only one tenant lease and 1195 queries/52 transactions were recorded. The dashboard route awaits applications.report before privateSummary and dashboardContext. Its initial audited report committed; the request did not advance to the later tenant operations.",
+    "executeStartIntervalMs": [
+      1672.1143000000156,
+      1672.3936000000103
+    ],
+    "selectedTimerDueIntervalMs": [
+      11672.114300000016,
+      11672.39360000001
+    ],
+    "tenantReleaseApproximateMs": 11677.452300000034,
+    "tenantCommitEndMs": 11633.215800000005,
+    "commitBeforeExpectedTimerMs": [
+      38.898500000010245,
+      39.177800000004936
+    ],
+    "releaseAfterExpectedTimerMs": [
+      5.338000000017928,
+      5.0587000000232365
+    ],
+    "allocationEarliestApproximateDeadlineMs": 15960.060900000011,
+    "allocationHeadroomAtReleaseApproximateMs": 4282.608599999978,
+    "conclusion": "The observed LEASE_TIMEOUT is strongly localized to the 10000 ms operation timer during authority completion after tenant COMMIT, with more than 4 s estimated allocation headroom. The callback was not recorded directly.",
+    "assumptions": [
+      "Execute entry is bounded by the resolver final authority COMMIT and the next authority checkout, not an explicit execute-entry event.",
+      "The allocation estimate translates monotonic intervals to the Date-based deadline and assumes no wall-clock jump.",
+      "Release time is the sum of checkout start+wait+hold; adjacent instrumentation clock reads make it approximate.",
+      "The preparation bound uses the final authority transaction COMMIT, not the nested schema-read transaction COMMIT inside that same checkout."
+    ]
+  },
+  "lifecycle": {
+    "tenantCommitObserved": true,
+    "tenantRollbackObserved": false,
+    "sqlCancellationObserved": false,
+    "queriesStartingAfterApproximateRelease": 62,
+    "queriesEndingAfterApproximateRelease": 63,
+    "lastQueryEndMs": 11846.357000000018,
+    "mechanism": "Promise.race rejects the caller and starts discard release asynchronously on LEASE_TIMEOUT; it does not cancel the executing Promise. Already-started Central authority completion can continue. No inference of rollback or SQL cancellation follows from the 503.",
+    "businessScope": "GET dashboard report with audited read transaction; tenant COMMIT does not establish a business-data write."
+  },
+  "contention": {
+    "largestObservedQuery": {
+      "classification": "audit.prepare_append_v1",
+      "startMs": 4214.292300000001,
+      "endMs": 8829.670500000007,
+      "role": "tenant",
+      "category": "audit-prepare",
+      "hash": "1130bb78a9ac28aa34d397fde27b8d2111362d4083c87a168e705acc93abfb41",
+      "afterResponse": false,
+      "index": 952,
+      "durationMs": 4615.3782000000065
+    },
+    "staticLockMechanism": "audit.prepare_append_v1 locks audit.chain_head FOR UPDATE. Driver-observed duration includes execution, transport and waits; no per-request lock-wait duration is directly recorded.",
+    "sampler": {
+      "scope": "Entire stage7 dashboard-c4 phase, not an individually identified request",
+      "samples": 295,
+      "first": "2026-10-31T22:43:01.499Z",
+      "last": "2026-10-31T22:43:33.475Z",
+      "errors": [],
+      "p95SampleMs": 58.49079999999958,
+      "maximumSampleMs": 551.5984999999928,
+      "maxManagerQueued": 0,
+      "maxManagerActive": 4,
+      "maxBlockingCount": 2,
+      "blockedSessionSamples": 104,
+      "sessionWaitCounts": {
+        "idle:Client:ClientRead": 1618,
+        "active::": 565,
+        "idle in transaction:Client:ClientRead": 637,
+        "active:Lock:advisory": 29,
+        "active:Client:ClientRead": 9,
+        "idle in transaction::": 11,
+        "active:Lock:transactionid": 65,
+        "active:Lock:tuple": 11
+      }
+    },
+    "inference": "The trace exposes a 4.615 s audit preparation interval plus 2.334 s final tenant metadata observation. Scenario-level row/transaction/advisory lock waits support contention as a plausible contributor. Sampler lacks request/session binding, so the blocker and exact cause of this failed request remain unproven."
+  },
+  "historicalComparison": {
+    "sameObservedFailureClass": true,
+    "historical": {
+      "pointer": "/http/warmups/5",
+      "scenario": "dashboard-c4-two-tenants",
+      "tenant": 0,
+      "status": 503,
+      "publicCode": "SERVICE_UNAVAILABLE",
+      "observedFailureCodes": [
+        "LEASE_TIMEOUT"
+      ],
+      "httpMs": 20479.233600000007,
+      "serverResponseMs": 20474.4559,
+      "sqlErrors": [],
+      "pendingQueriesAtRecordedResponse": 0
+    },
+    "historicalOperation": "OPPORTUNITY_READ/privateSummary",
+    "currentOperation": "APPLICATION_READ/report",
+    "sameExecutorBytes": true,
+    "sameAfterCommitMechanismSupported": true,
+    "differences": [
+      "Historical failure was an A/index 4 warmup at concurrency 1 in the two-tenant scenario, stopped before eight planned measures.",
+      "Current failure is A/index 7 measured attempt 2 under concurrency 4 in the one-tenant dashboard scenario; this child completed all 36 measurements/7 warmups.",
+      "Current trace contains one tenant lease; historical trace contained two. The direct delayed SQL and environmental context differ."
+    ],
+    "deterministicTests": "Previous 5 PASS executor tests with doubles are referenced only as validation of unchanged lifecycle semantics. They were not rerun and do not prove real SQL authority, causality or performance for this request."
+  },
+  "sources": [
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "sha256": "d28e52aa9067c707cf9a8c93163178ee04fefeb4c75551743a8599aa4e2143b2",
+      "bytes": 22821,
+      "relativePath": "backend/src/security/tenantLeaseExecutor.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "d28e52aa9067c707cf9a8c93163178ee04fefeb4c75551743a8599aa4e2143b2"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantResolver.js",
+      "sha256": "b794d4eadaf4b586d791dab08a8973281f7f0a9e526eb26e377c25d9e3a3b845",
+      "bytes": 9509,
+      "relativePath": "backend/src/security/tenantResolver.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "b794d4eadaf4b586d791dab08a8973281f7f0a9e526eb26e377c25d9e3a3b845"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantPoolManager.js",
+      "sha256": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9",
+      "bytes": 37017,
+      "relativePath": "backend/src/security/tenantPoolManager.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/config/opportunityRuntime.js",
+      "sha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f",
+      "bytes": 10842,
+      "relativePath": "backend/src/config/opportunityRuntime.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/applications/composition.js",
+      "sha256": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a",
+      "bytes": 25111,
+      "relativePath": "backend/src/applications/composition.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/routes/organizationDashboardRoutes.js",
+      "sha256": "71389b67f93f222b21ceb0719199515d9bdf7bde99a4ab3f4a920c20b7ee76e7",
+      "bytes": 4111,
+      "relativePath": "backend/src/routes/organizationDashboardRoutes.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "71389b67f93f222b21ceb0719199515d9bdf7bde99a4ab3f4a920c20b7ee76e7"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/audit/postgresAppendRepository.js",
+      "sha256": "a0cba2984dc01b3601ee628b0a4b6263af025a8297e2202fae34c6c99c59fd9a",
+      "bytes": 1687,
+      "relativePath": "backend/src/audit/postgresAppendRepository.js",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "a0cba2984dc01b3601ee628b0a4b6263af025a8297e2202fae34c6c99c59fd9a"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/database/tenant/migrations/002_f7_append_only_audit.up.sql",
+      "sha256": "e8f6525bf4b69bc5c0c9a44f06b832c7ce979e1b72ac8b1b89ce475d5a6b62ff",
+      "bytes": 11481,
+      "relativePath": "backend/database/tenant/migrations/002_f7_append_only_audit.up.sql",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "e8f6525bf4b69bc5c0c9a44f06b832c7ce979e1b72ac8b1b89ce475d5a6b62ff"
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/test/integration/eu-writer-performance/instrumentation.cjs",
+      "sha256": "42ed1c9b335b18a3ef61f2895856886b02c78108071332ff65164ca3a1053daf",
+      "bytes": 8463,
+      "relativePath": "test/integration/eu-writer-performance/instrumentation.cjs",
+      "identicalAB": true,
+      "identicalHistorical": true,
+      "historicalSha256": "42ed1c9b335b18a3ef61f2895856886b02c78108071332ff65164ca3a1053daf"
+    }
+  ],
+  "code": [
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/applications/composition.js",
+      "line": 99,
+      "meaning": "Application operations select 10000 ms timeout."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/routes/organizationDashboardRoutes.js",
+      "line": 36,
+      "meaning": "Dashboard awaits report, private summary and dashboardContext sequentially."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/config/opportunityRuntime.js",
+      "line": 52,
+      "meaning": "Tenant allocation leaseTimeoutMs 15000."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantPoolManager.js",
+      "line": 474,
+      "meaning": "Allocation deadline created after physical checkout."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 322,
+      "meaning": "Choose minimum of operation and allocation deadline."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 328,
+      "meaning": "Operation timeout sets expired and rejects LEASE_TIMEOUT."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 205,
+      "meaning": "COMMIT precedes authorityGuard.complete."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 357,
+      "meaning": "Promise.race does not cancel the running execution."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 364,
+      "meaning": "LEASE_TIMEOUT starts discard release without awaiting it."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/audit/postgresAppendRepository.js",
+      "line": 4,
+      "meaning": "Exact SQL hash matches audit preparation event."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/database/tenant/migrations/002_f7_append_only_audit.up.sql",
+      "line": 127,
+      "meaning": "Audit preparation locks the chain head FOR UPDATE."
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/A/sources/backend/src/security/tenantSchemaFingerprint.js",
+      "line": 141,
+      "meaning": "536 ms metadata event is the organization_profile policy catalog SELECT."
+    }
+  ],
+  "limits": [
+    "Only the single stage7 JSON was parsed; full campaign 288/56 totals and global cleanup are verified separately by the parent workflow.",
+    "No timer arm/fire timestamp, failure timestamp, explicit cancellation or release cause was recorded. After-COMMIT deadline location is a reconstruction, not literal callback evidence.",
+    "Metrics are driver-observed wall intervals, not CPU. Nested spans and query work overlap and must not be added.",
+    "Sampler records no request identity or PID binding; sampled waits cannot be assigned to this request or to its 4.615 s audit query with certainty.",
+    "This A failure does not establish that B fixes the timeout or prove a candidate reliability gain. All failure samples remain in the campaign.",
+    "The first readiness failure lacked request details and remains unclassified; this later explicit LEASE_TIMEOUT must not be projected onto it.",
+    "No runtime changes, infrastructure, load or new tests were executed for this diagnosis."
+  ]
+}

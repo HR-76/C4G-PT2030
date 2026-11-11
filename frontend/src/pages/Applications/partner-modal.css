@@ -1,0 +1,14 @@
+.application-partner-editor { min-width: 0; }
+.application-partner-editor .partner-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.application-partner-editor .partner-form { margin: 16px 0 0; padding: 0; border: 0; background: transparent; }
+.application-partner-editor .field { min-width: 0; }
+.application-partner-editor .field label { display: flex; flex-direction: column; gap: 6px; }
+.application-partner-editor .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.application-partner-editor .partner-person-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.application-partner-editor .partner-person-remove { justify-self: end; }
+.application-partner-editor .subsection-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.application-partners .partner-draft-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+@media (max-width: 640px) {
+  .application-partner-editor .field-grid, .application-partner-editor .partner-person-row { grid-template-columns: minmax(0, 1fr); }
+  .application-partner-editor .form-actions { flex-wrap: wrap; }
+}

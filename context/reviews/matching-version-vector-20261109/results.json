@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "stable vector accepts complete reads of both 1501-row sources",
+    "central commit during capture invalidates the vector, including a row outside first page",
+    "tenant commit during capture invalidates the vector",
+    "data and version roll back together",
+    "uncommitted write remains invisible; subsequent commit invalidates saved vector",
+    "concurrent commits in both databases advance their local versions"
+  ],
+  "limits": [
+    "Synthetic schema and cooperative triggers, two databases in one PostgreSQL cluster; no product writers, RLS, OIDC or deployment.",
+    "Does not prove completeness of writer instrumentation, cross-host network failures, durable results, cursor security or operational performance."
+  ]
+}

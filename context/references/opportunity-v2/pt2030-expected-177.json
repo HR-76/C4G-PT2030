@@ -1,0 +1,5693 @@
+{
+  "contractVersion": "opportunity-v2.0",
+  "sourceSha256": "f5d81e3a2fcf31fac5b4545a4e7625c9f0c22333f28cc301ad4b61a7845f5869",
+  "kind": "EXPECTED_FIELD_PROJECTION_NOT_A_RUNTIME_IMPORT",
+  "rows": [
+    {
+      "physicalRow": 3,
+      "externalId": "8485",
+      "sourceColumnsDigest": "cdef02241f480d9652074e045ccbd4e8453c94ebe73e0672fe2d3ebec203af71",
+      "title": "CONTRATOS DE IMPACTO SOCIAL",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "NORTE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "510000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 4,
+      "externalId": "8589",
+      "sourceColumnsDigest": "b613bb5a7b99243a4a6f81c18dd04c09654e3fbccfbc9c3af996ea65f92a72b8",
+      "title": "Gestão de resíduos urbanos — subinvestimentos em baixa (ITI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.6 - Economia circular",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "23501000",
+      "currency": null,
+      "plannedOpening": "2027-04-30",
+      "plannedClosing": "2027-12-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 5,
+      "externalId": "8598",
+      "sourceColumnsDigest": "c2e121ad13557c4f00ae29522679a54659e9116d65db67e045f5d7d15c5f6e4b",
+      "title": "CUA: Reutilização, resiliência, modernização e descarbonização",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.5 - Gestão sustentável da água",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "8997845",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 6,
+      "externalId": "8602",
+      "sourceColumnsDigest": "19456ecf38bb85b2526ca06f87793f43e8cf7f645f3cdb6470244b7af4239180",
+      "title": "Habitação a custos acessíveis na Região Alentejo - Prioridade 4H",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5350000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 7,
+      "externalId": "8603",
+      "sourceColumnsDigest": "5784f09983ce203ba4a750d701afb8dbe52a55b2053eed90d5e33f15666fe960",
+      "title": "Habitação social na Região Alentejo - Prioridade 4H",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5350000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 8,
+      "externalId": "8604",
+      "sourceColumnsDigest": "84863090629a4ecf3cfadc1071158c842fb85c8908f3ecb1e30603ded9141be5",
+      "title": "Casas de Função na Região Alentejo - Prioridade 4H",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "2300000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 9,
+      "externalId": "8605",
+      "sourceColumnsDigest": "1fa96556e2e6edac5821419961c49ca4ac1e5128458ae9ca49d78cb332b8e69a",
+      "title": "Alojamento para estudantes do ensino superior na Região Alentejo - Prioridade 4H",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "10000000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 10,
+      "externalId": "8607",
+      "sourceColumnsDigest": "f63de1a2bbb2353561e1ba2e4920f94b3e98b5d19ceede2546b4f22731490a8e",
+      "title": "Habitação a custos acessíveis na Região do  Alentejo Litoral- Prioridade 6H  (FTJ)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "JSO8.1 - Fundo para uma Transição Justa",
+      "fundLabels": [
+        "FTJ"
+      ],
+      "allocationAmount": "9300000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 11,
+      "externalId": "8502",
+      "sourceColumnsDigest": "7a78aad2e3cd5ded3d44379ed708a0887f725861af7a4fdf3558dfc401dc5905",
+      "title": "Infraestruturas de cuidados de saúde primários (IT)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO5.1 - Desenvolvimento integrado nas zonas urbanas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "652702",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 12,
+      "externalId": "8478",
+      "sourceColumnsDigest": "b1afb4252d375fdd75e70be3d7fee672d9a20ec5346551c45038e5dbb51603b6",
+      "title": "INFRAESTRUTURAS DO ENSINO BÁSICO E/OU SECUNDÁRIO (IT)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO5.1 - Desenvolvimento integrado nas zonas urbanas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "11393412",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 13,
+      "externalId": "8588",
+      "sourceColumnsDigest": "06f32f9feb36d7a27a757c456a4f0e828110e9c5845cb8b697708ffcc630e3c8",
+      "title": "Meios materiais para a proteção civil (ITI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "3581002",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 14,
+      "externalId": "8601",
+      "sourceColumnsDigest": "809f1d7c62feeb5dc8c53851ae2497f358325f46849d1f6080a58eef95a70076",
+      "title": "Habitação a custos acessíveis na Região Alentejo - Prioridade 5H",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO5.3 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "13800000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 15,
+      "externalId": "8531",
+      "sourceColumnsDigest": "314cbebad56c7a3b75f9e5f8d564cafdc1c725eecb5097539e24c21fe7a459b5",
+      "title": "Promoção do autoconsumo e comunidades de energia renovável",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.2 - Energia renovável",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 16,
+      "externalId": "8579",
+      "sourceColumnsDigest": "1f4186068bef3f8dd3b2d872acc9576305e673f16e851b8a91f93bf6d63c395e",
+      "title": "Mobilidade a Pedido ITI",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO5.1 - Desenvolvimento integrado nas zonas urbanas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "362234",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 17,
+      "externalId": "8583",
+      "sourceColumnsDigest": "a2d429a9411111295a3644d508cb16333f199c4012763595d243daf790cd4277",
+      "title": "Eficiência Energética na Administração Pública Local – ITI CIM",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "18181527.09",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 18,
+      "externalId": "8614",
+      "sourceColumnsDigest": "82f5007024eabd5b20114e65a2e4f4cf0a4a190253fb601a7d94ee6461bdafb0",
+      "title": "SICE - Internacionalização das PME - Operações em conjunto",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030",
+        "COMPETE2030",
+        "LISBOA2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "51000000",
+      "currency": null,
+      "plannedOpening": "2027-01-04",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Conjunto"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 19,
+      "externalId": "8592",
+      "sourceColumnsDigest": "b98b2df855511a9706de74e4fe5d5f7b19cff9841e2d1c4142ca7fa9c27c7dae",
+      "title": "Ciclo urbano da água em baixa  (ITI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.5 - Gestão sustentável da água",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "36540000",
+      "currency": null,
+      "plannedOpening": "2027-04-01",
+      "plannedClosing": "2027-12-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 20,
+      "externalId": "8501",
+      "sourceColumnsDigest": "b289f02de69427c85a6dcac36d069504dc41cb1d3badcee9bf587f614ca67c68",
+      "title": "CONTRATOS DE IMPACTO SOCIAL",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "CENTRO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "425000",
+      "currency": null,
+      "plannedOpening": "2026-10-19",
+      "plannedClosing": "2027-12-20",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Centro"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 21,
+      "externalId": "8477",
+      "sourceColumnsDigest": "1bb76b23982fd54bd56f06f4509ae967c6109f52b8644c800a07e56e9623afec",
+      "title": "CONTRATOS DE IMPACTO SOCIAL",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "120000",
+      "currency": null,
+      "plannedOpening": "2026-09-15",
+      "plannedClosing": "2027-12-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 22,
+      "externalId": "8479",
+      "sourceColumnsDigest": "6926742d93f6cc66a5a98787995fc9e5254b686266956cbf339fec09530fdab9",
+      "title": "CONTRATOS DE IMPACTO SOCIAL",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "300000",
+      "currency": null,
+      "plannedOpening": "2026-09-15",
+      "plannedClosing": "2027-12-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 23,
+      "externalId": "8664",
+      "sourceColumnsDigest": "1a621e6df69296f3489a69dc3dac01edb6ebc2157114b1b3bf75378321c1ec3d",
+      "title": "SICE - Inovação Produtiva - Regime Contratual de Investimento",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "0",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 24,
+      "externalId": "8484",
+      "sourceColumnsDigest": "1b82322c9884c9224881a07d60d989ef108aa6aae9b6feae2482318e08ba66bd",
+      "title": "Melhoria das condições de navegabilidade do Porto de Aveiro",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "21358759",
+      "currency": null,
+      "plannedOpening": "2027-05-01",
+      "plannedClosing": "2027-10-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "Centro"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 25,
+      "externalId": "8537",
+      "sourceColumnsDigest": "e8219c452482e239ac5bbd4debcb958ccf622cd356b161b577494ee0d54e7c07",
+      "title": "Tratamento em Estações de Tratamento de Águas Residuais (ETAR) para produção de Água para Reutilização (ApR)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.5 - Gestão sustentável da água",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "30000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-09-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 26,
+      "externalId": "8578",
+      "sourceColumnsDigest": "7ab010f74a39f1c348a2400547ff09ae8cb176c1e7dafed084375b288636180f",
+      "title": "Áreas de Acolhimento Empresarial de base não tecnológica (AAE) - soluções de autoprodução coletiva de energia",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO2.2 - Energia renovável",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5700000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-09-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 27,
+      "externalId": "8576",
+      "sourceColumnsDigest": "896767e25b0fdb940c1fc49787e7fa18a9e14ec1c433f573e29328e4e538cd3b",
+      "title": "Infraestruturas do pré-escolar (ITI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO5.1 - Desenvolvimento integrado nas zonas urbanas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1890759.5",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-09-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 28,
+      "externalId": "8595",
+      "sourceColumnsDigest": "ec2f520a1c43d85105324207ee6fa4790a8433230407dc0f14266373bddb9031",
+      "title": "Meios materiais para a proteção civil e gestão integrada de riscos– CIM – AMAL.",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "9000000",
+      "currency": null,
+      "plannedOpening": "2026-12-14",
+      "plannedClosing": "2027-09-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 29,
+      "externalId": "8599",
+      "sourceColumnsDigest": "f8fb6514c936d9f08fb3ab7b9910377017b1b35775fbf3640dadc56eaf6617ec",
+      "title": "Assistência Técnica FTJ - Alentejo",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FTJ"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2027-07-02",
+      "plannedClosing": "2027-09-03",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 30,
+      "externalId": "8456",
+      "sourceColumnsDigest": "e3da236c8b13781d8ed6be19fa1f94ab84ae991ef1bbddd142c43e7ee56b1a80",
+      "title": "Respostas de saúde primárias e hospitalares",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO4.5 - Acesso aos cuidados de saúde",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "37000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 31,
+      "externalId": "8539",
+      "sourceColumnsDigest": "00ebc3dfc783a1f279ea80f006a6ea235a1f208b893a7a8b9b9eddf4b269f3a3",
+      "title": "Intervenções e aquisição de equipamentos nas Infraestruturas aeroportuárias da RAA",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "5881575",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 32,
+      "externalId": "8509",
+      "sourceColumnsDigest": "4a1f737b3980c743f7c36d40d65a62942d24c3f7d7367784b9ebcc78a1ecfeab",
+      "title": "Ampliação e modernização do Aeroporto das Lajes",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "42500000",
+      "currency": null,
+      "plannedOpening": "2027-02-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 33,
+      "externalId": "8558",
+      "sourceColumnsDigest": "4ca63926999147c45d6566ac646b50759c34c72e539d343163a3475de9d38478",
+      "title": "Transparência Salarial 2.0",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.3 - Participação equilibrada de homens e mulheres no mercado de trabalho",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1200000",
+      "currency": null,
+      "plannedOpening": "2027-05-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 34,
+      "externalId": "8516",
+      "sourceColumnsDigest": "839572bcb58a26813adc339c61c095cd277b17b5373136fa1461f72c7f2c02f5",
+      "title": "Formação de Públicos Estratégicos na área do combate à xenofobia e discriminação",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2000000",
+      "currency": null,
+      "plannedOpening": "2027-05-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 35,
+      "externalId": "8656",
+      "sourceColumnsDigest": "809e6b2d3c3fe33ae8db9aef0c272fe34b9fa3460786537322a033cb3f32c8c8",
+      "title": "Cursos de Especialização Tecnológica (CET) - 3º Aviso",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3000000",
+      "currency": null,
+      "plannedOpening": "2027-06-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 36,
+      "externalId": "8657",
+      "sourceColumnsDigest": "a34cb63d0519e5facadf7d9f4c94369192f15ced1d1db70debe38ed0cfdd3292",
+      "title": "Cursos Profissionais  - 3º Aviso",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "25000000",
+      "currency": null,
+      "plannedOpening": "2027-06-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 37,
+      "externalId": "8658",
+      "sourceColumnsDigest": "bb0dcfe52b5e2c6042dcc25bd5320164773b6ecd8816db8dec066a710598f5ba",
+      "title": "Cursos Dual - 2º Aviso",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3000000",
+      "currency": null,
+      "plannedOpening": "2027-06-01",
+      "plannedClosing": "2027-08-31",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 38,
+      "externalId": "8462",
+      "sourceColumnsDigest": "4a1bdc016c5e593545ca43ba05079316aab9ee52967f7ded7623f99b6d2be483",
+      "title": "Proteção civil e gestão integrada de riscos - 3º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "4525400",
+      "currency": null,
+      "plannedOpening": "2027-02-01",
+      "plannedClosing": "2027-07-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 39,
+      "externalId": "8610",
+      "sourceColumnsDigest": "5a84f6bb60364e62a92cac48743a96936f9ecfeb8316ac9d6f70f7568ec00ca8",
+      "title": "SIQRH - Formação Ação",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "60000000",
+      "currency": null,
+      "plannedOpening": "2027-05-03",
+      "plannedClosing": "2027-07-30",
+      "planningPeriodLabel": "Q3",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Conjunto",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 40,
+      "externalId": "8606",
+      "sourceColumnsDigest": "cab845e1b29d5059d0b24f17e47433d0a133c6fe6f06d357fc79f394ef188de5",
+      "title": "Contratação de Recursos Humanos Altamente Qualificados por empresas (micro, pequenas e médias)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1500000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-06-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 41,
+      "externalId": "8533",
+      "sourceColumnsDigest": "c3c990dbaf7dc69201b3904f7db2e9fc37cb76421dc05733c96572bc6e03e72a",
+      "title": "Aquisição de equipamentos e intervenção em Infraestruturas portuárias da RAA - 3º aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "53284760.9",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-06-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 42,
+      "externalId": "8654",
+      "sourceColumnsDigest": "5dab60ab048e31d6df0b0a72fd00b0c0566ca0a6240638f3da58f1c69c618794",
+      "title": "Ações de promoção do destino Açores - 4º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1700000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-06-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 43,
+      "externalId": "8535",
+      "sourceColumnsDigest": "589202fc8575b548184735bb2e74f2e708043cbee0869ab2a2c334d7dd2709ec",
+      "title": "Inquéritos de mobilidade nas Áreas Metropolitana de Lisboa e do Porto",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.8 - Mobilidade urbana sustentável",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-06-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "AML",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 44,
+      "externalId": "8640",
+      "sourceColumnsDigest": "76a8a663df7732da05eeb51149a41d064c1db527ee2a93d1588aaefb74542e8a",
+      "title": "Estimulo às provas de conceito empresariais",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "450000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-05-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 45,
+      "externalId": "8497",
+      "sourceColumnsDigest": "e411210a7cc0719736e6a558037bc2e07d83feeecb9c510df036b27be415bd41",
+      "title": "Sistema de Incentivos de Base Territorial – EEC PROVERE.",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "CENTRO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "10000000",
+      "currency": null,
+      "plannedOpening": "2026-11-02",
+      "plannedClosing": "2027-05-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Centro"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 46,
+      "externalId": "8483",
+      "sourceColumnsDigest": "a034d9dc845fa088d1db761d76f8a465bdf4ca626c55ea9327f5afb183f37163",
+      "title": "Medidas de adaptação às alterações Climáticas",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "11700000",
+      "currency": null,
+      "plannedOpening": "2027-02-01",
+      "plannedClosing": "2027-05-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 47,
+      "externalId": "8457",
+      "sourceColumnsDigest": "e3dd1d98ce8ff9805a02bd3fb1b641e8219a05352472d003b5161febf9dd8c97",
+      "title": "Estratégias de I&D para Cadeias de Valor",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "900000",
+      "currency": null,
+      "plannedOpening": "2027-02-02",
+      "plannedClosing": "2027-05-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 48,
+      "externalId": "8552",
+      "sourceColumnsDigest": "a0320c79baf6d60dac3101eb2fbfc359e8f0118601cf61611d7fe8cb80c27318",
+      "title": "Apoio à Compensação dos Custos Suplementares para os Produtos da Pesca e da Aquicultura na Região Autónoma da Madeira - Ano 2026",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MAR2030"
+      ],
+      "specificObjectiveRaw": "FSO1.5 - Condições equitativas para as regiões ultraperiféricas - produtos de pesca e aquicultura",
+      "fundLabels": [
+        "FEAMPA"
+      ],
+      "allocationAmount": "3000000",
+      "currency": null,
+      "plannedOpening": "2027-04-01",
+      "plannedClosing": "2027-05-28",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 49,
+      "externalId": "8496",
+      "sourceColumnsDigest": "e051197860409c4e8e68fcf9f48241ace5688a76770961a7d94e01374f990271",
+      "title": "Economia Circular",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.6 - Economia circular",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "935000",
+      "currency": null,
+      "plannedOpening": "2026-11-02",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 50,
+      "externalId": "8526",
+      "sourceColumnsDigest": "df115a037694d851111bae7b395f8d44caaf5adc17e683c15f1af0d7ce1ae7fb",
+      "title": "Formação Avançada",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "40000000",
+      "currency": null,
+      "plannedOpening": "2026-12-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 51,
+      "externalId": "8528",
+      "sourceColumnsDigest": "875a2b35faec7937ded7b140e0ed01609401dd493ed3db8d12fbc47cd9e38f60",
+      "title": "Apoios à Contratação",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.1 - Acesso ao emprego e medidas de ativação para todos",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "68000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 52,
+      "externalId": "8460",
+      "sourceColumnsDigest": "b206feab0528484906cda1732471f1d5826901a6ae1dd9d685db9da9f1e7d6aa",
+      "title": "Serviços e apoios reforçados à conciliação entre trabalho e vida familiar - Conciliação setor privado",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.3 - Participação equilibrada de homens e mulheres no mercado de trabalho",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "6000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 53,
+      "externalId": "8527",
+      "sourceColumnsDigest": "6c5944d16e9de0de02d1f64d7e9e6a225a5ff4d0db0e9c96da2a7fa4906b6b55",
+      "title": "Estágios Profissionais",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.1 - Acesso ao emprego e medidas de ativação para todos",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "144500000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 54,
+      "externalId": "8544",
+      "sourceColumnsDigest": "3eb04f049d73c6e37dae706d9d2693816c2f74a94422309fa1c1ee035a962641",
+      "title": "Programa Mais - Medidas de ativação e inclusão social",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "30500000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 55,
+      "externalId": "8503",
+      "sourceColumnsDigest": "6e2e78b9667ef5fab02a6f9a8d1112bca1513e5767fad959acc009c4a4da26c3",
+      "title": "Capacitação dos Parceiros da Comissão Permanente de Concertação Social (CPCS)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.1 - Acesso ao emprego e medidas de ativação para todos",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2594116",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 56,
+      "externalId": "8609",
+      "sourceColumnsDigest": "b0c475a10605d5c439a2c2003f4da4ea97c271ee83bbe324eb901b2a48acb6a9",
+      "title": "Programa Escolhas (2027/2029)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "13300000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 57,
+      "externalId": "8505",
+      "sourceColumnsDigest": "d1c90f30e7eb74badcd881093018212b98f9b7e9da3b929823b67927b746e210",
+      "title": "Apoio ao emprego de pessoas com deficiência e ou incapacidade",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "10735492",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 58,
+      "externalId": "8504",
+      "sourceColumnsDigest": "a32eeea133cfb0e34423f6c909be9f91f7892e9ace7878bd93e6a171e0d80ff5",
+      "title": "Cursos de Especialização Tecnológica (CET)",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "26000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 59,
+      "externalId": "8557",
+      "sourceColumnsDigest": "ef8c78ab7477454f0d53fec97f6d0c381a1d6dba81601d7863626b3fa4d6e2cc",
+      "title": "Gabinetes de Inserção Profissional",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.1 - Acesso ao emprego e medidas de ativação para todos",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "6375000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 60,
+      "externalId": "8541",
+      "sourceColumnsDigest": "0d0fac112899ac4782f9dc2db0aff1deba11e31184e97241deb7247151c1d076",
+      "title": "Formações modulares certificadas",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "115000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "CIF",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 61,
+      "externalId": "8499",
+      "sourceColumnsDigest": "3aac6f1ba206977216d39480f6330503370641e356bad9529e74af930a86a6d7",
+      "title": "Inserção Socioprofissional da Comunidade Cigana",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 62,
+      "externalId": "8513",
+      "sourceColumnsDigest": "ae9197b3bc24707140e07ed835033c9f53a2ce0578927dce50bda60efe5729db",
+      "title": "Vida Ativa Emprego Qualificado",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "42842927.4",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 63,
+      "externalId": "8470",
+      "sourceColumnsDigest": "59e779889befe86426dfc75fbbdc1cda7be2e9817eb1fc2641c03c25843169e4",
+      "title": "Centros Nacionais de Apoio à Integração de Migrantes (CNAIM) - Mediação nas lojas AIMA",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3500000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 64,
+      "externalId": "8561",
+      "sourceColumnsDigest": "720c5824f8c3eee25c138610e3ec8fb9c00f2d6b04d8ac18af6b4ae8d3721bb3",
+      "title": "Cursos de Aprendizagem",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "90000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 65,
+      "externalId": "8495",
+      "sourceColumnsDigest": "6161cee3cf6e35ce65b49eb9dd2092ce8debcc64af47da276649c926ea843656",
+      "title": "Infraestrutura Portuária (RTE) – Porto de  Sines - Implementação de Sistema de Pré-Gate para o Terminal de Contentores",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "9350000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 66,
+      "externalId": "8530",
+      "sourceColumnsDigest": "84a7275d7b4562243e7bece3061a19dbe0ff798af209e215f9d9820a38e5fbe6",
+      "title": "Gestão de Resíduos Urbanos - ações imateriais",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.6 - Economia circular",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "8000000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 67,
+      "externalId": "8475",
+      "sourceColumnsDigest": "437c5e48d894fca7805a4e77eb08dbacf6656206b6be42e3e2ed628fc1df071d",
+      "title": "Proteção  Civil e gestão integrada de riscos -prevenção ou mitigação dos riscos de derrocada de taludes-3º aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "15500000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 68,
+      "externalId": "8577",
+      "sourceColumnsDigest": "c2676a240a205152f4c66e2faa1b10f803d6692329c795bfee8f0cf09c3dbc70",
+      "title": "Apoio a Infraestruturas de Base Tecnológica – Regulamento STEP",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "CENTRO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.6 - Desenvolvimento ou fabrico de tecnologias críticas",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2027-01-31",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Centro"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 69,
+      "externalId": "8600",
+      "sourceColumnsDigest": "330304bed07dc727390f6f66e3e1168fce4bc2b4810c0ff7dbe8bc6f705fb3ed",
+      "title": "Apoio ao Empreendedorismo (FTJ)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "JSO8.1 - Fundo para uma Transição Justa",
+      "fundLabels": [
+        "FTJ"
+      ],
+      "allocationAmount": "900000",
+      "currency": null,
+      "plannedOpening": "2027-02-05",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 70,
+      "externalId": "8655",
+      "sourceColumnsDigest": "4e4a14c6b8b2fe19d94975892cb09543a5b731359c1bf41aacd4d4b82d491650",
+      "title": "Formação Modular/Ativos - 3º Aviso",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2027-03-01",
+      "plannedClosing": "2027-04-30",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 71,
+      "externalId": "8524",
+      "sourceColumnsDigest": "2cbddb5514dfb2dd3d3277e5dd6f54d5848e33f5d764df78982175d069035ec7",
+      "title": "Infraestrutura Ferroviária (RTE) - Programa de sinalização e implementação do ERTMS",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "65890000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 72,
+      "externalId": "8641",
+      "sourceColumnsDigest": "e5833e6baada610f08e1c12a0f5efa2bae9ecd26b7e8a7de93eb7e7e392904a0",
+      "title": "Vale Internacionalização I&D",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "100000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 73,
+      "externalId": "8647",
+      "sourceColumnsDigest": "86eca54d980d04b798f8bb78c34b8b38a3d234f588ce5c4526530fd006a3b7de",
+      "title": "COPE Famílias - Combate à Pobreza Energética",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "3750000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 74,
+      "externalId": "8648",
+      "sourceColumnsDigest": "ce7db2e5eda7e5e57c4f992fae9025cbbdd0136c10acea7ea7862ac6ebd9ede2",
+      "title": "COPE Empresas - Combate à Pobreza Energética",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1875000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 75,
+      "externalId": "8649",
+      "sourceColumnsDigest": "c7e6279828bd3dbff7cd517b9d02d253d41402d08cfc1a586434b9eafc6bbe7f",
+      "title": "COPE IPSS - Combate à Pobreza Energética",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1875000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 76,
+      "externalId": "8650",
+      "sourceColumnsDigest": "82dad2ed236f195530f44b74c0ffa896253b4897a03727c25b12fcd5db1e4dd8",
+      "title": "SIERA - Sistemas Energéticos Inteligentes e Integração de Armazenamento em Rede",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO2.3 - Sistemas energéticos inteligentes",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "7500000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 77,
+      "externalId": "8468",
+      "sourceColumnsDigest": "2f6247c45ee1be66fc8a848f9a17316ca6f3199ff9f4ab4b752967adc02e2c20",
+      "title": "Vale Spin-off",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "100000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 78,
+      "externalId": "8638",
+      "sourceColumnsDigest": "340935747234f970c437d05ab6dba4a8cdec3b5ad943a7031b13eb14e7753866",
+      "title": "Vale Inovação",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "100000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 79,
+      "externalId": "8543",
+      "sourceColumnsDigest": "6b11c40154feea952572b4e69ff4e1ae7b5f64ad9c29220a200fba4ab8fc4b08",
+      "title": "Vale Direitos de Propriedade Intelectual e Industrial",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "100000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 80,
+      "externalId": "8518",
+      "sourceColumnsDigest": "a3ff88e74b520f4c44e3d02b6adc73303da0ea23d102a36a25d8dd75205f4e6b",
+      "title": "Vale Certificação em I&D",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "100000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 81,
+      "externalId": "8597",
+      "sourceColumnsDigest": "90449591407c79db813c718fd687f1c4f1078149573dbad0ff48f23b93672637",
+      "title": "Renovação e requalificação de infraestruturas existentes afetadas por eventos extremos associados às alterações climáticas",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "4700000",
+      "currency": null,
+      "plannedOpening": "2027-01-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 82,
+      "externalId": "8613",
+      "sourceColumnsDigest": "698cb02736f07f405c70301362f2351e3ef03d5ed3243d62a1440d24f412a1a3",
+      "title": "SIAC - Internacionalização",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "30000000",
+      "currency": null,
+      "plannedOpening": "2027-01-04",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 83,
+      "externalId": "8617",
+      "sourceColumnsDigest": "41c9d72a6a56eb16b596b860f0772b82eae5c1a99d7e449e0ab33104b806f23f",
+      "title": "Formação de executivos",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "20000000",
+      "currency": null,
+      "plannedOpening": "2027-01-04",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Conjunto"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 84,
+      "externalId": "8474",
+      "sourceColumnsDigest": "e95e6f379cbea4e461d5713abe39377f94a27a5dd5c1dba357c11f63d127dabc",
+      "title": "Estágios Profissionais - 3º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.1 - Acesso ao emprego e medidas de ativação para todos",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "15000000",
+      "currency": null,
+      "plannedOpening": "2027-02-01",
+      "plannedClosing": "2027-03-31",
+      "planningPeriodLabel": "Q2",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 85,
+      "externalId": "7929",
+      "sourceColumnsDigest": "599a415ca38c914da14a6f433039a7a5dc066a06263e425c1da412ab77c61193",
+      "title": "Contratação de Recursos Humanos Altamente Qualificados por PME - Territórios de Baixa Densidade",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2125000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2027-03-22",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 86,
+      "externalId": "8652",
+      "sourceColumnsDigest": "9ac80aeab7274c817d0680489b8f88c97bf9df2ca0bf5582d51ee6839bce1345",
+      "title": "Ensino Pré-Escolar, Básico e Secundário - Administração Pública Regional",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO4.2 - Infraestruturas de educação e formação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "17000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-02-28",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 87,
+      "externalId": "8644",
+      "sourceColumnsDigest": "60fca48de3a18f8db57eefaecba5c8397d855beb062f8d1ce04346cdb7fad28e",
+      "title": "Digitalização na Administração Pública",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.2 - Colher os benefícios da digitalização",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "6500000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 88,
+      "externalId": "8651",
+      "sourceColumnsDigest": "23db53f73edf030bd316484af6773bd7bca12090e44c87d4c2580d26dd3e1405",
+      "title": "Ensino Pré-Escolar, Básico e Secundário - Administração Pública Local",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO4.2 - Infraestruturas de educação e formação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 89,
+      "externalId": "8542",
+      "sourceColumnsDigest": "57bb669a9d6b8262ec508b9fc43226a357a7dbd9e3faaded9f27919e5ab7dbde",
+      "title": "Participação individual na formação (FTJ)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "JSO8.1 - Fundo para uma Transição Justa",
+      "fundLabels": [
+        "FTJ"
+      ],
+      "allocationAmount": "300000",
+      "currency": null,
+      "plannedOpening": "2026-10-02",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 90,
+      "externalId": "8489",
+      "sourceColumnsDigest": "03341a1ee2c7e3fb90758c3ac39d2dc088dcff981daff2e36f02b806ec90e9da",
+      "title": "SIAC - Descarbonização",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 91,
+      "externalId": "8490",
+      "sourceColumnsDigest": "4ffc2bdbbe5281b82ac629ad95ce124b799e6a0c30d7d4015e5b2271be5ea35e",
+      "title": "SIAC - Transferência do conhecimento científico e tecnológico",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 92,
+      "externalId": "8519",
+      "sourceColumnsDigest": "63c4ae632415674939086277d582890b883d6f4663f3c2608bf6291489f9a0d0",
+      "title": "Núcleos de I&DT em ambiente empresarial",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2026-11-02",
+      "plannedClosing": "2027-02-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 93,
+      "externalId": "7993",
+      "sourceColumnsDigest": "26772c92b52b5acf441c8b2b870402676e0b7c56cb1791dc873369633fef4e32",
+      "title": "Contratação de Recursos Humanos Altamente Qualificados por PME - Outros Territórios",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1400000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2027-02-22",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 94,
+      "externalId": "8570",
+      "sourceColumnsDigest": "363c77b11fd7df9b3e534fc728a9ef7a860de367e7c678ce20d10a820b4b2a48",
+      "title": "SIID - Empreendedorismo Qualificado e Associado ao Conhecimento - Criação de novas empresas e novos negócios (SI)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "2000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-02-12",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 95,
+      "externalId": "8581",
+      "sourceColumnsDigest": "f291ee1c99c9b96b00c4e36d6d1474a4e643daf05f5d9c9b7e48e51ccb61a4b6",
+      "title": "Planos Intermunicipais de Promoção do Sucesso Escolar - CIMLT",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1200000",
+      "currency": null,
+      "plannedOpening": "2026-11-04",
+      "plannedClosing": "2027-02-04",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 96,
+      "externalId": "8511",
+      "sourceColumnsDigest": "c8daaaf68744dc32ff0ab68a29ad7fcea9bf1b968575ff9a329669cea6889777",
+      "title": "Funcionamento de CIT multifunções e espaços equiparados",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "FAMI2030"
+      ],
+      "specificObjectiveRaw": "HSO9.3 - Voltar",
+      "fundLabels": [
+        "FAMI"
+      ],
+      "allocationAmount": "5895000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-01-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte",
+        "RAA",
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 97,
+      "externalId": "8585",
+      "sourceColumnsDigest": "4d2957bcdac3c76139b8ee4d1e35fa8b34db41a25e5364e1e42fbb1320cea0e8",
+      "title": "Proteção e defesa do litoral - ações imateriais - 3º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "4700000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2027-01-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 98,
+      "externalId": "8569",
+      "sourceColumnsDigest": "3350c545f03c4909857a6b51ca9dc164bec477feae464e35acc0e656d44b6777",
+      "title": "SIID - Núcleos de I&DT (SI)",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-01-29",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 99,
+      "externalId": "8661",
+      "sourceColumnsDigest": "ef980e451d890985289ec7a0b49726355121170f1554e3da92321e23da829aa2",
+      "title": "Investimento Empresarial Produtivo (SI) - Defesa",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.7 - Capacidades industriais de defesa",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "25000000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2027-01-29",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 100,
+      "externalId": "8487",
+      "sourceColumnsDigest": "4911070ebc0d38beaba43d963557e86503354174d40a19aac9f73ec48910dea9",
+      "title": "SIAC - Qualificação",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-01-29",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 101,
+      "externalId": "8500",
+      "sourceColumnsDigest": "2451e418edc4d2a1a9d321ee3c74cbc034ac981c78f48d883c23e61ca9bf8b78",
+      "title": "Modelo de Apoio à Vida Independente (MAVI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2400000",
+      "currency": null,
+      "plannedOpening": "2026-11-30",
+      "plannedClosing": "2027-01-29",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 102,
+      "externalId": "8571",
+      "sourceColumnsDigest": "e91da742152ad80eb5dbf4f3e1dbbc29648ae21550398d221c8640c78b670d37",
+      "title": "Assistência Técnica NORTE2030 – 2027 – Autoridade de Gestão",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "NORTE2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "6700000",
+      "currency": null,
+      "plannedOpening": "2026-12-02",
+      "plannedClosing": "2027-01-29",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 103,
+      "externalId": "8467",
+      "sourceColumnsDigest": "a0e14e2d6b22db98043f287e0b75667845b12ee4a2b63b5b91443a44d9e4db5d",
+      "title": "Economia circular (SI)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO2.6 - Economia circular",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2026-09-07",
+      "plannedClosing": "2027-01-25",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 104,
+      "externalId": "8580",
+      "sourceColumnsDigest": "e5259fb31aaa343100dbabe9491e1350538d6babf720e6762a800355793b7729",
+      "title": "CURSOS TÉCNICOS SUPERIORES PROFISSIONAIS (TeSP)  – Ciclo Formativo 2026/2028 - Instituições Públicas\nInvestimento em competências para a descarbonização",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3500000",
+      "currency": null,
+      "plannedOpening": "2026-10-20",
+      "plannedClosing": "2027-01-20",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 105,
+      "externalId": "8553",
+      "sourceColumnsDigest": "2d52f4ccc4cac74b83779fc09679ac0b5a57c8d42423ea2b6085f5947e7ce870",
+      "title": "CURSOS TÉCNICOS SUPERIORES PROFISSIONAIS (TeSP)  – Ciclo Formativo 2026/2028 - Instituições Privadas",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-10-16",
+      "plannedClosing": "2027-01-18",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 106,
+      "externalId": "8506",
+      "sourceColumnsDigest": "542354483d57b4a28a2e692c34a11d75aae9f4f3040981f7bc29d4a88395a2ad",
+      "title": "Valorização economica do conhecimento nas empresas",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "2578000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-01-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 107,
+      "externalId": "8639",
+      "sourceColumnsDigest": "2ddb00367e2153ac28325491b31c3033e078c683ed3322e7e960aac58195c586",
+      "title": "I&DT centrado na economia hipocarbónica, na resiliência e adaptação às alterações climáticas",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "6500000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2027-01-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 108,
+      "externalId": "8488",
+      "sourceColumnsDigest": "2296ba966467ad5f3189a6af13ff22b91ba1cdfd91f09ac5c4bf46b2c65805a8",
+      "title": "SIAC-Empreendedorismo Qualificado associado ao conhecimento",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2027-01-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 109,
+      "externalId": "8556",
+      "sourceColumnsDigest": "0a1968064c87ab88d79b2304a2265dd1a5ce3913e8174e3913d7b2344758a2cf",
+      "title": "Execução da EDL do GALCOSTEIRO da RAM",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MAR2030"
+      ],
+      "specificObjectiveRaw": "FSO3.1 - Desenvolvimento sustentável das comunidades piscatórias",
+      "fundLabels": [
+        "FEAMPA"
+      ],
+      "allocationAmount": "745468.41",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 110,
+      "externalId": "8515",
+      "sourceColumnsDigest": "c9a40cfa0baa4f7097453a9853dba006e5547dbe331a4ebd4d10ee4e11a08aab",
+      "title": "Infraestrutura Portuária (RTE) – Porto de Leixões  - 4.º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO3.1 - RTE-T sustentáveis",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "7197800",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 111,
+      "externalId": "8514",
+      "sourceColumnsDigest": "b04ad9879af527d76e111c4e04d98e2ade21f19ca83836f1a1fca2997ea49325",
+      "title": "SIID - I&D Empresarial - Operações Individuais e em Copromoção",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030",
+        "ALGARVE2030",
+        "CENTRO2030",
+        "COMPETE2030",
+        "LISBOA2030",
+        "NORTE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "40000000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 112,
+      "externalId": "8566",
+      "sourceColumnsDigest": "444f19d2cfd9908467eef3f17d2bc05b06ade594e3793aaf85216b23975a42c2",
+      "title": "Migração laboral",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "FAMI2030"
+      ],
+      "specificObjectiveRaw": "HSO9.2 - Migração legal e integração",
+      "fundLabels": [
+        "FAMI"
+      ],
+      "allocationAmount": "3115652.51",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Extra-Regio NUTS II",
+        "Norte",
+        "RAA",
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 113,
+      "externalId": "8671",
+      "sourceColumnsDigest": "af7a53cd6ba40de208d4c31502312f31b469f4f285e3e19fe9c4673d5d7cd87a",
+      "title": "Assistência Técnica NORTE2030 2027/2028 - OI Sistema de Incentivos",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "NORTE2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "700000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 114,
+      "externalId": "8584",
+      "sourceColumnsDigest": "b2e45bd060ebf5b8cb21145d01f9a15ba5c15a93b6177561d41bf9fb011307f9",
+      "title": "Centros especializados em qualificação de adultos e processos de RVCC (Centros Qualifica)",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "60000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 115,
+      "externalId": "8536",
+      "sourceColumnsDigest": "07c1c3f6964762b61a0103b8f6885d694ec989983eab701cc3cb11e3a59122ad",
+      "title": "Reformulação da Estação de Transferência da Zona Leste e de Triagem da Madeira (ETZL/ET)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.6 - Economia circular",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "12000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 116,
+      "externalId": "8532",
+      "sourceColumnsDigest": "e1c3bdc40e0a8874b6a6b8967e363ba8c9223710fd3a02f776ff1e154bbed62b",
+      "title": "Assistência Técnica - Organismo Intermédio da Região Autónoma da Madeira (2027 - 2030)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "3000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 117,
+      "externalId": "8481",
+      "sourceColumnsDigest": "8a4a5df3ae1261bd7ea8135730bcd0fd4e7d004671edcc68f1dd06539a6f6ee2",
+      "title": "Medidas de adaptação às alterações Climáticas",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "20000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 118,
+      "externalId": "8529",
+      "sourceColumnsDigest": "d37bbbdec14b0310ab62e5c10ee76e8316b4907ad0d06d8fa22d0af56f536e2f",
+      "title": "Serviços de Psicologia e Orientação",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "7500000",
+      "currency": null,
+      "plannedOpening": "2026-11-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 119,
+      "externalId": "8458",
+      "sourceColumnsDigest": "2cc442d273acdd2551fc63c856c8797eb55afcd5cca1bb530e6cc108463a1482",
+      "title": "Promoção da igualdade remuneratória - Certificação NP 4588",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.3 - Participação equilibrada de homens e mulheres no mercado de trabalho",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3300000",
+      "currency": null,
+      "plannedOpening": "2026-11-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 120,
+      "externalId": "8559",
+      "sourceColumnsDigest": "aef3ef00775165d935e40299af6dc6368e5ac74f941753f1b926bcb2c39ac0ff",
+      "title": "Serviços e apoios reforçados à conciliação entre trabalho e vida familiar - Igualdade na prestação de cuidados",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.3 - Participação equilibrada de homens e mulheres no mercado de trabalho",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1500000",
+      "currency": null,
+      "plannedOpening": "2026-11-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 121,
+      "externalId": "8517",
+      "sourceColumnsDigest": "81bcc076510f672bb6590f82fd6c0f1bc77739a9b60a03f3442cc753f6e045f6",
+      "title": "Sistema de Incentivos de Base Territorial - RAM",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-11-30",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 122,
+      "externalId": "8459",
+      "sourceColumnsDigest": "d5a85ac281dd8a0a09b2c22f09f51013902e0f91d6a173d7df56613350e4ba82",
+      "title": "Serviços e apoios reforçados à conciliação entre trabalho e vida familiar - Conciliação na AP",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PESSOAS2030"
+      ],
+      "specificObjectiveRaw": "ESO4.3 - Participação equilibrada de homens e mulheres no mercado de trabalho",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "4000000",
+      "currency": null,
+      "plannedOpening": "2026-12-01",
+      "plannedClosing": "2026-12-31",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 123,
+      "externalId": "8623",
+      "sourceColumnsDigest": "747a228975af9e88a7eb7af4b559e13fc1b02cad189a5b4bee9e6adbe16b1402",
+      "title": "SIQRH - Formação Empresarial - Clusters - Operações em conjunto",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "25000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Conjunto"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 124,
+      "externalId": "8666",
+      "sourceColumnsDigest": "86cfe05db744ed17edb093f17480f61dd817d9ecb91ae6c1d9a0c0e312b36e6b",
+      "title": "SIQRH - Formação Empresarial - Operações em conjunto (STEP)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "20000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Conjunto"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 125,
+      "externalId": "8612",
+      "sourceColumnsDigest": "6459d012bd8427958967e3cc09c5c11ab0e970c162d615c576d50a3cd57ff34e",
+      "title": "Capacitação para criação do próprio emprego",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "10000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 126,
+      "externalId": "8625",
+      "sourceColumnsDigest": "e2789eec687d8bfab1e2faba837c7943a0aaa08e1521db9cfbdcddcc2878148b",
+      "title": "SIQRH - Formação Empresarial - Clusters - Operações individuais",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "25000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 127,
+      "externalId": "8665",
+      "sourceColumnsDigest": "24bb7749861ce74c2bf201eb0cdaa6737c39389536679288e6c51380b0de0dfc",
+      "title": "SIQRH - Formação Empresarial - Operações individuais (STEP)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "20000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 128,
+      "externalId": "8632",
+      "sourceColumnsDigest": "ebb584fbff836b4b0190af07832d6cd94db307f8ca4e335a96db19b4ab4fe181",
+      "title": "Execução da EDL do GAL Litoral Rural - Náutica de recreio (Aquisição/ construção/ instalação de infraestruturas e equipamentos de apoio à prática de atividades náuticas ao longo da orla costeira)",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MAR2030"
+      ],
+      "specificObjectiveRaw": "FSO3.1 - Desenvolvimento sustentável das comunidades piscatórias",
+      "fundLabels": [
+        "FEAMPA"
+      ],
+      "allocationAmount": "140000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 129,
+      "externalId": "8551",
+      "sourceColumnsDigest": "9313b629199ea47ac5451071525ed3a28d12fc247e7eab96d8bb6ef6ebb73069",
+      "title": "PPC 2026",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MAR2030"
+      ],
+      "specificObjectiveRaw": "FSO2.2 - Comercialização e transformação - Pesca e Aquicultura",
+      "fundLabels": [
+        "FEAMPA"
+      ],
+      "allocationAmount": "1500000",
+      "currency": null,
+      "plannedOpening": "2026-09-15",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Extra-Regio NUTS II",
+        "Norte",
+        "RAA",
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 130,
+      "externalId": "8498",
+      "sourceColumnsDigest": "9ae7545debf77aad728cf04818400bd5ab36143686d765bfc15004ad08b95072",
+      "title": "Centros Nacionais de Apoio à Integração de Migrantes (CNAIM)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "270000",
+      "currency": null,
+      "plannedOpening": "2026-10-26",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 131,
+      "externalId": "8522",
+      "sourceColumnsDigest": "6710961672666c49f2240ed64f09864a35524e81ce434deabdf90cd3c5979025",
+      "title": "Apoio a pessoas em situação de sem-abrigo",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1200000",
+      "currency": null,
+      "plannedOpening": "2026-10-26",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 132,
+      "externalId": "8663",
+      "sourceColumnsDigest": "e6adefde519ac07ef1b1edca72bcc3bfe3dafb82bc3a73f9a0d4f8da68e3e05e",
+      "title": "Formação em Inteligência Artificial para as empresas (Convite IAPMEI)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "80000000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 133,
+      "externalId": "8627",
+      "sourceColumnsDigest": "ad09a4eb4e539ab6edd40985c6bcae26114055ab101aa81ba80ca5e0a55ba82d",
+      "title": "Execução da EDL do GAL ADELIAÇOR MAR",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MAR2030"
+      ],
+      "specificObjectiveRaw": "FSO3.1 - Desenvolvimento sustentável das comunidades piscatórias",
+      "fundLabels": [
+        "FEAMPA"
+      ],
+      "allocationAmount": "152690.23",
+      "currency": null,
+      "plannedOpening": "2026-11-02",
+      "plannedClosing": "2026-12-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 134,
+      "externalId": "8582",
+      "sourceColumnsDigest": "d8f3dcbfd8354954bdbcb5d9cbe7870f9094ccd87a84d09c571337b391bf45f0",
+      "title": "Assistência Técnica 2027/2028 para capacitar a Autoridade de Gestão para o eficaz desempenho das suas competências",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "6000000",
+      "currency": null,
+      "plannedOpening": "2026-11-02",
+      "plannedClosing": "2026-12-28",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 135,
+      "externalId": "7939",
+      "sourceColumnsDigest": "0b02189bd166b08d33ee5e7cc9531602cf6e148129a1b62352a6e31bd15f6e69",
+      "title": "CURSOS TÉCNICOS SUPERIORES PROFISSIONAIS (TeSP)  – Ciclo Formativo 2026/2028 - Instituições Públicas",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3500000",
+      "currency": null,
+      "plannedOpening": "2026-09-17",
+      "plannedClosing": "2026-12-17",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 136,
+      "externalId": "8660",
+      "sourceColumnsDigest": "bac1bf6799e33c6b427ea7012386768e603144b187bb1f0b01c36da4a7e54cca",
+      "title": "Planos Intermunicipais de Promoção do Sucesso Escolar - CIMAL",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1400000",
+      "currency": null,
+      "plannedOpening": "2026-09-16",
+      "plannedClosing": "2026-12-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 137,
+      "externalId": "8550",
+      "sourceColumnsDigest": "fc5c030e80dce9548139d8cdcdedee162adecce4347acde2f129a33ed95c05f4",
+      "title": "Dinamização e realização de cursos de especialização de média duração (summer/ winter schools) em áreas prioritárias do Portugal 2030: edição 2027",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "PAT2030"
+      ],
+      "specificObjectiveRaw": "TASO7.1 - Assistência técnica",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2026-12-11",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Extra-Regio NUTS II"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 138,
+      "externalId": "8642",
+      "sourceColumnsDigest": "2fd2235b69f1b0040682a4509613dded10a3ccec41a41b2518504a5a09e11acd",
+      "title": "Exploração de novas linhas de I&D aplicada",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "600000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Copromoção"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 139,
+      "externalId": "8643",
+      "sourceColumnsDigest": "a6f90fb1f82ccf13c2246c1f431933455c3d9a28ff45e69d408d97e4bb443a06",
+      "title": "Excelência cientifica na RAA - Capacitação dos nós regionais da RNIIIE",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1525000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 140,
+      "externalId": "8645",
+      "sourceColumnsDigest": "6aca83d0f1310aab5fe5d9258763c540987220cc57132b9d7c40aaa627475ecb",
+      "title": "Construir 2030 – Base Económica Local",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "10000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 141,
+      "externalId": "8491",
+      "sourceColumnsDigest": "e79c623f7ea40df433741112bd16add2f47b25d23c8507ef42178551f871b8c3",
+      "title": "Oficiais de ligação de imigração",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "FAMI2030"
+      ],
+      "specificObjectiveRaw": "HSO9.3 - Voltar",
+      "fundLabels": [
+        "FAMI"
+      ],
+      "allocationAmount": "1046445.93",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Extra-Regio NUTS II"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 142,
+      "externalId": "8480",
+      "sourceColumnsDigest": "b3c94286511925ea0b1922cf0af21651df8b098844cff274831b6b142d93a86f",
+      "title": "Proteção e defesa do litoral - Proteção de infraestruturas públicas afetadas ou identificadas em áreas de risco",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "SUSTENTAVEL2030"
+      ],
+      "specificObjectiveRaw": "RSO2.4 - Adaptação às alterações climáticas",
+      "fundLabels": [
+        "FC"
+      ],
+      "allocationAmount": "2000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 143,
+      "externalId": "8549",
+      "sourceColumnsDigest": "357b43617d3233281e336741c3cfcfa3ba14d0b95f3e58255710d778b7e7b874",
+      "title": "Cursos Técnicos Superiores Profissionais (TeSP) - Ciclo Letivo 26/28",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "CENTRO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "6060968.11",
+      "currency": null,
+      "plannedOpening": "2026-09-07",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Centro"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 144,
+      "externalId": "8538",
+      "sourceColumnsDigest": "6420bbf3f73365fa24e789793aa70f9e6312d8b1bd7290b55d535503e39c28b8",
+      "title": "PEPAC Missões",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3500000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 145,
+      "externalId": "8545",
+      "sourceColumnsDigest": "190edd7104ca8cdc369f991a43b5a28c9c81b1a9309b8359d47feb2f3b339379",
+      "title": "INOVCONTACTO",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "3500000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 146,
+      "externalId": "8662",
+      "sourceColumnsDigest": "2478f6c54900bba617f413c15a966876c59ce62c50df134ad8bb041f329b7f4a",
+      "title": "SIAC - Internacionalização (Convite AICEP 2027/2028)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5500000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 147,
+      "externalId": "8523",
+      "sourceColumnsDigest": "eaf6f2e7248f73e9a9b82af38bbf1f40a5b670e6e99c4d15609ecdd60caddf62",
+      "title": "FUNCIONAMENTO 2030 - T  4º aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "3400000",
+      "currency": null,
+      "plannedOpening": "2026-09-30",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 148,
+      "externalId": "8486",
+      "sourceColumnsDigest": "062cc9896c98f6548c38d7426b1be97c59071b873299ff07a69e7bbcad45b481",
+      "title": "Programa de Inserção Socioprofissional - 3º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "8500000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 149,
+      "externalId": "8653",
+      "sourceColumnsDigest": "31cff356caff692c34f3d0d9da6075e32a9c90bd9381a1e37240c31c33c4c749",
+      "title": "Combate à privação material - 1º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.13 - Combater a privação material",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "4500000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 150,
+      "externalId": "8646",
+      "sourceColumnsDigest": "7f7db3e7b58b4a1354ec24be9e9752b085d903e13dbbf653aa292c3ae01459e8",
+      "title": "Construir 2030 - Negócios Estruturantes",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "20000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 151,
+      "externalId": "8472",
+      "sourceColumnsDigest": "c1d7a7e0b0a7e3309d7da135864bb1aff3d79f58275fc5e6505efe9db0d151e8",
+      "title": "Ações do Mercado Social de Emprego",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 152,
+      "externalId": "8615",
+      "sourceColumnsDigest": "f36bd07d98dbca5fa0508279b01af3190646049f03e1bc10fd4d416516ee1431",
+      "title": "SIAC - Descarbonização",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "25000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 153,
+      "externalId": "8616",
+      "sourceColumnsDigest": "1328d7f1aad4a697e5a1c65ea7246ff1028a61dd16a6bdf12b2bf437068776f4",
+      "title": "Vales ESG - Integração de critérios Ambientais, Sociais e de Governança nas empresas - Projeto Simplificado",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "4000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 154,
+      "externalId": "8608",
+      "sourceColumnsDigest": "42f3db4c90d6dd794f6e1782cdd31093b50eda8228700789a33526c77eed40eb",
+      "title": "Assistência Técnica FAMI 2030",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "FAMI2030"
+      ],
+      "specificObjectiveRaw": "TA.36(5) - Assistência técnica - taxa fixa (artigo 36.º, n.º 5, do RDC)",
+      "fundLabels": [
+        "FAMI"
+      ],
+      "allocationAmount": "5200000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Algarve",
+        "Centro",
+        "Norte",
+        "RAA",
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 155,
+      "externalId": "8525",
+      "sourceColumnsDigest": "1f5f90027261bf199ae17f0b098a574777a33c29bd2e12de8e63fe3e0477adc9",
+      "title": "Eficiência Energética",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO2.1 - Eficiência energética",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "2550000",
+      "currency": null,
+      "plannedOpening": "2026-10-15",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 156,
+      "externalId": "8510",
+      "sourceColumnsDigest": "35d086fca66b52e2188827473ac78b3f6d790d51ed65ddf954f1d2df75951df8",
+      "title": "FUNCIONAMENTO 2030 OC",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO1.3 - Crescimento e competitividade das PMEs",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "15000000",
+      "currency": null,
+      "plannedOpening": "2026-10-30",
+      "plannedClosing": "2026-11-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 157,
+      "externalId": "7936",
+      "sourceColumnsDigest": "dcb850660ebe24e7b568be9cc71ec882218f275875fcc28611b7405f07833a5d",
+      "title": "Formação da Administração Pública  Regional e Local - CIMBAL",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "300000",
+      "currency": null,
+      "plannedOpening": "2026-09-28",
+      "plannedClosing": "2026-11-27",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 158,
+      "externalId": "8672",
+      "sourceColumnsDigest": "e7b0983f9b0c11dfbb10935cd5366d83d61e1b90ac3fd90891334345cc261669",
+      "title": "Programa Escolhas",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1200000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2026-11-20",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 159,
+      "externalId": "8673",
+      "sourceColumnsDigest": "480d160374765200aaa098dcacb0dc33aeeaf2cd894d44eff83c696ae8fc9933",
+      "title": "Centros especializados de qualificação de adultos e processos RVCC (Centros Qualifica)",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2400000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2026-11-20",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 160,
+      "externalId": "7935",
+      "sourceColumnsDigest": "98d6eb1f9c80fc9d803e27fba7012b1b9200895a8371af4b01e8bbb220f2302e",
+      "title": "Formação Empresarial Individual",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.4 - Adaptação dos trabalhadores e das empresas à mudança",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2500000",
+      "currency": null,
+      "plannedOpening": "2026-09-25",
+      "plannedClosing": "2026-11-02",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 161,
+      "externalId": "7937",
+      "sourceColumnsDigest": "8bec4b95ad3bbad91cb2d805a610ffc4f003837271bc331ac388fad64f6eebd0",
+      "title": "Qualificação de pessoas com deficiência e ou incapacidade",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.8 - Inclusão ativa e empregabilidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "250000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-02",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 162,
+      "externalId": "8482",
+      "sourceColumnsDigest": "2d87f7f3b6d7d6dbe64584a92ed916b99372c08197859fc82f5d8d2262c9c483",
+      "title": "Centros especializados em qualificação de adultos e processos de Reconhecimento, Validação e Certificação de Competências Profissionais - Centros Qualifica",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2026-10-01",
+      "plannedClosing": "2026-11-02",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 163,
+      "externalId": "8476",
+      "sourceColumnsDigest": "7116f9d99ba1f3ec1039ea0616e2fcc01a8198ce695feb2936bd26db0a70e67b",
+      "title": "Formação Modular/Ativos - 2º Aviso",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ACORES2030"
+      ],
+      "specificObjectiveRaw": "ESO4.7 - Aprendizagem ao longo da vida e transições profissionais",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAA"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 164,
+      "externalId": "8568",
+      "sourceColumnsDigest": "fa8f5cf27b1db100edc132c7c7db817f123b986f694a5a3bdc23d03e7ae6945a",
+      "title": "Infraestruturas Científicas",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALENTEJO2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "1000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Alentejo"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 165,
+      "externalId": "8622",
+      "sourceColumnsDigest": "25d07099156a4fd030197a7dc319d5998ce8bafa794b46971644aae1d3a3757f",
+      "title": "Digitalização da Administração Pública Central",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "COMPETE2030"
+      ],
+      "specificObjectiveRaw": "RSO1.2 - Colher os benefícios da digitalização",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "65000000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "AML",
+        "Alentejo",
+        "Centro",
+        "Norte"
+      ],
+      "applicationModeLabels": [
+        "Copromoção",
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 166,
+      "externalId": "8546",
+      "sourceColumnsDigest": "a677b0bdc37e931b349d5220d0585956fe600fd04e01bee87fe253e3f567d18f",
+      "title": "Cursos Técnicos Superiores Profissionais (Cursos TeSP) 26-28",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "990000",
+      "currency": null,
+      "plannedOpening": "2026-09-07",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 167,
+      "externalId": "8492",
+      "sourceColumnsDigest": "23e0d6c58892c01b953db69dcdd8cb28bb88b2aedd8202a4b169ff44697811d1",
+      "title": "Cursos Técnicos Superiores Profissionais (Cursos TeSP) 26-28 (entidades privadas)",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "ALGARVE2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "217500",
+      "currency": null,
+      "plannedOpening": "2026-09-07",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "Algarve"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 168,
+      "externalId": "8508",
+      "sourceColumnsDigest": "ada7ec5ecc12c67f8c470dc381c75c4bf01c0a4b685aac44c12fe23a0f86db97",
+      "title": "Cursos Técnicos Superiores Profissionais (TeSP)",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1250000",
+      "currency": null,
+      "plannedOpening": "2026-09-14",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 169,
+      "externalId": "8540",
+      "sourceColumnsDigest": "5d76983b2158fa11bc44c220bd12e73b27bbf7fd60ed769b76ef17314de8bb29",
+      "title": "INVESTIGAÇÃO 2030",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO1.1 - Promover a investigação e a inovação",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "4250000",
+      "currency": null,
+      "plannedOpening": "2026-09-20",
+      "plannedClosing": "2026-10-30",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 170,
+      "externalId": "8507",
+      "sourceColumnsDigest": "6079ea55738fa87eeb2115ae50a468f0a571ef7a74d7cb4775779528cda03d30",
+      "title": "Distribuição indireta de géneros alimentares - cartão eletrónico",
+      "beneficiaryLabels": [
+        "Privada"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.13 - Combater a privação material",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1050000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2026-10-28",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual",
+        "Parceria"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 171,
+      "externalId": "8466",
+      "sourceColumnsDigest": "e7743ea372bd8ea03fc0ea7f9b1276656ccffc0cceb7e5dfe81c561e922d4d38",
+      "title": "Reforço do Sistema Hidroelétrico",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO2.12 - Interligações energéticas e infraestruturas de carregamento",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-09-28",
+      "plannedClosing": "2026-10-28",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 172,
+      "externalId": "8465",
+      "sourceColumnsDigest": "9b3e1c50d54b8c742b3bf4f9a4ea9a5c6147a46e85f2e15ff3ce676458852022",
+      "title": "Energia - Proteção de Infraestruturas Críticas - 2.º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO2.12 - Interligações energéticas e infraestruturas de carregamento",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "500000",
+      "currency": null,
+      "plannedOpening": "2026-09-21",
+      "plannedClosing": "2026-10-26",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 173,
+      "externalId": "8593",
+      "sourceColumnsDigest": "79613ff8dde23b266c913d86a87ad693359b3df0cef6d046717df6d0d08b4949",
+      "title": "Cursos de Aprendizagem+",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "350000",
+      "currency": null,
+      "plannedOpening": "2026-09-14",
+      "plannedClosing": "2026-10-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 174,
+      "externalId": "8591",
+      "sourceColumnsDigest": "64755971b0534f6fe5dc29b033d9b32ada1803c6fec1ca31299d1a83fa4503e9",
+      "title": "Cursos de Aprendizagem",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "600000",
+      "currency": null,
+      "plannedOpening": "2026-09-14",
+      "plannedClosing": "2026-10-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 175,
+      "externalId": "8590",
+      "sourceColumnsDigest": "a0394cf1b193b31df71f38146e3ee9ff1ea336cb381508c20fa8de3cca6cfdf2",
+      "title": "Cursos Profissionais",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "2000000",
+      "currency": null,
+      "plannedOpening": "2026-09-14",
+      "plannedClosing": "2026-10-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 176,
+      "externalId": "8464",
+      "sourceColumnsDigest": "cc2c7176e5556b398d94768205febdb845d0f1a35ce54cc7807fe28454dad021",
+      "title": "Habitação Social - 2.º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "5000000",
+      "currency": null,
+      "plannedOpening": "2026-09-16",
+      "plannedClosing": "2026-10-16",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 177,
+      "externalId": "8594",
+      "sourceColumnsDigest": "edca667af00716b7a5a464c628502745b465adc7b77c2a0b41e1dbcc2f7456a7",
+      "title": "Fomento ao envelhecimento ativo",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Convite",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.11 - Igualdade de acesso a serviços sociais e de saúde de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "650000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-10-15",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 178,
+      "externalId": "8473",
+      "sourceColumnsDigest": "1142ea7750128e34ced3b3e5ab67aa0f200e830b61307ba61806aefb68ba3dd2",
+      "title": "Habitação Acessível - 2.º Aviso",
+      "beneficiaryLabels": [
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "RSO4.7 - Habitação a preços acessíveis",
+      "fundLabels": [
+        "FEDER"
+      ],
+      "allocationAmount": "10000000",
+      "currency": null,
+      "plannedOpening": "2026-09-07",
+      "plannedClosing": "2026-10-09",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    },
+    {
+      "physicalRow": 179,
+      "externalId": "8469",
+      "sourceColumnsDigest": "a5bc45d3721f31ff54da5693749e88c4053549e09d9c5f4219164a0446751fe8",
+      "title": "Formação de Formadores, Docentes e Tutores",
+      "beneficiaryLabels": [
+        "Privada",
+        "Pública"
+      ],
+      "callNature": "Concurso",
+      "programmeLabels": [
+        "MADEIRA2030"
+      ],
+      "specificObjectiveRaw": "ESO4.6 - Sistemas de educação e formação inclusivos e de qualidade",
+      "fundLabels": [
+        "FSE+"
+      ],
+      "allocationAmount": "1500000",
+      "currency": null,
+      "plannedOpening": "2026-09-01",
+      "plannedClosing": "2026-10-01",
+      "planningPeriodLabel": "Q1",
+      "territoryLabels": [
+        "RAM"
+      ],
+      "applicationModeLabels": [
+        "Individual"
+      ],
+      "publicationStage": "PLANNED",
+      "publishedState": null,
+      "confirmedDeadlines": null
+    }
+  ]
+}

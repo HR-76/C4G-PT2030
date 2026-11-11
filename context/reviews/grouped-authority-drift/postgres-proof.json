@@ -1,0 +1,153 @@
+{
+  "startedAt": "2026-10-27T20:26:41.505Z",
+  "status": "PASS",
+  "checks": [
+    "exact baseline/new schema, authority and catalog fingerprints: 032_single_organization_membership",
+    "admission deduplicates one checkpoint and recollects on repeated calls: 032_single_organization_membership",
+    "fresh same-connection drift rejection and rollback restoration: role attribute",
+    "fresh same-connection drift rejection and rollback restoration: role membership",
+    "fresh same-connection drift rejection and rollback restoration: table ACL",
+    "fresh same-connection drift rejection and rollback restoration: column ACL",
+    "fresh same-connection drift rejection and rollback restoration: schema ACL",
+    "fresh same-connection drift rejection and rollback restoration: function security",
+    "fresh same-connection drift rejection and rollback restoration: table structure",
+    "fresh same-connection drift rejection and rollback restoration: separate catalog ACL",
+    "fresh post-lock authority observation rejects committed table ACL drift",
+    "fresh post-lock authority observation rejects committed role attribute drift",
+    "exact baseline/new schema, authority and catalog fingerprints: 029_catalog_reader",
+    "admission deduplicates one checkpoint and recollects on repeated calls: 029_catalog_reader",
+    "exact baseline/new schema, authority and catalog fingerprints: 030_application_responsibles",
+    "admission deduplicates one checkpoint and recollects on repeated calls: 030_application_responsibles",
+    "exact baseline/new schema, authority and catalog fingerprints: 031_tenant_directory_resolution",
+    "admission deduplicates one checkpoint and recollects on repeated calls: 031_tenant_directory_resolution",
+    "current schema remains exact after historical fixtures"
+  ],
+  "versions": [
+    {
+      "version": "032_single_organization_membership",
+      "schemaFingerprint": "18f818779aa10ea673f34263b1f8386388d4ae3ad8d3edd0db24106b11b10497",
+      "authoritySecurityFingerprint": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+      "catalogSecurityFingerprint": "2c8e1af3ec8ac9de2eb9550bcb94726db38010d9635d15957844e5e51e8a3084",
+      "exactJsonEqual": true,
+      "admissionSecurityCollections": {
+        "before": 3,
+        "after": 1,
+        "twoRepeatedAdmissions": 2
+      }
+    },
+    {
+      "version": "029_catalog_reader",
+      "schemaFingerprint": "248f1c3b50b5c887158e66de0e64aaea1ddc9fb978295685b79324d2542ac8b8",
+      "authoritySecurityFingerprint": "b55a1fbf4f040ebd116a3ad5284a73c149fc04a0bd1b919238dc50ef765ea240",
+      "catalogSecurityFingerprint": "2c8e1af3ec8ac9de2eb9550bcb94726db38010d9635d15957844e5e51e8a3084",
+      "exactJsonEqual": true,
+      "admissionSecurityCollections": {
+        "before": 3,
+        "after": 1,
+        "twoRepeatedAdmissions": 2
+      }
+    },
+    {
+      "version": "030_application_responsibles",
+      "schemaFingerprint": "e815fd08ecde12637bc641869b66bcef33518bd4fc94d0caf504e71396baf630",
+      "authoritySecurityFingerprint": "1f116eca8bf5e0d6cf25c286fb50195973ca9908764729df6f954da57011468a",
+      "catalogSecurityFingerprint": "2c8e1af3ec8ac9de2eb9550bcb94726db38010d9635d15957844e5e51e8a3084",
+      "exactJsonEqual": true,
+      "admissionSecurityCollections": {
+        "before": 3,
+        "after": 1,
+        "twoRepeatedAdmissions": 2
+      }
+    },
+    {
+      "version": "031_tenant_directory_resolution",
+      "schemaFingerprint": "ce2b9e43475c2c6d81ef0d9ef37aba93356c6f945a91acd30265cbc795826c82",
+      "authoritySecurityFingerprint": "af32fd14953b0fcf8cb2395001d77416f3cf96ca02eedbe06f2c8e3f97c8e731",
+      "catalogSecurityFingerprint": "2c8e1af3ec8ac9de2eb9550bcb94726db38010d9635d15957844e5e51e8a3084",
+      "exactJsonEqual": true,
+      "admissionSecurityCollections": {
+        "before": 3,
+        "after": 1,
+        "twoRepeatedAdmissions": 2
+      }
+    }
+  ],
+  "drifts": [
+    {
+      "case": "role attribute",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "role membership",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "table ACL",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "column ACL",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "schema ACL",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "function security",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "table structure",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    },
+    {
+      "case": "separate catalog ACL",
+      "rejected": true,
+      "baselineAndNewSnapshotsEqual": true,
+      "restored": true
+    }
+  ],
+  "postLock": [
+    {
+      "case": "table ACL",
+      "realBlockedAuthorityTransactions": 1,
+      "mutationAfterPreflight": true,
+      "functionalCallbackExecuted": false,
+      "rejected": "AUTHORITY_SECURITY_DRIFT"
+    },
+    {
+      "case": "role attribute",
+      "realBlockedAuthorityTransactions": 1,
+      "mutationAfterPreflight": true,
+      "functionalCallbackExecuted": false,
+      "rejected": "AUTHORITY_SECURITY_DRIFT"
+    }
+  ],
+  "cleanupErrors": [],
+  "limits": [
+    "Exclusive disposable PostgreSQL 17; synthetic schema only.",
+    "No HTTP/OIDC claim: the existing HTTP revocation gate is executed separately.",
+    "Mutations and grants below apply only to the owned disposable fixture."
+  ],
+  "baselineSourceHashes": {
+    "centralSchemaManifest": "e62152834c51af3bd5b192c995483f54e4f9e6c700661356638e775ab090571f",
+    "authoritySecurityManifest": "74964983f6e2f6c16bce10e95a6adb62eb3a00465045bf7216ca8c038af94138"
+  },
+  "postgres": "17.11",
+  "finishedAt": "2026-10-27T20:26:52.914Z"
+}

@@ -1,0 +1,67 @@
+const cancelled = () => Object.assign(new Error('Contexto de sessão alterado.'), { code: 'ERR_CANCELED', __CANCEL__: true })
+
+export function createContextRequestCoordinator({ drainMs = 250, quietMs = 150 } = {}) {
+  let tail = Promise.resolve()
+  const active = new Set()
+  const waiters = new Set()
+  const changed = () => { for (const notify of [...waiters]) notify() }
+
+  function waitForQuiet(entry) {
+    return new Promise((resolve, reject) => {
+      let timer
+      const cleanup = () => { clearTimeout(timer); waiters.delete(check); entry.controller.signal.removeEventListener('abort', check) }
+      const check = () => {
+        clearTimeout(timer)
+        if (entry.controller.signal.aborted) { cleanup(); reject(cancelled()); return }
+        if ([...active].some(other => other !== entry && other.started)) return
+        timer = setTimeout(() => {
+          cleanup(); entry.started = true; changed(); resolve()
+        }, quietMs)
+      }
+      waiters.add(check); entry.controller.signal.addEventListener('abort', check, { once: true }); check()
+    })
+  }
+
+  async function acquire({ read = false, signal, background = false } = {}) {
+    const controller = new AbortController()
+    const abort = () => controller.abort()
+    signal?.addEventListener('abort', abort, { once: true })
+    if (signal?.aborted) abort()
+    let done
+    const entry = { read, controller, started: !background, settled: new Promise(resolve => { done = resolve }) }
+    const release = () => { active.delete(entry); signal?.removeEventListener('abort', abort); done(); changed() }
+    entry.release = release
+    active.add(entry)
+    changed()
+    try {
+      await tail
+      if (controller.signal.aborted) throw cancelled()
+      if (background) await waitForQuiet(entry)
+      if (controller.signal.aborted) throw cancelled()
+    } catch (error) { release(); throw error }
+    return { signal: controller.signal, release }
+  }
+
+  function change(work) {
+    const previous = [...active]
+    for (const entry of previous) if (entry.read || !entry.started) entry.controller.abort()
+    const result = tail.then(async () => {
+      let timer
+      await Promise.race([
+        Promise.all(previous.map(entry => entry.settled)),
+        new Promise(resolve => { timer = setTimeout(resolve, drainMs) }),
+      ])
+      clearTimeout(timer)
+      // A broken transport may ignore abort forever; do not retain its listeners.
+      for (const entry of previous) if (entry.read) entry.release()
+      if (previous.some(entry => !entry.read && active.has(entry))) {
+        throw Object.assign(new Error('Existe uma operação em curso. Repita a alteração de sessão.'), { code: 'SESSION_BUSY' })
+      }
+      return work()
+    })
+    tail = result.then(() => undefined, () => undefined)
+    return result
+  }
+
+  return Object.freeze({ acquire, change })
+}

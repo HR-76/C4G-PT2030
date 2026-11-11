@@ -1,0 +1,16 @@
+# Parceiros por candidatura — contrato de implementação
+
+Entrega 3 / E3-06, Review — ativado e validado, 2026-10-17. Recuperação autorizada dos componentes do piloto. Anexos reais continuam pendentes.
+
+Âmbito reconfirmado em 18/10/2026: nesta fase, parceiros e pessoas são informação para o gestor da candidatura. O utilizador retirou do plano os convites, o acesso externo e a colaboração de parceiros em tarefas; conserva-se este percurso de registo e consulta, sem criação de contas ou permissões. [Decisão e plano atualizado](../features/organization-users-and-application-guests.md).
+
+- `GET /api/applications/:id/partners`: revisão independente, parceiros ativos, permissão de edição e paginação de 25. `GET .../partners/history`: histórico imutável paginado, incluindo a ficha completa e pessoas retiradas.
+- `POST .../partners`: criar; `PUT .../partners`: editar; `POST .../partners/remove`: retirar associação logicamente. Comandos têm `expectedRevision` e `idempotencyKey`; edição/remoção têm `partnerId`. Criação/edição têm `partner` com `entity_name`, `country`, `research_area_interest`, `responsible_person`, `contact`, `email`, `people`.
+- Pessoas: `id` (null nas novas), `name`, `role` (RESPONSAVEL/INVESTIGADOR/OUTRO), `research_area`, `contact`, `email`. IDs existentes são estáveis; omissões inativam a pessoa, conservada na ficha histórica. Nova pessoa começa em Outro. Não se criam contas, acessos ou memberships.
+- Nome de entidade/pessoa obrigatório, até 200 caracteres; país 100; área/interesse 2000; restantes campos 200, email 254. Até 50 pessoas ativas e 100 parceiros ativos por candidatura. Limites técnicos explícitos, sem truncagem silenciosa.
+- `GET /api/applications/partners`: pesquisa `q` (entidade, responsável, pessoa, área, contacto/email), `country`, `person_role`, `cursor`. Tabela original de seis colunas; 25 por página, total e países derivados exclusivamente das associações autorizadas. Ordenação entidade/ID. Cursor assinado, ligado a utilizador, organização, filtros e conteúdo autorizado; alterações invalidam a paginação antiga.
+- Leitura exige `APPLICATION_READ` e leitura da origem/oportunidade e avaliação, quando existe. Escrita exige também `APPLICATION_EDIT`. Permissões centrais existentes; nenhum acesso global legacy. `X-C4G-Organization` fixa o contexto do pedido. Indisponibilidade de autoridade não se transforma em lista vazia.
+- Migration aditiva 028: agregado próprio, fichas JSONB com pessoas e inativações, histórico e recibos. RLS forçada, sem DELETE/TRUNCATE; histórico/recibos imutáveis. Não modifica candidaturas, tarefas nem revisões anteriores. Recibo, histórico, ficha e F7 na mesma transação. CAS por candidatura, repetição exata mesmo após resposta perdida, chave de auditoria própria.
+- Antes da migration, endpoints devolvem `SCHEMA_UPGRADE_REQUIRED`; não se ativa o backend antigo. Atualização local exige prova descartável, backup protegido e comparação dos dados existentes.
+
+Aceitação: criação/edição/releitura, remoção lógica de pessoa e parceiro, histórico, pesquisas/filtros/países/paginação; dois tenants, grants limitados, revisão concorrente, idempotência e rollback de auditoria; build e Chrome desktop/móvel, comparação com páginas originais. Entrega 3 integral não termina neste incremento.

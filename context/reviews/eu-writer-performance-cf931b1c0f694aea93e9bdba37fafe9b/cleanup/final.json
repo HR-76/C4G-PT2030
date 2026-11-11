@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "verifiedAt": "2026-10-31T17:05:38.853Z",
+  "method": "READ_ONLY_DOCKER_CONTAINER_ID_INVENTORY",
+  "expectedOwnedContainers": 10,
+  "ownedContainersStillPresent": [],
+  "resources": [
+    {
+      "id": "e715fe7ed5b5544ee5590ed4716f2127dd3293cbc2aae67fdb2a5e2b0bb23bb0",
+      "name": "c4g-eu-trial-pg-2a0742f99acc485c89f6ace271d8f8b8-043",
+      "runId": "2a0742f99acc485c89f6ace271d8f8b8",
+      "absent": true
+    },
+    {
+      "id": "858a731bfc7d9097466ee5229d369d9ae5463a7c2d8d989aa8993245a242a65d",
+      "name": "c4g-eu-trial-kc-2a0742f99acc485c89f6ace271d8f8b8-043",
+      "runId": "2a0742f99acc485c89f6ace271d8f8b8",
+      "absent": true
+    },
+    {
+      "id": "b42af273fd0d0994ba4f282af95a76699a19812e6f15e1edf3b9ed6060f9de57",
+      "name": "c4g-eu-trial-pg-5e6762c68e414029826958f9246ff06e-042",
+      "runId": "5e6762c68e414029826958f9246ff06e",
+      "absent": true
+    },
+    {
+      "id": "a146042f3180074587acf9ed4b605a2f09189d02123032343e97b6f0c7cd2f32",
+      "name": "c4g-eu-trial-kc-5e6762c68e414029826958f9246ff06e-042",
+      "runId": "5e6762c68e414029826958f9246ff06e",
+      "absent": true
+    },
+    {
+      "id": "280dd78c889763538ce3489d548bd89de981bd90474e713fc57b0fc32f38fc66",
+      "name": "c4g-eu-trial-pg-c739a80e59aa4c9ca26d8c9356dc9ea6-043",
+      "runId": "c739a80e59aa4c9ca26d8c9356dc9ea6",
+      "absent": true
+    },
+    {
+      "id": "e62cbb8e2076fe0aa287601b0555a632bc5dcb6f0a397e281d9791ceec4b6fea",
+      "name": "c4g-eu-trial-kc-c739a80e59aa4c9ca26d8c9356dc9ea6-043",
+      "runId": "c739a80e59aa4c9ca26d8c9356dc9ea6",
+      "absent": true
+    },
+    {
+      "id": "c2d10e484427005a97a02d2def19e7a208da6b076e9793c10862dec64243811e",
+      "name": "c4g-eu-trial-pg-10c89558256e419896b38410c47316b7-043",
+      "runId": "10c89558256e419896b38410c47316b7",
+      "absent": true
+    },
+    {
+      "id": "ad2dacd8edee593e7fccd66ceb1cdf4712607875c2facc8bd3c3403673f6c7ca",
+      "name": "c4g-eu-trial-kc-10c89558256e419896b38410c47316b7-043",
+      "runId": "10c89558256e419896b38410c47316b7",
+      "absent": true
+    },
+    {
+      "id": "7265bbe890e21fae746177f73e3666c1978091536bb91043f93e5f40b5c19308",
+      "name": "c4g-eu-trial-pg-96cfd080f3f441638fb446d01b2e4545-043",
+      "runId": "96cfd080f3f441638fb446d01b2e4545",
+      "absent": true
+    },
+    {
+      "id": "6a4ad29f1e2f2161b5da9e5b728c53108afad098ff349af5d8e045482e22a6d5",
+      "name": "c4g-eu-trial-kc-96cfd080f3f441638fb446d01b2e4545-043",
+      "runId": "96cfd080f3f441638fb446d01b2e4545",
+      "absent": true
+    }
+  ],
+  "children": [
+    {
+      "mode": "measure-metadata",
+      "index": 0,
+      "pid": 63260,
+      "terminated": false,
+      "exitVerified": true
+    },
+    {
+      "mode": "measure-metadata",
+      "index": 1,
+      "pid": 60460,
+      "terminated": false,
+      "exitVerified": true
+    },
+    {
+      "mode": "measure-http",
+      "index": 0,
+      "pid": 22992,
+      "terminated": false,
+      "exitVerified": true
+    },
+    {
+      "mode": "measure-http",
+      "index": 1,
+      "pid": 62628,
+      "terminated": false,
+      "exitVerified": true
+    },
+    {
+      "mode": "measure-http",
+      "index": 2,
+      "pid": 63484,
+      "terminated": false,
+      "exitVerified": true
+    }
+  ]
+}

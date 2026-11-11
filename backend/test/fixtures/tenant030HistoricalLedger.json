@@ -1,0 +1,212 @@
+[
+  {
+    "migration_id": "000_tenant_control_baseline",
+    "ordinal": 0,
+    "checksum_sha256": "29f5c43a25e3585cc9e9035f9bad10c9def104a65ae4701176cfd552ded5af75",
+    "irreversible": true,
+    "resulting_fingerprint": "8751cf659b63e683d9d3603a48b0a6f5ddbeb5a042bbeefc9656cf07e36d2a9b"
+  },
+  {
+    "migration_id": "001_f9_async_execution",
+    "ordinal": 1,
+    "checksum_sha256": "8d84140152413da48579f8a8a0132be6a38b0b8b3761163a7caca80af6b9102a",
+    "irreversible": false,
+    "resulting_fingerprint": "2988704817125d4af4642880d8612b1509cb25ff998389232694dc08124097a6"
+  },
+  {
+    "migration_id": "002_f7_append_only_audit",
+    "ordinal": 2,
+    "checksum_sha256": "e8f6525bf4b69bc5c0c9a44f06b832c7ce979e1b72ac8b1b89ce475d5a6b62ff",
+    "irreversible": false,
+    "resulting_fingerprint": "bc255bfd59012135c82188763aab27c428b6417661dde8349170e1eb40059ade"
+  },
+  {
+    "migration_id": "003_f11_private_document_storage",
+    "ordinal": 3,
+    "checksum_sha256": "f5e982129d57bd78728673ba10c2edd51e6d2fbc752c8f3da999281ba64d5075",
+    "irreversible": false,
+    "resulting_fingerprint": "fce14fb1bfae7612b29dcc80b2cb56dc9f0d4c07aba3f2b4ffa651c8bc201e59"
+  },
+  {
+    "migration_id": "004_f12_opportunity_catalog",
+    "ordinal": 4,
+    "checksum_sha256": "e36a00d4d8ae05a5fe37fe91e32806a4aa4e67926a90f9d409e3ec89862a816b",
+    "irreversible": false,
+    "resulting_fingerprint": "cd9456cd4956b16ee9317f6b9c4e32bccd790f6ee792fd00068d20c6e98fbf49"
+  },
+  {
+    "migration_id": "005_f9_execution_lineage",
+    "ordinal": 5,
+    "checksum_sha256": "dd4e4be2bb57c56361275146450448197db1bde32ee269931c8f11892a207991",
+    "irreversible": false,
+    "resulting_fingerprint": "cd001ae58e1e982233f64976811ec9b629293ae883045b40e0e491ee3e824fed"
+  },
+  {
+    "migration_id": "006_f13_p1_organizational_scope",
+    "ordinal": 6,
+    "checksum_sha256": "841ca7033924af88eaf9448eccc7ff8984f880d759863487ef7a7699e7db1a65",
+    "irreversible": false,
+    "resulting_fingerprint": "29a98501da147ab979043e156e290c7f625dcc442b6da593c1c6ff135bbea70f"
+  },
+  {
+    "migration_id": "007_f13_profile_catalogs_and_policies",
+    "ordinal": 7,
+    "checksum_sha256": "c327d759936b69df5f495e2454f209a6ddd34c94dc512933f700363a8cd5a900",
+    "irreversible": false,
+    "resulting_fingerprint": "17df0837daf146752e94fc7c870e58b653e23dd1051ea31b697e37d1c477b909"
+  },
+  {
+    "migration_id": "008_f13_profile_authoring_and_assertions",
+    "ordinal": 8,
+    "checksum_sha256": "7a6921546c6902bb59f6b3f34adbde4266e7eb947370cf0e7390b67b07edb30c",
+    "irreversible": false,
+    "resulting_fingerprint": "7ee1e9277e39c0016985061fe0ddcd03980474680f9855ee50fc2aebe59f4b8f"
+  },
+  {
+    "migration_id": "009_f13_competencies_and_experience",
+    "ordinal": 9,
+    "checksum_sha256": "244282e6b87034d15600ab61df04a0fe77347c307132232509a300dbb184708e",
+    "irreversible": false,
+    "resulting_fingerprint": "5a23e5b95300e9af471d90ac4e1212c5e88c11b3735fa88445e7b6aae010f1f1"
+  },
+  {
+    "migration_id": "010_f13_financial_capacity",
+    "ordinal": 10,
+    "checksum_sha256": "ab3b92b001e90dbae4d38d42e1f61ed00ce2b94fb28797195e1324ac90ad1b93",
+    "irreversible": false,
+    "resulting_fingerprint": "876e01b28fb3617b464a4a85c8e8cc5a1e4f405e7e8678e07f1d0ddb12820eac"
+  },
+  {
+    "migration_id": "011_f13_operational_capacity",
+    "ordinal": 11,
+    "checksum_sha256": "1f07a21b145d23500cd7928272ee0be816f90688e41a5ba5024566732d6cfdbd",
+    "irreversible": false,
+    "resulting_fingerprint": "884396f0858205d0c3098dc5b44fcc366664ef0af4238e69628c2e57cdb453ff"
+  },
+  {
+    "migration_id": "012_f13_territories_and_populations",
+    "ordinal": 12,
+    "checksum_sha256": "4f3972e42a292678b45e86d690aca7410155f17dee7fedfc275a88837c984cd8",
+    "irreversible": false,
+    "resulting_fingerprint": "0558700553db2170ee60565b92339f5556f603d4108c9273d476b960cb1460c3"
+  },
+  {
+    "migration_id": "014_f4_runtime_metadata_access",
+    "ordinal": 14,
+    "checksum_sha256": "5051cc10b19d034d30969ab63f1aa9275716b4e51da3eb866b6e7fd09d8ee7d1",
+    "irreversible": false,
+    "resulting_fingerprint": "039997acfeb75dd7540ebaad805ed9a18aec4cdc3418bf155c205c1cad87b1b3"
+  },
+  {
+    "migration_id": "015_f12_opportunity_xlsx_import",
+    "ordinal": 15,
+    "checksum_sha256": "58ecebd8c4dd726bd7f65d4ec16adebab44bc3a838ca8177ef486e983c7ba509",
+    "irreversible": false,
+    "resulting_fingerprint": "8c96af15c713ba36658d462e348ff3b69324042cd163bf426bb9b55353bec5ac"
+  },
+  {
+    "migration_id": "016_f13_editorial_baseline_publication",
+    "ordinal": 16,
+    "checksum_sha256": "18365bce636ff77a257b55724545711db33b12520d6b34e0f613c1a256b6331d",
+    "irreversible": false,
+    "resulting_fingerprint": "bc47c3c859f9790136b70dc40d1159978f2f30ce80ffb124ec6522b546a6ea5a"
+  },
+  {
+    "migration_id": "017_opportunity_evidenced_criteria",
+    "ordinal": 17,
+    "checksum_sha256": "352440c3843e4b033cb208ac0aaa04eea82e3c0038f72cdf805b7c51982b6b77",
+    "irreversible": false,
+    "resulting_fingerprint": "e72833f1a24a515dccd5cedf306408cc12098f6531f06eb50cb1c8ab7411376f"
+  },
+  {
+    "migration_id": "018_f13_pq1_publication",
+    "ordinal": 18,
+    "checksum_sha256": "553692a662c4fc316ececf33ea18308dbbb73ff6e485585b4f72cd95e64c8626",
+    "irreversible": false,
+    "resulting_fingerprint": "77b31fd6d07065e3798df1e285a1a39226778d06eaa21c260d90690d763ec9af"
+  },
+  {
+    "migration_id": "019_f13_pq1_activation",
+    "ordinal": 19,
+    "checksum_sha256": "d84ceb78cda7e600bc5c79109f4c021588e6115c636337a3c6580e782e169aeb",
+    "irreversible": false,
+    "resulting_fingerprint": "addaa7024066f87b767415bc0880b3e0f4473839f9c3aa457b1ebc4908eeb856"
+  },
+  {
+    "migration_id": "020_f14_pq1_decisions",
+    "ordinal": 20,
+    "checksum_sha256": "1b8877f8a3cb6343dc7b3735ecccc3c0da60d9c062662723abb76646630d100f",
+    "irreversible": false,
+    "resulting_fingerprint": "dd3b09221b0347b70377919aa7693dbf83390b63b0e68b303fe892f46de9ffea"
+  },
+  {
+    "migration_id": "021_application_first_slice",
+    "ordinal": 21,
+    "checksum_sha256": "7f656827ec4262cdb7f056a6d4962c6c10e62444861b134ead524c5e6b3abc47",
+    "irreversible": false,
+    "resulting_fingerprint": "a900cec04d3d7ddc95eb4a7c7cc9dde61488c76bb50a422d693fb700538a8f44"
+  },
+  {
+    "migration_id": "022_application_team_tasks",
+    "ordinal": 22,
+    "checksum_sha256": "ce24cf9f558a776a84a1bf9d295c8bf8844cae1ab4055b5bea96dac22590c7ac",
+    "irreversible": false,
+    "resulting_fingerprint": "d1ab7a44ecd5efbfabf288c1173a4c5abc94c3bec547e407264453b289a01952"
+  },
+  {
+    "migration_id": "023_application_documents_review",
+    "ordinal": 23,
+    "checksum_sha256": "e89ab596933767c5ae0ec579eebe026470d8b503028b3ba9145350add555798a",
+    "irreversible": false,
+    "resulting_fingerprint": "de499ab0fa8a12336d81712642364edd6752df244581892ad6f27f7d2ebd78bd"
+  },
+  {
+    "migration_id": "024_application_central_origin",
+    "ordinal": 24,
+    "checksum_sha256": "3373df5275626ec338d77053700e11c103c62b252fa340bf06ed3bbc5dc6d92e",
+    "irreversible": true,
+    "resulting_fingerprint": "92ce67929c3b5066df6562b3805e955e59d3db3f489aae76b05a1baf26f2f7ed"
+  },
+  {
+    "migration_id": "025_organization_directory",
+    "ordinal": 25,
+    "checksum_sha256": "f2b60f88e58d25f7e947d7d5489452ac1f3a985fb9612760405ab2550cd5d069",
+    "irreversible": true,
+    "resulting_fingerprint": "a7ddfc8d176291da7c75750f420a08f55114d4ac59c4a5ebc92a1b02fb623ea8"
+  },
+  {
+    "migration_id": "026_personal_profile",
+    "ordinal": 26,
+    "checksum_sha256": "fd6fd91659efe186ea51451dd39ad2d69c7b913e3ce06510d95215870ccf1615",
+    "irreversible": true,
+    "resulting_fingerprint": "26602fdb2f7e0214ac2896fe36384eaa40d0dcd27b4b83c4bf54b166aae62485"
+  },
+  {
+    "migration_id": "027_application_lifecycle",
+    "ordinal": 27,
+    "checksum_sha256": "dc51c7c65d563532ce891d62485a2913e240eb9d708becbe3d4c672ca09ca388",
+    "irreversible": true,
+    "resulting_fingerprint": "e7eea047318abb3cdda037ea4e7d90454735480cea56d62bc670dcf8e3d296a5"
+  },
+  {
+    "migration_id": "028_application_partners",
+    "ordinal": 28,
+    "checksum_sha256": "9a403e433ebcab39574d43d882d83d09b2a3b762bab45ec38fa11969ffbdfb27",
+    "irreversible": true,
+    "resulting_fingerprint": "1ccdeb2c22e66d4ea673f604ff4b5b28d634bfb7c85b6611bb9a63758688ab29"
+  },
+  {
+    "migration_id": "029_application_alerts",
+    "ordinal": 29,
+    "checksum_sha256": "3a4c741b7acfae929fc32d1668a472d54fcac8aa6181e7bad4f0a598bea358b9",
+    "irreversible": true,
+    "resulting_fingerprint": "71bdf9cb894a3c1fe61cce83815fdf3314adbaf6e60d4b167715c793aa7700c7"
+  },
+  {
+    "migration_id": "030_organization_notices",
+    "ordinal": 30,
+    "checksum_sha256": "25a407d1926d08d44f2fbe692040a748b5c39e92f51ffac0723015ee7c51f2c1",
+    "irreversible": true,
+    "resulting_fingerprint": "e39a77c76efb85ce9e19fe17f2e92057739681ded45601cb3e2c1374fca6a623"
+  }
+]

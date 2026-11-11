@@ -1,0 +1,380 @@
+{
+  "schemaVersion": 1,
+  "status": "RECONSTRUCTED_FROM_IMMUTABLE_TRACE_AND_FROZEN_CODE",
+  "generatedAt": "2026-10-31T19:02:28.397Z",
+  "inputs": {
+    "raw": {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/bfd7495e00394b85821c568571e26908/stage-4-043-A.json",
+      "sha256": "cab6e68827bcad1fe3752741f326e90e65a277953d6312b5072e9d60e3cd7864",
+      "bytes": 25394363
+    },
+    "deterministicProof": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/deterministic-result.json",
+      "sha256": "df6395d4195b46cbc89b59568bf6700cb79e2405d7bcffdfda880c6fca196fb3",
+      "bytes": 20640
+    },
+    "test": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/lease-timeout.test.cjs",
+      "sha256": "17344dcb11440dafb4f1af960db9604d8f22a651e430013fcc017f7c2e49eeb3",
+      "bytes": 12696
+    }
+  },
+  "identicalRuntimeModules": [
+    {
+      "path": "backend/src/security/tenantLeaseExecutor.js",
+      "sha256": "d28e52aa9067c707cf9a8c93163178ee04fefeb4c75551743a8599aa4e2143b2",
+      "bytes": 22821,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/tenantPoolManager.js",
+      "sha256": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9",
+      "bytes": 37017,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/tenantResolver.js",
+      "sha256": "b794d4eadaf4b586d791dab08a8973281f7f0a9e526eb26e377c25d9e3a3b845",
+      "bytes": 9509,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/authorityCoordinator.js",
+      "sha256": "cff9d773d72c0f93a7252c460e1bda03ebed7484451568dc2d20539607557b4c",
+      "bytes": 32168,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/config/opportunityRuntime.js",
+      "sha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f",
+      "bytes": 10842,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/opportunities/httpComposition.js",
+      "sha256": "1389118396991de48b1a1d3fb04524aedf8fc20e2051760b3df49c6b7472eff4",
+      "bytes": 17815,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/routes/organizationDashboardRoutes.js",
+      "sha256": "71389b67f93f222b21ceb0719199515d9bdf7bde99a4ab3f4a920c20b7ee76e7",
+      "bytes": 4111,
+      "identicalAB": true
+    }
+  ],
+  "request": {
+    "pointer": "/http/warmups/5",
+    "scenario": "dashboard-c4-two-tenants",
+    "tenant": 0,
+    "status": 503,
+    "publicCode": "SERVICE_UNAVAILABLE",
+    "observedFailureCodes": [
+      "LEASE_TIMEOUT"
+    ],
+    "httpMs": 20479.233600000007,
+    "serverResponseMs": 20474.4559,
+    "sqlErrors": [],
+    "pendingQueriesAtRecordedResponse": 0
+  },
+  "directEvidence": {
+    "statementTimeout": {
+      "sql": "SET LOCAL statement_timeout TO '10000ms'",
+      "sha256": "b5297617afb2db1d5daead45f7931fa8b593c3248942af7ab94669e37cc95a8a",
+      "matchingEvents": [
+        {
+          "index": 410,
+          "startMs": 1346.5431999999855,
+          "endMs": 1346.9171999999962,
+          "role": "tenant",
+          "category": "transaction",
+          "hash": "b5297617afb2db1d5daead45f7931fa8b593c3248942af7ab94669e37cc95a8a",
+          "afterResponse": false
+        },
+        {
+          "index": 1504,
+          "startMs": 11921.185999999987,
+          "endMs": 11927.990899999975,
+          "role": "tenant",
+          "category": "transaction",
+          "hash": "b5297617afb2db1d5daead45f7931fa8b593c3248942af7ab94669e37cc95a8a",
+          "afterResponse": false
+        }
+      ],
+      "selectedRemainingMs": 10000,
+      "interpretation": "Frozen executor passes the same remainingMs to scheduler.setTimeout and this SQL; the selected initial execution budget was10000ms. PostgreSQL applies statement_timeout per statement, not as the JS operation deadline."
+    },
+    "tenantCheckouts": [
+      {
+        "index": 6,
+        "startMs": 725.3689000000013,
+        "waitMs": 0.02549999998882413,
+        "holdMs": 4463.183100000024,
+        "max": 5,
+        "role": "tenant"
+      },
+      {
+        "index": 29,
+        "startMs": 7506.295799999993,
+        "waitMs": 0.03169999999227002,
+        "holdMs": 12703.563999999984,
+        "max": 5,
+        "role": "tenant"
+      }
+    ],
+    "tenantCommits": [
+      {
+        "index": 309,
+        "startMs": 989.4327999999805,
+        "endMs": 989.8152999999875,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false
+      },
+      {
+        "index": 1125,
+        "startMs": 4695.215499999991,
+        "endMs": 4698.718599999993,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false
+      },
+      {
+        "index": 1403,
+        "startMs": 8866.453699999984,
+        "endMs": 8870.175300000003,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false
+      },
+      {
+        "index": 1935,
+        "startMs": 20086.152000000002,
+        "endMs": 20087.058499999985,
+        "role": "tenant",
+        "category": "transaction",
+        "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+        "afterResponse": false
+      }
+    ],
+    "preparationFinalAuthorityCommit": {
+      "index": 1436,
+      "startMs": 10170.489499999996,
+      "endMs": 10208.545799999993,
+      "role": "authority",
+      "category": "transaction",
+      "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "afterResponse": false
+    },
+    "firstAuthorityCheckoutAfterPreparation": {
+      "startMs": 10208.9902,
+      "waitMs": 0.01619999998365529,
+      "holdMs": 1162.536699999997,
+      "max": 8,
+      "role": "authority"
+    },
+    "postCommitSpans": [
+      {
+        "index": 117,
+        "name": "assertAuthorityAdmission",
+        "startMs": 20087.133099999977,
+        "endMs": 20233.892399999982
+      },
+      {
+        "index": 118,
+        "name": "assertCentralSchema",
+        "startMs": 20096.200299999997,
+        "endMs": 20233.061799999996
+      },
+      {
+        "index": 119,
+        "name": "assertAuthorityAdmission",
+        "startMs": 20235.922699999996,
+        "endMs": 20426.761700000003
+      },
+      {
+        "index": 120,
+        "name": "assertAuthoritySecurity",
+        "startMs": 20237.5086,
+        "endMs": 20264.86069999999
+      },
+      {
+        "index": 121,
+        "name": "assertCentralSchema",
+        "startMs": 20248.015999999974,
+        "endMs": 20426.0294
+      },
+      {
+        "index": 122,
+        "name": "assertAuthoritySecurity",
+        "startMs": 20430.433699999994,
+        "endMs": 20457.8076
+      }
+    ],
+    "lastSqlEvent": {
+      "index": 2004,
+      "startMs": 20472.08839999998,
+      "endMs": 20473.712099999975,
+      "role": "authority",
+      "category": "transaction",
+      "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "afterResponse": false
+    }
+  },
+  "reconstruction": {
+    "operation": "OPPORTUNITY_READ/privateSummary",
+    "operationEvidence": "Sequential dashboard route awaits report then privateSummary before publicSummary and dashboardContext; only two tenant leases exist in the failed request.",
+    "executeStartIntervalMs": [
+      10208.545799999993,
+      10208.9902
+    ],
+    "selectedTimerDueIntervalMs": [
+      20208.545799999993,
+      20208.9902
+    ],
+    "tenantReleaseApproximateMs": 20209.89149999997,
+    "tenantCommitEndMs": 20087.058499999985,
+    "commitBeforeExpectedTimerMs": [
+      121.48730000000796,
+      121.93170000001555
+    ],
+    "releaseAfterExpectedTimerMs": [
+      0.9012999999686144,
+      1.3456999999762047
+    ],
+    "allocationEarliestApproximateDeadlineMs": 22506.327499999985,
+    "allocationHeadroomAtReleaseApproximateMs": 2296.436000000016,
+    "conclusion": "The selected10000ms operation timer is strongly localized to authority completion after tenant COMMIT. The original report did not capture the callback, so callback identity/time remains reconstructed rather than a direct timer observation.",
+    "assumptions": [
+      "Allocation deadline estimates translate elapsed performance.now intervals into the Date-based clock and assume no wall-clock jump; raw allocation.deadline was not recorded.",
+      "Checkout release estimate sums start+wait+hold; instrumentation performs adjacent performance.now reads, so the sum is approximate.",
+      "The reconstructed execute-start window uses completion of resolver directory transaction and the next authority checkout, not a recorded execute-entry event."
+    ]
+  },
+  "lifecycle": {
+    "commitObserved": true,
+    "tenantRollbackObserved": false,
+    "sqlCancellationObserved": false,
+    "observedSqlContinuedAfterApproximateRelease": 48,
+    "runtimeMechanism": "Promise.race rejects the caller; for LEASE_TIMEOUT release(true) starts without being awaited. It does not cancel the execution Promise. Already-started Central authority completion may continue after release. No claim of PostgreSQL cancellation or transaction rollback follows.",
+    "mutationScope": "The failing route is GET/private opportunity summary with audited read transaction; a tenant COMMIT is not evidence of a functional business write."
+  },
+  "code": [
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/config/opportunityRuntime.js",
+      "line": 34,
+      "meaning": "Date clock and native scheduler"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/config/opportunityRuntime.js",
+      "line": 52,
+      "meaning": "leaseTimeoutMs15000"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantPoolManager.js",
+      "line": 474,
+      "meaning": "allocation.deadline created after physical checkout"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantResolver.js",
+      "line": 65,
+      "meaning": "preparation bound by allocation deadline"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 322,
+      "meaning": "operationDeadline and min(allocation,operation)"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 328,
+      "meaning": "selected remaining schedules LEASE_TIMEOUT"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 153,
+      "meaning": "same remainingMs sets statement_timeout"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 205,
+      "meaning": "tenant COMMIT precedes authorityGuard.complete"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 357,
+      "meaning": "Promise.race and timer clear"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 364,
+      "meaning": "timeout starts discard release asynchronously"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/opportunities/httpComposition.js",
+      "line": 170,
+      "meaning": "OPPORTUNITY_READ timeout10000ms"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/routes/organizationDashboardRoutes.js",
+      "line": 36,
+      "meaning": "sequential report then privateSummary"
+    }
+  ],
+  "gaps": [
+    "No timer armed/fired event, operation identifier, absolute allocation deadline, failure timestamp, release cause or explicit SQL cancellation event was recorded in the original trace.",
+    "This reconstruction identifies the likely deadline mechanism, not the cause of distributed latency in PostgreSQL, transport, event-loop scheduling or host load.",
+    "Deterministic proof uses the actual frozen executor with doubles; it does not establish real SQL authority, audit durability, HTTP status or performance."
+  ],
+  "deterministicValidation": {
+    "status": "PASS",
+    "passed": 5,
+    "total": 5,
+    "syntaxCommand": "node --check context/reviews/central-snapshot-lease-timeout-repeat/lease-timeout.test.cjs",
+    "syntaxExitCode": 0,
+    "testCommand": "node --test --test-isolation=none context/reviews/central-snapshot-lease-timeout-repeat/lease-timeout.test.cjs",
+    "testExitCode": 0
+  },
+  "correction": {
+    "correctedAt": "2026-10-31T19:37:47.548Z",
+    "original": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/timeline.json",
+      "sha256": "f5423a74891b09a22c118b2f9324bcb810d3999608d37130506d6eafeca9fcca",
+      "bytes": 13072
+    },
+    "scope": "Only source-line references are corrected. Numerical evidence, interpretations and limitations are byte-for-byte unchanged as JSON values.",
+    "errata": [
+      {
+        "index": 6,
+        "oldLine": 163,
+        "newLine": 153,
+        "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+        "meaning": "same remainingMs sets statement_timeout"
+      },
+      {
+        "index": 8,
+        "oldLine": 363,
+        "newLine": 357,
+        "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+        "meaning": "Promise.race and timer clear"
+      },
+      {
+        "index": 9,
+        "oldLine": 370,
+        "newLine": 364,
+        "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+        "meaning": "timeout starts discard release asynchronously"
+      },
+      {
+        "index": 11,
+        "oldLine": 32,
+        "newLine": 36,
+        "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/routes/organizationDashboardRoutes.js",
+        "meaning": "sequential report then privateSummary"
+      }
+    ]
+  }
+}

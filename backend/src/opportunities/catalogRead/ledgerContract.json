@@ -1,0 +1,354 @@
+[
+  {
+    "version": "000_central_identity_baseline",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "47ae0e8d5172e22d4bf6ae0c320b510960f3b21ae3b5bc5911c52924e41e0f16",
+      "4fe9223c07cc1d1e43e95a49ae0ae95224698f9d29fd6d1ea40ce0150bae207e"
+    ]
+  },
+  {
+    "version": "001_f2_oidc_sessions",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "0cfc4f9503ed985787857040a9d3619c9456eb9bb35dc291f86bea62dcd9de68",
+      "671483a5d8cda83529e6ef22948ce6da64120f2bd6616b9308070730bbd8676b"
+    ]
+  },
+  {
+    "version": "002_f3_organization_memberships",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "784ad8f042d2a93a61537b338c2f7634c8130dada71b31f9d1572181d71c3d44",
+      "650b23bdc8be5791f15cb61078498f87bcef8ce075261c0fd3aa5dfabade6455"
+    ]
+  },
+  {
+    "version": "003_f4_tenant_directory",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "5edf40b58bbcb3bd42ff8476f23071e9cd6624065495ee9a86d3fccfc517b344",
+      "3781978de2a3bdcbe9e23582a01f412daa24d50dbb4f372638840fbd558da3c5"
+    ]
+  },
+  {
+    "version": "004_f9_async_execution",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "e286e724e24a1514051d272eaef295dc71aafbe6ac5b94a2c7806a83f3a80edd",
+      "9d41e214cc2fc74c453ce69a84cf116f634943db983cbd89a6bafbb0134dcb43"
+    ]
+  },
+  {
+    "version": "005_f7_append_only_audit",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "e8f6525bf4b69bc5c0c9a44f06b832c7ce979e1b72ac8b1b89ce475d5a6b62ff",
+      "9792cf07aa8960a85248bf57b36859177467bf07c6cc552ce66e4347f3260b3d"
+    ]
+  },
+  {
+    "version": "006_f12_opportunity_catalog",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "584cf87b735a29b881690a00bf1ba114ab47cf4ac92ee82ca1441d8e4e17c1e1",
+      "04c575ab8b3c1af9c862fcb1db52600523847732daf02d6c880645d2a8473605"
+    ]
+  },
+  {
+    "version": "007_f9_execution_lineage",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "6accfe1a084ed188a52a33e6994e0b1463ba2a6575aa95c09795c5b6ed7a4669",
+      "acdf8b5ad4bcfac8f37372a13aef12d16f9f8c6f096ed645a3e7383c65e6d7ad"
+    ]
+  },
+  {
+    "version": "008_f44_tenant_workload_identity",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "04d771da38fbc78e68ba7565e490784983002b8753de0b606f5c07789ed92f84",
+      "5ed8d447992e54cc89a11e87c68af87c6f205f13506c42a7cc8af45b92ce8293"
+    ]
+  },
+  {
+    "version": "009_authority_commit_guard",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "ac647889866689c44887df39db2b63393a1fcf600031a184729cf53ef46376ce"
+    ]
+  },
+  {
+    "version": "010_editorial_intention_lookup",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "e5471d8847251aaeeb1e1c5c87418b14aeb3752976a2a9811a085dca58b2e0b6"
+    ]
+  },
+  {
+    "version": "011_criteria_intention_lookup",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "0049858a09df7baae9f5ac7e40575b85b3f5b99c621fe1613236685f0ac3976a"
+    ]
+  },
+  {
+    "version": "012_pq1_intention_lookup",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "c51f07df2bfb1c8c92720eecc23fa2085bdc5093ac6677b23f493030c85f7eea"
+    ]
+  },
+  {
+    "version": "013_pq1_effective_lookup",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "5431b18c567deaf4cb35e6f63d8cd7c012c92f5eab8400bddaa8147473136333"
+    ]
+  },
+  {
+    "version": "014_pq1_decision_lookup",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "5b61c5a88d4011464b96356c1d91e4ee7f814db2dfe9de0942f6086cccf2681c"
+    ]
+  },
+  {
+    "version": "015_funding_tenders_central",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "5ffbc8f08b7242e33449337dba7dbaedcf227737cb2095bc9d0837d7442a11d4"
+    ]
+  },
+  {
+    "version": "016_membership_access",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "baa9e57c455bbc50bf7b357e3f9f70bac956e1df60c7dc9f1133dbc51743988a"
+    ]
+  },
+  {
+    "version": "017_funding_programmes",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "41e183f9888dd55f52567475d19dd1e3295687b8c63d53fc9edca6b1698b17dc"
+    ]
+  },
+  {
+    "version": "018_official_programme_sources",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "fad887d7f5a1dc2269aacd1ab4605538783adeee8ec947fbceb203c950a2e1f1"
+    ]
+  },
+  {
+    "version": "019_internal_access_profiles",
+    "irreversible": false,
+    "acceptedChecksums": [
+      "024b47f4a74ff913580cd932716f69a881a088518e6337382768a6079988a268"
+    ]
+  },
+  {
+    "version": "020_platform_onboarding",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "08ec2e41971fa023c93c11a9da5ddd424ad249ddd49e3a7f323ace702f7f3b02"
+    ]
+  },
+  {
+    "version": "021_platform_members",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "57a56af149dd39cfde4f4cc63329acbf506c748b3e154e1482d373f9abf4472c"
+    ]
+  },
+  {
+    "version": "022_entity_admission",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "7c8212fb473f4bb0712b4fc20228b6d286ac339ea6334472342f4a09c55c76dd"
+    ]
+  },
+  {
+    "version": "023_entity_registration_draft",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "491d54080de1a7f831751fac9d8a87da34cfefc0d595bd05495015030d5a66e5"
+    ]
+  },
+  {
+    "version": "024_organization_registration",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "2f6325a4230317969e877d32bfbb0f5c9d5e8948926806d1e312021e6fa3297f"
+    ]
+  },
+  {
+    "version": "025_entity_admission_completion",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "8c5e64e189bb9b9e70158d2d12e8bf2ca277b2406cedda32bc7b053548a09df9"
+    ]
+  },
+  {
+    "version": "026_platform_logs",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "aa1e6d2acea55403e709ef1b03fb48e72984e548f9b9d86df6740f1286348760"
+    ]
+  },
+  {
+    "version": "027_platform_billing",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "8f6f39cc106073452ffe9f206ae19b771f267d48eef96c684bb5f084e727f0a9"
+    ]
+  },
+  {
+    "version": "028_catalog_identity_authority",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "13731a2618a5b9c14fc012165a543bcac73b69747f0aeff6c28ba369c0624212"
+    ]
+  },
+  {
+    "version": "029_catalog_reader",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "3b90dcc49f7e53c342b5be8cd4bb99729000a92a3a302ba443c0a45aec91d0bc"
+    ]
+  },
+  {
+    "version": "030_application_responsibles",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "9e2f08d2cc0b013b5f25a889307b4ffcf6c896ce0d71b6fdf5a206fa67a6237f"
+    ]
+  },
+  {
+    "version": "031_tenant_directory_resolution",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "e0a16c77b5a90548206e980c3ef658a99ca2ff213ad776e2eb3b609d18b71062"
+    ]
+  },
+  {
+    "version": "032_single_organization_membership",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "2f19b8f22a586eeab967d7374e8967a5ad626f27f1712654269d51433d3ba2c2"
+    ]
+  },
+  {
+    "version": "033_funding_coverage",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "635b02beaf8257a413b0c951f71e1b0a54502fb438864072591fb002357c2c9e"
+    ]
+  },
+  {
+    "version": "034_funding_temporal_refresh",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "5cd4f5ffefad52d6910379440d6943ba10c1474a964dd2648b0e43d7fe15ece7"
+    ]
+  },
+  {
+    "version": "035_funding_source_resolution",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "a621ed6763c6f59f668d0bca4b9b7cb91bb65cd47c73ae1ba258021a58ca76c5"
+    ]
+  },
+  {
+    "version": "036_funding_canonical_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "c729f6d1048a6ccf5592cf903e6e717a16bccca108aa3c307ab1837f4a742a75"
+    ]
+  },
+  {
+    "version": "037_manual_opportunity_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "07302055a705a30b4b6e5fb3ab537e1b9e6b1c8031988d5bcdfec155538ec990"
+    ]
+  },
+  {
+    "version": "038_pt2030_plan_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "fb9d9e46ea2382dd9086343c5b6f685a946519942065c459975d872d922c45d5"
+    ]
+  },
+  {
+    "version": "039_opportunity_persistence_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "fb2b973a11b8be7909452287416050ed2199f6b1bfd0b2d2b419a09f8f1d9f2c"
+    ]
+  },
+  {
+    "version": "040_opportunity_activation_authority_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "06cfde591666f079bfd97db3e2ba0c3504770541ab7bd1c82139c8567c0108d5"
+    ]
+  },
+  {
+    "version": "041_opportunity_activation_approval_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "b75daef91a24886fe42baf2a79823f0cb121fa22ca6a1785dba404dd36d0e879"
+    ]
+  },
+  {
+    "version": "042_opportunity_eu_source_control_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "c4b371d8a75f89567645c08f83e244ffa49fb386639175c8c2a53e526288b747"
+    ]
+  },
+  {
+    "version": "043_opportunity_eu_writer_v2",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "68562ede29f9c6063105c132331d7defb7b776d6ad5e928b3b1e843925af3f62"
+    ]
+  },
+  {
+    "version": "044_opportunity_eu_expired_reconciliation",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "afadcb18620fed476affae75421c074b34bd6f983209d962e2468295c2355a6c"
+    ]
+  },
+  {
+    "version": "045_opportunity_eu_legacy_prearchive",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "68cb256a60029fce201d4f5c9dace068b284785affce897267ecc25fc17fc7b7"
+    ]
+  },
+  {
+    "version": "046_catalog_read_projection_v1",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "33e4c6d90017824ec168decc04bfff3b3cb4487e771936678ca09f8b8b3956f3"
+    ]
+  },
+  {
+    "version": "047_catalog_read_admission_v1",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "d8683bb92205ba31bc31035d3635c1f3c9157a63486e62a808c9a88721dbfe61"
+    ]
+  },
+  {
+    "version": "048_catalog_read_service_v1",
+    "irreversible": true,
+    "acceptedChecksums": [
+      "78e0ce6bc77f75cdbeef2e14ab03021882e8220a0f28af90ee2d2eda3a1f4992"
+    ]
+  }
+]

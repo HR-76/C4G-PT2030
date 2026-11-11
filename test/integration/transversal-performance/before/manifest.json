@@ -1,0 +1,57 @@
+[
+  {
+    "path": "backend/src/applications/composition.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__applications__composition.js.txt",
+    "sha256": "058398ff1f446ca8b74e44eed87452b2658313f31e9a5cd6eb254684d20ecaad"
+  },
+  {
+    "path": "backend/src/applications/contracts.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__applications__contracts.js.txt",
+    "sha256": "faea2cf8589b968a52ec2bdaf33bf16eb2cd66085639d73b1a727152fdb88bc7"
+  },
+  {
+    "path": "backend/src/applications/repository.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__applications__repository.js.txt",
+    "sha256": "00b344e739832dc23b2fc4771141c895254be3e9d4bf1ea7f651657702284da9"
+  },
+  {
+    "path": "backend/src/applications/alerts.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__applications__alerts.js.txt",
+    "sha256": "41c04474569686d54681dc76d1faf6618ef80acfc6c7f9b0fbaf14ccf7ffac95"
+  },
+  {
+    "path": "backend/src/security/authorityCoordinator.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__security__authorityCoordinator.js.txt",
+    "sha256": "17556ae2da2acaab637593001c7251d5546732e01524580dae6b3eb68c1a6076"
+  },
+  {
+    "path": "backend/src/routes/applicationSliceRoutes.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__routes__applicationSliceRoutes.js.txt",
+    "sha256": "a8f8aa7011c60396d50ac528809fa0ddea9bfe55663b2934f3803316d7fff943"
+  },
+  {
+    "path": "backend/src/routes/applicationAlertRoutes.js",
+    "snapshot": "test/integration/transversal-performance/before/backend__src__routes__applicationAlertRoutes.js.txt",
+    "sha256": "24bc1bc9bd4ab7f19b3aafddfb2498d8e7ee79cd1d77658fdc091af55b8b29ae"
+  },
+  {
+    "path": "frontend/src/api/api.js",
+    "snapshot": "test/integration/transversal-performance/before/frontend__src__api__api.js.txt",
+    "sha256": "0bc56e1419e8d612a5dd8e19b2c10d024ebc1f727f3f81514f2210a5efc14b93"
+  },
+  {
+    "path": "frontend/src/components/Layout/Header.jsx",
+    "snapshot": "test/integration/transversal-performance/before/frontend__src__components__Layout__Header.jsx.txt",
+    "sha256": "8c84c2958f66c9e6ad4e062a6075243b725c20456adc5e77ba32da68573512b3"
+  },
+  {
+    "path": "frontend/src/pages/Notifications.jsx",
+    "snapshot": "test/integration/transversal-performance/before/frontend__src__pages__Notifications.jsx.txt",
+    "sha256": "192a1c710cd46c341f5257bc6f662f0b557188193595706981ff6f9994f807df"
+  },
+  {
+    "path": "frontend/src/pages/Applications/ApplicationBrowse.jsx",
+    "snapshot": "test/integration/transversal-performance/before/frontend__src__pages__Applications__ApplicationBrowse.jsx.txt",
+    "sha256": "058e15a5469001017b852f51c9409af71eb9d2c9a1b3ea54549661068ae34738"
+  }
+]

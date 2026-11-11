@@ -1,0 +1,234 @@
+{
+  "date": "2026-10-28",
+  "scope": "Fourth explicitly authorized isolated execution after startup UTC fix",
+  "exitCode": 1,
+  "status": "FAIL",
+  "setupDiagnostic": {
+    "phase": "READY",
+    "tenant": null,
+    "status": "READY",
+    "classification": null,
+    "errorCode": null,
+    "localCleanup": "NOT_STARTED",
+    "substep": null,
+    "substepStatus": null,
+    "substepFailure": null
+  },
+  "cleanup": {
+    "environmentClosed": true,
+    "containerRemoved": true,
+    "errors": []
+  },
+  "cleanupVerification": {
+    "localContextConfirmed": true,
+    "daemonIdentityConfirmed": true,
+    "containerAbsentById": true,
+    "containerAbsentByLabel": true,
+    "independentVolumeInventory": false,
+    "verifiedAt": "2026-10-28T00:50:41.410Z"
+  },
+  "reEvaluation": {
+    "exitCode": 1,
+    "status": "FAIL",
+    "incomplete": []
+  },
+  "sourceManifestVerified": true,
+  "sourceFiles": 1013,
+  "repositoryCases": 14,
+  "authorityCases": 9,
+  "contractReadCasesPassed": 14,
+  "expectedStorageRejections": 2,
+  "completeContractReadCoverage": false,
+  "capacitySamples": 52,
+  "warmups": 26,
+  "measuredSuccesses": 40,
+  "warmupSuccesses": 20,
+  "failedMeasured": 12,
+  "failedWarmups": 6,
+  "failureCode": "LEASE_TIMEOUT",
+  "failedScenarios": [
+    "volume-10000",
+    "volume-10001",
+    "profile-distinct-origins"
+  ],
+  "capacitySummary": [
+    {
+      "scenarioId": "volume-0",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1215.3129499999923,
+      "meanAfterMs": 1217.668150000005,
+      "meanQueriesBefore": 333,
+      "meanQueriesAfter": 335
+    },
+    {
+      "scenarioId": "volume-25",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1810.6263000000035,
+      "meanAfterMs": 1599.7000499999995,
+      "meanQueriesBefore": 337,
+      "meanQueriesAfter": 339
+    },
+    {
+      "scenarioId": "volume-26",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1658.1859499999991,
+      "meanAfterMs": 1650.830099999992,
+      "meanQueriesBefore": 337,
+      "meanQueriesAfter": 339
+    },
+    {
+      "scenarioId": "volume-100",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1668.9955000000045,
+      "meanAfterMs": 1540.9876499999955,
+      "meanQueriesBefore": 338,
+      "meanQueriesAfter": 340
+    },
+    {
+      "scenarioId": "volume-101",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1963.7153500000059,
+      "meanAfterMs": 2068.5199999999895,
+      "meanQueriesBefore": 340,
+      "meanQueriesAfter": 342
+    },
+    {
+      "scenarioId": "volume-10000",
+      "measuredSamples": 4,
+      "meanBeforeMs": 9888.87950000001,
+      "meanAfterMs": 9930.56809999999,
+      "meanQueriesBefore": 395.5,
+      "meanQueriesAfter": 406
+    },
+    {
+      "scenarioId": "volume-10001",
+      "measuredSamples": 4,
+      "meanBeforeMs": 9904.817700000014,
+      "meanAfterMs": 9926.605349999998,
+      "meanQueriesBefore": 406,
+      "meanQueriesAfter": 412
+    },
+    {
+      "scenarioId": "profile-denied",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1338.6465000000026,
+      "meanAfterMs": 1387.6767500000133,
+      "meanQueriesBefore": 340,
+      "meanQueriesAfter": 342
+    },
+    {
+      "scenarioId": "profile-shared-origin",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1513.053500000009,
+      "meanAfterMs": 1427.8469499999774,
+      "meanQueriesBefore": 340,
+      "meanQueriesAfter": 342
+    },
+    {
+      "scenarioId": "profile-distinct-origins",
+      "measuredSamples": 4,
+      "meanBeforeMs": 9894.524849999987,
+      "meanAfterMs": 9903.118450000009,
+      "meanQueriesBefore": 335.5,
+      "meanQueriesAfter": 339.5
+    },
+    {
+      "scenarioId": "profile-selective",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1440.0804500000377,
+      "meanAfterMs": 1327.519649999973,
+      "meanQueriesBefore": 340,
+      "meanQueriesAfter": 342
+    },
+    {
+      "scenarioId": "profile-historical-people",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1586.0999500000325,
+      "meanAfterMs": 1592.4745500000136,
+      "meanQueriesBefore": 340,
+      "meanQueriesAfter": 342
+    },
+    {
+      "scenarioId": "profile-large-payload",
+      "measuredSamples": 4,
+      "meanBeforeMs": 1509.2090000000026,
+      "meanAfterMs": 1397.1919000000053,
+      "meanQueriesBefore": 337,
+      "meanQueriesAfter": 339
+    }
+  ],
+  "testsRepeated": {
+    "sessionConfiguration": {
+      "pass": 8,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "codeChanged": false,
+  "testsAdded": 0,
+  "suitesAndBuildRerun": false,
+  "lastCodeValidation": {
+    "focusedPass": 195,
+    "backendPass": 1533,
+    "backendFail": 0,
+    "backendSkip": 7,
+    "frontendPass": 346,
+    "build": "PASS"
+  },
+  "runtimeIntegrated": false,
+  "productionCapacityApproved": false,
+  "diagnosis": {
+    "originalThirdAttemptMismatchFieldKnown": false,
+    "costRootCauseKnown": false
+  },
+  "immutableEvidenceHashes": {
+    "evidence.json": "207ea2a86182c7b32c4dd467f7291cef261ba87df772ef11c1289b5821e06e5f",
+    "sources.json": "540b0eeeb91fca4e0daf55428e593d6d164e0ddd00e0865132c625dd7d7a46ee"
+  },
+  "previousThreeExecutionFileHashes": {
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/evidence.json": "5afa8b743d17dc65c9d811beb6784eb0ed139340260c5b9e92d604afa3e9f83e",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/README.md": "3f43e61395136a4921a34bf48dee4eb70cfdbd6b796d4208f0a2ba6eea047c44",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/sources.json": "014b04f9250084eeacd481839c18e95b721f16ab7b6c46cf0c062ea6a8f77985",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/verification.json": "1a7921cb3563a72af62d715825518b2f3d036aadc5d0d6f965a22be1e6b3c818",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/evidence.json": "46137f216ac34af192d6520d8a630c46d435b7dfc96582db0a483962e956a1a3",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/README.md": "8dcbb193833235c2c0191b78bbb30f6f2d3bf464ff024180ccde653ec0ef3898",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/sources.json": "b6d68cb4529e319e0e0f01cd10fcd37bc52c0fa78caed4e66c4965eab58d6c43",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/verification.json": "a3984b5682481f479c33f088ca565f09dcda3710534a4f4a1e2bc6fc7c3330e2",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/evidence.json": "d296011b36f3229bb7e432fb25c30605ba478d9d56a5770f86812eb6010ba96e",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/README.md": "f66a9c7fd0d394aeb6d1d4aabd471f4e433a2c856b0bd5e83017a74d09d11aff",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/sources.json": "0a17d2587fd5e2bc1b4b80adf9e6e13c7541f40a557a819d87252f5607abe5c3",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/verification.json": "b44fd6a3ac1bfb08455fd900c4c1f0a2b6a07b3bf2eeaa95360490c9f268fc3f"
+  },
+  "preservation": {
+    "status": "PASS",
+    "branch": "feat/f13-organizational-profile",
+    "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baselineFiles": 30990,
+    "baselineWorktreeEntries": 2616,
+    "currentFiles": 30994,
+    "currentWorktreeEntries": 2620,
+    "added": [
+      "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/README.md",
+      "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/evidence.json",
+      "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/sources.json",
+      "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md"
+    ],
+    "removed": [],
+    "unexpected": [],
+    "branchAndHeadUnchanged": true,
+    "previousThreeFailuresUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  },
+  "independentReview": {
+    "status": "PASS",
+    "conclusion": "FAIL verdict correctly retained; no integration authorization"
+  },
+  "documentationChecks": {
+    "utf8": "PASS",
+    "links": 5
+  }
+}

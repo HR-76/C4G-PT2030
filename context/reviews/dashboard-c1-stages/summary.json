@@ -1,0 +1,600 @@
+{
+  "status": "COMPLETE",
+  "startedAt": "2026-10-27T20:09:32.692Z",
+  "finishedAt": "2026-10-27T20:13:13.999Z",
+  "sampleCount": 1669,
+  "sampleQueryMeanMs": 3.24,
+  "sampleQueryMaxMs": 69.06,
+  "policies": [
+    {
+      "globalLimit": 20,
+      "perTenantLimit": 5,
+      "operationalReserve": 2,
+      "globalQueueLimit": 40,
+      "perTenantQueueLimit": 10,
+      "operationalQueueReserve": 2,
+      "acquireTimeoutMs": 5000,
+      "leaseTimeoutMs": 15000,
+      "idleTimeoutMs": 30000,
+      "drainTimeoutMs": 10000,
+      "circuitFailureThreshold": 3,
+      "circuitResetMs": 10000,
+      "backoffBaseMs": 25,
+      "maxBackoffMs": 250
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "report-c1",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 4208.2,
+      "p95Ms": 4464.52,
+      "successThroughputPerSecond": 0.24,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1117,
+        1117,
+        1117,
+        1117
+      ],
+      "meanMetadataMs": 3185.88,
+      "meanApplicationSelectionMs": 23.42,
+      "meanAuditPrepareMs": 6.34,
+      "meanCentralLockCallMs": 47.59,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 84,
+          "maxWaitMs": 0.32,
+          "maxHeldMs": 216.91,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 2
+        },
+        "tenant": {
+          "count": 4,
+          "maxWaitMs": 0.18,
+          "maxHeldMs": 3395.7,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 1
+        }
+      },
+      "logicalAdmissions": {
+        "count": 4,
+        "maxWaitMs": 0.42,
+        "errors": []
+      },
+      "sampledFrames": 161,
+      "maxActive": 1,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 0,
+      "centralBlockedFrames": 2,
+      "auditWaitEvents": [],
+      "blockerExamples": [],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "report-c2",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 4342.31,
+      "p95Ms": 4703.77,
+      "successThroughputPerSecond": 0.44,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1117,
+        1117,
+        1117,
+        1117
+      ],
+      "meanMetadataMs": 3111.61,
+      "meanApplicationSelectionMs": 19.29,
+      "meanAuditPrepareMs": 120.46,
+      "meanCentralLockCallMs": 111.29,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 84,
+          "maxWaitMs": 31.3,
+          "maxHeldMs": 247.43,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 4
+        },
+        "tenant": {
+          "count": 4,
+          "maxWaitMs": 37.39,
+          "maxHeldMs": 3530.13,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 2
+        }
+      },
+      "logicalAdmissions": {
+        "count": 4,
+        "maxWaitMs": 37.65,
+        "errors": []
+      },
+      "sampledFrames": 88,
+      "maxActive": 2,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 5,
+      "centralBlockedFrames": 3,
+      "auditWaitEvents": [
+        "transactionid"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 7
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "metadata",
+              "request": 7
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 7
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "report-c4",
+      "samples": 8,
+      "successes": 8,
+      "errors": 0,
+      "p50Ms": 5465.63,
+      "p95Ms": 7495.43,
+      "successThroughputPerSecond": 0.62,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1117,
+        1117,
+        1117,
+        1117,
+        1117,
+        1117,
+        1117,
+        1117
+      ],
+      "meanMetadataMs": 3773.63,
+      "meanApplicationSelectionMs": 18.55,
+      "meanAuditPrepareMs": 368.64,
+      "meanCentralLockCallMs": 363.77,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 168,
+          "maxWaitMs": 64.73,
+          "maxHeldMs": 367.72,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 7
+        },
+        "tenant": {
+          "count": 8,
+          "maxWaitMs": 21.17,
+          "maxHeldMs": 5930.83,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 8,
+        "maxWaitMs": 21.4,
+        "errors": []
+      },
+      "sampledFrames": 123,
+      "maxActive": 4,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 15,
+      "centralBlockedFrames": 21,
+      "auditWaitEvents": [
+        "transactionid",
+        "tuple"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 13
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 12
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 14
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 12
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 13
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "metadata",
+              "request": 12
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "dashboard-c1",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 10143.13,
+      "p95Ms": 10223.32,
+      "successThroughputPerSecond": 0.1,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2619,
+        2619,
+        2619,
+        2619
+      ],
+      "meanMetadataMs": 7423.51,
+      "meanApplicationSelectionMs": 23.59,
+      "meanAuditPrepareMs": 10.92,
+      "meanCentralLockCallMs": 46.49,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 168,
+          "maxWaitMs": 26.17,
+          "maxHeldMs": 264.15,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 2
+        },
+        "tenant": {
+          "count": 12,
+          "maxWaitMs": 0.07,
+          "maxHeldMs": 3481.23,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 12,
+        "maxWaitMs": 0.21,
+        "errors": []
+      },
+      "sampledFrames": 377,
+      "maxActive": 1,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 0,
+      "centralBlockedFrames": 2,
+      "auditWaitEvents": [],
+      "blockerExamples": [],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "dashboard-c4",
+      "samples": 8,
+      "successes": 8,
+      "errors": 0,
+      "p50Ms": 13146.14,
+      "p95Ms": 14490.39,
+      "successThroughputPerSecond": 0.29,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619
+      ],
+      "meanMetadataMs": 9070.74,
+      "meanApplicationSelectionMs": 24.34,
+      "meanAuditPrepareMs": 323.55,
+      "meanCentralLockCallMs": 685.59,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 336,
+          "maxWaitMs": 68.72,
+          "maxHeldMs": 427.17,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 7
+        },
+        "tenant": {
+          "count": 24,
+          "maxWaitMs": 84.73,
+          "maxHeldMs": 5712.02,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 24,
+        "maxWaitMs": 84.88,
+        "errors": []
+      },
+      "sampledFrames": 258,
+      "maxActive": 4,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 14,
+      "centralBlockedFrames": 41,
+      "auditWaitEvents": [
+        "transactionid",
+        "tuple"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 26
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 27
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 29
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 27
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 26
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 27
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "dashboard-two-tenants-c4",
+      "samples": 8,
+      "successes": 8,
+      "errors": 0,
+      "p50Ms": 13112.38,
+      "p95Ms": 13788.36,
+      "successThroughputPerSecond": 0.3,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619,
+        2619
+      ],
+      "meanMetadataMs": 9175.71,
+      "meanApplicationSelectionMs": 18.7,
+      "meanAuditPrepareMs": 130.04,
+      "meanCentralLockCallMs": 662.67,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 336,
+          "maxWaitMs": 36.08,
+          "maxHeldMs": 347.62,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 7
+        },
+        "tenant": {
+          "count": 24,
+          "maxWaitMs": 16.95,
+          "maxHeldMs": 4886.07,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 24,
+        "maxWaitMs": 17.69,
+        "errors": []
+      },
+      "sampledFrames": 250,
+      "maxActive": 4,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 5,
+      "centralBlockedFrames": 35,
+      "auditWaitEvents": [
+        "transactionid"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 37
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "metadata",
+              "request": 35
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 37
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 35
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-2",
+            "wait": "transactionid",
+            "request": 38
+          },
+          "blockers": [
+            {
+              "role": "tenant-2",
+              "state": "active",
+              "wait": null,
+              "query": "metadata",
+              "request": 36
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    }
+  ]
+}

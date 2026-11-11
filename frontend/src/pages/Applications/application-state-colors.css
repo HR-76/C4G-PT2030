@@ -1,0 +1,33 @@
+/* Shared accents for the status filters, list and dashboard charts. */
+:root {
+  --application-identified: var(--color-neutral-label);
+  --application-intention: var(--color-violet);
+  --application-preparation: var(--color-info);
+  --application-submitted: var(--color-warning);
+  --application-approved: var(--color-success);
+  --application-rejected: var(--color-danger);
+  --application-cancelled: var(--color-rose);
+  --application-archived: var(--color-slate);
+}
+
+.application-state-row {
+  --application-state-surface: var(--color-neutral-soft);
+  --application-state-accent: var(--color-neutral-label);
+}
+.application-state-row[data-status="IDENTIFIED"] { --application-state-surface: var(--color-neutral-soft); --application-state-accent: var(--application-identified); }
+.application-state-row[data-status="INTENTION"] { --application-state-surface: var(--color-violet-soft); --application-state-accent: var(--application-intention); }
+.application-state-row[data-status="PREPARATION"] { --application-state-surface: var(--color-info-soft); --application-state-accent: var(--application-preparation); }
+.application-state-row[data-status="SUBMITTED"] { --application-state-surface: var(--color-warning-soft); --application-state-accent: var(--application-submitted); }
+.application-state-row[data-status="APPROVED"] { --application-state-surface: var(--color-success-soft); --application-state-accent: var(--application-approved); }
+.application-state-row[data-status="REJECTED"] { --application-state-surface: var(--color-danger-soft); --application-state-accent: var(--application-rejected); }
+.application-state-row[data-status="CANCELLED"] { --application-state-surface: var(--color-rose-soft); --application-state-accent: var(--application-cancelled); }
+.application-state-row[data-status="ARCHIVED"] { --application-state-surface: var(--color-slate-soft); --application-state-accent: var(--application-archived); }
+
+.state-dot[data-state="IDENTIFIED"] { --application-state-accent: var(--application-identified); }
+.state-dot[data-state="INTENTION"] { --application-state-accent: var(--application-intention); }
+.state-dot[data-state="PREPARATION"] { --application-state-accent: var(--application-preparation); }
+.state-dot[data-state="SUBMITTED"] { --application-state-accent: var(--application-submitted); }
+.state-dot[data-state="APPROVED"] { --application-state-accent: var(--application-approved); }
+.state-dot[data-state="REJECTED"] { --application-state-accent: var(--application-rejected); }
+.state-dot[data-state="CANCELLED"] { --application-state-accent: var(--application-cancelled); }
+.state-dot[data-state="ARCHIVED"] { --application-state-accent: var(--application-archived); }

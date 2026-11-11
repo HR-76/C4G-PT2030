@@ -1,0 +1,83 @@
+/* Creation only; the existing detail and edit modal keep their own layout. */
+.application-create-workspace {
+  --create-brand:var(--color-success);
+  --create-ink:var(--color-text-primary);
+  --create-line:var(--color-border);
+  --create-soft:var(--color-neutral-soft);
+  --border:var(--color-border-strong);
+  --text-muted:var(--color-text-secondary);
+  --focus-ring:var(--color-success);
+  max-width:none; container-type:inline-size; color:var(--create-ink);
+}
+.application-create-workspace > a:first-of-type { display:inline-block; margin-bottom:16px; font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+.application-create-header { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:8px 0 20px; background:var(--color-surface); border-bottom:1px solid var(--color-border); color:var(--color-text-primary); }
+.application-create-header > div { min-width:0; }
+.application-create-header p { margin:0 0 8px; color:var(--color-text-secondary); }
+.application-create-header h1 { color:var(--color-text-primary); margin:0; font-size:1.85rem; line-height:1.25; letter-spacing:-.4px; }
+.application-create-initial-state { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+.application-create-initial-state > span { color:var(--color-text-secondary); font-size:.85rem; }
+.application-create-initial-state strong { padding:6px 14px; background:var(--color-neutral-soft); color:var(--color-action); border-radius:5px; font-size:.9rem; }
+.application-create-workspace > [role=alert], .application-create-workspace > [role=status] { padding:14px 18px; margin:18px 0; border:1px solid var(--color-warning); border-left:4px solid var(--color-warning); border-radius:5px; background:var(--color-warning-soft); color:var(--color-warning); overflow-wrap:anywhere; }
+.application-create-workspace > [role=alert] { border-color:var(--color-danger); background:var(--color-danger-soft); color:var(--color-danger); }
+.application-create-context { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin:20px 0; }
+.application-create-context > section { min-width:0; padding:20px; background:var(--create-soft); border:1px solid var(--create-line); border-radius:6px; }
+.application-create-context > section:only-child { grid-column:1/-1; }
+.application-create-context h2 { margin:0 0 12px; color:var(--color-text-primary); font-size:1rem; }
+.application-create-workspace .application-opportunity-context { gap:8px; line-height:1.5; }
+.application-create-workspace .application-opportunity-context strong { font-size:1.05rem; overflow-wrap:anywhere; }
+.application-create-workspace .application-opportunity-context p { margin:0; color:var(--color-text-secondary); }
+.application-create-context a { color:var(--create-brand); text-decoration:underline; text-underline-offset:3px; overflow-wrap:anywhere; }
+.application-create-workspace .interest-application-context { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+.application-create-workspace .interest-application-context h2 { margin:0; }
+.application-create-workspace .interest-application-context > p { margin:0; }
+.application-interest-notes { width:100%; max-height:7.5em; overflow:auto; line-height:1.5; overflow-wrap:anywhere; }
+.application-create-workspace .application-create-form { padding:0; margin:0; border:1px solid var(--create-line); border-radius:8px; background:var(--color-surface); overflow:hidden; }
+.application-create-fields { display:grid; grid-template-columns:1.1fr 1fr; }
+.application-create-section { min-width:0; }
+.application-create-section + .application-create-section { border-left:1px solid var(--create-line); }
+.application-create-section h2 { margin:0; padding:16px 22px; border-bottom:1px solid var(--create-line); background:var(--color-surface); color:var(--color-text-primary); font-size:1.1rem; }
+.application-create-section > .field-grid { padding:22px; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 18px; }
+.application-create-workspace .field { min-width:0; gap:8px; }
+.application-create-workspace .field label, .application-create-evaluation label { display:flex; flex-direction:column; gap:8px; font-size:.88rem; font-weight:600; text-transform:none; letter-spacing:0; color:var(--color-text-secondary); }
+.application-create-workspace input:not([type=checkbox]), .application-create-workspace select, .application-create-workspace textarea { min-width:0; width:100%; min-height:42px; border:1px solid var(--border-control); border-radius:5px; background:var(--color-surface); color:var(--create-ink); font:inherit; }
+.application-create-workspace input[type=number] { font-variant-numeric:tabular-nums; }
+.application-create-workspace .field > input[type=number] { margin-top:auto; }
+.application-create-workspace textarea { min-height:138px; resize:vertical; line-height:1.5; }
+.application-create-workspace input:disabled, .application-create-workspace select:disabled, .application-create-workspace textarea:disabled { background:var(--color-neutral-soft); color:var(--color-action); opacity:1; }
+.application-create-workspace .interest-units { margin:4px 0 0; padding:12px; border-color:var(--create-line); background:var(--color-surface); }
+.application-create-workspace .interest-units legend { color:var(--color-text-secondary); font-size:.88rem; font-weight:600; }
+.application-create-workspace .interest-units label { flex-direction:row; align-items:flex-start; font-weight:400; }
+.application-create-workspace input[type=checkbox] { width:17px; height:17px; min-height:0; flex-shrink:0; accent-color:var(--color-success); margin:2px 0 0; }
+.application-create-workspace .application-team-choice { display:flex; align-items:flex-start; gap:9px; color:var(--color-text-primary); font-size:.9rem; }
+.application-create-evaluation { padding:16px 22px; border-top:1px solid var(--create-line); }
+.application-create-evaluation summary { cursor:pointer; color:var(--create-brand); font-weight:600; }
+.application-create-evaluation label { margin-top:16px; max-width:500px; }
+.application-create-evaluation p { margin:12px 0 0; font-size:.88rem; }
+.application-create-workspace .application-create-actions { margin:0; padding:18px 22px; border-top:1px solid var(--create-line); background:var(--create-soft); gap:12px; }
+.application-create-workspace .btn { min-height:42px; white-space:normal; }
+.application-create-workspace [role=status] > .btn { margin:8px 0 0; }
+.application-create-workspace :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible { outline:2px solid var(--create-brand); outline-offset:3px; }
+@media(max-width:1100px) {
+  .application-create-fields { grid-template-columns:minmax(0,1fr); }
+  .application-create-section + .application-create-section { border-left:0; border-top:1px solid var(--create-line); }
+}
+@media(max-width:680px) {
+  .application-create-header { align-items:flex-start; padding:22px 18px; flex-direction:column; gap:18px; }
+  .application-create-header h1 { font-size:1.6rem; }
+  .application-create-initial-state { flex-direction:row; align-items:center; gap:12px; }
+  .application-create-context { grid-template-columns:minmax(0,1fr); gap:12px; }
+  .application-create-context > section { padding:18px; }
+  .application-create-section h2 { padding:14px 18px; }
+  .application-create-section > .field-grid { grid-template-columns:minmax(0,1fr); padding:18px; gap:18px; }
+  .application-create-evaluation { padding:18px; }
+  .application-create-workspace .application-create-actions { padding:18px; flex-direction:column; }
+  .application-create-workspace .application-create-actions .btn { width:100%; justify-content:center; min-height:44px; }
+}
+
+@container (min-width:1120px) {
+  .application-create-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,22%); gap:24px; align-items:start; margin-top:24px; }
+  .application-create-form { grid-column:1; grid-row:1; min-width:0; }
+  .application-create-context { grid-column:2; grid-row:1; grid-template-columns:minmax(0,1fr); margin:0; gap:20px; padding-left:20px; border-left:1px solid var(--create-line); }
+  .application-create-context > section { padding:0; border:0; background:transparent; }
+  .application-create-context > section + section { border-top:1px solid var(--create-line); padding-top:18px; }
+}

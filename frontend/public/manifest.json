@@ -1,0 +1,16 @@
+{
+  "name": "C4G Funding Platform",
+  "short_name": "C4G",
+  "icons": [
+    {
+      "src": "/favicon-c4g.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#075B59",
+  "background_color": "#F6F8F8",
+  "display": "standalone",
+  "lang": "pt-PT"
+}

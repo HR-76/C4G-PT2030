@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "busy Central marker makes guarded capture fail without publishing a result",
+    "real tenant tree lock and guarded write complete after experimental no-wait capture releases marker",
+    "real session revocation waits for guards and invalidates the session after protected commits",
+    "second tenant remains unchanged"
+  ],
+  "limits": [
+    "Real F4 tenant executor and durable Central guards; authorization evidence and marker protocol are synthetic, not product matching or F5.",
+    "No claim about trigger coverage, lock order of all writers, OIDC, cursor security, or production pagination."
+  ],
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "description": "Isolated rehearsal only, not registered in APP",
+  "entries": [
+    {
+      "version": "046_catalog_read_projection_v1",
+      "file": "catalog_read_projection_v1.up.sql",
+      "irreversible": true,
+      "upChecksum": "33e4c6d90017824ec168decc04bfff3b3cb4487e771936678ca09f8b8b3956f3"
+    },
+    {
+      "version": "047_catalog_read_admission_v1",
+      "file": "catalog_read_admission_v1.up.sql",
+      "irreversible": true,
+      "upChecksum": "d8683bb92205ba31bc31035d3635c1f3c9157a63486e62a808c9a88721dbfe61"
+    },
+    {
+      "version": "048_catalog_read_service_v1",
+      "file": "catalog_read_service_v1.up.sql",
+      "irreversible": true,
+      "upChecksum": "78e0ce6bc77f75cdbeef2e14ab03021882e8220a0f28af90ee2d2eda3a1f4992"
+    }
+  ],
+  "fingerprint": "007fcfaa1a206d287d8aa776596153f95f2135aa7bfce16d04c7c5ed8b64e6dc",
+  "coreFingerprint": "f97daac28a88cff3027f3d16caaf537ef37bbc0d19a6dbc6323f9b59d516abe2",
+  "previousFingerprint": "9dba9c6cc083b2744b5ee86a99e7105e6482dcebceed212d75cf8399a1c2ea17",
+  "previousCoreFingerprint": "d14e8d2f43c715a13c5b087ce11bd377d45d4a98a6f6483cb083754d459f17b5"
+}

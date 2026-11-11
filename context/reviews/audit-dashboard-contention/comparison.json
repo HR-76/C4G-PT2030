@@ -1,0 +1,926 @@
+{
+  "createdAt": "2026-10-27T00:16:41.091Z",
+  "baseline": [
+    "authority-metadata-contention",
+    "authority-metadata-capacity"
+  ],
+  "current": [
+    "audit-dashboard-standard",
+    "audit-dashboard-capacity"
+  ],
+  "notes": [
+    "Local instrumented synthetic fixture; same harness and limits; no production claim.",
+    "p50/p95 and hold metrics are successful HTTP responses only; failures listed separately.",
+    "Audit held sum is per HTTP; dashboard has three individual audit lock holds per successful HTTP.",
+    "Two changes measured together; small sequential samples without alternating versions.",
+    "Mean audit-prepare and central-lock call metrics copied from summaries include all responses, including errors; audit-held means only successful responses."
+  ],
+  "scenarios": [
+    {
+      "mode": "standard",
+      "name": "report-c1",
+      "before": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 4286.83,
+        "p95SuccessMs": 4416.84,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1596.02,
+        "auditHeldMaxIndividualMs": 1740.2041000000027,
+        "maxActive": 1,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 4,
+          "maxWaitMs": 1.14,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 84,
+            "maxWaitMs": 0.31,
+            "maxHeldMs": 217.12,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 2
+          },
+          "tenant": {
+            "count": 4,
+            "maxWaitMs": 0.12,
+            "maxHeldMs": 3382.58,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 1
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 5.16,
+        "meanCentralLockCallMsAllResponses": 42.47
+      },
+      "after": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 4005.91,
+        "p95SuccessMs": 4295.36,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 470.55,
+        "auditHeldMaxIndividualMs": 610.3819999999978,
+        "maxActive": 1,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 4,
+          "maxWaitMs": 0.75,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 84,
+            "maxWaitMs": 0.22,
+            "maxHeldMs": 258.36,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 2
+          },
+          "tenant": {
+            "count": 4,
+            "maxWaitMs": 0.12,
+            "maxHeldMs": 3201.21,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 1
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 4.48,
+        "meanCentralLockCallMsAllResponses": 49.34
+      }
+    },
+    {
+      "mode": "standard",
+      "name": "report-c2",
+      "before": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 5852.07,
+        "p95SuccessMs": 6708.81,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 2306.37,
+        "auditHeldMaxIndividualMs": 2825.0455999999976,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 4,
+          "maxWaitMs": 50.22,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 84,
+            "maxWaitMs": 21.43,
+            "maxHeldMs": 492.02,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 3
+          },
+          "tenant": {
+            "count": 4,
+            "maxWaitMs": 49.97,
+            "maxHeldMs": 5293.88,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 2
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 417.45,
+        "meanCentralLockCallMsAllResponses": 198.21
+      },
+      "after": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 3370.72,
+        "p95SuccessMs": 3752.47,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 439.4,
+        "auditHeldMaxIndividualMs": 519.0111999999936,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 4,
+          "maxWaitMs": 19.84,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 84,
+            "maxWaitMs": 10.19,
+            "maxHeldMs": 202.54,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 4
+          },
+          "tenant": {
+            "count": 4,
+            "maxWaitMs": 19.71,
+            "maxHeldMs": 2885.85,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 2
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 121.03,
+        "meanCentralLockCallMsAllResponses": 65.69
+      }
+    },
+    {
+      "mode": "standard",
+      "name": "report-c4",
+      "before": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 7838.8,
+        "p95SuccessMs": 11089.68,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1935.28,
+        "auditHeldMaxIndividualMs": 2110.0743999999977,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 8,
+          "maxWaitMs": 19.44,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 168,
+            "maxWaitMs": 72.89,
+            "maxHeldMs": 268.17,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 4
+          },
+          "tenant": {
+            "count": 8,
+            "maxWaitMs": 19.25,
+            "maxHeldMs": 9643.56,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 2801.39,
+        "meanCentralLockCallMsAllResponses": 189.09
+      },
+      "after": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 3655.03,
+        "p95SuccessMs": 5075.35,
+        "queryCountsSuccessful": [
+          1117
+        ],
+        "authorityTransactionsSuccessful": [
+          21
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          1
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 407.84,
+        "auditHeldMaxIndividualMs": 442.38580000000366,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 8,
+          "maxWaitMs": 8.2,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 168,
+            "maxWaitMs": 13.48,
+            "maxHeldMs": 305.98,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 6
+          },
+          "tenant": {
+            "count": 8,
+            "maxWaitMs": 8.05,
+            "maxHeldMs": 4035.2,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 250.82,
+        "meanCentralLockCallMsAllResponses": 293.11
+      }
+    },
+    {
+      "mode": "standard",
+      "name": "dashboard-c1",
+      "before": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 6344.5,
+        "p95SuccessMs": 7401.16,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 2852.61,
+        "auditHeldMaxIndividualMs": 1885.4642000000167,
+        "maxActive": 2,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 12,
+          "maxWaitMs": 0.23,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 168,
+            "maxWaitMs": 22.56,
+            "maxHeldMs": 258.2,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 3
+          },
+          "tenant": {
+            "count": 12,
+            "maxWaitMs": 0.04,
+            "maxHeldMs": 3526.88,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 10.92,
+        "meanCentralLockCallMsAllResponses": 130.1
+      },
+      "after": {
+        "samples": 4,
+        "successes": 4,
+        "errors": 0,
+        "p50SuccessMs": 8548.92,
+        "p95SuccessMs": 9733.63,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1374.2,
+        "auditHeldMaxIndividualMs": 559.5923000000039,
+        "maxActive": 1,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 12,
+          "maxWaitMs": 0.22,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 168,
+            "maxWaitMs": 0.22,
+            "maxHeldMs": 315.19,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 2
+          },
+          "tenant": {
+            "count": 12,
+            "maxWaitMs": 0.05,
+            "maxHeldMs": 2890.39,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 9.62,
+        "meanCentralLockCallMsAllResponses": 62.57
+      }
+    },
+    {
+      "mode": "standard",
+      "name": "dashboard-c4",
+      "before": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 15621.89,
+        "p95SuccessMs": 18375.89,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 4485.31,
+        "auditHeldMaxIndividualMs": 2967.6949000000022,
+        "maxActive": 5,
+        "maxQueued": 3,
+        "logicalAdmissions": {
+          "count": 24,
+          "maxWaitMs": 4284.81,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 336,
+            "maxWaitMs": 58.14,
+            "maxHeldMs": 746.24,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 24,
+            "maxWaitMs": 32.89,
+            "maxHeldMs": 9333.36,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 5
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 4364.95,
+        "meanCentralLockCallMsAllResponses": 2259.63
+      },
+      "after": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 8230.86,
+        "p95SuccessMs": 9835.05,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1251.35,
+        "auditHeldMaxIndividualMs": 490.3070000000007,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 24,
+          "maxWaitMs": 25.8,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 336,
+            "maxWaitMs": 34.68,
+            "maxHeldMs": 254.69,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 24,
+            "maxWaitMs": 25.72,
+            "maxHeldMs": 4023.52,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 295.74,
+        "meanCentralLockCallMsAllResponses": 545.39
+      }
+    },
+    {
+      "mode": "standard",
+      "name": "dashboard-two-tenants-c4",
+      "before": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 12090.65,
+        "p95SuccessMs": 15227.6,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 4989.58,
+        "auditHeldMaxIndividualMs": 3614.837300000014,
+        "maxActive": 8,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 24,
+          "maxWaitMs": 104.27,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 336,
+            "maxWaitMs": 72.34,
+            "maxHeldMs": 601.92,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 24,
+            "maxWaitMs": 104.01,
+            "maxHeldMs": 8599.49,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 5
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 819.57,
+        "meanCentralLockCallMsAllResponses": 2497.56
+      },
+      "after": {
+        "samples": 8,
+        "successes": 8,
+        "errors": 0,
+        "p50SuccessMs": 8187.02,
+        "p95SuccessMs": 9415.73,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1304.37,
+        "auditHeldMaxIndividualMs": 608.6276000000071,
+        "maxActive": 4,
+        "maxQueued": 0,
+        "logicalAdmissions": {
+          "count": 24,
+          "maxWaitMs": 10.66,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 336,
+            "maxWaitMs": 28.2,
+            "maxHeldMs": 248.61,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 24,
+            "maxWaitMs": 10.56,
+            "maxHeldMs": 3158.16,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 4
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 95.98,
+        "meanCentralLockCallMsAllResponses": 597.88
+      }
+    },
+    {
+      "mode": "capacity",
+      "name": "dashboard-c6",
+      "before": {
+        "samples": 6,
+        "successes": 4,
+        "errors": 2,
+        "p50SuccessMs": 16055.42,
+        "p95SuccessMs": 17576,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 3976.33,
+        "auditHeldMaxIndividualMs": 2364.6972999999925,
+        "maxActive": 5,
+        "maxQueued": 7,
+        "logicalAdmissions": {
+          "count": 16,
+          "maxWaitMs": 5005.36,
+          "errors": [
+            {
+              "before": {
+                "active": 5,
+                "queued": 3,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5002.53,
+              "after": {
+                "active": 5,
+                "queued": 4,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 4,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 4999.71,
+              "after": {
+                "active": 5,
+                "queued": 3,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 5,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5000.34,
+              "after": {
+                "active": 5,
+                "queued": 2,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            },
+            {
+              "before": {
+                "active": 5,
+                "queued": 6,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 0,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "ms": 5005.36,
+              "after": {
+                "active": 5,
+                "queued": 1,
+                "pools": 1,
+                "tenants": 1,
+                "circuitsOpen": 0,
+                "credentialDisposalsPending": 1,
+                "credentialCleanupTimeouts": 0,
+                "credentialCleanupFailures": 0,
+                "cleanupFailures": 0
+              },
+              "error": "POOL_EXHAUSTED"
+            }
+          ]
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 188,
+            "maxWaitMs": 248.89,
+            "maxHeldMs": 714.15,
+            "maxWaitingAtEntry": 3,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 12,
+            "maxWaitMs": 64.21,
+            "maxHeldMs": 8949.26,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 5
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8331.56,
+            "failures": [
+              {
+                "code": "POOL_EXHAUSTED"
+              },
+              {
+                "code": "POOL_EXHAUSTED"
+              }
+            ],
+            "sqlErrors": [],
+            "auditPrepareMs": 0,
+            "applicationSelectionMs": 0,
+            "admissions": [
+              {
+                "before": {
+                  "active": 5,
+                  "queued": 3,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 0,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "ms": 5002.53,
+                "after": {
+                  "active": 5,
+                  "queued": 4,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 1,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "error": "POOL_EXHAUSTED"
+              },
+              {
+                "before": {
+                  "active": 5,
+                  "queued": 4,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 0,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "ms": 4999.71,
+                "after": {
+                  "active": 5,
+                  "queued": 3,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 1,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "error": "POOL_EXHAUSTED"
+              }
+            ],
+            "tenantCheckouts": []
+          },
+          {
+            "status": 503,
+            "code": "SERVICE_UNAVAILABLE",
+            "ms": 8417.98,
+            "failures": [
+              {
+                "code": "POOL_EXHAUSTED"
+              },
+              {
+                "code": "POOL_EXHAUSTED"
+              }
+            ],
+            "sqlErrors": [],
+            "auditPrepareMs": 0,
+            "applicationSelectionMs": 0,
+            "admissions": [
+              {
+                "before": {
+                  "active": 5,
+                  "queued": 5,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 0,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "ms": 5000.34,
+                "after": {
+                  "active": 5,
+                  "queued": 2,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 1,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "error": "POOL_EXHAUSTED"
+              },
+              {
+                "before": {
+                  "active": 5,
+                  "queued": 6,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 0,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "ms": 5005.36,
+                "after": {
+                  "active": 5,
+                  "queued": 1,
+                  "pools": 1,
+                  "tenants": 1,
+                  "circuitsOpen": 0,
+                  "credentialDisposalsPending": 1,
+                  "credentialCleanupTimeouts": 0,
+                  "credentialCleanupFailures": 0,
+                  "cleanupFailures": 0
+                },
+                "error": "POOL_EXHAUSTED"
+              }
+            ],
+            "tenantCheckouts": []
+          }
+        ],
+        "meanAuditPrepareMsAllResponses": 2832.5,
+        "meanCentralLockCallMsAllResponses": 1859.45
+      },
+      "after": {
+        "samples": 6,
+        "successes": 6,
+        "errors": 0,
+        "p50SuccessMs": 10718.42,
+        "p95SuccessMs": 12403.14,
+        "queryCountsSuccessful": [
+          2619
+        ],
+        "authorityTransactionsSuccessful": [
+          42
+        ],
+        "auditHoldCallsPerSuccessfulHttp": [
+          3
+        ],
+        "auditHeldSumMeanPerSuccessfulHttpMs": 1409.7,
+        "auditHeldMaxIndividualMs": 604.7783999999956,
+        "maxActive": 5,
+        "maxQueued": 1,
+        "logicalAdmissions": {
+          "count": 18,
+          "maxWaitMs": 2886.7,
+          "errors": []
+        },
+        "physicalCheckouts": {
+          "authority": {
+            "count": 252,
+            "maxWaitMs": 65.4,
+            "maxHeldMs": 316.32,
+            "maxWaitingAtEntry": 1,
+            "maxPoolTotalAtEntry": 8
+          },
+          "tenant": {
+            "count": 18,
+            "maxWaitMs": 23.85,
+            "maxHeldMs": 4904.06,
+            "maxWaitingAtEntry": 0,
+            "maxPoolTotalAtEntry": 5
+          }
+        },
+        "afterResponseQueryCompletions": 0,
+        "failedRequests": [],
+        "meanAuditPrepareMsAllResponses": 622.71,
+        "meanCentralLockCallMsAllResponses": 1524.08
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-27T20:03:35.507Z",
+  "baselineFileCount": 2653,
+  "unchangedFileCount": 2651,
+  "changedExistingFiles": [
+    "context/features/http-flows-performance.md",
+    "context/current-work.md"
+  ],
+  "missingFiles": [],
+  "unexpectedChangedFiles": [],
+  "headUnchanged": true,
+  "branchUnchanged": true,
+  "baselineStatusEntries": 2203,
+  "finalStatusEntries": 2213,
+  "protectedFilesChecked": 219,
+  "protectedFilesChanged": [],
+  "runtimeFilesChecked": 466,
+  "runtimeFilesChanged": [],
+  "frontendFilesChecked": 179,
+  "frontendFilesChanged": [],
+  "harnessFilesChecked": 14,
+  "harnessFilesChanged": [],
+  "limits": "Comparison of initial inventory only; no immutable claim for ignored files or running databases. Only disposable synthetic test databases used.",
+  "pass": true
+}

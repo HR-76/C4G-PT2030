@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0",
+  "date": "2026-10-27",
+  "environment": {
+    "node": "v24.13.1",
+    "icu": "78.2"
+  },
+  "method": "Same synthetic joined rows and fixed token clock/key, reference and candidate protocol doubles; counts only, no elapsed-time or PostgreSQL performance claim",
+  "commandScope": "Schema, scan and portal lifecycle only; outer transaction and authority/audit SQL are not represented",
+  "responseBytesScope": "JSON.stringify response bytes, not network or PostgreSQL transfer bytes",
+  "postgresExecuted": false,
+  "measurements": [
+    {
+      "candidates": 0,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 2,
+        "candidateRows": 0,
+        "authorizationCalls": 0,
+        "responseJsonBytes": 86
+      },
+      "candidate": {
+        "code": null,
+        "commands": 4,
+        "candidateRows": 0,
+        "authorizationCalls": 0,
+        "responseJsonBytes": 86
+      }
+    },
+    {
+      "candidates": 25,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 2,
+        "candidateRows": 25,
+        "authorizationCalls": 50,
+        "responseJsonBytes": 10696
+      },
+      "candidate": {
+        "code": null,
+        "commands": 4,
+        "candidateRows": 25,
+        "authorizationCalls": 50,
+        "responseJsonBytes": 10696
+      }
+    },
+    {
+      "candidates": 26,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 2,
+        "candidateRows": 26,
+        "authorizationCalls": 52,
+        "responseJsonBytes": 11149
+      },
+      "candidate": {
+        "code": null,
+        "commands": 4,
+        "candidateRows": 26,
+        "authorizationCalls": 52,
+        "responseJsonBytes": 11149
+      }
+    },
+    {
+      "candidates": 100,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 3,
+        "candidateRows": 100,
+        "authorizationCalls": 200,
+        "responseJsonBytes": 11150
+      },
+      "candidate": {
+        "code": null,
+        "commands": 5,
+        "candidateRows": 100,
+        "authorizationCalls": 200,
+        "responseJsonBytes": 11150
+      }
+    },
+    {
+      "candidates": 101,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 3,
+        "candidateRows": 101,
+        "authorizationCalls": 202,
+        "responseJsonBytes": 11150
+      },
+      "candidate": {
+        "code": null,
+        "commands": 5,
+        "candidateRows": 101,
+        "authorizationCalls": 202,
+        "responseJsonBytes": 11150
+      }
+    },
+    {
+      "candidates": 10000,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": null,
+        "commands": 102,
+        "candidateRows": 10000,
+        "authorizationCalls": 20000,
+        "responseJsonBytes": 11152
+      },
+      "candidate": {
+        "code": null,
+        "commands": 104,
+        "candidateRows": 10000,
+        "authorizationCalls": 20000,
+        "responseJsonBytes": 11152
+      }
+    },
+    {
+      "candidates": 10001,
+      "equalResponseOrError": true,
+      "baseline": {
+        "code": "LIMIT_EXCEEDED",
+        "commands": 102,
+        "candidateRows": 10001,
+        "authorizationCalls": 20000,
+        "responseJsonBytes": null
+      },
+      "candidate": {
+        "code": "LIMIT_EXCEEDED",
+        "commands": 104,
+        "candidateRows": 10001,
+        "authorizationCalls": 20000,
+        "responseJsonBytes": null
+      }
+    }
+  ]
+}

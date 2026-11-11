@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    "directory membership query reads both synthetic organizations with explicit three-table grants",
+    "identity table and organization write denied",
+    "table grants alone expose both organizations to this reader",
+    "reader lacks superuser, create database, create role and bypass RLS"
+  ],
+  "limitations": [
+    "Three public tables and one directory query only; not a complete central reader grant inventory.",
+    "Fixture identities are synthetic; no HTTP/OIDC or productive deployment parity claim.",
+    "Table-level grants permit reading both organizations; they do not enforce row-level isolation."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

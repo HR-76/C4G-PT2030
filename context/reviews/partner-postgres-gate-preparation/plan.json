@@ -1,0 +1,70 @@
+{
+  "policy": "C4G_PARTNER_PORTAL_POSTGRES_V1",
+  "status": "NOT_RUN",
+  "databaseExecuted": false,
+  "scope": "C4G_PARTNER_PORTAL_DISPOSABLE_V1",
+  "postgresMajor": 17,
+  "isolation": "read committed",
+  "requiredCases": {
+    "repository": [
+      "repository.roles-rls",
+      "repository.cross-tenant-connect",
+      "repository.equivalence",
+      "repository.collation",
+      "repository.contract-matrix",
+      "snapshot.before-declare",
+      "snapshot.after-declare",
+      "snapshot.between-fetches",
+      "cleanup.success",
+      "cleanup.local-error",
+      "cleanup.sql-abort",
+      "cleanup.cancel",
+      "cleanup.disconnect",
+      "cleanup.session-reuse"
+    ],
+    "authority": [
+      "membership-authority-first",
+      "membership-guard-first",
+      "policy-authority-first",
+      "policy-guard-first",
+      "session-revoked",
+      "team-before-read",
+      "team-during-unseen-resource",
+      "team-cache-hit",
+      "audit-failure"
+    ]
+  },
+  "capacity": {
+    "expectedRepetitions": 2,
+    "expectedScenarioIds": [
+      "volume-0",
+      "volume-25",
+      "volume-26",
+      "volume-100",
+      "volume-101",
+      "volume-10000",
+      "volume-10001",
+      "profile-denied",
+      "profile-shared-origin",
+      "profile-distinct-origins",
+      "profile-selective",
+      "profile-historical-people",
+      "profile-large-payload"
+    ]
+  },
+  "productionCapacityApproved": false,
+  "executionRequirements": [
+    "Explicit authorization for disposable infrastructure",
+    "Immutable locally available image ID",
+    "Owned container identity verified before SQL",
+    "Source manifest matches reviewed files",
+    "No inherited database configuration"
+  ],
+  "creates": [
+    "One new labelled PostgreSQL container, random loopback port and anonymous data volume",
+    "Synthetic Central and two tenant databases, existing migrations and isolated roles/grants",
+    "Fresh context/reviews/partner-portal-pg-<runId> evidence directory"
+  ],
+  "cleanup": "Only the exact container created by this run, after rechecking ownership; remove its anonymous volumes",
+  "existingServices": "Never stop, pause, reconfigure or use existing services/databases"
+}

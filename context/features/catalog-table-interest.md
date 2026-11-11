@@ -1,0 +1,8 @@
+# Registar interesse na tabela do catálogo
+
+**Decisão posterior — 30/10/2026:** o utilizador confirmou [interesse organizacional separado da candidatura](organizational-opportunity-interest.md), com departamentos/unidades para segmentação. O contrato abaixo descreve o percurso anterior ainda implementado; a nova feature está Ready, sem alteração do runtime nesta preparação.
+
+Pedido de 18/10/2026. Ação Registar interesse na coluna Candidaturas para a organização ativa, reutilizando a criação existente em Identificada. O clique consulta a revisão atual e abre o formulário, sem criar automaticamente dados. Sem Matching obrigatório. Oportunidades arquivadas não permitem a ação; administração sem entidade não mostra ações privadas. Tratar falhas, impedir cliques repetidos e ignorar respostas após mudar de organização ou sair da página. Preservar filtros, resumo de candidaturas e permissões do servidor. Sem alteração de API ou migração.
+
+Estado: Review. Implementado com consulta de detalhe apenas ao clicar, seguida do percurso existente com origem CENTRAL e revisão explícita. 12 testes do catálogo e build PASS. Prova Chrome com conta de entidade: botão desktop/mobile, formulário Nova candidatura e revisão no endereço confirmados; nenhum pedido de gravação de candidatura. Pedidos automáticos de verificação de alertas foram bloqueados no ensaio. Capturas e resultado em `output/playwright/catalog-interest/`.
+Um coração de contorno na coluna Interesse abre o formulário de registo da organização. Cancelar mantém o coração vazio. Após confirmação do registo, o coração preenchido abre o interesse da oportunidade. Os interesses arquivados conservam a identificação textual e as permissões de registo continuam a aplicar-se.

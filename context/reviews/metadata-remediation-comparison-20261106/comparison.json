@@ -1,0 +1,53 @@
+{
+  "integrity": "PASS",
+  "rows": [
+    {
+      "scenario": "report-c1",
+      "samplesPerVariant": 8,
+      "A_p50": 2094.7,
+      "B_p50": 2053.94,
+      "A_p95": 2236.15,
+      "B_p95": 2136.89
+    },
+    {
+      "scenario": "report-c2",
+      "samplesPerVariant": 8,
+      "A_p50": 2224.15,
+      "B_p50": 2269.24,
+      "A_p95": 2558.63,
+      "B_p95": 2563.73
+    },
+    {
+      "scenario": "report-c4",
+      "samplesPerVariant": 16,
+      "A_p50": 2640.87,
+      "B_p50": 2653.4,
+      "A_p95": 3791.99,
+      "B_p95": 3780.64
+    },
+    {
+      "scenario": "dashboard-c1",
+      "samplesPerVariant": 8,
+      "A_p50": 4756.28,
+      "B_p50": 4717.88,
+      "A_p95": 5086.52,
+      "B_p95": 4798.24
+    },
+    {
+      "scenario": "dashboard-c4",
+      "samplesPerVariant": 16,
+      "A_p50": 5884.95,
+      "B_p50": 5959.55,
+      "A_p95": 7313,
+      "B_p95": 7053.38
+    },
+    {
+      "scenario": "dashboard-two-tenants-c4",
+      "samplesPerVariant": 16,
+      "A_p50": 5997.73,
+      "B_p50": 6045.68,
+      "A_p95": 6421.03,
+      "B_p95": 6453.61
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+﻿[
+    {
+        "file":  "backend/src/applications/composition.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "backend/src/opportunities/httpComposition.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "backend/src/security/authorityCoordinator.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "backend/test/groupedAuthorityValidation.test.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "test/integration/authority-short-groups/proof.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "context/reviews/grouped-authority-validation/compare.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "context/reviews/grouped-authority-validation/verify-preservation.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "test/integration/authority-short-groups/proof.ps1",
+        "status":  "PASS"
+    }
+]

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checks": [
+    "repeatable-read snapshot excludes mutation during iteration; next snapshot rejects stale cursor",
+    "1501 synthetic rows across 16 pages equal global ranking"
+  ],
+  "limits": [
+    "One synthetic PostgreSQL database and synthetic ranking; no product matching HTTP, RLS, permission or cross-database consistency proof.",
+    "No durable snapshots, operational budgets, lifecycle or production pagination implemented."
+  ]
+}

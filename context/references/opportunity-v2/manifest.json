@@ -1,0 +1,117 @@
+{
+  "contractVersion": "opportunity-v2.0",
+  "schemaVersion": 2,
+  "s0Status": "CLOSED",
+  "featureStatus": "READY_FOR_S1",
+  "packagedAt": "2026-10-30T22:55:05.825Z",
+  "authority": "Explicit user request to close S0 with call 11145 and the supplied workbook as normative examples.",
+  "runtimeCertified": false,
+  "applicationCodeChangedByS0": false,
+  "sourceWorkbook": {
+    "filename": "PlanoAnualAvisos_download_140926-1.xlsx",
+    "sha256": "f5d81e3a2fcf31fac5b4545a4e7625c9f0c22333f28cc301ad4b61a7845f5869",
+    "bytes": 65667,
+    "sheet": "Sheet1",
+    "recordCount": 177,
+    "includedInPackage": false
+  },
+  "artifacts": [
+    {
+      "path": "contract.md",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 21808,
+      "sha256": "e362e48b3aaa4a2c0aec040a692acfc931f255fd39ba4b1ee8885219e2669528"
+    },
+    {
+      "path": "evidence/eu-11145.json",
+      "role": "SOURCE_EVIDENCE",
+      "bytes": 20544,
+      "sha256": "21e07eb79a478de23ca126fd8377733f82c6731ac24fe91313a79b2ed186f2a6"
+    },
+    {
+      "path": "evidence/eu-11145.metadata.json",
+      "role": "SOURCE_EVIDENCE",
+      "bytes": 1347,
+      "sha256": "0449058b636bd2699bf4045de48ec4d35a63446abf10fe1e7e7c83d8decc5276"
+    },
+    {
+      "path": "evidence/eu-programme-taxonomy.json",
+      "role": "SOURCE_EVIDENCE",
+      "bytes": 3687,
+      "sha256": "8bfb8ed421ba23e747439be0160e2b460f99f2fb258c00b98a4270757b9d28aa"
+    },
+    {
+      "path": "evidence/pt2030-plan-177.json",
+      "role": "SOURCE_EVIDENCE",
+      "bytes": 451610,
+      "sha256": "33916c726c41c869d3d38b8637812102c6d23538af280d1cdd0790098b2b009f"
+    },
+    {
+      "path": "examples/eu-11145.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 16548,
+      "sha256": "1e7f21d03dcf0ac6fd4da20709664028b052c188810df0f14522093224887718"
+    },
+    {
+      "path": "examples/pt2030-8485.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 14824,
+      "sha256": "c0d8e949e3464e94b42afe5aaeb8f6c506afe3d924de5b66dc4c936f83aeb8dd"
+    },
+    {
+      "path": "examples/pt2030-8514.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 17891,
+      "sha256": "ff79af6ed7f038ab998f50079d680de704b925498abfe2ee8093be92da329e41"
+    },
+    {
+      "path": "examples/pt2030-8583.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 14314,
+      "sha256": "5ea81bc0e082b85496cd58e82fbfdb4f9d0ec693ea364ba131d914a3805e4609"
+    },
+    {
+      "path": "examples/pt2030-8614.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 16901,
+      "sha256": "cbb595ce4a0c958348f74ca707e152df73b3ba150ff0ec7d7ceca63548e52525"
+    },
+    {
+      "path": "examples/pt2030-8664.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 14505,
+      "sha256": "64d9ec42284502263086a61373920e97f66d6d273ff5aa1791723e0f297b45c9"
+    },
+    {
+      "path": "examples.md",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 5902,
+      "sha256": "93f85192122a5c4a5b59f03b211de6e1350142c66a717016cfc2150fc0bb8519"
+    },
+    {
+      "path": "mappings.md",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 18466,
+      "sha256": "90cf980158ea5b626d2095627d04b194211189697a922e2d6dbcc9247d1f3250"
+    },
+    {
+      "path": "opportunity-v2.schema.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 109308,
+      "sha256": "2996f35eaab2717860e4276b041899620d497e737f0a29900dbbbc02693d1675"
+    },
+    {
+      "path": "pt2030-expected-177.json",
+      "role": "NORMATIVE_CONTRACT_ARTIFACT",
+      "bytes": 170071,
+      "sha256": "23bc72b4862f09630372af4217b7566ede77d34340f484b832da2aa4d1a44f83"
+    },
+    {
+      "path": "validation.json",
+      "role": "OFFLINE_VALIDATION_REPORT",
+      "bytes": 7170,
+      "sha256": "80c3f322c18ccdfe989a7b1ed6156eb397a9a19915b957121f5544e4fa5cff29"
+    }
+  ],
+  "integrityNote": "Manifest excludes its own hash. Hashes identify frozen evidence and contract artifacts; they are not a digital signature or proof of APP persistence."
+}

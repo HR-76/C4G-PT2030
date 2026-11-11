@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-27T21:46:27.337Z",
+  "status": "PASS",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "branch": "feat/f13-organizational-profile",
+  "baselineFiles": 2750,
+  "unchanged": 2748,
+  "changed": [
+    "context/current-work.md",
+    "context/features/http-flows-performance.md"
+  ],
+  "missing": [],
+  "newHarness": [
+    {
+      "path": "test/integration/c6-dedicated/analyze.js",
+      "sha256": "5eee0ca63a957265cf9a19c4f03576645b45a487db94620aa1f6894ab7c02a67"
+    },
+    {
+      "path": "test/integration/c6-dedicated/background.ps1",
+      "sha256": "e8ac1d0be943f0b3bfd49ed8c88863f80dff55705508b6b271f42b61df5ac032"
+    },
+    {
+      "path": "test/integration/c6-dedicated/hostCheck.js",
+      "sha256": "9d476e4947e40f6cf539bf86abb436e4ab49f89684e955eddfbfc2f1551c283b"
+    },
+    {
+      "path": "test/integration/c6-dedicated/observer.test.ps1",
+      "sha256": "5883aaaf3b6de6e3ec8b4120092bf895e9f4902abf945055c42bddc5831bf3a0"
+    },
+    {
+      "path": "test/integration/c6-dedicated/preload.js",
+      "sha256": "59d07d0c7bc69d63300cb19959bf024cef61eb9fbd837d000faf19a5d09959fd"
+    },
+    {
+      "path": "test/integration/c6-dedicated/README.md",
+      "sha256": "94ee02b67d761cc92186c4dc5297cc72e7e4caa3940c93edaeb9b59141197ec5"
+    },
+    {
+      "path": "test/integration/c6-dedicated/run.ps1",
+      "sha256": "17a3429a283a014445a66635d735daf94d80ca0109f8f7688f259a7a7d3b6254"
+    },
+    {
+      "path": "test/integration/c6-dedicated/slo.js",
+      "sha256": "b79c5f74713aac48b258ae3565fc12242772bfc91ce6aed6e6f2989a25be82bc"
+    },
+    {
+      "path": "test/integration/c6-dedicated/slo.test.js",
+      "sha256": "f6c89686465df3db1124a924b32b87c5fd255e734c9a24960526ac90610a3a64"
+    }
+  ],
+  "limits": "Hash comparison of recorded files, not atomic repository or Dev data immutability. No SQL/data operations on Dev; only authorized container pause/resume."
+}

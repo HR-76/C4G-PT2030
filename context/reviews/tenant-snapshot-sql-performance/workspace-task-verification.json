@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "createdAt": "2026-10-31T22:46:59.709Z",
+  "scope": "TASK_COMMON_SOURCES_AND_LIVE_RUNTIME_PATCH_ONLY",
+  "runtime": {
+    "path": "backend/src/security/tenantSchemaFingerprint.js",
+    "expected": "77bd2576b6727cffbdc5fc1563b144428034b907469341b0bd02878ced9bf42c",
+    "actual": "77bd2576b6727cffbdc5fc1563b144428034b907469341b0bd02878ced9bf42c"
+  },
+  "common": [
+    {
+      "path": "context/features/tenant-snapshot-sql-performance.md",
+      "expected": "c1ee5e4edeb29ce4a6fb1def5f386b2ed0a8d5bbce1f35ddbf1b5f32b6803652",
+      "actual": "c1ee5e4edeb29ce4a6fb1def5f386b2ed0a8d5bbce1f35ddbf1b5f32b6803652"
+    },
+    {
+      "path": "scripts/prepare-tenant-snapshot-ab.cjs",
+      "expected": "89c0fc92fb175f06690c9f0fba8e09bfe657a0eb0a1e747ba2aee439237b546c",
+      "actual": "89c0fc92fb175f06690c9f0fba8e09bfe657a0eb0a1e747ba2aee439237b546c"
+    },
+    {
+      "path": "scripts/verify-tenant-snapshot-ab.cjs",
+      "expected": "5b5681a6647fd695ad9c380d7a590617a26f27f9e3bff1d73c084e9780c17393",
+      "actual": "5b5681a6647fd695ad9c380d7a590617a26f27f9e3bff1d73c084e9780c17393"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/README.md",
+      "expected": "98fd2c532943d70b2edac76a856766168155b39f1ffb81ee5e86b827ac164540",
+      "actual": "98fd2c532943d70b2edac76a856766168155b39f1ffb81ee5e86b827ac164540"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/analyze.cjs",
+      "expected": "34a0dff9e1fc431984927e76f1c968928c3e9da0bb68e7da6f69c486848bf29a",
+      "actual": "34a0dff9e1fc431984927e76f1c968928c3e9da0bb68e7da6f69c486848bf29a"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/analyze.test.cjs",
+      "expected": "8b79369316fc355fb07b494aa67409324f103b6acf71f22bfe472520e33d541b",
+      "actual": "8b79369316fc355fb07b494aa67409324f103b6acf71f22bfe472520e33d541b"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/archive.cjs",
+      "expected": "fe541f0765d408d02a6fc5495949774f5653ca43285b58a18c889f5733afdb9f",
+      "actual": "fe541f0765d408d02a6fc5495949774f5653ca43285b58a18c889f5733afdb9f"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/authority-drift.cjs",
+      "expected": "82eef7bcaebc66277d6e9c97d619b93d3021fbd7f9b261597222b7ecc3bd7ee9",
+      "actual": "82eef7bcaebc66277d6e9c97d619b93d3021fbd7f9b261597222b7ecc3bd7ee9"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/equivalence.cjs",
+      "expected": "b7cfe4b8852d88039a74a62e051fc3ff8a76ef1f6c015e68dca3489f5d860616",
+      "actual": "b7cfe4b8852d88039a74a62e051fc3ff8a76ef1f6c015e68dca3489f5d860616"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/metadata.cjs",
+      "expected": "934b1d8f0dd198c0d819121c08532986554369e6b2753352b8bf57129a26f15a",
+      "actual": "934b1d8f0dd198c0d819121c08532986554369e6b2753352b8bf57129a26f15a"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/metadata.test.cjs",
+      "expected": "46756e3737b0b73e7238fb6ace9209b7e99edf14242f33c6951b5b28c23fc7a0",
+      "actual": "46756e3737b0b73e7238fb6ace9209b7e99edf14242f33c6951b5b28c23fc7a0"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/protocol.json",
+      "expected": "7a7b414b75e967520441e8e729b1debb0cc2d23a5956c24f0283878d3c148fbb",
+      "actual": "7a7b414b75e967520441e8e729b1debb0cc2d23a5956c24f0283878d3c148fbb"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/readiness-observer.cjs",
+      "expected": "c87a2abe137e05afa5f2fe7315a616a284adeb652c927b6714980d39d6e537f7",
+      "actual": "c87a2abe137e05afa5f2fe7315a616a284adeb652c927b6714980d39d6e537f7"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/readiness-observer.test.cjs",
+      "expected": "55ff737565ed515a740c2c6d9811122c72b179cc275426deb97f8aa91e90fab6",
+      "actual": "55ff737565ed515a740c2c6d9811122c72b179cc275426deb97f8aa91e90fab6"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/run.cjs",
+      "expected": "df03d9469f1a4853aa839afbcd7598f5801a2153ae09d3e22bc12e25734d4837",
+      "actual": "df03d9469f1a4853aa839afbcd7598f5801a2153ae09d3e22bc12e25734d4837"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/tenant-equivalence.cjs",
+      "expected": "303538a4d1b5c215916b7b258d6306d346c0f6542f3ff217e398c2590fb1de33",
+      "actual": "303538a4d1b5c215916b7b258d6306d346c0f6542f3ff217e398c2590fb1de33"
+    },
+    {
+      "path": "test/integration/tenant-snapshot-ab/tenant-equivalence.test.cjs",
+      "expected": "cc4d79e906436eb7384925df8eaf4346fb8637cd81225eb121b80a358eb1b0e7",
+      "actual": "cc4d79e906436eb7384925df8eaf4346fb8637cd81225eb121b80a358eb1b0e7"
+    },
+    {
+      "path": "test/tenant-snapshot-ab-analysis.test.cjs",
+      "expected": "62ecf3a61f9de8125c6ad3e4699cfee4a892fcedcdc1a9bd9dcebb7a5ebf69ce",
+      "actual": "62ecf3a61f9de8125c6ad3e4699cfee4a892fcedcdc1a9bd9dcebb7a5ebf69ce"
+    },
+    {
+      "path": "test/tenant-snapshot-ab-package.test.cjs",
+      "expected": "e4d87806cd670b6b6a843cb521b472a72eb3bbc07d31db655897a505d26d3b8a",
+      "actual": "e4d87806cd670b6b6a843cb521b472a72eb3bbc07d31db655897a505d26d3b8a"
+    },
+    {
+      "path": "test/tenant-snapshot-ab-runner.test.cjs",
+      "expected": "a26eb3e8788c2a5d0d814f2201ce8efb67a64c2c33e2736a81908f0a6f331064",
+      "actual": "a26eb3e8788c2a5d0d814f2201ce8efb67a64c2c33e2736a81908f0a6f331064"
+    }
+  ],
+  "limits": [
+    "Unrelated parallel workspace sources are outside this closure assertion; full-suite results bind their recorded input snapshots.",
+    "Measured candidate runtime differs from live by preserved parallel changes."
+  ]
+}

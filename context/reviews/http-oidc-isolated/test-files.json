@@ -1,0 +1,34 @@
+[
+  {
+    "file": "test/integration/http-oidc/browserProof.js",
+    "sha256": "3b3602e1a9d5f001852f545b4614e142c2b737e7b940ac7a98a9221cc563b128"
+  },
+  {
+    "file": "test/integration/http-oidc/fixture.js",
+    "sha256": "81d2f918332929c9c412b47b7768640b71aca6301d8c86c4a04d00d0b02113ef"
+  },
+  {
+    "file": "test/integration/http-oidc/gate.js",
+    "sha256": "bfbac2eaf7f1331d82203d6718fb21f88000a7e962799a0da9ad9a8fba8293b5"
+  },
+  {
+    "file": "test/integration/http-oidc/gate.ps1",
+    "sha256": "8e8c04e24e78b11267ad6a13a104f31eb2190c517186fc5d02185ce376d0af8e"
+  },
+  {
+    "file": "test/integration/http-oidc/measurement.js",
+    "sha256": "0b1fc1d467c7d2405f69498d2fd94b2343ff444b885cd86987b853227c709604"
+  },
+  {
+    "file": "test/integration/http-oidc/README.md",
+    "sha256": "827dd5958f421a3509d9fadbd9b2ea10f08ec40ad7610a39b6724742e97d52eb"
+  },
+  {
+    "file": "test/integration/http-oidc/revocationProof.js",
+    "sha256": "1a0337fc3c5c4c110d4b5d1d5ea1e4997b94e34a26afd265960eb320162abee3"
+  },
+  {
+    "file": "test/integration/http-oidc/sqlProof.js",
+    "sha256": "73bba5952abad5268e4cf4f05fdaa7025e5d501ef7f9fecfc27d4feffd799c7b"
+  }
+]

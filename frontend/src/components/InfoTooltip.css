@@ -1,0 +1,14 @@
+.heading-with-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.heading-with-info > :is(h1,h2,h3,h4) { margin-top: 0; margin-bottom: 0; }
+.info-tooltip { position: relative; display: inline-flex; flex: 0 0 auto; }
+.info-tooltip-button { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; color: var(--color-info); background: transparent; cursor: help; transition: var(--control-transition); }
+.info-tooltip-button:hover { color: var(--color-primary-hover); background: var(--color-info-soft); }
+.info-tooltip-button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+.info-tooltip-panel { position: fixed; z-index: 30; top: var(--info-tooltip-top,16px); left: var(--info-tooltip-left,16px); width: var(--info-tooltip-width,min(360px,calc(100vw - 32px))); padding: 10px 12px; border-radius: 6px; background: var(--text-primary); color: var(--surface-default); font-size: 13px; font-weight: 400; line-height: 1.45; text-align: left; box-shadow: 0 8px 24px color-mix(in srgb, var(--color-action-hover) 18%, transparent); opacity: 0; visibility: hidden; transition: opacity var(--motion-fast) var(--motion-ease); pointer-events: none; }
+/* Bridge the positioning gap so the help remains readable under the pointer. */
+.info-tooltip-panel::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 8px; }
+.info-tooltip-panel[data-side=above]::before { bottom: auto; top: 100%; }
+.info-tooltip-panel :is(p,ul,ol) { margin: 0; }
+.info-tooltip-panel :is(p,ul,ol) + :is(p,ul,ol) { margin-top: 8px; }
+.info-tooltip[data-open=true] .info-tooltip-panel { opacity: 1; visibility: visible; pointer-events: auto; }
+@media(prefers-reduced-motion: reduce) { .info-tooltip-panel { transition: none; } }

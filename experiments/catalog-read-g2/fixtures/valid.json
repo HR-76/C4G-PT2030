@@ -1,0 +1,681 @@
+{
+  "ListResponse": {
+    "data": [
+      {
+        "id": "10000000-0000-4000-8000-000000000003",
+        "revisionId": "10000000-0000-4000-8000-000000000004",
+        "externalCode": {
+          "state": "PRESENT",
+          "value": "DEMO-PT-03",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "title": {
+          "state": "PRESENT",
+          "value": "Inovação em processos produtivos",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "kind": "published_notice",
+        "descriptionExcerpt": {
+          "state": "PRESENT",
+          "value": "Exemplo sintético de modernização de processos.",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "programmes": {
+          "items": [
+            {
+              "id": "DEMO-PT2030",
+              "label": "Portugal 2030 (exemplo)"
+            }
+          ],
+          "completeness": "complete"
+        },
+        "sources": [
+          {
+            "namespace": "PORTUGAL2030_NOTICE",
+            "externalId": "DEMO-PT-03",
+            "officialUrl": "https://example.org/aviso"
+          }
+        ],
+        "opening": {
+          "state": "PRESENT",
+          "value": {
+            "kind": "date",
+            "date": "2026-11-01"
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "deadline": {
+          "state": "conditional",
+          "at": {
+            "kind": "local_datetime",
+            "local": "2027-02-26T18:00:00",
+            "timezone": null
+          },
+          "label": "Até 26/02/2027, se houver verba",
+          "scopeLabel": "Aviso completo",
+          "windowId": "10000000-0000-4000-8000-000000000005"
+        },
+        "funding": {
+          "state": "PRESENT",
+          "value": {
+            "amount": "800000",
+            "currency": "EUR",
+            "scope": "notice",
+            "basis": "confirmed",
+            "sharedGroupId": null
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "fundingLabel": "Dotação do aviso",
+        "status": {
+          "code": "conditional",
+          "label": "Condicionado",
+          "basis": "reviewed",
+          "scopeLabel": "Prorrogação do aviso"
+        },
+        "quality": {
+          "flags": [
+            "partial"
+          ],
+          "reviewRequired": true
+        },
+        "freshness": {
+          "observedAt": "2027-01-20T11:00:00.000Z",
+          "reviewedAt": "2027-01-20T11:30:00.000Z",
+          "expectedRefreshAt": null,
+          "state": "unknown"
+        },
+        "officialLinks": [
+          {
+            "label": "Fonte ilustrativa",
+            "url": "https://example.org/aviso"
+          }
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "DetailResponse": {
+    "data": {
+      "summary": {
+        "id": "10000000-0000-4000-8000-000000000003",
+        "revisionId": "10000000-0000-4000-8000-000000000004",
+        "externalCode": {
+          "state": "PRESENT",
+          "value": "DEMO-PT-03",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "title": {
+          "state": "PRESENT",
+          "value": "Inovação em processos produtivos",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "kind": "published_notice",
+        "descriptionExcerpt": {
+          "state": "PRESENT",
+          "value": "Exemplo sintético de modernização de processos.",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "programmes": {
+          "items": [
+            {
+              "id": "DEMO-PT2030",
+              "label": "Portugal 2030 (exemplo)"
+            }
+          ],
+          "completeness": "complete"
+        },
+        "sources": [
+          {
+            "namespace": "PORTUGAL2030_NOTICE",
+            "externalId": "DEMO-PT-03",
+            "officialUrl": "https://example.org/aviso"
+          }
+        ],
+        "opening": {
+          "state": "PRESENT",
+          "value": {
+            "kind": "date",
+            "date": "2026-11-01"
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "deadline": {
+          "state": "conditional",
+          "at": {
+            "kind": "local_datetime",
+            "local": "2027-02-26T18:00:00",
+            "timezone": null
+          },
+          "label": "Até 26/02/2027, se houver verba",
+          "scopeLabel": "Aviso completo",
+          "windowId": "10000000-0000-4000-8000-000000000005"
+        },
+        "funding": {
+          "state": "PRESENT",
+          "value": {
+            "amount": "800000",
+            "currency": "EUR",
+            "scope": "notice",
+            "basis": "confirmed",
+            "sharedGroupId": null
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "fundingLabel": "Dotação do aviso",
+        "status": {
+          "code": "conditional",
+          "label": "Condicionado",
+          "basis": "reviewed",
+          "scopeLabel": "Prorrogação do aviso"
+        },
+        "quality": {
+          "flags": [
+            "partial"
+          ],
+          "reviewRequired": true
+        },
+        "freshness": {
+          "observedAt": "2027-01-20T11:00:00.000Z",
+          "reviewedAt": "2027-01-20T11:30:00.000Z",
+          "expectedRefreshAt": null,
+          "state": "unknown"
+        },
+        "officialLinks": [
+          {
+            "label": "Fonte ilustrativa",
+            "url": "https://example.org/aviso"
+          }
+        ]
+      },
+      "description": {
+        "state": "PRESENT",
+        "value": "Exemplo sintético. A prorrogação depende de verba disponível.",
+        "evidenceIds": [
+          "10000000-0000-4000-8000-000000000008"
+        ]
+      },
+      "descriptionTruncated": false,
+      "descriptionSourceUrl": "https://example.org/aviso",
+      "sourceStatus": {
+        "state": "PRESENT",
+        "value": "Estado ilustrativo publicado",
+        "evidenceIds": [
+          "10000000-0000-4000-8000-000000000008"
+        ]
+      },
+      "statusExplanation": "Prazo condicionado; não confirma elegibilidade.",
+      "collections": {
+        "windows": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/windows"
+        },
+        "funding": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/funding"
+        },
+        "fundingRules": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/funding-rules"
+        },
+        "documents": {
+          "completeness": "partial",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/documents"
+        },
+        "conflicts": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/conflicts"
+        },
+        "relationships": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/relationships"
+        },
+        "history": {
+          "completeness": "unknown",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/history"
+        },
+        "evidence": {
+          "completeness": "partial",
+          "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/evidence"
+        }
+      }
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "WindowResponse": {
+    "data": [
+      {
+        "id": "10000000-0000-4000-8000-000000000005",
+        "scopeLabel": "Aviso completo",
+        "phase": null,
+        "round": null,
+        "sequence": 2,
+        "opening": {
+          "state": "PRESENT",
+          "value": {
+            "kind": "date",
+            "date": "2026-11-01"
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "closing": {
+          "state": "PRESENT",
+          "value": {
+            "kind": "local_datetime",
+            "local": "2027-02-26T18:00:00",
+            "timezone": null
+          },
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "applicability": "conditional",
+        "condition": "Apenas se existir verba disponível.",
+        "supersedesId": "10000000-0000-4000-8000-000000000006",
+        "effectiveAt": {
+          "kind": "date",
+          "date": "2027-01-16"
+        },
+        "evidenceIds": [
+          "10000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "DocumentVersionResponse": {
+    "data": [
+      {
+        "id": "10000000-0000-4000-8000-000000000007",
+        "documentId": "10000000-0000-4000-8000-000000000009",
+        "title": "Alteração do aviso",
+        "versionLabel": "2",
+        "role": "amendment",
+        "contentSha256": null,
+        "publishedAt": {
+          "kind": "date",
+          "date": "2027-01-15"
+        },
+        "effectiveAt": {
+          "kind": "date",
+          "date": "2027-01-16"
+        },
+        "observedAt": "2027-01-20T11:00:00.000Z",
+        "sourceUrls": [
+          "https://example.org/aviso/documento"
+        ],
+        "supersedesVersionId": "10000000-0000-4000-8000-000000000010",
+        "supersessionScope": "Cláusula de prazo",
+        "preservation": "reference_only",
+        "evidenceIds": [
+          "10000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "EvidenceResponse": {
+    "data": [
+      {
+        "id": "10000000-0000-4000-8000-000000000008",
+        "namespace": "PORTUGAL2030_NOTICE",
+        "retrievedAt": "2027-01-20T11:00:00.000Z",
+        "sourceUrl": "https://example.org/aviso/documento",
+        "contentSha256": null,
+        "preservation": "reference_only",
+        "locator": {
+          "pages": [
+            1
+          ],
+          "sheet": null,
+          "range": null,
+          "section": "Prazo",
+          "jsonPointer": null
+        }
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "ErrorResponse": {
+    "error": {
+      "code": "SNAPSHOT_EXPIRED",
+      "message": "A consulta expirou. Atualize os resultados.",
+      "requestId": "10000000-0000-4000-8000-000000000011",
+      "fields": [],
+      "retryable": false
+    }
+  },
+  "FundingLineResponse": {
+    "data": [
+      {
+        "id": "20000000-0000-4000-8000-000000000001",
+        "label": "Verba partilhada",
+        "money": {
+          "state": "PRESENT",
+          "value": {
+            "amount": "999999999999999999999999.12345678",
+            "currency": "EUR",
+            "scope": "topic",
+            "basis": "confirmed",
+            "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+          },
+          "evidenceIds": [
+            "20000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "programmeId": "DEMO",
+        "fundCode": null,
+        "period": null,
+        "evidenceIds": [
+          "20000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "FundingRuleResponse": {
+    "data": [
+      {
+        "id": "20000000-0000-4000-8000-000000000003",
+        "scopeLabel": "Projeto",
+        "baseRate": {
+          "state": "PRESENT",
+          "value": "40",
+          "evidenceIds": [
+            "20000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "bonusPercentagePoints": {
+          "state": "PRESENT",
+          "value": "10",
+          "evidenceIds": [
+            "20000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "capRate": {
+          "state": "PRESENT",
+          "value": "50",
+          "evidenceIds": [
+            "20000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "conditions": "Bónus condicionado; não calcular apoio garantido.",
+        "evidenceIds": [
+          "20000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "ConflictResponse": {
+    "data": [
+      {
+        "id": "20000000-0000-4000-8000-000000000004",
+        "fieldPath": "schedule.closing",
+        "scopeLabel": "Aviso",
+        "severity": "material",
+        "status": "unresolved",
+        "reason": "Fontes oficiais divergentes.",
+        "alternatives": [
+          {
+            "id": "20000000-0000-4000-8000-000000000005",
+            "valueText": "2027-01-31",
+            "evidenceIds": [
+              "20000000-0000-4000-8000-000000000008"
+            ]
+          },
+          {
+            "id": "20000000-0000-4000-8000-000000000006",
+            "valueText": "2027-02-26",
+            "evidenceIds": [
+              "20000000-0000-4000-8000-000000000008"
+            ]
+          }
+        ],
+        "selectedAlternativeId": null,
+        "decision": null
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "RelationshipResponse": {
+    "data": [
+      {
+        "id": "20000000-0000-4000-8000-000000000007",
+        "targetId": "20000000-0000-4000-8000-000000000009",
+        "targetExternalCode": "DEMO-PLAN-01",
+        "relation": "plan_to_notice",
+        "confidence": "probable",
+        "explicitOfficialLink": false,
+        "differences": [
+          "Prazo ainda não confirmado."
+        ],
+        "evidenceIds": [
+          "20000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "EventResponse": {
+    "data": [
+      {
+        "id": "20000000-0000-4000-8000-000000000010",
+        "kind": "deadline_amendment.v1",
+        "recordedAt": "2027-01-20T11:00:00.000Z",
+        "effectiveAt": {
+          "kind": "date",
+          "date": "2027-01-16"
+        },
+        "description": "Prorrogação condicional preservada.",
+        "revisionId": "10000000-0000-4000-8000-000000000004",
+        "evidenceIds": [
+          "20000000-0000-4000-8000-000000000008"
+        ]
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "OptionResponse": {
+    "data": [
+      {
+        "id": "DEMO",
+        "label": "Programa demonstrativo",
+        "namespace": null,
+        "deprecated": false
+      }
+    ],
+    "page": {
+      "limit": 25,
+      "returned": 1,
+      "hasMore": false,
+      "nextCursor": null
+    },
+    "meta": {
+      "contractVersion": "gcni-catalog-read/1.0",
+      "requestId": "10000000-0000-4000-8000-000000000001",
+      "generationId": "10000000-0000-4000-8000-000000000002",
+      "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+      "asOf": "2027-01-20T12:00:00.000Z",
+      "expiresAt": "2027-01-20T12:15:00.000Z",
+      "normalizationVersion": "gcni-cat-normalization-proposed-1"
+    }
+  },
+  "ListQuery": {
+    "q": "energia",
+    "deadline_from": "2026-11-01",
+    "funding_min": "0",
+    "currency": "EUR",
+    "limit": "25"
+  },
+  "DetailQuery": {},
+  "CollectionQuery": {
+    "snapshot": "SYNTHETIC_TOKEN"
+  },
+  "EvidenceQuery": {
+    "snapshot": "SYNTHETIC_TOKEN",
+    "ids": "20000000-0000-4000-8000-000000000008"
+  },
+  "OptionsQuery": {
+    "dimension": "programme"
+  },
+  "OpportunityPath": {
+    "id": "20000000-0000-4000-8000-000000000001"
+  }
+}

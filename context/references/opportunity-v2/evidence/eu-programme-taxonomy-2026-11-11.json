@@ -1,0 +1,203 @@
+{
+  "observedAt": "2026-11-11",
+  "endpoint": "https://api.tech.ec.europa.eu/search-api/prod/rest/facet",
+  "documentation": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/apis",
+  "apiVersion": "2.157.1",
+  "request": {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "terms": {
+              "type": [
+                "1",
+                "2",
+                "8"
+              ]
+            }
+          },
+          {
+            "terms": {
+              "status": [
+                "31094501",
+                "31094502"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "languages": [
+      "en"
+    ]
+  },
+  "facet": "frameworkProgramme",
+  "note": "Extract of the frameworkProgramme facet only; counts are open and forthcoming records at observation time.",
+  "values": [
+    {
+      "rawValue": "43108390",
+      "value": "Horizon Europe (HORIZON)",
+      "count": 860
+    },
+    {
+      "rawValue": "43152860",
+      "value": "Digital Europe Programme (DIGITAL)",
+      "count": 79
+    },
+    {
+      "rawValue": "44181033",
+      "value": "European Defence Fund (EDF)",
+      "count": 41
+    },
+    {
+      "rawValue": "43252476",
+      "value": "Single Market Programme (SMP)",
+      "count": 36
+    },
+    {
+      "rawValue": "43252405",
+      "value": "Programme for the Environment and Climate Action (LIFE)",
+      "count": 32
+    },
+    {
+      "rawValue": "43251814",
+      "value": "Creative Europe Programme (CREA)",
+      "count": 23
+    },
+    {
+      "rawValue": "111111",
+      "value": "EU External Action - Prospect (RELEX-PROSPECT)",
+      "count": 19
+    },
+    {
+      "rawValue": "43251589",
+      "value": "Citizens, Equality, Rights and Values programme (CERV)",
+      "count": 16
+    },
+    {
+      "rawValue": "43298916",
+      "value": "Euratom Research and Training Programme (EURATOM)",
+      "count": 16
+    },
+    {
+      "rawValue": "43251567",
+      "value": "Connecting Europe Facility (CEF)",
+      "count": 10
+    },
+    {
+      "rawValue": "31045243",
+      "value": "Horizon 2020 Framework Programme (H2020 - 2014-2020)",
+      "count": 7
+    },
+    {
+      "rawValue": "43353764",
+      "value": "Erasmus  (ERASMUS )",
+      "count": 5
+    },
+    {
+      "rawValue": "45532249",
+      "value": "EU Bodies and Agencies (EUBA)",
+      "count": 5
+    },
+    {
+      "rawValue": "44416173",
+      "value": "Interregional Innovation Investments Instrument (I3)",
+      "count": 4
+    },
+    {
+      "rawValue": "44773066",
+      "value": "Just Transition Mechanism (JTM)",
+      "count": 4
+    },
+    {
+      "rawValue": "31059643",
+      "value": "Programme for the Competitiveness of Enterprises and small and medium-sized enterprises (COSME - 2014-2020)",
+      "count": 3
+    },
+    {
+      "rawValue": "43252368",
+      "value": "Internal Security Fund (ISF)",
+      "count": 3
+    },
+    {
+      "rawValue": "43252517",
+      "value": "Social Prerogative and Specific Competencies Lines (SOCPL)",
+      "count": 3
+    },
+    {
+      "rawValue": "43252386",
+      "value": "Justice Programme (JUST)",
+      "count": 2
+    },
+    {
+      "rawValue": "43254019",
+      "value": "European Social Fund   (ESF)",
+      "count": 2
+    },
+    {
+      "rawValue": "43637601",
+      "value": "Pilot Projects & Preparation Actions (PPPA)",
+      "count": 2
+    },
+    {
+      "rawValue": "43697167",
+      "value": "European Parliament (EP)",
+      "count": 2
+    },
+    {
+      "rawValue": "45876777",
+      "value": "Neighbourhood, Development and International Cooperation Instrument – Global Europe (NDICI)",
+      "count": 2
+    },
+    {
+      "rawValue": "42810547",
+      "value": "EUROPE DIRECT (ED - 2014-2020)",
+      "count": 1
+    },
+    {
+      "rawValue": "43089234",
+      "value": "Innovation Fund (INNOVFUND)",
+      "count": 1
+    },
+    {
+      "rawValue": "43251882",
+      "value": "Support for information measures relating to the common agricultural policy (IMCAP)",
+      "count": 1
+    },
+    {
+      "rawValue": "43252433",
+      "value": "Programme for the Protection of the Euro against Counterfeiting  (PERICLES IV)",
+      "count": 1
+    },
+    {
+      "rawValue": "43253952",
+      "value": "Humanitarian Aid (HUMA)",
+      "count": 1
+    },
+    {
+      "rawValue": "43253967",
+      "value": "Renewable Energy Financing Mechanism (RENEWFM)",
+      "count": 1
+    },
+    {
+      "rawValue": "43254037",
+      "value": "European Solidarity Corps (ESC)",
+      "count": 1
+    },
+    {
+      "rawValue": "43332642",
+      "value": "EU4Health Programme (EU4H)",
+      "count": 1
+    },
+    {
+      "rawValue": "43392145",
+      "value": "European Maritime, Fisheries and Aquaculture Fund (EMFAF)",
+      "count": 1
+    },
+    {
+      "rawValue": "44773133",
+      "value": "Information Measures for the EU Cohesion policy (IMREG)",
+      "count": 1
+    }
+  ]
+}

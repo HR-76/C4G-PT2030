@@ -1,0 +1,334 @@
+{
+  "runs": [
+    {
+      "name": "a1",
+      "directory": "profile-a1-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T22:50:53.682Z",
+      "finishedAt": "2026-11-06T22:52:29.675Z"
+    },
+    {
+      "name": "b1",
+      "directory": "profile-b1-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T22:52:34.056Z",
+      "finishedAt": "2026-11-06T22:54:07.463Z"
+    },
+    {
+      "name": "b2",
+      "directory": "profile-b2-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T22:54:12.612Z",
+      "finishedAt": "2026-11-06T22:55:45.208Z"
+    },
+    {
+      "name": "a2",
+      "directory": "profile-a2-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T22:55:50.231Z",
+      "finishedAt": "2026-11-06T22:57:26.917Z"
+    }
+  ],
+  "images": [
+    "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+    "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+  ],
+  "totalPageMeasurements": 48,
+  "rows": [
+    {
+      "mode": "load",
+      "route": "/dashboard",
+      "before": {
+        "n": 4,
+        "medianMs": 4174.904200000001,
+        "minMs": 3995.5308000000005,
+        "maxMs": 4488.2355000000025,
+        "valuesMs": [
+          4171.240100000003,
+          3995.5308000000005,
+          4488.2355000000025,
+          4178.568299999999
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4307.596450000001,
+        "minMs": 4117.449499999995,
+        "maxMs": 4406.126600000003,
+        "valuesMs": [
+          4406.126600000003,
+          4211.0098,
+          4404.183100000002,
+          4117.449499999995
+        ]
+      },
+      "reductionPercent": -3.1783304153422343,
+      "settledMedianMs": {
+        "before": 4627.892350000002,
+        "after": 4747.556400000001
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 4,
+        "medianMs": 4788.116199999997,
+        "minMs": 4577.694199999998,
+        "maxMs": 4922.052600000003,
+        "valuesMs": [
+          4725.341,
+          4577.694199999998,
+          4922.052600000003,
+          4850.891399999993
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 3679.1694499999976,
+        "minMs": 3574.158599999995,
+        "maxMs": 3753.7549,
+        "valuesMs": [
+          3644.912199999999,
+          3574.158599999995,
+          3753.7549,
+          3713.4266999999963
+        ]
+      },
+      "reductionPercent": 23.160397611068838,
+      "settledMedianMs": {
+        "before": 5885.677749999999,
+        "after": 4826.9245999999985
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/candidaturas",
+      "before": {
+        "n": 4,
+        "medianMs": 4089.078999999998,
+        "minMs": 3938.6152000000075,
+        "maxMs": 4227.583499999993,
+        "valuesMs": [
+          4086.236499999999,
+          3938.6152000000075,
+          4227.583499999993,
+          4091.9214999999967
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4153.298650000001,
+        "minMs": 4033.7721999999994,
+        "maxMs": 4245.175199999998,
+        "valuesMs": [
+          4204.042499999996,
+          4033.7721999999994,
+          4245.175199999998,
+          4102.554800000005
+        ]
+      },
+      "reductionPercent": -1.5705162458343969,
+      "settledMedianMs": {
+        "before": 4521.574049999996,
+        "after": 4581.1798999999955
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/notificacoes",
+      "before": {
+        "n": 4,
+        "medianMs": 5457.600700000003,
+        "minMs": 5322.8217,
+        "maxMs": 5622.270400000001,
+        "valuesMs": [
+          5447.101800000004,
+          5322.8217,
+          5622.270400000001,
+          5468.099600000001
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 5524.916650000003,
+        "minMs": 5431.700499999992,
+        "maxMs": 5603.377500000002,
+        "valuesMs": [
+          5603.377500000002,
+          5461.100200000001,
+          5588.733100000005,
+          5431.700499999992
+        ]
+      },
+      "reductionPercent": -1.2334348681830143,
+      "settledMedianMs": {
+        "before": 5909.1663499999995,
+        "after": 5988.682350000003
+      }
+    },
+    {
+      "mode": "navigation",
+      "route": "/dashboard",
+      "before": {
+        "n": 2,
+        "medianMs": 3069.149750000004,
+        "minMs": 2993.575100000002,
+        "maxMs": 3144.7244000000064,
+        "valuesMs": [
+          2993.575100000002,
+          3144.7244000000064
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3106.9307499999923,
+        "minMs": 3106.5977999999886,
+        "maxMs": 3107.263699999996,
+        "valuesMs": [
+          3107.263699999996,
+          3106.5977999999886
+        ]
+      },
+      "reductionPercent": -1.2309923945544865
+    },
+    {
+      "mode": "navigation",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 2,
+        "medianMs": 3863.2400000000052,
+        "minMs": 3813.2808000000077,
+        "maxMs": 3913.1992000000027,
+        "valuesMs": [
+          3813.2808000000077,
+          3913.1992000000027
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 2729.5376000000033,
+        "minMs": 2696.7379000000074,
+        "maxMs": 2762.3372999999992,
+        "valuesMs": [
+          2762.3372999999992,
+          2696.7379000000074
+        ]
+      },
+      "reductionPercent": 29.345896190762165
+    },
+    {
+      "mode": "navigation",
+      "route": "/candidaturas",
+      "before": {
+        "n": 2,
+        "medianMs": 2936.71385,
+        "minMs": 2883.0098,
+        "maxMs": 2990.4179000000004,
+        "valuesMs": [
+          2883.0098,
+          2990.4179000000004
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 2790.9748499999987,
+        "minMs": 2786.2416999999987,
+        "maxMs": 2795.7079999999987,
+        "valuesMs": [
+          2786.2416999999987,
+          2795.7079999999987
+        ]
+      },
+      "reductionPercent": 4.962655792970816
+    },
+    {
+      "mode": "navigation",
+      "route": "/notificacoes",
+      "before": {
+        "n": 2,
+        "medianMs": 3155.3847999999925,
+        "minMs": 2695.89439999999,
+        "maxMs": 3614.875199999995,
+        "valuesMs": [
+          3614.875199999995,
+          2695.89439999999
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 2741.0720999999976,
+        "minMs": 2716.6506999999983,
+        "maxMs": 2765.493499999997,
+        "valuesMs": [
+          2716.6506999999983,
+          2765.493499999997
+        ]
+      },
+      "reductionPercent": 13.130338334646098
+    }
+  ],
+  "securityChecks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection",
+    "profile payload and all six ordered audit decisions match the frozen baseline",
+    "shared projection snapshot preserves browse payload, filters and signed pagination",
+    "profile and browse refuse crossed organizations",
+    "profile preserves payload and ordered audit for both restricted and fully granted capabilities",
+    "profile preserves the exact denied capability edit",
+    "profile preserves the exact denied capability units",
+    "profile preserves the exact denied capability createUnit",
+    "profile preserves the exact denied capability renameUnit",
+    "profile preserves the exact denied capability moveUnit",
+    "profile refuses missing primary permission",
+    "browse refuses missing primary permission",
+    "transition capabilities are freshly denied without changing visible records",
+    "profile refuses publication on synchronous audit failure",
+    "browse refuses publication on synchronous audit failure",
+    "four concurrent profile requests complete successfully",
+    "four concurrent browse requests complete successfully",
+    "profile commits its protected result before revocation and refuses subsequent requests",
+    "browse commits its protected result before revocation and refuses subsequent requests"
+  ],
+  "concurrent": {
+    "profile": [
+      {
+        "status": 200,
+        "complete": true
+      },
+      {
+        "status": 200,
+        "complete": true
+      },
+      {
+        "status": 200,
+        "complete": true
+      },
+      {
+        "status": 200,
+        "complete": true
+      }
+    ],
+    "browse": [
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      }
+    ]
+  }
+}

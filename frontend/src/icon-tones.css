@@ -1,0 +1,41 @@
+/* Icon tones: decorative icons take a colour by subject instead of the petrol action colour.
+   Usage: <Icon data-icon-tone="blue|violet|amber|rose|sky" />, or the same attribute on an
+   icon chip. Every tone keeps at least 4.5:1 on white and 4:1 on its own soft surface.
+   Subject map: dashboards blue · tasks violet · catalogue sky · applications rose · alerts amber. */
+:root {
+  --icon-blue: #2563C9;
+  --icon-blue-soft: #EAF1FD;
+  --icon-violet: #7447C4;
+  --icon-violet-soft: #F1ECFB;
+  --icon-amber: #B45F06;
+  --icon-amber-soft: #FFF3E0;
+  --icon-rose: #C2366B;
+  --icon-rose-soft: #FDECF2;
+  --icon-sky: #0B79A6;
+  --icon-sky-soft: #E6F4FA;
+}
+
+[data-icon-tone="blue"] { --icon-tone: var(--icon-blue); --icon-tone-soft: var(--icon-blue-soft); }
+[data-icon-tone="violet"] { --icon-tone: var(--icon-violet); --icon-tone-soft: var(--icon-violet-soft); }
+[data-icon-tone="amber"] { --icon-tone: var(--icon-amber); --icon-tone-soft: var(--icon-amber-soft); }
+[data-icon-tone="rose"] { --icon-tone: var(--icon-rose); --icon-tone-soft: var(--icon-rose-soft); }
+[data-icon-tone="sky"] { --icon-tone: var(--icon-sky); --icon-tone-soft: var(--icon-sky-soft); }
+
+svg[data-icon-tone] { color: var(--icon-tone); }
+/* Icon inside a tinted chip. */
+:is(span, div)[data-icon-tone] { color: var(--icon-tone); background: var(--icon-tone-soft); }
+
+/* Contexts whose own rules colour the icon: the tone prevails, the previous colour stays as fallback. */
+.mt-demo1 .sidebar .nav-item svg[data-icon-tone],
+.mt-demo1 .sidebar .nav-item.active svg[data-icon-tone],
+.platform-dashboard .admin-metric > div svg[data-icon-tone],
+.platform-dashboard .admin-shortcuts svg[data-icon-tone],
+.linked-file-name svg[data-icon-tone] { color: var(--icon-tone); }
+.sidebar .nav-item svg[data-icon-tone] { opacity: 1; }
+.c4g-shell :is(.account-security-icon, .operational-heading-icon)[data-icon-tone] { color: var(--icon-tone); background: var(--icon-tone-soft); }
+
+/* Entity dashboard: the "open opportunities" indicator follows the catalogue tone. */
+.dashboard-kpi[data-tone="portfolio"] { --kpi-icon-color: var(--icon-rose); }
+.dashboard-kpi[data-tone="open"] { --kpi-icon-color: var(--icon-sky); }
+.dashboard-kpi[data-tone="deadline"] { --kpi-icon-color: var(--icon-amber); }
+.dashboard-kpi:not([data-tone]) { --kpi-icon-color: var(--icon-blue); }

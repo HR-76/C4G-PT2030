@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-10-27",
+  "scope": "Standalone portal candidate and synthetic tests; no active runtime integration or PostgreSQL execution",
+  "branch": "feat/f13-organizational-profile",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "baseline_file_count": 30934,
+  "baseline_worktree_entries": 2560,
+  "tdd": {
+    "redBeforeImplementation": true,
+    "redReason": "Two new test files could not load the absent prototype (MODULE_NOT_FOUND); not assertion failures",
+    "redExit": 1,
+    "firstGreenNewTests": 47,
+    "finalGreenNewTests": 49,
+    "additionalCoverage": "Two simulated temporal-content tests after independent review"
+  },
+  "tests": {
+    "new": 49,
+    "equivalenceAndCounterexamples": 24,
+    "protocol": 25,
+    "focused": {
+      "pass": 80,
+      "fail": 0,
+      "skip": 0
+    },
+    "backendBefore": {
+      "pass": 1369,
+      "fail": 0,
+      "skip": 7,
+      "source": "Previous completed increment"
+    },
+    "backendAfter": {
+      "pass": 1418,
+      "fail": 0,
+      "skip": 7,
+      "total": 1425
+    },
+    "frontend": {
+      "pass": 346,
+      "fail": 0,
+      "files": 55
+    },
+    "frontendBuild": "PASS",
+    "syntaxFiles": 4,
+    "commands": {
+      "backend": "npm test",
+      "frontend": "npm test",
+      "build": "npm run build"
+    },
+    "executionLimitation": "Initial backend npm test could not spawn isolated workers in sandbox (EPERM); same command passed with subprocess permission",
+    "preexistingWarnings": [
+      "jsdom navigation not implemented",
+      "Synthetic chunk failure in frontend error boundary tests"
+    ],
+    "preexistingSkips": "Seven PostgreSQL integration tests; not enabled or replaced"
+  },
+  "independentReview": {
+    "result": "PASS with no pending findings within prototype scope",
+    "scope": "Candidate, tests, reference reader and separation from active runtime"
+  },
+  "measurements": "measurements.json",
+  "postgresExecuted": false,
+  "postgresEquivalenceRlsConcurrencyCleanupProven": false,
+  "runtimeIntegrated": false,
+  "runtimeImportSearch": {
+    "matches": 0,
+    "paths": [
+      "backend/src",
+      "backend/scripts",
+      "frontend/src",
+      "backend/package.json",
+      "frontend/package.json"
+    ]
+  },
+  "preservation": {
+    "method": "Repository metadata inventory and eight selected source hashes; no external database snapshot",
+    "branchAndHeadUnchanged": true,
+    "allowedFiles": [
+      "backend/prototypes/partnerSqlPortal.js",
+      "backend/test/partnerPortalEquivalence.test.js",
+      "backend/test/partnerPortalProtocol.test.js",
+      "backend/test/support/partnerBrowsePortalHarness.js",
+      "context/current-work.md",
+      "context/features/partner-portal-prototype.md",
+      "context/features/partner-sql-pagination.md",
+      "context/research/partner-sql-adapter-design.md",
+      "context/reviews/partner-portal-prototype/README.md",
+      "context/reviews/partner-portal-prototype/measurements.json",
+      "context/reviews/partner-portal-prototype/verification.json"
+    ],
+    "unexpectedChanges": [],
+    "removedFiles": [],
+    "generatedBuildAndCacheChanges": 65,
+    "activeRuntimeDependenciesMigrationsPermissionsDevUnchanged": true,
+    "gitMutationsDeployOrDatabaseOperations": false
+  },
+  "sourceHashChecks": [
+    {
+      "path": "backend/src/applications/partners.js",
+      "sha256": "3272B2BFBFAA54AA3C4F35C5B9F4AFC3818BBB2BDDDE261F0A0286EA78AC9342",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/composition.js",
+      "sha256": "0F51E47FEE7E6016FC25F6A82DCDFFBE446CF25F6AC8B3C9D0D9F9F4E0F61CDF",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/browseSql.js",
+      "sha256": "7D3AF38C0C106324FFB1C5AB19C30D38AC303EE372651CEB80D6115037D8C287",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/routes/applicationSliceRoutes.js",
+      "sha256": "7573E7A1D682DEF64CAFD1498EFA2B764382F00F7C713A4D076134DB55376DAC",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/pq1UiTokens.js",
+      "sha256": "1A10A1D109AD967B9922CCF0DBB164D45E7608B20E28B229305CEF67E19B3F64",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/canonicalization.js",
+      "sha256": "641A6980C356699FE4B3989DC9B1968E438835626933217F19A58BEAB7FEBF63",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/api/api.js",
+      "sha256": "F6BAC2DE291D63935E1B4A136DDD06532C2C8F1A5DF483D273B9A6B66BE7238B",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/pages/Partners.jsx",
+      "sha256": "AF49B44AC114AB287ADDED4A4D99FA8C73F7D1067D6FF7FC958B58DD7DC38FB4",
+      "unchanged": true
+    }
+  ]
+}

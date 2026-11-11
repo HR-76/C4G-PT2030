@@ -1,0 +1,28 @@
+{
+  "status": "ISOLATED_REHEARSAL_PASS",
+  "executable": false,
+  "registered": false,
+  "activated": false,
+  "measuredAt": "2026-10-31T00:27:01.659Z",
+  "postgres": "18.6",
+  "evidence": "output/opportunity-v2-s6-3d409b9e962a4351a1ae989635678301/verification.json",
+  "central": {
+    "baseline": "035_funding_source_resolution",
+    "ordinal": null,
+    "sql": "backend/database/central/candidates/opportunity_persistence_v2.up.sql",
+    "schemaFingerprint": "676d30ce81d9ebc524b8c92b81ce3d3a698b321ada1316f03cd2c9d20ca8b4ba",
+    "sqlSha256": "fb2b973a11b8be7909452287416050ed2199f6b1bfd0b2d2b419a09f8f1d9f2c"
+  },
+  "tenant": {
+    "baseline": "033_organizational_opportunity_interests",
+    "ordinal": null,
+    "sql": "backend/database/tenant/candidates/application_snapshot_v2.up.sql",
+    "schemaFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3",
+    "sqlSha256": "5be4eba00f11eb28b4756ec5d8a29fc08191a8e74133f25056a5315b244c77d7"
+  },
+  "limitations": [
+    "Fixtures only; no production data or source recollection.",
+    "No OIDC or production authority integration is certified.",
+    "Candidate SQL is not registered in active migration manifests."
+  ]
+}

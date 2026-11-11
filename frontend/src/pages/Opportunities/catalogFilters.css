@@ -1,0 +1,148 @@
+/* Scoped to the common catalogue; other filter bars retain their layout. */
+.filter-bar.catalog-discovery-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.catalog-discovery-filters .catalog-date-filters,
+.catalog-discovery-filters .filter-wide,
+.catalog-discovery-filters .filter-note,
+.catalog-discovery-filters > [role="alert"] { grid-column: 1 / -1; }
+@media (max-width: 1050px) {
+  .filter-bar.catalog-discovery-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .filter-bar.catalog-discovery-filters { grid-template-columns: minmax(0, 1fr); }
+}
+
+.organization-catalog.catalog-pilot .page-header {
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+.catalog-pilot .page-header > div { margin-right: auto; }
+.catalog-pilot .page-header h1 { color: var(--color-text-primary); letter-spacing: -.035em; }
+.organization-catalog.catalog-pilot .catalog-source { padding: 10px 0; color: var(--color-action); }
+.catalog-pilot .catalog-discovery-filters,
+.catalog-pilot .opportunity-table-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: none;
+}
+.catalog-pilot .opportunity-analysis-table th { color: var(--color-action); text-transform: none; letter-spacing: normal; }
+.catalog-pilot .col-title .link-cell { color: var(--color-success); font-size: 1rem; font-weight: 650; line-height: 1.4; }
+.catalog-pilot .table-meta { margin: 20px 0 8px; font-weight: 650; color: var(--color-text-primary); }
+.catalog-pilot td[data-label="Fecho"] { color: var(--color-text-primary); font-weight: 650; font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) {
+  .catalog-pilot .filter-bar.catalog-discovery-filters { grid-template-columns: repeat(2,minmax(0,1fr)); padding: 12px; }
+  .catalog-pilot .catalog-discovery-filters .opportunity-search { grid-column: 1 / -1; }
+  .organization-catalog.catalog-pilot .recovered-filters label { min-width: 0; }
+  .catalog-pilot .opportunity-table-wrap { background: transparent; border: 0; box-shadow: none; }
+  .catalog-pilot .opportunity-analysis-table .col-title { background: var(--color-neutral-soft); }
+}
+
+.catalog-pilot .filter-bar.catalog-discovery-filters { display: flex; align-items: end; gap: 12px; }
+.catalog-pilot .catalog-discovery-filters .filter-search { flex: 1 1 260px; }
+.catalog-extra-filters summary { cursor: pointer; padding: 11px 14px; color: var(--color-success); font-weight: 600; }
+.catalog-extra-filters[open] { flex-basis: 100%; }
+.catalog-filter-fields { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,160px),1fr)); gap: 12px; padding: 12px 0; }
+.catalog-pilot .catalog-discovery-filters .filter-actions { flex: 0 1 auto; width: auto; margin: 0; padding: 0; border: 0; }
+.catalog-result-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 18px 0 10px; }
+.catalog-result-tools .table-meta,.catalog-result-tools .catalog-actions { margin: 0; }
+.catalog-pilot .habitual-catalog-table tr.catalog-interest-registered,
+.catalog-pilot .habitual-catalog-table tr.catalog-interest-registered td { background: var(--color-surface); }
+.catalog-pilot .habitual-catalog-table tr:hover td { background: var(--color-background); }
+.catalog-pilot .habitual-catalog-table tr.catalog-interest-registered td:first-child { box-shadow: inset 3px 0 var(--color-success); }
+.catalog-summary:not(.catalog-custom) .habitual-catalog-table :is(th,td):is(:nth-child(3),:nth-child(8)) { display: none; }
+@media (min-width:769px) {
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table { min-width: 840px; }
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table th:nth-child(n) { width: auto; }
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table th:first-child { width: 30%; }
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table th:nth-child(6) { width: 16%; }
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table th:nth-child(7) { width: 14%; }
+  .catalog-summary .opportunity-analysis-table.habitual-catalog-table th:nth-child(9) { width: calc(5.5rem + 6%); }
+  .catalog-pilot .habitual-catalog-table :is(th,td) { padding: 14px 12px; }
+}
+@media (max-width:700px) {
+  .catalog-pilot .catalog-discovery-filters .filter-search { flex-basis: 100%; }
+}
+
+.catalog-extra-filters summary { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--color-border-strong); border-radius: 7px; }
+.catalog-extra-filters[open] summary { background: var(--color-background); }
+.catalog-filter-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 8px 0; }
+.catalog-filter-badges strong { font-size: .8rem; color: var(--color-action); margin-right: 3px; }
+.catalog-filter-badges [data-slot=badge] { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 30px; padding: 4px 8px; border: 1px solid var(--color-info-soft); border-radius: 6px; background: var(--color-info-soft); color: var(--color-text-primary); font: 500 .8rem/1.3 var(--font); cursor: pointer; }
+.catalog-filter-badges [data-slot=badge] span { overflow-wrap: anywhere; }
+.catalog-filter-badges [data-slot=badge] svg { flex-shrink: 0; }
+.catalog-filter-badges button:focus-visible,.catalog-extra-filters summary:focus-visible { outline: 2px solid var(--color-info); outline-offset: 2px; }
+@media (max-width:700px) { .catalog-filter-badges button[data-slot=badge] { min-height: 38px; } }
+
+/* The compact catalogue pairs a figure with its funding scope and estimate. */
+.catalog-pilot .habitual-catalog-table .col-title .link-cell { color: var(--color-text-primary); line-height: 1.4; }
+.catalog-summary-programme { display: none; }
+.catalog-summary:not(.catalog-custom) .catalog-summary-programme { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .78rem; }
+.catalog-pilot .catalog-amount { display: block; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+.catalog-pilot .catalog-amount-note { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .77rem; line-height: 1.35; }
+.catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a { text-decoration: none; }
+.catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a:hover strong { text-decoration: underline; }
+@media (min-width:769px) {
+  .catalog-summary .habitual-catalog-table :is(th:nth-child(7),td[data-label="Dotação da call"]) { text-align: left; }
+  .catalog-summary .habitual-catalog-table .opportunity-source { font-weight: 400; }
+}
+@media (max-width:768px) {
+  .catalog-summary:not(.catalog-custom) .habitual-catalog-table :is(th,td):is(:nth-child(4),:nth-child(6)) { display: none; }
+  .catalog-summary .habitual-catalog-table tbody { display: grid; gap: 12px; padding: 10px; background: var(--color-surface); }
+  .catalog-summary .habitual-catalog-table tbody tr { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); gap: 8px 12px; align-items: start; padding: 14px; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface); }
+  .catalog-summary .habitual-catalog-table td:is(.col-title,[data-label="Estado do aviso"],[data-label="Fecho"],[data-label="Dotação da call"],[data-label="Interesse"]) { display: block; }
+  .catalog-summary .habitual-catalog-table td:is(.col-title,[data-label="Estado do aviso"],[data-label="Interesse"]) { grid-column: 1 / -1; }
+  .catalog-summary .habitual-catalog-table td::before { display: block; margin-bottom: 4px; color: var(--color-text-secondary); font-size: .75rem; font-weight: 550; text-transform: none; letter-spacing: normal; }
+  .catalog-summary .habitual-catalog-table td:is(.col-title,[data-label="Estado do aviso"])::before { content: none; }
+  .catalog-summary .habitual-catalog-table td.col-title { background: var(--color-surface); box-shadow: none; }
+  .catalog-summary .habitual-catalog-table tr.catalog-interest-registered { border-left: 3px solid var(--color-success); }
+  .catalog-summary .habitual-catalog-table tr.catalog-interest-registered td:first-child { box-shadow: none; }
+  .catalog-summary .habitual-catalog-table td[data-label="Interesse"] { border-top: 1px solid var(--color-border); }
+}
+@media (max-width:700px) {
+  .catalog-pilot .filter-bar.catalog-discovery-filters { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-8); }
+  .catalog-pilot .catalog-extra-filters summary { display:flex; min-height:44px; }
+  .catalog-pilot .catalog-discovery-filters .filter-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-8); }
+  .catalog-pilot .catalog-discovery-filters .filter-actions .btn { width:100%; }
+}
+
+.catalog-columns summary { cursor:pointer; list-style:none; width:fit-content; }
+.catalog-columns summary::-webkit-details-marker { display:none; }
+.catalog-columns fieldset { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 12px; margin:8px 0 0; padding:12px; border:1px solid #d8e1e9; border-radius:8px; }
+.catalog-columns label { display:flex; align-items:center; gap:6px; min-height:32px; font-size:.85rem; }
+.catalog-columns legend { font-weight:650; padding:0 4px; }
+.column-presets { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; }
+.column-presets button { border:1px solid #c4d3dd; border-radius:5px; padding:5px 8px; background:white; color:#254e70; cursor:pointer; }
+.catalog-columns :is(summary,input,button):focus-visible { outline:2px solid #305d83; outline-offset:2px; }
+.catalog-custom .habitual-catalog-table [hidden] { display:none !important; }
+@media(min-width:769px) {
+ .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:nth-child(n) { width:auto; }
+ .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:first-child { width:33%; }
+ .catalog-custom.catalog-wide .opportunity-analysis-table.habitual-catalog-table { min-width:1200px; }
+}
+@media(max-width:768px) {
+ .catalog-custom .habitual-catalog-table td:not([hidden]) { display:block; }
+ .catalog-custom .habitual-catalog-table td[data-label="Programa financiador"] { grid-column:1/-1; }
+ .catalog-columns[open] { width:100%; }
+}
+
+.catalog-compare-tools { display:flex; align-items:end; flex-wrap:wrap; gap:10px; margin:16px 0 8px; }
+.catalog-compare-tools label { display:grid; gap:4px; font-size:.85rem; font-weight:600; }
+.catalog-compare-tools select { max-width:100%; padding:7px; color:var(--text-primary); background:white; border:1px solid var(--border-control); border-radius:5px; }
+/* Catalog table header: shared rules live in c4g-foundations.css. */
+.habitual-catalog-table th .catalog-sort-button {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: -4px -8px; padding: 4px 8px;
+  color: inherit; font: inherit; text-align: left;
+  border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+}
+.habitual-catalog-table th .catalog-sort-button svg { flex: none; opacity: .45; }
+.habitual-catalog-table th .catalog-sort-button:hover { background: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
+.habitual-catalog-table th .catalog-sort-button:is(:hover, [data-active]) svg { opacity: 1; }
+.habitual-catalog-table th .catalog-sort-button:focus-visible { outline: 2px solid var(--ui-action, var(--color-action)); outline-offset: 1px; }

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "status": "HABITUAL_11145_ACCEPTED",
+  "completedAt": "2026-10-31T15:23:13.847Z",
+  "windowId": "afa2ccb8-21cd-48b0-874f-e06bfec830d6",
+  "source": "EU_FUNDING_TENDERS",
+  "externalIdentifier": "CASCADE:11145",
+  "packageId": "opportunity-v2-activation-11145",
+  "packageDigest": "4f83267f1c2d3f41c604453f3489136397f661fbc06a99de8b79ed2980674e7a",
+  "installed": {
+    "centralVersion": "042_opportunity_eu_source_control_v2",
+    "tenantVersion": "034_application_snapshot_v2"
+  },
+  "schema": {
+    "central": "042_opportunity_eu_source_control_v2",
+    "centralFingerprint": "0cb6ef8f6e00cc8e9209864addab966c9772a9bb5d886b0165d49a67e1d21e82",
+    "tenant": "034_application_snapshot_v2",
+    "tenantFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3"
+  },
+  "accepted": {
+    "opportunityId": "01a14a80-9143-7177-ba86-9fa72d09fb64",
+    "revisionId": "f6fe19fd-12d7-4c38-920a-b456dd74e9a9",
+    "revisionNumber": 5,
+    "rowVersion": 5,
+    "action": "REVISION_CREATED",
+    "contentDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6",
+    "sourceVersion": 2,
+    "sqlAmount": "120000.00000000",
+    "sqlType": "numeric",
+    "currencyState": "NOT_FOUND",
+    "cutoffs": 7
+  },
+  "plan": {
+    "planId": "a8f5271a-3c81-4fa8-bb38-2c30edaa730b",
+    "planDigest": "3daadd64f7b9f8455285277d4a06dac23324526cc59217aa99328ce3361e012f",
+    "fence": 2,
+    "expiresAt": "2026-10-31T16:19:50.673Z"
+  },
+  "sourceState": {
+    "state": "QUIESCED",
+    "fence": 3,
+    "acceptedV2": 1
+  },
+  "habitualActivationExecuted": true,
+  "oidcProviderLogin": true,
+  "sessionFabricated": false,
+  "backup": {
+    "path": "output/opportunity-v2-window/afa2ccb8-21cd-48b0-874f-e06bfec830d6/backup-restore-342224a3-ab03-4ab7-b14f-08a459f0ee86.json",
+    "id": "opportunity-v2-backup-342224a3-ab03-4ab7-b14f-08a459f0ee86",
+    "tables": 216,
+    "rows": 54007,
+    "configurationFiles": 7,
+    "restoration": "PASS",
+    "aclRestricted": true,
+    "cleanup": true
+  },
+  "report": "context/reviews/opportunity-data-standardization/habitual-11145.md",
+  "summary": "output/opportunity-v2-habitual/validation-summary.json",
+  "evidenceHashes": {
+    "output/opportunity-v2-habitual-afa2ccb8-21cd-48b0-874f-e06bfec830d6/window.json": "e68586018fc2525d20da8258a799308df755372ea54c089210abb2cda2352107",
+    "output/opportunity-v2-habitual-afa2ccb8-21cd-48b0-874f-e06bfec830d6/approval-57325a83-6a15-44e0-9ea3-a723f816ab02.json": "6782942f3f32d4d183fc56c2a9c967fa11d41b13768d8151fca46361536fbdff",
+    "output/opportunity-v2-habitual-afa2ccb8-21cd-48b0-874f-e06bfec830d6/after.json": "0f3f2225ab2cb7a244f4664f3811a942635f7d1f195fe6a74d1a273438d97434",
+    "output/opportunity-v2-habitual-afa2ccb8-21cd-48b0-874f-e06bfec830d6/before.json": "63f887d22da7f03a810a074e312422f29b01bcd20468bccaab668970d6d1f882",
+    "output/opportunity-v2-habitual-afa2ccb8-21cd-48b0-874f-e06bfec830d6/accepted-11145.json": "1b0e5e81ff68eef23a366bd45de39c47feac5ce48be598fc2e956a57572cdfb8",
+    "output/opportunity-v2-window/afa2ccb8-21cd-48b0-874f-e06bfec830d6/backup-restore-342224a3-ab03-4ab7-b14f-08a459f0ee86.json": "0bfa8823333521951ae6f559655b41f07010f8b7ba4a85c34fa41c1ea7a6bcbd",
+    "output/opportunity-v2-installer-1f1a8e94cfd442e2b6b0dba528a68ccb/verification.json": "2d03360622ec28e9ff1c0aaa975e881b6f20822640f146e7a92733829a2ed158",
+    "output/opportunity-v2-registered-8b7b3ef5959840949451a6e9affa2f3c/verification.json": "74a410b77fb9cb578ad3771e7d6f601e2fb4891a1e2a14eae1a62b732711ad88",
+    "output/opportunity-v2-habitual/verify.cjs": "bcf622ff58d244f99108aab651f011b1468806dc4bd0d8ca9088c4e1d9c0a83d",
+    "output/opportunity-v2-habitual/backend-tests.log": "4aed38bfed5bf7306d22b087df278ea6a345f35e562c36d8a2931647fe7bc554",
+    "output/opportunity-v2-habitual/frontend-tests.log": "2cacaef70048a9cdd76a9f678050199d4b343eb9068369e83efa14d0cd4d8ace",
+    "output/opportunity-v2-habitual/frontend-build.log": "613ed42a7861d6fcb312a3df5f697bd96ba3524644a1a1a6f83f37a7a705cbee",
+    "output/opportunity-v2-habitual/operational-tests.log": "c91394fa64cb1be7cb4c7a6afb78767aea09c3d838c12c9c23a3c3f5da24e915"
+  },
+  "nextStep": "Integrate and rehearse the v2-compatible EU writer before controlled resumption.",
+  "limitations": [
+    "EU legacy automatic writer remains suspended; a v2-compatible writer is required before resumption.",
+    "Backup is pre-installation; recovery needs reconciliation of later writes and authentication/binding verification at a new destination.",
+    "No activation of other opportunities or Portugal2030/Interreg/POCTEP was performed.",
+    "Public accepted export is factual evidence, not a full database backup or independent replay authorization."
+  ]
+}

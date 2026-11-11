@@ -1,0 +1,573 @@
+{
+  "startedAt": "2026-11-09T23:57:55.575Z",
+  "mode": "standard",
+  "status": "COMPLETE",
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection"
+  ],
+  "scenarios": [],
+  "limits": [
+    "Local synthetic data; no production capacity claim.",
+    "Instrumentation adds timing and 100ms PostgreSQL sampling overhead.",
+    "Central non-authority reader uses fixture pg_read_all_data.",
+    "No changes to pool limits, deadlines or security checks.",
+    "Standard mixed-tenant scenario warms tenant A only; first tenant B access can be cold."
+  ],
+  "variant": "B",
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "050_billing_private_documents",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "repetition": 0,
+      "readyMs": 4708,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 385
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 314
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 633
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2705
+        },
+        {
+          "path": "/api/organizations/6a783042-6f95-4424-8292-a6d6e82f2ba8/dashboard/summary",
+          "status": 200,
+          "ms": 3615
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "repetition": 1,
+      "readyMs": 4740,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 474
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 337
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 663
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2599
+        },
+        {
+          "path": "/api/organizations/6a783042-6f95-4424-8292-a6d6e82f2ba8/dashboard/summary",
+          "status": 200,
+          "ms": 3469
+        }
+      ]
+    },
+    {
+      "route": "catalogo-detalhe",
+      "width": 1440,
+      "readyMs": 861
+    },
+    {
+      "route": "/catalogo",
+      "width": 1440,
+      "repetition": 0,
+      "readyMs": 1690,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 370
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 297
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 583
+        },
+        {
+          "path": "/api/central-opportunities",
+          "status": 200,
+          "ms": 616
+        },
+        {
+          "path": "/api/central-opportunities/fbfb2310-0fab-456c-bdcb-1597f78eb9b8",
+          "status": 200,
+          "ms": 655
+        }
+      ]
+    },
+    {
+      "route": "/catalogo",
+      "width": 1440,
+      "repetition": 1,
+      "readyMs": 2189,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 491
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 384
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 815
+        },
+        {
+          "path": "/api/central-opportunities",
+          "status": 200,
+          "ms": 843
+        }
+      ]
+    },
+    {
+      "route": "/candidaturas",
+      "width": 1440,
+      "repetition": 0,
+      "readyMs": 4221,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 521
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 341
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 741
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3201
+        }
+      ]
+    },
+    {
+      "route": "/candidaturas",
+      "width": 1440,
+      "repetition": 1,
+      "readyMs": 3689,
+      "dims": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 402
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 286
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 534
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 2645
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "repetition": 0,
+      "readyMs": 4233,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 404
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 270
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 580
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2641
+        },
+        {
+          "path": "/api/organizations/6a783042-6f95-4424-8292-a6d6e82f2ba8/dashboard/summary",
+          "status": 200,
+          "ms": 3434
+        }
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "repetition": 1,
+      "readyMs": 4174,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 402
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 301
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 608
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2504
+        },
+        {
+          "path": "/api/organizations/6a783042-6f95-4424-8292-a6d6e82f2ba8/dashboard/summary",
+          "status": 200,
+          "ms": 3287
+        }
+      ]
+    },
+    {
+      "route": "catalogo-detalhe",
+      "width": 390,
+      "readyMs": 822
+    },
+    {
+      "route": "/catalogo",
+      "width": 390,
+      "repetition": 0,
+      "readyMs": 1685,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 401
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 306
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 604
+        },
+        {
+          "path": "/api/central-opportunities",
+          "status": 200,
+          "ms": 641
+        },
+        {
+          "path": "/api/central-opportunities/fbfb2310-0fab-456c-bdcb-1597f78eb9b8",
+          "status": 200,
+          "ms": 587
+        }
+      ]
+    },
+    {
+      "route": "/catalogo",
+      "width": 390,
+      "repetition": 1,
+      "readyMs": 2254,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 552
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 442
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 939
+        },
+        {
+          "path": "/api/central-opportunities",
+          "status": 200,
+          "ms": 981
+        }
+      ]
+    },
+    {
+      "route": "/candidaturas",
+      "width": 390,
+      "repetition": 0,
+      "readyMs": 4699,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 526
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 397
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 740
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3420
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 3468
+        }
+      ]
+    },
+    {
+      "route": "/candidaturas",
+      "width": 390,
+      "repetition": 1,
+      "readyMs": 4210,
+      "dims": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 393
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 270
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 564
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2450
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3235
+        }
+      ]
+    }
+  ],
+  "instrumentation": {
+    "queries": [],
+    "policies": [
+      {
+        "globalLimit": 20,
+        "perTenantLimit": 5,
+        "operationalReserve": 2,
+        "globalQueueLimit": 40,
+        "perTenantQueueLimit": 10,
+        "operationalQueueReserve": 2,
+        "acquireTimeoutMs": 5000,
+        "leaseTimeoutMs": 15000,
+        "idleTimeoutMs": 30000,
+        "drainTimeoutMs": 10000,
+        "circuitFailureThreshold": 3,
+        "circuitResetMs": 10000,
+        "backoffBaseMs": 25,
+        "maxBackoffMs": 250
+      }
+    ],
+    "samples": []
+  },
+  "integrity": {
+    "unchanged": true
+  },
+  "finishedAt": "2026-11-09T23:59:20.200Z"
+}

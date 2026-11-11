@@ -1,0 +1,15 @@
+# Continuação do ensaio H interrompido —31/10/2026
+
+Extensão operacional do [contrato A/B](../../features/central-security-snapshot-sql-performance.md), registada após a falha observada e antes da continuação. Não altera o protocolo congelado nem transforma o resultado da tentativa em PASS.
+
+O ensaio H `bfd7495e00394b85821c568571e26908`, do pacote `central-snapshot-ab-58f2f8910abee80f`, parou no índice4 (A do terceiro par). Os índices0–3 passaram. No índice4 houve28 medidas HTTP200 e cinco aquecimentos HTTP200; o sexto aquecimento, dashboard com dois tenants/tenant0, recebeu503/SERVICE_UNAVAILABLE com `LEASE_TIMEOUT`,20,479s. O último cenário não chegou a medir os oito pedidos. O parent terminou com exit1; cleanup de todos os recursos criados e integridade ficaram PASS.
+
+Para concluir a recolha já autorizada, executar apenas os índices ainda não tentados5(B),6(B),7(A), através do child original congelado, com os mesmos A/B, manifesto, imagens, seed, prontidão, volumes e limites. Um orquestrador externo mínimo, com fonte/hashes próprios, valida os relatórios da prontidão e da tentativa falhada, os IDs/stages e os cleanups antes de criar recursos. Preserva os relatórios antigos e escreve numa nova pasta de evidência. Não repete o índice4 nem aumenta leases/timeouts, não altera SQL runtime ou dados habituais, não escolhe execuções vencedoras. Falha de cleanup impede novas fixtures.
+
+Regressões e revisão independente do orquestrador precedem a execução. A conclusão exige conferir hashes, contagens, outputs dos processos e remoção dos recursos próprios. Continuar após uma falha de workload só é permitido depois de terminar o processo e confirmar cleanup dos seus recursos; a falha permanece no resultado global.
+
+Análise: a campanha H permanece FAIL por erro funcional num aquecimento e população planeada incompleta. Se os três braços restantes passarem, haverá280 tentativas medidas (oito por medir no cenário interrompido),55 aquecimentos (incluindo o503) e136 controlos de prontidão. Os cinco cenários anteriores têm quatro pares completos; dashboard C4/dois tenants tem três pares completos e oito observações B sem par, que devem permanecer identificadas. Apresentar distribuições de todos os dados e análise emparelhada sem misturar a população sem par. M permanece a sua prova independente PASS/2400 medidas. Não publicar H como288/288, nem declarar a certificação integral do protocolo satisfeita.
+
+O par de índice2 fica separado por uma interrupção operacional longa entre A4 e B5. Antes de medir B5, fica definida também uma análise de sensibilidade dos pares0/1/3 completos, sem essa interrupção; todos os dados do par2 continuam nos resultados observados e nos pareamentos possíveis. Não chamar à campanha uma sequência contínua nem escolher pares em função do ganho observado.
+
+O erro na referência A não prova que B corrige a causa do lease expirado. A investigação deve separar o que os traces mostram de hipóteses de carga do host, Docker ou PostgreSQL. A correção funcional dessa causa, se necessária, pertence a incremento próprio, com contrato e nova prova.

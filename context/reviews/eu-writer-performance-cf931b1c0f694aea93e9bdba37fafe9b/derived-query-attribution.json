@@ -1,0 +1,863 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "createdAt": "2026-10-31T17:07:02.964Z",
+  "trialId": "eu-writer-trial-0ecb31dc7c705859",
+  "sourceSetDigest": "0ecb31dc7c70585959a97b38046e79c5aa0dec06b87763a557720ad3e8ce1d6c",
+  "manifestSha256": "767625d37bece93c7877a577c527324ce514cec3081ed57451d1677b04be7afc",
+  "seedDigest": "3809b44e0f34f7a5f6868b9052fb66af021051292b0b49648b9d0e8876edf3f6",
+  "input": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/287cf708112d4f139778986a3e771110/report.json",
+    "sha256": "062a01eb174b4efd920ada023e21292cf24d56c07c06c09d5eddbc37f9e0716d",
+    "stageEvidence": [
+      {
+        "path": "evidence/287cf708112d4f139778986a3e771110/stage-0-043.json",
+        "sha256": "d25dc64271d56f1d6023ecda87b7329e4682a6d4e99093fb8a5d65e7d307b28a"
+      },
+      {
+        "path": "evidence/287cf708112d4f139778986a3e771110/stage-1-043.json",
+        "sha256": "f96c0e4dff8a508bef00a7e56ee75c79cb508bb84f06acf8af1894d62c5d7b67"
+      },
+      {
+        "path": "evidence/287cf708112d4f139778986a3e771110/stage-2-043.json",
+        "sha256": "25412bd2994fea211b9f28cf7a0e6430fc527e5095c9bc8b89227e876b0accb8"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "id": "centralSchemaSnapshot",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "source": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/backend/src/security/centralSchemaManifest.js",
+      "sqlLine": 32,
+      "helperLine": 29,
+      "sourceSha256": "a0d8fff404e90dea7ddae20ff9b468d208d7a0db598c4987701be61aaed9b7d1",
+      "sourceHashMatchVerified": true,
+      "mappingMethod": "Static template extraction; JavaScript CRLF normalization; authority template substitutes its literal protectedRelation. No runtime module executed."
+    },
+    {
+      "id": "authoritySecuritySnapshot",
+      "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+      "source": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/backend/src/security/authoritySecurityManifest.js",
+      "sqlLine": 13,
+      "helperLine": 49,
+      "sourceSha256": "462ce6ab2ee46eb47fef09bdb119c151cab9bc6ef26815d1a44b36678b273732",
+      "sourceHashMatchVerified": true,
+      "mappingMethod": "Static template extraction; JavaScript CRLF normalization; authority template substitutes its literal protectedRelation. No runtime module executed."
+    }
+  ],
+  "method": {
+    "quantiles": "NEAREST_RANK",
+    "roundBeforeCalculation": false,
+    "intervals": "startMs/endMs relative to the same request start; union of BOTH target SQL hashes per request",
+    "ratio": "For each request calculate jointUnionMs/httpMs; summarize those ratios. Do not divide population medians or add individual medians.",
+    "algorithm": "function union(intervals){let end=-Infinity,total=0;for(const [a,b] of intervals.slice().sort((x,y)=>x[0]-y[0])){assert(Number.isFinite(a)&&Number.isFinite(b)&&b>=a);total+=Math.max(0,b-Math.max(a,end));end=Math.max(end,b);}return total;}\nfunction distribution(values){assert(values.length&&values.every(Number.isFinite));const sorted=[...values].sort((a,b)=>a-b);return {n:sorted.length,p50:sorted[Math.ceil(sorted.length*.5)-1],p95:sorted[Math.ceil(sorted.length*.95)-1],maximum:sorted.at(-1),minimum:sorted[0]};}",
+    "algorithmSha256": "2807959b5e0dd102cb062d8fa77e33b4a9501f0069878d385fa27179a7066779",
+    "sqlOccurrencesVersusSpans": "authoritySecurity SQL occurs 50/106 times per report/dashboard request; assertAuthoritySecurity span occurs 25/53 times. The other SQL execution is embedded in the fresh Central schema snapshot.",
+    "limits": [
+      "Driver wall intervals include SQL execution, network and waits; they do not measure SQL CPU.",
+      "The two hashes can overlap; union is used before percentiles and ratios.",
+      "No checkpoint removal, post-lock reuse, cross-request caching or performance improvement is tested here."
+    ]
+  },
+  "cases": [
+    {
+      "scenario": "report-c1",
+      "population": "HTTP_200_MEASURED_ONLY; 4 attempts per replica, 3 replicas; warmups/readiness excluded",
+      "n": 12,
+      "perRequest": [
+        {
+          "replica": 0,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 3680.3340000000026,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1098.6472999999387,
+              "unionMs": 1061.1343999999517,
+              "unionToHttpRatio": 0.28832557045092944
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 916.3009000000311,
+              "unionMs": 902.4409000000305,
+              "unionToHttpRatio": 0.24520625030229046
+            }
+          ],
+          "jointUnionMs": 1957.1339999999764,
+          "jointUnionToHttpRatio": 0.5317816263415155
+        },
+        {
+          "replica": 0,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 3688.8533999999927,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1102.284400000004,
+              "unionMs": 1058.7244999999966,
+              "unionToHttpRatio": 0.28700639065786643
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 925.3215999999811,
+              "unionMs": 908.1268999999884,
+              "unionToHttpRatio": 0.24618134729886262
+            }
+          ],
+          "jointUnionMs": 1965.576299999986,
+          "jointUnionToHttpRatio": 0.5328420749927308
+        },
+        {
+          "replica": 0,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 3796.6157999999996,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1138.3556999999855,
+              "unionMs": 1098.4454999999725,
+              "unionToHttpRatio": 0.2893222695854483
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 986.2879000000394,
+              "unionMs": 973.6467000000412,
+              "unionToHttpRatio": 0.25645120583442793
+            }
+          ],
+          "jointUnionMs": 2065.9612000000197,
+          "jointUnionToHttpRatio": 0.544158616207629
+        },
+        {
+          "replica": 0,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 3710.0207999999984,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1087.7970999999816,
+              "unionMs": 1049.2766999999876,
+              "unionToHttpRatio": 0.28282232272120633
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 960.0596000000078,
+              "unionMs": 942.6393000000098,
+              "unionToHttpRatio": 0.25407924936701437
+            }
+          ],
+          "jointUnionMs": 1988.9513000000006,
+          "jointUnionToHttpRatio": 0.5361024660562554
+        },
+        {
+          "replica": 1,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 3654.683499999999,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1133.5817000000534,
+              "unionMs": 1089.3136000000522,
+              "unionToHttpRatio": 0.29805962677754516
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 912.2064999999857,
+              "unionMs": 893.5766999999905,
+              "unionToHttpRatio": 0.24450180159239254
+            }
+          ],
+          "jointUnionMs": 1981.2760000000417,
+          "jointUnionToHttpRatio": 0.5421197211742254
+        },
+        {
+          "replica": 1,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 3711.975600000005,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1091.4400999999925,
+              "unionMs": 1052.1291999999958,
+              "unionToHttpRatio": 0.28344184158968994
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 926.2511000000814,
+              "unionMs": 910.6118000000715,
+              "unionToHttpRatio": 0.24531729141755948
+            }
+          ],
+          "jointUnionMs": 1960.3170000000682,
+          "jointUnionToHttpRatio": 0.5281061114733797
+        },
+        {
+          "replica": 1,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 3624.962499999994,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1091.5451999999495,
+              "unionMs": 1048.664199999941,
+              "unionToHttpRatio": 0.2892896685137964
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 943.0491000000329,
+              "unionMs": 923.2894000000379,
+              "unionToHttpRatio": 0.2547031589982074
+            }
+          ],
+          "jointUnionMs": 1970.9182999999757,
+          "jointUnionToHttpRatio": 0.5437072245574895
+        },
+        {
+          "replica": 1,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 3575.0757000000012,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1068.6379000000015,
+              "unionMs": 1030.2428999999975,
+              "unionToHttpRatio": 0.28817373013947567
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 926.6824999999662,
+              "unionMs": 910.1534999999712,
+              "unionToHttpRatio": 0.25458300085784785
+            }
+          ],
+          "jointUnionMs": 1937.1436999999714,
+          "jointUnionToHttpRatio": 0.5418469041089035
+        },
+        {
+          "replica": 2,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 3721.38489999999,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1125.04270000002,
+              "unionMs": 1080.010500000033,
+              "unionToHttpRatio": 0.29021735967167384
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 947.9894999999815,
+              "unionMs": 929.4702999999863,
+              "unionToHttpRatio": 0.24976462391729187
+            }
+          ],
+          "jointUnionMs": 2004.9135000000242,
+          "jointUnionToHttpRatio": 0.5387546716815101
+        },
+        {
+          "replica": 2,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 3556.871900000013,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1077.0763000000297,
+              "unionMs": 1036.3057000000263,
+              "unionToHttpRatio": 0.2913531128292876
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 909.534799999994,
+              "unionMs": 891.9193999999843,
+              "unionToHttpRatio": 0.2507594945997299
+            }
+          ],
+          "jointUnionMs": 1926.7912000000215,
+          "jointUnionToHttpRatio": 0.5417094723034627
+        },
+        {
+          "replica": 2,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 3667.4920999999886,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1112.0882000000129,
+              "unionMs": 1073.3542000000161,
+              "unionToHttpRatio": 0.2926670789556764
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 941.0208000000275,
+              "unionMs": 925.6989000000322,
+              "unionToHttpRatio": 0.2524065150678948
+            }
+          ],
+          "jointUnionMs": 1995.9584000000468,
+          "jointUnionToHttpRatio": 0.5442297748916904
+        },
+        {
+          "replica": 2,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 3696.5417000000016,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 25,
+              "observedWorkMs": 1109.4535000000033,
+              "unionMs": 1069.5750000000116,
+              "unionToHttpRatio": 0.28934476784071206
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 50,
+              "observedWorkMs": 944.0285999999614,
+              "unionMs": 928.6826999999612,
+              "unionToHttpRatio": 0.2512301430279985
+            }
+          ],
+          "jointUnionMs": 1995.8771999999735,
+          "jointUnionToHttpRatio": 0.5399309305776188
+        }
+      ],
+      "jointUnionMs": {
+        "n": 12,
+        "p50": 1970.9182999999757,
+        "p95": 2065.9612000000197,
+        "maximum": 2065.9612000000197,
+        "minimum": 1926.7912000000215
+      },
+      "jointUnionToHttpRatio": {
+        "n": 12,
+        "p50": 0.5399309305776188,
+        "p95": 0.5442297748916904,
+        "maximum": 0.5442297748916904,
+        "minimum": 0.5281061114733797
+      },
+      "individual": [
+        {
+          "id": "centralSchemaSnapshot",
+          "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+          "count": {
+            "n": 12,
+            "p50": 25,
+            "p95": 25,
+            "maximum": 25,
+            "minimum": 25
+          },
+          "observedWorkMs": {
+            "n": 12,
+            "p50": 1098.6472999999387,
+            "p95": 1138.3556999999855,
+            "maximum": 1138.3556999999855,
+            "minimum": 1068.6379000000015
+          },
+          "unionMs": {
+            "n": 12,
+            "p50": 1058.7244999999966,
+            "p95": 1098.4454999999725,
+            "maximum": 1098.4454999999725,
+            "minimum": 1030.2428999999975
+          },
+          "unionToHttpRatio": {
+            "n": 12,
+            "p50": 0.2892896685137964,
+            "p95": 0.29805962677754516,
+            "maximum": 0.29805962677754516,
+            "minimum": 0.28282232272120633
+          }
+        },
+        {
+          "id": "authoritySecuritySnapshot",
+          "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+          "count": {
+            "n": 12,
+            "p50": 50,
+            "p95": 50,
+            "maximum": 50,
+            "minimum": 50
+          },
+          "observedWorkMs": {
+            "n": 12,
+            "p50": 926.6824999999662,
+            "p95": 986.2879000000394,
+            "maximum": 986.2879000000394,
+            "minimum": 909.534799999994
+          },
+          "unionMs": {
+            "n": 12,
+            "p50": 910.6118000000715,
+            "p95": 973.6467000000412,
+            "maximum": 973.6467000000412,
+            "minimum": 891.9193999999843
+          },
+          "unionToHttpRatio": {
+            "n": 12,
+            "p50": 0.2507594945997299,
+            "p95": 0.25645120583442793,
+            "maximum": 0.25645120583442793,
+            "minimum": 0.24450180159239254
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "dashboard-c1",
+      "population": "HTTP_200_MEASURED_ONLY; 4 attempts per replica, 3 replicas; warmups/readiness excluded",
+      "n": 12,
+      "perRequest": [
+        {
+          "replica": 0,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 8939.873699999996,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2354.0780999999843,
+              "unionMs": 2314.045299999998,
+              "unionToHttpRatio": 0.25884541299504027
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2359.8669999999984,
+              "unionMs": 2340.056099999987,
+              "unionToHttpRatio": 0.26175493955803736
+            }
+          ],
+          "jointUnionMs": 4650.279099999985,
+          "jointUnionToHttpRatio": 0.5201727961771974
+        },
+        {
+          "replica": 0,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 8924.939700000017,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2363.454699999944,
+              "unionMs": 2326.935199999949,
+              "unionToHttpRatio": 0.26072279233437784
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2323.7843999998586,
+              "unionMs": 2308.0275999998557,
+              "unionToHttpRatio": 0.2586042794216135
+            }
+          ],
+          "jointUnionMs": 4628.909899999824,
+          "jointUnionToHttpRatio": 0.5186488710954333
+        },
+        {
+          "replica": 0,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 8865.864300000016,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2353.7272999999404,
+              "unionMs": 2313.3237999999255,
+              "unionToHttpRatio": 0.260924792182971
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2330.783999999956,
+              "unionMs": 2309.820299999963,
+              "unionToHttpRatio": 0.2605296248443549
+            }
+          ],
+          "jointUnionMs": 4621.575699999899,
+          "jointUnionToHttpRatio": 0.5212775138008701
+        },
+        {
+          "replica": 0,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 9128.892099999997,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2415.6353000000818,
+              "unionMs": 2375.266200000071,
+              "unionToHttpRatio": 0.26019216504925846
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2376.1956999998656,
+              "unionMs": 2356.075399999856,
+              "unionToHttpRatio": 0.25808996033591597
+            }
+          ],
+          "jointUnionMs": 4729.456499999942,
+          "jointUnionToHttpRatio": 0.5180756271618046
+        },
+        {
+          "replica": 1,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 8911.99410000001,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2388.399000000005,
+              "unionMs": 2343.543399999995,
+              "unionToHttpRatio": 0.2629650977888318
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2338.5062999997754,
+              "unionMs": 2317.779599999776,
+              "unionToHttpRatio": 0.26007418474388055
+            }
+          ],
+          "jointUnionMs": 4659.946499999758,
+          "jointUnionToHttpRatio": 0.5228848277625938
+        },
+        {
+          "replica": 1,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 9045.734399999987,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2425.815800000011,
+              "unionMs": 2379.0488000000187,
+              "unionToHttpRatio": 0.2630022831534853
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2369.028299999947,
+              "unionMs": 2345.1468999999342,
+              "unionToHttpRatio": 0.2592544503628072
+            }
+          ],
+          "jointUnionMs": 4723.106299999927,
+          "jointUnionToHttpRatio": 0.5221363010614078
+        },
+        {
+          "replica": 1,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 8978.560499999992,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2405.4833999999682,
+              "unionMs": 2359.374899999966,
+              "unionToHttpRatio": 0.2627787494442977
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2364.228400000051,
+              "unionMs": 2340.4179000000586,
+              "unionToHttpRatio": 0.2606673864925297
+            }
+          ],
+          "jointUnionMs": 4698.578400000028,
+          "jointUnionToHttpRatio": 0.5233108804022685
+        },
+        {
+          "replica": 1,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 8796.307900000014,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2328.7482999999193,
+              "unionMs": 2286.0961999999126,
+              "unionToHttpRatio": 0.2598926988446947
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2329.7790000000386,
+              "unionMs": 2307.7259000000195,
+              "unionToHttpRatio": 0.2623516509693818
+            }
+          ],
+          "jointUnionMs": 4591.786499999929,
+          "jointUnionToHttpRatio": 0.5220129345404021
+        },
+        {
+          "replica": 2,
+          "attempt": 0,
+          "tenant": 0,
+          "httpMs": 8851.774400000024,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2318.5488000000187,
+              "unionMs": 2279.4601000000257,
+              "unionToHttpRatio": 0.25751448206813987
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2330.658999999956,
+              "unionMs": 2307.9113999999536,
+              "unionToHttpRatio": 0.26072867378996323
+            }
+          ],
+          "jointUnionMs": 4584.339999999967,
+          "jointUnionToHttpRatio": 0.5179006821502313
+        },
+        {
+          "replica": 2,
+          "attempt": 1,
+          "tenant": 0,
+          "httpMs": 8770.8033,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2288.612000000081,
+              "unionMs": 2249.177500000078,
+              "unionToHttpRatio": 0.2564391678924185
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2309.997399999993,
+              "unionMs": 2293.2238999999827,
+              "unionToHttpRatio": 0.2614611024283241
+            }
+          ],
+          "jointUnionMs": 4536.013800000073,
+          "jointUnionToHttpRatio": 0.5171719903922681
+        },
+        {
+          "replica": 2,
+          "attempt": 2,
+          "tenant": 0,
+          "httpMs": 8931.178800000023,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2309.036800000118,
+              "unionMs": 2271.215300000127,
+              "unionToHttpRatio": 0.254301850949409
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2427.239999999816,
+              "unionMs": 2411.3029999998107,
+              "unionToHttpRatio": 0.2699870928571942
+            }
+          ],
+          "jointUnionMs": 4677.406199999939,
+          "jointUnionToHttpRatio": 0.5237165557585666
+        },
+        {
+          "replica": 2,
+          "attempt": 3,
+          "tenant": 0,
+          "httpMs": 8830.264800000004,
+          "individual": [
+            {
+              "id": "centralSchemaSnapshot",
+              "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+              "count": 53,
+              "observedWorkMs": 2338.8761000000814,
+              "unionMs": 2299.6721000000834,
+              "unionToHttpRatio": 0.260430706449492
+            },
+            {
+              "id": "authoritySecuritySnapshot",
+              "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+              "count": 106,
+              "observedWorkMs": 2313.211600000126,
+              "unionMs": 2294.3294000001333,
+              "unionToHttpRatio": 0.2598256623063141
+            }
+          ],
+          "jointUnionMs": 4591.0723000002035,
+          "jointUnionToHttpRatio": 0.5199246459743995
+        }
+      ],
+      "jointUnionMs": {
+        "n": 12,
+        "p50": 4628.909899999824,
+        "p95": 4729.456499999942,
+        "maximum": 4729.456499999942,
+        "minimum": 4536.013800000073
+      },
+      "jointUnionToHttpRatio": {
+        "n": 12,
+        "p50": 0.5201727961771974,
+        "p95": 0.5237165557585666,
+        "maximum": 0.5237165557585666,
+        "minimum": 0.5171719903922681
+      },
+      "individual": [
+        {
+          "id": "centralSchemaSnapshot",
+          "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+          "count": {
+            "n": 12,
+            "p50": 53,
+            "p95": 53,
+            "maximum": 53,
+            "minimum": 53
+          },
+          "observedWorkMs": {
+            "n": 12,
+            "p50": 2353.7272999999404,
+            "p95": 2425.815800000011,
+            "maximum": 2425.815800000011,
+            "minimum": 2288.612000000081
+          },
+          "unionMs": {
+            "n": 12,
+            "p50": 2313.3237999999255,
+            "p95": 2379.0488000000187,
+            "maximum": 2379.0488000000187,
+            "minimum": 2249.177500000078
+          },
+          "unionToHttpRatio": {
+            "n": 12,
+            "p50": 0.26019216504925846,
+            "p95": 0.2630022831534853,
+            "maximum": 0.2630022831534853,
+            "minimum": 0.254301850949409
+          }
+        },
+        {
+          "id": "authoritySecuritySnapshot",
+          "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+          "count": {
+            "n": 12,
+            "p50": 106,
+            "p95": 106,
+            "maximum": 106,
+            "minimum": 106
+          },
+          "observedWorkMs": {
+            "n": 12,
+            "p50": 2330.783999999956,
+            "p95": 2427.239999999816,
+            "maximum": 2427.239999999816,
+            "minimum": 2309.997399999993
+          },
+          "unionMs": {
+            "n": 12,
+            "p50": 2309.820299999963,
+            "p95": 2411.3029999998107,
+            "maximum": 2411.3029999998107,
+            "minimum": 2293.2238999999827
+          },
+          "unionToHttpRatio": {
+            "n": 12,
+            "p50": 0.2605296248443549,
+            "p95": 0.2699870928571942,
+            "maximum": 0.2699870928571942,
+            "minimum": 0.25808996033591597
+          }
+        }
+      ]
+    }
+  ]
+}

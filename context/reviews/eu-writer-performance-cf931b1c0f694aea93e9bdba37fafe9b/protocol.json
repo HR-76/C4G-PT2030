@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "cf931b1c0f694aea93e9bdba37fafe9b",
+  "status": "AUTHORIZED_READY_TO_EXECUTE",
+  "createdAt": "2026-10-31T16:46:21.926Z",
+  "trialId": "eu-writer-trial-0ecb31dc7c705859",
+  "sourceSetDigest": "0ecb31dc7c70585959a97b38046e79c5aa0dec06b87763a557720ad3e8ce1d6c",
+  "sourceCount": 1844,
+  "manifest": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/trial.json",
+    "sha256": "767625d37bece93c7877a577c527324ce514cec3081ed57451d1677b04be7afc"
+  },
+  "archive": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources.zip",
+    "sha256": "8570b0efe3c0a3cdcaab008d488a4689e6b8179dc8f243b77ed94e0683befe6a"
+  },
+  "readiness": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/612a14e5e11c41c1a8d2fc38cda17c7c/report.json",
+    "sha256": "163c726bc2433b71638e00a9a3c56a2674c1c437973d546869357b5f80ed7b17"
+  },
+  "protocol": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/context/references/performance/eu-writer-v2-protocol.json",
+    "sha256": "dd3c1fa9791a7473eb6e941f8f6c139bcf5ae1eae3aa0423429fa07cb70fac14"
+  },
+  "adapter": {
+    "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/test/integration/eu-writer-performance/protocol.json",
+    "sha256": "5efb4f3162b8fd891b7a40bde8a37ccf578c08f7b59ceea7502ffb86ffdb9658"
+  },
+  "packageDigest": "2bdae82ddd6516e3b31bf33699f5213adaf6c36ae038a59c59f2123752033ee7",
+  "seedDigest": "3809b44e0f34f7a5f6868b9052fb66af021051292b0b49648b9d0e8876edf3f6",
+  "images": {
+    "postgres": {
+      "id": "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+      "repositoryDigests": [
+        "postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873"
+      ],
+      "sourceTag": "postgres:18-alpine"
+    },
+    "keycloak": {
+      "id": "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc",
+      "repositoryDigests": [
+        "quay.io/keycloak/keycloak@sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+      ],
+      "sourceTag": "quay.io/keycloak/keycloak:26.8.0"
+    }
+  },
+  "order": [
+    "M043",
+    "M042",
+    "H043-replica0",
+    "H043-replica1",
+    "H043-replica2"
+  ],
+  "execution": {
+    "authorizedByUser": true,
+    "isolatedOnly": true,
+    "habitualEnvironmentAccess": false,
+    "externalNetwork": false,
+    "simultaneousWorkloads": false,
+    "concurrentTestsOrBuilds": false,
+    "writerInterference": false,
+    "c6": false,
+    "cleanupRequired": true
+  },
+  "environment": {
+    "platform": "win32",
+    "release": "10.0.26300",
+    "arch": "x64",
+    "node": "v24.13.1",
+    "cpuModel": [
+      "Intel(R) Core(TM) Ultra 9 275HX"
+    ],
+    "logicalCpuCount": 24,
+    "totalMemoryBytes": 68095725568,
+    "freeMemoryBytes": 39122182144,
+    "powerScheme": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Equilibrado)",
+    "timezone": "UTC",
+    "hostReserved": false,
+    "externalLoadControlled": false,
+    "cpuTimesBefore": [
+      {
+        "user": 2190578,
+        "nice": 0,
+        "sys": 4346093,
+        "idle": 23832109,
+        "irq": 550859
+      },
+      {
+        "user": 3297812,
+        "nice": 0,
+        "sys": 4277937,
+        "idle": 22792828,
+        "irq": 305234
+      },
+      {
+        "user": 1128578,
+        "nice": 0,
+        "sys": 1745843,
+        "idle": 27494156,
+        "irq": 93500
+      },
+      {
+        "user": 1182203,
+        "nice": 0,
+        "sys": 1622593,
+        "idle": 27563781,
+        "irq": 77015
+      },
+      {
+        "user": 1138593,
+        "nice": 0,
+        "sys": 1532578,
+        "idle": 27697406,
+        "irq": 70421
+      },
+      {
+        "user": 1112000,
+        "nice": 0,
+        "sys": 1479140,
+        "idle": 27777437,
+        "irq": 66828
+      },
+      {
+        "user": 1086468,
+        "nice": 0,
+        "sys": 1517468,
+        "idle": 27764640,
+        "irq": 75765
+      },
+      {
+        "user": 1132890,
+        "nice": 0,
+        "sys": 1478187,
+        "idle": 27757500,
+        "irq": 70718
+      },
+      {
+        "user": 1099406,
+        "nice": 0,
+        "sys": 1398250,
+        "idle": 27870921,
+        "irq": 62796
+      },
+      {
+        "user": 1098796,
+        "nice": 0,
+        "sys": 1358250,
+        "idle": 27911531,
+        "irq": 59953
+      },
+      {
+        "user": 2306890,
+        "nice": 0,
+        "sys": 3082500,
+        "idle": 24979187,
+        "irq": 115609
+      },
+      {
+        "user": 2728453,
+        "nice": 0,
+        "sys": 3286187,
+        "idle": 24353937,
+        "irq": 117171
+      },
+      {
+        "user": 2600437,
+        "nice": 0,
+        "sys": 3147593,
+        "idle": 24620546,
+        "irq": 113328
+      },
+      {
+        "user": 7870656,
+        "nice": 0,
+        "sys": 7742140,
+        "idle": 14755781,
+        "irq": 195734
+      },
+      {
+        "user": 1228828,
+        "nice": 0,
+        "sys": 1830968,
+        "idle": 27308781,
+        "irq": 90828
+      },
+      {
+        "user": 1272359,
+        "nice": 0,
+        "sys": 1798953,
+        "idle": 27297265,
+        "irq": 80109
+      },
+      {
+        "user": 1208328,
+        "nice": 0,
+        "sys": 1596875,
+        "idle": 27563375,
+        "irq": 74437
+      },
+      {
+        "user": 1174968,
+        "nice": 0,
+        "sys": 1547343,
+        "idle": 27646265,
+        "irq": 71062
+      },
+      {
+        "user": 1196718,
+        "nice": 0,
+        "sys": 1600500,
+        "idle": 27571359,
+        "irq": 77296
+      },
+      {
+        "user": 1212750,
+        "nice": 0,
+        "sys": 1485187,
+        "idle": 27670640,
+        "irq": 64375
+      },
+      {
+        "user": 1197125,
+        "nice": 0,
+        "sys": 1530671,
+        "idle": 27640781,
+        "irq": 63343
+      },
+      {
+        "user": 1183750,
+        "nice": 0,
+        "sys": 1449593,
+        "idle": 27735234,
+        "irq": 62296
+      },
+      {
+        "user": 2571203,
+        "nice": 0,
+        "sys": 3181984,
+        "idle": 24615390,
+        "irq": 113687
+      },
+      {
+        "user": 8388609,
+        "nice": 0,
+        "sys": 8139453,
+        "idle": 13840515,
+        "irq": 186562
+      }
+    ]
+  },
+  "runtimeLimits": {
+    "tenantPoolMax": 5,
+    "globalLimit": 20,
+    "perTenantLimit": 5,
+    "operationalReserve": 2,
+    "globalQueueLimit": 40,
+    "perTenantQueueLimit": 10,
+    "operationalQueueReserve": 2,
+    "acquireTimeoutMs": 5000,
+    "leaseTimeoutMs": 15000,
+    "idleTimeoutMs": 30000,
+    "drainTimeoutMs": 10000,
+    "connectionTimeoutMillis": 5000,
+    "limitedCentralReaderPoolMax": 8,
+    "httpHarnessRequestTimeoutMs": 65000,
+    "source": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/backend/src/config/opportunityRuntime.js",
+      "sha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f"
+    }
+  },
+  "limitations": [
+    "No exclusive host reservation; independent concurrent work may affect timings.",
+    "Installed dependency versions verified, dependency bytes not individually pinned.",
+    "HTTP baseline only; no optimization candidate, production SLO or causal before/after claim.",
+    "Historical writer proof preserves its original identity; changed sources rely on separate functional readiness."
+  ]
+}

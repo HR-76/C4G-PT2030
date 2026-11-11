@@ -1,0 +1,21 @@
+{
+  "provenance": "Summary of tool outputs observed after the first run. The original full JSON was overwritten by the second run before the archive request arrived; this is not a copy or reconstruction of that JSON.",
+  "status": "PASS",
+  "startedAt": "2026-10-27T00:08:05.031Z",
+  "finishedAt": "2026-10-27T00:08:29.901Z",
+  "postgres": "17.11",
+  "checks": 10,
+  "cleanupErrors": 0,
+  "remainingContainersWithProofLabel": 0,
+  "cases": [
+    {"name": "staged success", "success": true, "persistedEvents": 2},
+    {"name": "blocked audit-row success", "success": true, "persistedEvents": 2},
+    {"name": "critical export and prefix", "success": true, "persistedEvents": 3},
+    {"name": "second append failure", "errorCode": "TENANT_QUERY_FAILED", "persistedEvents": 0},
+    {"name": "membership loss probe", "errorCode": "ORGANIZATION_MISMATCH", "persistedEvents": 0},
+    {"name": "fence divergence probe", "errorCode": "TRANSITION_CONFLICT", "persistedEvents": 0},
+    {"name": "lease expiry probe", "errorCode": "LEASE_TIMEOUT", "persistedEvents": 0},
+    {"name": "authority deadline expiry", "errorCode": "TENANT_QUERY_FAILED", "persistedEvents": 0},
+    {"name": "lost commit acknowledgement", "errorCode": "COMMIT_UNCERTAIN", "persistedEvents": 2}
+  ]
+}

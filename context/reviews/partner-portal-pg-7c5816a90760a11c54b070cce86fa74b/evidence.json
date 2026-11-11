@@ -1,0 +1,6622 @@
+{
+  "schemaVersion": 1,
+  "runId": "7c5816a90760a11c54b070cce86fa74b",
+  "imageId": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+  "execution": "POSTGRESQL",
+  "sourceVerification": true,
+  "sourceManifestHash": "66cda35a62e024205b5708b73c0fec1c90a402ee8f0de3a2ebe057024c6a4200",
+  "localDockerContext": "desktop-linux",
+  "daemonId": "33c5d206-32e9-4cc2-8415-536547768f8a",
+  "startedAt": "2026-10-28T20:26:01.918Z",
+  "cleanup": {
+    "environmentClosed": true,
+    "containerRemoved": true,
+    "errors": []
+  },
+  "containerId": "5bdae6de63f8b20d67e3abfc9ae4fdca5d8c5b45d671a114a505aba070cdbc53",
+  "postgresMajor": 17,
+  "isolation": "read committed",
+  "setupDiagnostic": {
+    "phase": "READY",
+    "tenant": null,
+    "status": "READY",
+    "classification": null,
+    "errorCode": null,
+    "localCleanup": "NOT_STARTED",
+    "substep": null,
+    "substepStatus": null,
+    "substepFailure": null
+  },
+  "repository": {
+    "cases": [
+      {
+        "id": "repository.roles-rls",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "sessions": [
+            {
+              "limitedLogin": true,
+              "forcedRls": true,
+              "ownRows": 1,
+              "foreignRows": 0,
+              "ownPartnerRows": 1,
+              "foreignPartnerRows": 0,
+              "mismatchedWriteSqlState": "42501"
+            },
+            {
+              "limitedLogin": true,
+              "forcedRls": true,
+              "ownRows": 1,
+              "foreignRows": 0,
+              "ownPartnerRows": 1,
+              "foreignPartnerRows": 0,
+              "mismatchedWriteSqlState": "42501"
+            }
+          ]
+        }
+      },
+      {
+        "id": "repository.cross-tenant-connect",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "rejectedConnections": 2,
+          "sqlState": "42501"
+        }
+      },
+      {
+        "id": "repository.equivalence",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "responseDigest": "51208403de9f965b07ba588128f484b779ed6037f9cf991393d0c77e67ec1df1",
+          "responseBytes": 12560,
+          "candidates": 101,
+          "cursorsAcceptedBothDirections": true
+        }
+      },
+      {
+        "id": "repository.collation",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "zeroComparisonPairs": 3,
+          "idTiebreakerPreserved": true
+        }
+      },
+      {
+        "id": "repository.contract-matrix",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "coverage": [
+            {
+              "id": "ordered-pages",
+              "status": "PASS",
+              "reads": 5,
+              "storage": []
+            },
+            {
+              "id": "empty-and-last-page",
+              "status": "PASS",
+              "reads": 4,
+              "storage": []
+            },
+            {
+              "id": "countries-before-filters",
+              "status": "PASS",
+              "reads": 8,
+              "storage": []
+            },
+            {
+              "id": "literal-search-fields",
+              "status": "PASS",
+              "reads": 28,
+              "storage": []
+            },
+            {
+              "id": "projection",
+              "status": "PASS",
+              "reads": 1,
+              "storage": []
+            },
+            {
+              "id": "authorization-trace",
+              "status": "EXPECTED_STORAGE_REJECTION",
+              "reads": 0,
+              "sqlState": "23514",
+              "constraint": "application_exact_origin",
+              "storage": [
+                {
+                  "sqlState": "23514",
+                  "constraint": "application_exact_origin",
+                  "category": "IMPOSSIBLE_ORIGIN_FIXTURE"
+                }
+              ]
+            },
+            {
+              "id": "error-precedence",
+              "status": "PASS",
+              "reads": 3,
+              "storage": []
+            },
+            {
+              "id": "digest-golden",
+              "status": "PASS",
+              "reads": 2,
+              "storage": []
+            },
+            {
+              "id": "cursor-binding",
+              "status": "PASS",
+              "reads": 9,
+              "storage": []
+            },
+            {
+              "id": "cursor-expiration-and-position",
+              "status": "PASS",
+              "reads": 13,
+              "storage": []
+            },
+            {
+              "id": "unseen-mutation",
+              "status": "PASS",
+              "reads": 10,
+              "storage": []
+            },
+            {
+              "id": "membership-between-pages",
+              "status": "PASS",
+              "reads": 10,
+              "storage": []
+            },
+            {
+              "id": "excluded-changes",
+              "status": "PASS",
+              "reads": 3,
+              "storage": []
+            },
+            {
+              "id": "fresh-authority",
+              "status": "PASS",
+              "reads": 2,
+              "storage": []
+            },
+            {
+              "id": "canonical-input",
+              "status": "EXPECTED_STORAGE_REJECTION",
+              "reads": 4,
+              "sqlState": "22P02",
+              "storage": [
+                {
+                  "sqlState": "22P02",
+                  "category": "INVALID_UNICODE_STORAGE"
+                }
+              ]
+            },
+            {
+              "id": "raw-limit",
+              "status": "PASS",
+              "reads": 5,
+              "storage": []
+            }
+          ],
+          "completeReadCoverage": false,
+          "expectedStorageRejections": 2,
+          "reason": "EXPECTED_STORAGE_REJECTION_IS_NOT_READ_COVERAGE"
+        }
+      },
+      {
+        "id": "snapshot.before-declare",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "writerCommitted": true,
+          "independentWriter": true,
+          "capturedExpectedVersion": true,
+          "nextRequestSeesCommit": true,
+          "activeRemovalCaptured": true,
+          "projectedFields": [
+            "body",
+            "people",
+            "application_title",
+            "application_status",
+            "opportunity_title",
+            "updatedAt"
+          ]
+        }
+      },
+      {
+        "id": "snapshot.after-declare",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "writerCommitted": true,
+          "independentWriter": true,
+          "capturedExpectedVersion": true,
+          "nextRequestSeesCommit": true,
+          "activeRemovalCaptured": true,
+          "projectedFields": [
+            "body",
+            "people",
+            "application_title",
+            "application_status",
+            "opportunity_title",
+            "updatedAt"
+          ]
+        }
+      },
+      {
+        "id": "snapshot.between-fetches",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "writerCommitted": true,
+          "independentWriter": true,
+          "capturedExpectedVersion": true,
+          "nextRequestSeesCommit": true,
+          "activeRemovalCaptured": true,
+          "projectedFields": [
+            "body",
+            "people",
+            "application_title",
+            "application_status",
+            "opportunity_title",
+            "updatedAt"
+          ]
+        }
+      },
+      {
+        "id": "cleanup.success",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "requestPid": 95,
+          "observedPid": 95,
+          "portals": 0,
+          "roleReset": true,
+          "errorCode": null,
+          "injectedFault": false,
+          "injectedSqlState": null,
+          "rollbackObserved": false
+        }
+      },
+      {
+        "id": "cleanup.local-error",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "requestPid": 95,
+          "observedPid": 95,
+          "portals": 0,
+          "roleReset": true,
+          "errorCode": "INVALID_CURSOR",
+          "injectedFault": false,
+          "injectedSqlState": null,
+          "rollbackObserved": true
+        }
+      },
+      {
+        "id": "cleanup.sql-abort",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "requestPid": 95,
+          "observedPid": 95,
+          "portals": 0,
+          "roleReset": true,
+          "errorCode": "SERVICE_UNAVAILABLE",
+          "injectedFault": true,
+          "injectedSqlState": "22012",
+          "rollbackObserved": true
+        }
+      },
+      {
+        "id": "cleanup.cancel",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "requestPid": 95,
+          "observedPid": 95,
+          "portals": 0,
+          "roleReset": true,
+          "errorCode": "SERVICE_UNAVAILABLE",
+          "injectedFault": true,
+          "injectedSqlState": "57014",
+          "rollbackObserved": true
+        }
+      },
+      {
+        "id": "cleanup.disconnect",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "backendTerminated": true,
+          "verification": "PG_STAT_ACTIVITY_BACKEND_ABSENCE_NOT_FOREIGN_PG_CURSORS"
+        }
+      },
+      {
+        "id": "cleanup.session-reuse",
+        "status": "PASS",
+        "evidence": {
+          "scope": "REAL_POSTGRESQL_REPOSITORY_WITH_CONTROLLED_AUTHORITY_PORTS",
+          "samePhysicalSession": true,
+          "crossOrganizationGucReturnsNoRows": true,
+          "tenantDatabaseUnchanged": true
+        }
+      }
+    ],
+    "environmentVerified": true
+  },
+  "authority": {
+    "environmentVerified": true,
+    "cases": [
+      {
+        "id": "membership-authority-first",
+        "status": "PASS",
+        "evidence": {
+          "authorizedBefore": true,
+          "writerCommittedBeforeRead": true,
+          "successfulRead": false,
+          "realCentralWriter": true,
+          "refusalCode": "AUTHORITY_REQUIRED",
+          "authorityFailure": "MEMBERSHIP_INVALID"
+        }
+      },
+      {
+        "id": "membership-guard-first",
+        "status": "PASS",
+        "evidence": {
+          "realCentralWriter": true,
+          "writerWaitObserved": true,
+          "committedBeforeRelease": false,
+          "firstReadSucceeded": true,
+          "nextReadRefused": true,
+          "durableAudit": true,
+          "refusalCode": "AUTHORITY_REQUIRED",
+          "authorityFailure": "MEMBERSHIP_INVALID"
+        }
+      },
+      {
+        "id": "policy-authority-first",
+        "status": "PASS",
+        "evidence": {
+          "authorizedBefore": true,
+          "writerCommittedBeforeRead": true,
+          "successfulRead": false,
+          "realCentralWriter": true,
+          "refusalCode": "AUTHORITY_UNAVAILABLE",
+          "authorityFailure": null
+        }
+      },
+      {
+        "id": "policy-guard-first",
+        "status": "PASS",
+        "evidence": {
+          "realCentralWriter": true,
+          "writerWaitObserved": true,
+          "committedBeforeRelease": false,
+          "firstReadSucceeded": true,
+          "nextReadRefused": true,
+          "durableAudit": true,
+          "refusalCode": "AUTHORITY_UNAVAILABLE",
+          "authorityFailure": null
+        }
+      },
+      {
+        "id": "session-revoked",
+        "status": "PASS",
+        "evidence": {
+          "authorizedBefore": true,
+          "realSessionRegistry": true,
+          "successfulRead": false,
+          "refusalCode": "AUTHORITY_REQUIRED",
+          "authorityFailure": "SESSION_INVALID"
+        }
+      },
+      {
+        "id": "team-before-read",
+        "status": "PASS",
+        "evidence": {
+          "removalThroughApplicationService": true,
+          "resultTotal": 0
+        }
+      },
+      {
+        "id": "team-during-unseen-resource",
+        "status": "PASS",
+        "evidence": {
+          "writerKind": "synthetic-direct-team-update",
+          "realReaderAuthorityAndAudit": true,
+          "changedUnseenResource": true,
+          "resultTotal": 1
+        }
+      },
+      {
+        "id": "team-cache-hit",
+        "status": "PASS",
+        "evidence": {
+          "writerKind": "synthetic-direct-team-update",
+          "existingCacheSemanticsPreserved": true,
+          "applicationPortCalls": 2,
+          "actualTeamQueries": 2,
+          "firstResultTotal": 2,
+          "nextResultTotal": 0
+        }
+      },
+      {
+        "id": "audit-failure",
+        "status": "PASS",
+        "evidence": {
+          "realPostgresFault": true,
+          "successfulRead": false,
+          "partialAuditRows": 0,
+          "activeLeases": 0,
+          "injectedSqlState": "22012",
+          "refusalCode": "22012"
+        }
+      }
+    ],
+    "limitations": [
+      "Synthetic authenticated sessions; no OIDC/browser proof.",
+      "Concurrent team fixtures use direct synthetic SQL; they do not prove concurrent audited mutation endpoint ordering.",
+      "Team cache semantics are characterized, not strengthened to immediate revocation within the same request."
+    ]
+  },
+  "capacity": {
+    "environmentVerified": true,
+    "samples": [
+      {
+        "scenarioId": "volume-0",
+        "variant": "before",
+        "pair": 1,
+        "order": 1,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1484.8907000000036,
+        "admissionMs": 0.19259999999485444,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 333,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 282419200,
+        "nodeHeapPeakBytes": 85213408,
+        "postgresTempBytes": 0,
+        "cleanupMs": 23.818799999993644,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-0",
+        "variant": "after",
+        "pair": 1,
+        "order": 2,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1290.7032999999938,
+        "admissionMs": 0.12969999999040738,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 335,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 283484160,
+        "nodeHeapPeakBytes": 76906672,
+        "postgresTempBytes": 0,
+        "cleanupMs": 25.20919999999751,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-0",
+        "variant": "after",
+        "pair": 2,
+        "order": 1,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1461.3640000000014,
+        "admissionMs": 0.14949999999953434,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 335,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 282206208,
+        "nodeHeapPeakBytes": 76052400,
+        "postgresTempBytes": 0,
+        "cleanupMs": 15.846200000014505,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-0",
+        "variant": "before",
+        "pair": 2,
+        "order": 2,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1365.2723000000115,
+        "admissionMs": 0.22370000000228174,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 333,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 284180480,
+        "nodeHeapPeakBytes": 81567352,
+        "postgresTempBytes": 0,
+        "cleanupMs": 21.468999999997322,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "before",
+        "pair": 1,
+        "order": 1,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1592.310300000012,
+        "admissionMs": 0.10869999999704305,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 337,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 288800768,
+        "nodeHeapPeakBytes": 78011096,
+        "postgresTempBytes": 0,
+        "cleanupMs": 28.70229999998992,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "after",
+        "pair": 1,
+        "order": 2,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1881.8246000000072,
+        "admissionMs": 0.14159999998810235,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 339,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 283377664,
+        "nodeHeapPeakBytes": 76351256,
+        "postgresTempBytes": 0,
+        "cleanupMs": 17.956500000000233,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "after",
+        "pair": 2,
+        "order": 1,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2069.2360000000044,
+        "admissionMs": 0.19079999999667052,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 339,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 277229568,
+        "nodeHeapPeakBytes": 71205456,
+        "postgresTempBytes": 0,
+        "cleanupMs": 16.791299999997136,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "before",
+        "pair": 2,
+        "order": 2,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1665.1281000000017,
+        "admissionMs": 0.0868999999947846,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 337,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 290291712,
+        "nodeHeapPeakBytes": 71226072,
+        "postgresTempBytes": 0,
+        "cleanupMs": 15.923800000004121,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "before",
+        "pair": 1,
+        "order": 1,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1879.1879000000044,
+        "admissionMs": 0.31259999999019783,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 337,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 274804736,
+        "nodeHeapPeakBytes": 72238792,
+        "postgresTempBytes": 0,
+        "cleanupMs": 25.303800000008778,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "after",
+        "pair": 1,
+        "order": 2,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1818.771299999993,
+        "admissionMs": 0.18589999999676365,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 339,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 274804736,
+        "nodeHeapPeakBytes": 74292288,
+        "postgresTempBytes": 0,
+        "cleanupMs": 24.597899999993388,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "after",
+        "pair": 2,
+        "order": 1,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1974.0133999999962,
+        "admissionMs": 0.12660000000323635,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 339,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 274427904,
+        "nodeHeapPeakBytes": 74382776,
+        "postgresTempBytes": 0,
+        "cleanupMs": 18.47949999998673,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "before",
+        "pair": 2,
+        "order": 2,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1937.8859999999986,
+        "admissionMs": 0.15150000000721775,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 337,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 274235392,
+        "nodeHeapPeakBytes": 73096856,
+        "postgresTempBytes": 0,
+        "cleanupMs": 24.702699999994365,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "before",
+        "pair": 1,
+        "order": 1,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1865.0804999999818,
+        "admissionMs": 0.1700999999884516,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 338,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 274698240,
+        "nodeHeapPeakBytes": 74600752,
+        "postgresTempBytes": 0,
+        "cleanupMs": 21.3350999999966,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "after",
+        "pair": 1,
+        "order": 2,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1902.5761999999813,
+        "admissionMs": 0.16529999999329448,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 340,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 274595840,
+        "nodeHeapPeakBytes": 74628272,
+        "postgresTempBytes": 0,
+        "cleanupMs": 18.616099999984726,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "after",
+        "pair": 2,
+        "order": 1,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1903.1484000000055,
+        "admissionMs": 0.1578999999910593,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 340,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 275005440,
+        "nodeHeapPeakBytes": 73559728,
+        "postgresTempBytes": 0,
+        "cleanupMs": 27.97919999997248,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "before",
+        "pair": 2,
+        "order": 2,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1643.873900000006,
+        "admissionMs": 0.17699999999604188,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 338,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 274841600,
+        "nodeHeapPeakBytes": 73484568,
+        "postgresTempBytes": 0,
+        "cleanupMs": 23.703000000008615,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "before",
+        "pair": 1,
+        "order": 1,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2080.0084999999963,
+        "admissionMs": 0.13629999998374842,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 340,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 275636224,
+        "nodeHeapPeakBytes": 72539448,
+        "postgresTempBytes": 0,
+        "cleanupMs": 25.481299999984913,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "after",
+        "pair": 1,
+        "order": 2,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2017.3160999999964,
+        "admissionMs": 0.19529999999213032,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 342,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 275017728,
+        "nodeHeapPeakBytes": 72563888,
+        "postgresTempBytes": 0,
+        "cleanupMs": 26.85000000000582,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "after",
+        "pair": 2,
+        "order": 1,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2184.396999999997,
+        "admissionMs": 0.19580000001587905,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 342,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 275296256,
+        "nodeHeapPeakBytes": 72584744,
+        "postgresTempBytes": 0,
+        "cleanupMs": 21.634499999985565,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "before",
+        "pair": 2,
+        "order": 2,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2100.6933000000136,
+        "admissionMs": 0.125,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 340,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 275300352,
+        "nodeHeapPeakBytes": 73304384,
+        "postgresTempBytes": 0,
+        "cleanupMs": 14.386900000012247,
+        "afterSuccessQueries": 0
+      }
+    ],
+    "warmups": [
+      {
+        "scenarioId": "volume-0",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1459.6391000000003,
+        "admissionMs": 13.184000000008382,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 333,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 273801216,
+        "nodeHeapPeakBytes": 72450624,
+        "postgresTempBytes": 0,
+        "cleanupMs": 24.14660000000731,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-0",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 0,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1507.5527999999904,
+        "admissionMs": 0.22079999999550637,
+        "responseBytes": 86,
+        "responseDigest": "2d8aeff094a9187d98418553925f471c4ed94ffd1bbd2735e521dc562b05f75e",
+        "queryCount": 335,
+        "authorizationCalls": 0,
+        "rowsRead": 0,
+        "nodeRssPeakBytes": 280330240,
+        "nodeHeapPeakBytes": 85544144,
+        "postgresTempBytes": 0,
+        "cleanupMs": 17.77730000000156,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1736.7761000000028,
+        "admissionMs": 0.21820000000298023,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 337,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 284372992,
+        "nodeHeapPeakBytes": 74748168,
+        "postgresTempBytes": 0,
+        "cleanupMs": 18.07039999999688,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-25",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 25,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 2055.1716999999917,
+        "admissionMs": 0.2589999999909196,
+        "responseBytes": 11146,
+        "responseDigest": "528439b526711cf3e8e3e7580ec7f13b616f7165bb3c083d860b1124ee9dc689",
+        "queryCount": 339,
+        "authorizationCalls": 50,
+        "rowsRead": 25,
+        "nodeRssPeakBytes": 290373632,
+        "nodeHeapPeakBytes": 71072944,
+        "postgresTempBytes": 0,
+        "cleanupMs": 25.25669999999809,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1880.5720000000001,
+        "admissionMs": 0.21209999998973217,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 337,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 290336768,
+        "nodeHeapPeakBytes": 60078744,
+        "postgresTempBytes": 0,
+        "cleanupMs": 20.44770000000426,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-26",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 26,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1806.486699999994,
+        "admissionMs": 0.15109999998821877,
+        "responseBytes": 11607,
+        "responseDigest": "0a4508990cf9803a8bb4bd7a327b7ccd315783adaf89a8163bbaaee7b4916303",
+        "queryCount": 339,
+        "authorizationCalls": 52,
+        "rowsRead": 26,
+        "nodeRssPeakBytes": 286388224,
+        "nodeHeapPeakBytes": 91007208,
+        "postgresTempBytes": 0,
+        "cleanupMs": 18.18159999999625,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1780.7918000000063,
+        "admissionMs": 0.1224999999976717,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 338,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 275050496,
+        "nodeHeapPeakBytes": 74548000,
+        "postgresTempBytes": 0,
+        "cleanupMs": 25.492399999988265,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-100",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 100,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1581.3943999999901,
+        "admissionMs": 0.23470000000088476,
+        "responseBytes": 11634,
+        "responseDigest": "bd827f731f56685d1ef637eaf4ba6871f6b7fd51a7e71f70747d279b0f39f141",
+        "queryCount": 340,
+        "authorizationCalls": 200,
+        "rowsRead": 100,
+        "nodeRssPeakBytes": 274599936,
+        "nodeHeapPeakBytes": 73386240,
+        "postgresTempBytes": 0,
+        "cleanupMs": 12.381099999998696,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1762.7131999999983,
+        "admissionMs": 0.4312999999965541,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 340,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 274747392,
+        "nodeHeapPeakBytes": 73562552,
+        "postgresTempBytes": 0,
+        "cleanupMs": 13.168600000004517,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-101",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 101,
+        "expectedErrorCode": null,
+        "success": true,
+        "errorCode": null,
+        "operationMs": 1789.7467999999935,
+        "admissionMs": 0.15689999997266568,
+        "responseBytes": 11634,
+        "responseDigest": "443e64bb49acd15aa4ec348638052d73bcba7ef3abb5e169ee4ad705aa411379",
+        "queryCount": 342,
+        "authorizationCalls": 202,
+        "rowsRead": 101,
+        "nodeRssPeakBytes": 275304448,
+        "nodeHeapPeakBytes": 71974536,
+        "postgresTempBytes": 0,
+        "cleanupMs": 19.230300000024727,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-10000",
+        "variant": "before",
+        "pair": 0,
+        "order": 0,
+        "candidates": 10000,
+        "expectedErrorCode": null,
+        "temporalDiagnostic": {
+          "status": "VALID",
+          "atSettlement": {
+            "schemaVersion": 1,
+            "status": "VALID",
+            "inclusive": true,
+            "metrics": {
+              "OPERATION": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10512.75999999998,
+                "maxMs": 10512.75999999998,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "RESOLVE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 365.56630000000587,
+                "maxMs": 365.56630000000587,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "LEASE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10004.104599999991,
+                "maxMs": 10004.104599999991,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "PROTECT": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 315.81239999999525,
+                "maxMs": 315.81239999999525,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "READER": {
+                "started": 1,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 1,
+                "pendingMs": 9359.7641
+              },
+              "AUTHORIZATION": {
+                "started": 7201,
+                "completed": 7200,
+                "failed": 0,
+                "totalMs": 8310.003099998808,
+                "maxMs": 327.6761000000115,
+                "inflight": 1,
+                "pendingMs": 273.70490000001155
+              },
+              "AUTHORIZATION_MEMBERSHIP": {
+                "started": 39,
+                "completed": 39,
+                "failed": 0,
+                "totalMs": 4131.363200000109,
+                "maxMs": 191.4702999999863,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_DATA": {
+                "started": 39,
+                "completed": 38,
+                "failed": 0,
+                "totalMs": 4147.4314000000595,
+                "maxMs": 194.9940999999817,
+                "inflight": 1,
+                "pendingMs": 126.63490000000456
+              },
+              "RESOURCE_POLICY": {
+                "started": 38,
+                "completed": 38,
+                "failed": 0,
+                "totalMs": 0.28070000000298023,
+                "maxMs": 0.05730000001494773,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUDIT": {
+                "started": 38,
+                "completed": 38,
+                "failed": 0,
+                "totalMs": 150.89470000003348,
+                "maxMs": 12.198900000017602,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_HIT": {
+                "started": 7163,
+                "completed": 7163,
+                "failed": 0,
+                "totalMs": 26.61339999877964,
+                "maxMs": 0.2779000000155065,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_MISS": {
+                "started": 37,
+                "completed": 37,
+                "failed": 0,
+                "totalMs": 8283.389700000029,
+                "maxMs": 327.6761000000115,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_UNRESOLVED": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "SQL_CENTRAL": {
+                "started": 2840,
+                "completed": 2839,
+                "failed": 0,
+                "totalMs": 8322.14100000073,
+                "maxMs": 50.288300000014715,
+                "inflight": 1,
+                "pendingMs": 24.941800000000512
+              },
+              "SQL_TENANT": {
+                "started": 335,
+                "completed": 335,
+                "failed": 0,
+                "totalMs": 1117.8672000004153,
+                "maxMs": 27.274499999999534,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "CLEANUP": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              }
+            }
+          },
+          "afterCleanup": {
+            "schemaVersion": 1,
+            "status": "VALID",
+            "inclusive": true,
+            "metrics": {
+              "OPERATION": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10512.75999999998,
+                "maxMs": 10512.75999999998,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "RESOLVE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 365.56630000000587,
+                "maxMs": 365.56630000000587,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "LEASE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10004.104599999991,
+                "maxMs": 10004.104599999991,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "PROTECT": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 315.81239999999525,
+                "maxMs": 315.81239999999525,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "READER": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 9383.36970000001,
+                "maxMs": 9383.36970000001,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION": {
+                "started": 7201,
+                "completed": 7201,
+                "failed": 1,
+                "totalMs": 8607.278699998831,
+                "maxMs": 327.6761000000115,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_MEMBERSHIP": {
+                "started": 39,
+                "completed": 39,
+                "failed": 0,
+                "totalMs": 4131.363200000109,
+                "maxMs": 191.4702999999863,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_DATA": {
+                "started": 39,
+                "completed": 39,
+                "failed": 0,
+                "totalMs": 4297.145600000047,
+                "maxMs": 194.9940999999817,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "RESOURCE_POLICY": {
+                "started": 39,
+                "completed": 39,
+                "failed": 0,
+                "totalMs": 0.28419999999459833,
+                "maxMs": 0.05730000001494773,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUDIT": {
+                "started": 39,
+                "completed": 39,
+                "failed": 1,
+                "totalMs": 151.26050000003306,
+                "maxMs": 12.198900000017602,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_HIT": {
+                "started": 7163,
+                "completed": 7163,
+                "failed": 0,
+                "totalMs": 26.61339999877964,
+                "maxMs": 0.2779000000155065,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_MISS": {
+                "started": 38,
+                "completed": 38,
+                "failed": 1,
+                "totalMs": 8580.665300000052,
+                "maxMs": 327.6761000000115,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_UNRESOLVED": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "SQL_CENTRAL": {
+                "started": 2842,
+                "completed": 2842,
+                "failed": 0,
+                "totalMs": 8368.847100000712,
+                "maxMs": 50.288300000014715,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "SQL_TENANT": {
+                "started": 336,
+                "completed": 336,
+                "failed": 1,
+                "totalMs": 1117.9488000004203,
+                "maxMs": 27.274499999999534,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "CLEANUP": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 49.149099999980535,
+                "maxMs": 49.149099999980535,
+                "inflight": 0,
+                "pendingMs": 0
+              }
+            }
+          }
+        },
+        "success": false,
+        "errorCode": "LEASE_TIMEOUT",
+        "operationMs": 9872.121299999999,
+        "admissionMs": 0.14449999999487773,
+        "responseBytes": 0,
+        "responseDigest": null,
+        "queryCount": 336,
+        "authorizationCalls": 7200,
+        "rowsRead": 3700,
+        "nodeRssPeakBytes": 286404608,
+        "nodeHeapPeakBytes": 77629840,
+        "postgresTempBytes": 0,
+        "cleanupMs": 49.14010000001872,
+        "afterSuccessQueries": 0
+      },
+      {
+        "scenarioId": "volume-10000",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 10000,
+        "expectedErrorCode": null,
+        "temporalDiagnostic": {
+          "status": "INCOMPLETE",
+          "atSettlement": {
+            "schemaVersion": 1,
+            "status": "VALID",
+            "inclusive": true,
+            "metrics": {
+              "OPERATION": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10545.849699999992,
+                "maxMs": 10545.849699999992,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "RESOLVE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 404.1702000000223,
+                "maxMs": 404.1702000000223,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "LEASE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10000.140799999994,
+                "maxMs": 10000.140799999994,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "PROTECT": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 297.0688000000082,
+                "maxMs": 297.0688000000082,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "READER": {
+                "started": 1,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 1,
+                "pendingMs": 9411.5098
+              },
+              "AUTHORIZATION": {
+                "started": 7801,
+                "completed": 7800,
+                "failed": 0,
+                "totalMs": 8824.322999999538,
+                "maxMs": 381.8202000000165,
+                "inflight": 1,
+                "pendingMs": 159.4818999999843
+              },
+              "AUTHORIZATION_MEMBERSHIP": {
+                "started": 42,
+                "completed": 42,
+                "failed": 0,
+                "totalMs": 4374.671400000108,
+                "maxMs": 211.23569999999017,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_DATA": {
+                "started": 42,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 4381.951300000044,
+                "maxMs": 266.32199999998556,
+                "inflight": 1,
+                "pendingMs": 69.52919999998994
+              },
+              "RESOURCE_POLICY": {
+                "started": 41,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 0.23930000001564622,
+                "maxMs": 0.0181999999913387,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUDIT": {
+                "started": 41,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 136.06110000004992,
+                "maxMs": 13.643700000015087,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_HIT": {
+                "started": 7760,
+                "completed": 7760,
+                "failed": 0,
+                "totalMs": 23.16009999939706,
+                "maxMs": 0.14110000000800937,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_MISS": {
+                "started": 40,
+                "completed": 40,
+                "failed": 0,
+                "totalMs": 8801.162900000141,
+                "maxMs": 381.8202000000165,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_UNRESOLVED": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "SQL_CENTRAL": {
+                "started": 3038,
+                "completed": 3037,
+                "failed": 0,
+                "totalMs": 8719.843100000086,
+                "maxMs": 58.59779999998864,
+                "inflight": 1,
+                "pendingMs": 0.3887000000104308
+              },
+              "SQL_TENANT": {
+                "started": 345,
+                "completed": 345,
+                "failed": 0,
+                "totalMs": 710.220100000297,
+                "maxMs": 14.800499999983003,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "CLEANUP": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              }
+            }
+          },
+          "afterCleanup": {
+            "schemaVersion": 1,
+            "status": "VALID",
+            "inclusive": true,
+            "metrics": {
+              "OPERATION": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10545.849699999992,
+                "maxMs": 10545.849699999992,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "RESOLVE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 404.1702000000223,
+                "maxMs": 404.1702000000223,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "LEASE": {
+                "started": 1,
+                "completed": 1,
+                "failed": 1,
+                "totalMs": 10000.140799999994,
+                "maxMs": 10000.140799999994,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "PROTECT": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 297.0688000000082,
+                "maxMs": 297.0688000000082,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "READER": {
+                "started": 1,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 1,
+                "pendingMs": 9436.032099999982
+              },
+              "AUTHORIZATION": {
+                "started": 7801,
+                "completed": 7800,
+                "failed": 0,
+                "totalMs": 8824.322999999538,
+                "maxMs": 381.8202000000165,
+                "inflight": 1,
+                "pendingMs": 184.0058999999892
+              },
+              "AUTHORIZATION_MEMBERSHIP": {
+                "started": 42,
+                "completed": 42,
+                "failed": 0,
+                "totalMs": 4374.671400000108,
+                "maxMs": 211.23569999999017,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_DATA": {
+                "started": 42,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 4381.951300000044,
+                "maxMs": 266.32199999998556,
+                "inflight": 1,
+                "pendingMs": 94.05379999999423
+              },
+              "RESOURCE_POLICY": {
+                "started": 41,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 0.23930000001564622,
+                "maxMs": 0.0181999999913387,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUDIT": {
+                "started": 41,
+                "completed": 41,
+                "failed": 0,
+                "totalMs": 136.06110000004992,
+                "maxMs": 13.643700000015087,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_HIT": {
+                "started": 7760,
+                "completed": 7760,
+                "failed": 0,
+                "totalMs": 23.16009999939706,
+                "maxMs": 0.14110000000800937,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_MISS": {
+                "started": 40,
+                "completed": 40,
+                "failed": 0,
+                "totalMs": 8801.162900000141,
+                "maxMs": 381.8202000000165,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "AUTHORIZATION_UNRESOLVED": {
+                "started": 0,
+                "completed": 0,
+                "failed": 0,
+                "totalMs": 0,
+                "maxMs": 0,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "SQL_CENTRAL": {
+                "started": 3044,
+                "completed": 3043,
+                "failed": 0,
+                "totalMs": 8727.683500000101,
+                "maxMs": 58.59779999998864,
+                "inflight": 1,
+                "pendingMs": 17.00920000000042
+              },
+              "SQL_TENANT": {
+                "started": 345,
+                "completed": 345,
+                "failed": 0,
+                "totalMs": 710.220100000297,
+                "maxMs": 14.800499999983003,
+                "inflight": 0,
+                "pendingMs": 0
+              },
+              "CLEANUP": {
+                "started": 1,
+                "completed": 1,
+                "failed": 0,
+                "totalMs": 23.27719999998226,
+                "maxMs": 23.27719999998226,
+                "inflight": 0,
+                "pendingMs": 0
+              }
+            }
+          }
+        },
+        "success": false,
+        "errorCode": "LEASE_TIMEOUT",
+        "operationMs": 9825.006499999989,
+        "admissionMs": 12.980400000000373,
+        "responseBytes": 0,
+        "responseDigest": null,
+        "queryCount": 345,
+        "authorizationCalls": 7800,
+        "rowsRead": 4000,
+        "nodeRssPeakBytes": 318750720,
+        "nodeHeapPeakBytes": 118121664,
+        "postgresTempBytes": 0,
+        "cleanupMs": 23.273600000014994,
+        "afterSuccessQueries": 0
+      }
+    ],
+    "scenarios": [
+      {
+        "id": "volume-0",
+        "count": 0,
+        "profile": "volume",
+        "status": "COMPLETE"
+      },
+      {
+        "id": "volume-25",
+        "count": 25,
+        "profile": "volume",
+        "status": "COMPLETE"
+      },
+      {
+        "id": "volume-26",
+        "count": 26,
+        "profile": "volume",
+        "status": "COMPLETE"
+      },
+      {
+        "id": "volume-100",
+        "count": 100,
+        "profile": "volume",
+        "status": "COMPLETE"
+      },
+      {
+        "id": "volume-101",
+        "count": 101,
+        "profile": "volume",
+        "status": "COMPLETE"
+      },
+      {
+        "id": "volume-10000",
+        "count": 10000,
+        "profile": "volume",
+        "status": "INCOMPLETE"
+      },
+      {
+        "id": "volume-10001",
+        "count": 10001,
+        "profile": "volume",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-denied",
+        "count": 101,
+        "profile": "denied",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-shared-origin",
+        "count": 101,
+        "profile": "shared-origin",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-distinct-origins",
+        "count": 101,
+        "profile": "distinct-origins",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-selective",
+        "count": 101,
+        "profile": "selective",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-historical-people",
+        "count": 101,
+        "profile": "historical-people",
+        "status": "NOT_RUN"
+      },
+      {
+        "id": "profile-large-payload",
+        "count": 26,
+        "profile": "large-payload",
+        "status": "NOT_RUN"
+      }
+    ],
+    "observationErrors": [
+      {
+        "scenarioId": "volume-10000",
+        "code": "UNEXPECTED_WARMUP_FAILURE"
+      },
+      {
+        "scenarioId": "volume-10000",
+        "variant": "after",
+        "pair": 0,
+        "order": 0,
+        "candidates": 10000,
+        "expectedErrorCode": null,
+        "code": "TEMPORAL_DIAGNOSTIC_INCOMPLETE"
+      },
+      {
+        "scenarioId": "volume-10000",
+        "code": "CAPACITY_CLEANUP_UNCONFIRMED"
+      },
+      {
+        "scenarioId": "volume-10000",
+        "code": "CAPACITY_FIXTURE_ARCHIVE_DEFERRED"
+      }
+    ],
+    "evaluation": {
+      "status": "INCOMPLETE",
+      "failures": [
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 2
+        },
+        {
+          "scenarioId": "volume-10000",
+          "code": "UNEXPECTED_WARMUP_FAILURE"
+        },
+        {
+          "scenarioId": "volume-10000",
+          "variant": "after",
+          "pair": 0,
+          "order": 0,
+          "candidates": 10000,
+          "expectedErrorCode": null,
+          "code": "TEMPORAL_DIAGNOSTIC_INCOMPLETE"
+        },
+        {
+          "scenarioId": "volume-10000",
+          "code": "CAPACITY_CLEANUP_UNCONFIRMED"
+        },
+        {
+          "scenarioId": "volume-10000",
+          "code": "CAPACITY_FIXTURE_ARCHIVE_DEFERRED"
+        }
+      ],
+      "scenarios": [
+        {
+          "scenarioId": "volume-0",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1425.0815000000075,
+                "p95": 1484.8907000000036,
+                "max": 1484.8907000000036
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.2081499999985681,
+                "p95": 0.22370000000228174,
+                "max": 0.22370000000228174
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 86,
+                "p95": 86,
+                "max": 86
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 333,
+                "p95": 333,
+                "max": 333
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 283299840,
+                "p95": 284180480,
+                "max": 284180480
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 83390380,
+                "p95": 85213408,
+                "max": 85213408
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.643899999995483,
+                "p95": 23.818799999993644,
+                "max": 23.818799999993644
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1376.0336499999976,
+                "p95": 1461.3640000000014,
+                "max": 1461.3640000000014
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.13959999999497086,
+                "p95": 0.14949999999953434,
+                "max": 0.14949999999953434
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 86,
+                "p95": 86,
+                "max": 86
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 335,
+                "p95": 335,
+                "max": 335
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 282845184,
+                "p95": 283484160,
+                "max": 283484160
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 76479536,
+                "p95": 76906672,
+                "max": 76906672
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 20.527700000006007,
+                "p95": 25.20919999999751,
+                "max": 25.20919999999751
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.6006006006006006
+            },
+            "operationMs": {
+              "absolute": -49.04785000000993,
+              "percent": -3.4417575415868966
+            },
+            "admissionMs": {
+              "absolute": -0.06855000000359723,
+              "percent": -32.93298102525525
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -454656,
+              "percent": -0.16048579483842984
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -6910844,
+              "percent": -8.287339618790561
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -2.116199999989476,
+              "percent": -9.345563264234068
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-25",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1628.7192000000068,
+                "p95": 1665.1281000000017,
+                "max": 1665.1281000000017
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.09779999999591382,
+                "p95": 0.10869999999704305,
+                "max": 0.10869999999704305
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11146,
+                "p95": 11146,
+                "max": 11146
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 337,
+                "p95": 337,
+                "max": 337
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 50,
+                "p95": 50,
+                "max": 50
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 25,
+                "p95": 25,
+                "max": 25
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 289546240,
+                "p95": 290291712,
+                "max": 290291712
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74618584,
+                "p95": 78011096,
+                "max": 78011096
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.31304999999702,
+                "p95": 28.70229999998992,
+                "max": 28.70229999998992
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1975.5303000000058,
+                "p95": 2069.2360000000044,
+                "max": 2069.2360000000044
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.16619999999238644,
+                "p95": 0.19079999999667052,
+                "max": 0.19079999999667052
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11146,
+                "p95": 11146,
+                "max": 11146
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 339,
+                "p95": 339,
+                "max": 339
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 50,
+                "p95": 50,
+                "max": 50
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 25,
+                "p95": 25,
+                "max": 25
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 280303616,
+                "p95": 283377664,
+                "max": 283377664
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 73778356,
+                "p95": 76351256,
+                "max": 76351256
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 17.373899999998685,
+                "p95": 17.956500000000233,
+                "max": 17.956500000000233
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5934718100890207
+            },
+            "operationMs": {
+              "absolute": 346.811099999999,
+              "percent": 21.293486317346634
+            },
+            "admissionMs": {
+              "absolute": 0.06839999999647262,
+              "percent": 69.93865030606383
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -9242624,
+              "percent": -3.192106379968878
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -840228,
+              "percent": -1.1260304805569614
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -4.939149999998335,
+              "percent": -22.135700856669057
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-26",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1908.5369500000015,
+                "p95": 1937.8859999999986,
+                "max": 1937.8859999999986
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.2320499999987078,
+                "p95": 0.31259999999019783,
+                "max": 0.31259999999019783
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11607,
+                "p95": 11607,
+                "max": 11607
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 337,
+                "p95": 337,
+                "max": 337
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 52,
+                "p95": 52,
+                "max": 52
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 26,
+                "p95": 26,
+                "max": 26
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274520064,
+                "p95": 274804736,
+                "max": 274804736
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72667824,
+                "p95": 73096856,
+                "max": 73096856
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 25.00325000000157,
+                "p95": 25.303800000008778,
+                "max": 25.303800000008778
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1896.3923499999946,
+                "p95": 1974.0133999999962,
+                "max": 1974.0133999999962
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.15625,
+                "p95": 0.18589999999676365,
+                "max": 0.18589999999676365
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11607,
+                "p95": 11607,
+                "max": 11607
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 339,
+                "p95": 339,
+                "max": 339
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 52,
+                "p95": 52,
+                "max": 52
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 26,
+                "p95": 26,
+                "max": 26
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274616320,
+                "p95": 274804736,
+                "max": 274804736
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74337532,
+                "p95": 74382776,
+                "max": 74382776
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 21.538699999990058,
+                "p95": 24.597899999993388,
+                "max": 24.597899999993388
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5934718100890207
+            },
+            "operationMs": {
+              "absolute": -12.144600000006903,
+              "percent": -0.6363303576599286
+            },
+            "admissionMs": {
+              "absolute": -0.07579999999870779,
+              "percent": -32.66537384146947
+            },
+            "nodeRssPeakBytes": {
+              "absolute": 96256,
+              "percent": 0.03506337518557478
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": 1669708,
+              "percent": 2.2977267077654617
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -3.4645500000115135,
+              "percent": -13.856398668218315
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-100",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1754.477199999994,
+                "p95": 1865.0804999999818,
+                "max": 1865.0804999999818
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.17354999999224674,
+                "p95": 0.17699999999604188,
+                "max": 0.17699999999604188
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 338,
+                "p95": 338,
+                "max": 338
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 200,
+                "p95": 200,
+                "max": 200
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 100,
+                "p95": 100,
+                "max": 100
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274769920,
+                "p95": 274841600,
+                "max": 274841600
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74042660,
+                "p95": 74600752,
+                "max": 74600752
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.519050000002608,
+                "p95": 23.703000000008615,
+                "max": 23.703000000008615
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1902.8622999999934,
+                "p95": 1903.1484000000055,
+                "max": 1903.1484000000055
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1615999999921769,
+                "p95": 0.16529999999329448,
+                "max": 0.16529999999329448
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 340,
+                "p95": 340,
+                "max": 340
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 200,
+                "p95": 200,
+                "max": 200
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 100,
+                "p95": 100,
+                "max": 100
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274800640,
+                "p95": 275005440,
+                "max": 275005440
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74094000,
+                "p95": 74628272,
+                "max": 74628272
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 23.297649999978603,
+                "p95": 27.97919999997248,
+                "max": 27.97919999997248
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.591715976331361
+            },
+            "operationMs": {
+              "absolute": 148.3850999999995,
+              "percent": 8.457510875604427
+            },
+            "admissionMs": {
+              "absolute": -0.01195000000006985,
+              "percent": -6.885623739904183
+            },
+            "nodeRssPeakBytes": {
+              "absolute": 30720,
+              "percent": 0.011180263108858494
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": 51340,
+              "percent": 0.0693384057244837
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": 0.7785999999759952,
+              "percent": 3.4575170798763937
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-101",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 2090.350900000005,
+                "p95": 2100.6933000000136,
+                "max": 2100.6933000000136
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1306499999918742,
+                "p95": 0.13629999998374842,
+                "max": 0.13629999998374842
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 340,
+                "p95": 340,
+                "max": 340
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 202,
+                "p95": 202,
+                "max": 202
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 101,
+                "p95": 101,
+                "max": 101
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 275468288,
+                "p95": 275636224,
+                "max": 275636224
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72921916,
+                "p95": 73304384,
+                "max": 73304384
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 19.93409999999858,
+                "p95": 25.481299999984913,
+                "max": 25.481299999984913
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 2100.856549999997,
+                "p95": 2184.396999999997,
+                "max": 2184.396999999997
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1955500000040047,
+                "p95": 0.19580000001587905,
+                "max": 0.19580000001587905
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 342,
+                "p95": 342,
+                "max": 342
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 202,
+                "p95": 202,
+                "max": 202
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 101,
+                "p95": 101,
+                "max": 101
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 275156992,
+                "p95": 275296256,
+                "max": 275296256
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72574316,
+                "p95": 72584744,
+                "max": 72584744
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 24.242249999995693,
+                "p95": 26.85000000000582,
+                "max": 26.85000000000582
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5882352941176471
+            },
+            "operationMs": {
+              "absolute": 10.505649999991874,
+              "percent": 0.502578299174165
+            },
+            "admissionMs": {
+              "absolute": 0.06490000001213048,
+              "percent": 49.674703418420926
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -311296,
+              "percent": -0.11300611125154268
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -347600,
+              "percent": -0.4766742552403587
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": 4.308149999997113,
+              "percent": 21.611961412842415
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10000",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10001",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-denied",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-shared-origin",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-distinct-origins",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-selective",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-historical-people",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-large-payload",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        }
+      ],
+      "limits": {
+        "operationMs": 10000,
+        "admissionMs": 5000,
+        "responseBytes": 1048576,
+        "candidates": 10000
+      },
+      "productionCapacityApproved": false
+    },
+    "measurementScope": {
+      "operationMs": "Observed main BEGIN TRANSACTION READ WRITE to composition settlement; real executor enforces the full operation deadline",
+      "admissionMs": "Actual pool-manager acquire observer; exactly one admission per operation required",
+      "queryCount": "Physical tenant LOGIN SQL only, including outer protocol; excludes Central SQL and admin observations",
+      "responseBytes": "JSON repository result bytes; zero for refused operations with no successful result, not HTTP error bytes",
+      "responseDigest": "SHA-256 of result with cursors reduced to context/position; no token/expiry persisted",
+      "memory": "Observed gate-process RSS/heap peaks include fixtures and instrumentation; no product budget inferred",
+      "postgresTempBytes": "Observed pg_stat_database counter delta; database-wide and subject to PostgreSQL statistics publication lag",
+      "cleanup": "Two quiet observations of pool state and tenant LOGIN pg_stat_activity, within 10000 ms; pending temporal spans stop load and defer fixture archive to outer environment cleanup; separate gate verifies portal/session cleanup",
+      "productionCapacityApproved": false
+    }
+  },
+  "finishedAt": "2026-10-28T20:29:10.686Z",
+  "verdict": {
+    "status": "FAIL",
+    "failures": [
+      "CAPACITY_OBSERVER_ERRORS"
+    ],
+    "incomplete": [
+      "MISSING_WARMUPS",
+      "CAPACITY_INCOMPLETE"
+    ],
+    "capacity": {
+      "status": "INCOMPLETE",
+      "failures": [
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10000",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "volume-10001",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-denied",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-shared-origin",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-distinct-origins",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-selective",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-historical-people",
+          "pair": 2
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 1
+        },
+        {
+          "code": "MISSING_PAIRED_SAMPLE",
+          "scenarioId": "profile-large-payload",
+          "pair": 2
+        }
+      ],
+      "scenarios": [
+        {
+          "scenarioId": "volume-0",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1425.0815000000075,
+                "p95": 1484.8907000000036,
+                "max": 1484.8907000000036
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.2081499999985681,
+                "p95": 0.22370000000228174,
+                "max": 0.22370000000228174
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 86,
+                "p95": 86,
+                "max": 86
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 333,
+                "p95": 333,
+                "max": 333
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 283299840,
+                "p95": 284180480,
+                "max": 284180480
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 83390380,
+                "p95": 85213408,
+                "max": 85213408
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.643899999995483,
+                "p95": 23.818799999993644,
+                "max": 23.818799999993644
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1376.0336499999976,
+                "p95": 1461.3640000000014,
+                "max": 1461.3640000000014
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.13959999999497086,
+                "p95": 0.14949999999953434,
+                "max": 0.14949999999953434
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 86,
+                "p95": 86,
+                "max": 86
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 335,
+                "p95": 335,
+                "max": 335
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 282845184,
+                "p95": 283484160,
+                "max": 283484160
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 76479536,
+                "p95": 76906672,
+                "max": 76906672
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 20.527700000006007,
+                "p95": 25.20919999999751,
+                "max": 25.20919999999751
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.6006006006006006
+            },
+            "operationMs": {
+              "absolute": -49.04785000000993,
+              "percent": -3.4417575415868966
+            },
+            "admissionMs": {
+              "absolute": -0.06855000000359723,
+              "percent": -32.93298102525525
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -454656,
+              "percent": -0.16048579483842984
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -6910844,
+              "percent": -8.287339618790561
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -2.116199999989476,
+              "percent": -9.345563264234068
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-25",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1628.7192000000068,
+                "p95": 1665.1281000000017,
+                "max": 1665.1281000000017
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.09779999999591382,
+                "p95": 0.10869999999704305,
+                "max": 0.10869999999704305
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11146,
+                "p95": 11146,
+                "max": 11146
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 337,
+                "p95": 337,
+                "max": 337
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 50,
+                "p95": 50,
+                "max": 50
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 25,
+                "p95": 25,
+                "max": 25
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 289546240,
+                "p95": 290291712,
+                "max": 290291712
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74618584,
+                "p95": 78011096,
+                "max": 78011096
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.31304999999702,
+                "p95": 28.70229999998992,
+                "max": 28.70229999998992
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1975.5303000000058,
+                "p95": 2069.2360000000044,
+                "max": 2069.2360000000044
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.16619999999238644,
+                "p95": 0.19079999999667052,
+                "max": 0.19079999999667052
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11146,
+                "p95": 11146,
+                "max": 11146
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 339,
+                "p95": 339,
+                "max": 339
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 50,
+                "p95": 50,
+                "max": 50
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 25,
+                "p95": 25,
+                "max": 25
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 280303616,
+                "p95": 283377664,
+                "max": 283377664
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 73778356,
+                "p95": 76351256,
+                "max": 76351256
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 17.373899999998685,
+                "p95": 17.956500000000233,
+                "max": 17.956500000000233
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5934718100890207
+            },
+            "operationMs": {
+              "absolute": 346.811099999999,
+              "percent": 21.293486317346634
+            },
+            "admissionMs": {
+              "absolute": 0.06839999999647262,
+              "percent": 69.93865030606383
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -9242624,
+              "percent": -3.192106379968878
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -840228,
+              "percent": -1.1260304805569614
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -4.939149999998335,
+              "percent": -22.135700856669057
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-26",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1908.5369500000015,
+                "p95": 1937.8859999999986,
+                "max": 1937.8859999999986
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.2320499999987078,
+                "p95": 0.31259999999019783,
+                "max": 0.31259999999019783
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11607,
+                "p95": 11607,
+                "max": 11607
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 337,
+                "p95": 337,
+                "max": 337
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 52,
+                "p95": 52,
+                "max": 52
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 26,
+                "p95": 26,
+                "max": 26
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274520064,
+                "p95": 274804736,
+                "max": 274804736
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72667824,
+                "p95": 73096856,
+                "max": 73096856
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 25.00325000000157,
+                "p95": 25.303800000008778,
+                "max": 25.303800000008778
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1896.3923499999946,
+                "p95": 1974.0133999999962,
+                "max": 1974.0133999999962
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.15625,
+                "p95": 0.18589999999676365,
+                "max": 0.18589999999676365
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11607,
+                "p95": 11607,
+                "max": 11607
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 339,
+                "p95": 339,
+                "max": 339
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 52,
+                "p95": 52,
+                "max": 52
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 26,
+                "p95": 26,
+                "max": 26
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274616320,
+                "p95": 274804736,
+                "max": 274804736
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74337532,
+                "p95": 74382776,
+                "max": 74382776
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 21.538699999990058,
+                "p95": 24.597899999993388,
+                "max": 24.597899999993388
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5934718100890207
+            },
+            "operationMs": {
+              "absolute": -12.144600000006903,
+              "percent": -0.6363303576599286
+            },
+            "admissionMs": {
+              "absolute": -0.07579999999870779,
+              "percent": -32.66537384146947
+            },
+            "nodeRssPeakBytes": {
+              "absolute": 96256,
+              "percent": 0.03506337518557478
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": 1669708,
+              "percent": 2.2977267077654617
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": -3.4645500000115135,
+              "percent": -13.856398668218315
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-100",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1754.477199999994,
+                "p95": 1865.0804999999818,
+                "max": 1865.0804999999818
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.17354999999224674,
+                "p95": 0.17699999999604188,
+                "max": 0.17699999999604188
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 338,
+                "p95": 338,
+                "max": 338
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 200,
+                "p95": 200,
+                "max": 200
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 100,
+                "p95": 100,
+                "max": 100
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274769920,
+                "p95": 274841600,
+                "max": 274841600
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74042660,
+                "p95": 74600752,
+                "max": 74600752
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 22.519050000002608,
+                "p95": 23.703000000008615,
+                "max": 23.703000000008615
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 1902.8622999999934,
+                "p95": 1903.1484000000055,
+                "max": 1903.1484000000055
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1615999999921769,
+                "p95": 0.16529999999329448,
+                "max": 0.16529999999329448
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 340,
+                "p95": 340,
+                "max": 340
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 200,
+                "p95": 200,
+                "max": 200
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 100,
+                "p95": 100,
+                "max": 100
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 274800640,
+                "p95": 275005440,
+                "max": 275005440
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 74094000,
+                "p95": 74628272,
+                "max": 74628272
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 23.297649999978603,
+                "p95": 27.97919999997248,
+                "max": 27.97919999997248
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.591715976331361
+            },
+            "operationMs": {
+              "absolute": 148.3850999999995,
+              "percent": 8.457510875604427
+            },
+            "admissionMs": {
+              "absolute": -0.01195000000006985,
+              "percent": -6.885623739904183
+            },
+            "nodeRssPeakBytes": {
+              "absolute": 30720,
+              "percent": 0.011180263108858494
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": 51340,
+              "percent": 0.0693384057244837
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": 0.7785999999759952,
+              "percent": 3.4575170798763937
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-101",
+          "pairsExpected": 2,
+          "measuredSamples": 4,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 2090.350900000005,
+                "p95": 2100.6933000000136,
+                "max": 2100.6933000000136
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1306499999918742,
+                "p95": 0.13629999998374842,
+                "max": 0.13629999998374842
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 340,
+                "p95": 340,
+                "max": 340
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 202,
+                "p95": 202,
+                "max": 202
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 101,
+                "p95": 101,
+                "max": 101
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 275468288,
+                "p95": 275636224,
+                "max": 275636224
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72921916,
+                "p95": 73304384,
+                "max": 73304384
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 19.93409999999858,
+                "p95": 25.481299999984913,
+                "max": 25.481299999984913
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 2,
+                "mean": 2100.856549999997,
+                "p95": 2184.396999999997,
+                "max": 2184.396999999997
+              },
+              "admissionMs": {
+                "samples": 2,
+                "mean": 0.1955500000040047,
+                "p95": 0.19580000001587905,
+                "max": 0.19580000001587905
+              },
+              "responseBytes": {
+                "samples": 2,
+                "mean": 11634,
+                "p95": 11634,
+                "max": 11634
+              },
+              "queryCount": {
+                "samples": 2,
+                "mean": 342,
+                "p95": 342,
+                "max": 342
+              },
+              "authorizationCalls": {
+                "samples": 2,
+                "mean": 202,
+                "p95": 202,
+                "max": 202
+              },
+              "rowsRead": {
+                "samples": 2,
+                "mean": 101,
+                "p95": 101,
+                "max": 101
+              },
+              "nodeRssPeakBytes": {
+                "samples": 2,
+                "mean": 275156992,
+                "p95": 275296256,
+                "max": 275296256
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 2,
+                "mean": 72574316,
+                "p95": 72584744,
+                "max": 72584744
+              },
+              "postgresTempBytes": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "cleanupMs": {
+                "samples": 2,
+                "mean": 24.242249999995693,
+                "p95": 26.85000000000582,
+                "max": 26.85000000000582
+              },
+              "afterSuccessQueries": {
+                "samples": 2,
+                "mean": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": 2,
+              "percent": 0.5882352941176471
+            },
+            "operationMs": {
+              "absolute": 10.505649999991874,
+              "percent": 0.502578299174165
+            },
+            "admissionMs": {
+              "absolute": 0.06490000001213048,
+              "percent": 49.674703418420926
+            },
+            "nodeRssPeakBytes": {
+              "absolute": -311296,
+              "percent": -0.11300611125154268
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": -347600,
+              "percent": -0.4766742552403587
+            },
+            "postgresTempBytes": {
+              "absolute": 0,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": 4.308149999997113,
+              "percent": 21.611961412842415
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10000",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "volume-10001",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-denied",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-shared-origin",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-distinct-origins",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-selective",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-historical-people",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        },
+        {
+          "scenarioId": "profile-large-payload",
+          "pairsExpected": 2,
+          "measuredSamples": 0,
+          "variants": {
+            "before": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            },
+            "after": {
+              "operationMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "admissionMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "responseBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "queryCount": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "authorizationCalls": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "rowsRead": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeRssPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "nodeHeapPeakBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "postgresTempBytes": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "cleanupMs": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              },
+              "afterSuccessQueries": {
+                "samples": 0,
+                "mean": null,
+                "p95": null,
+                "max": null
+              }
+            }
+          },
+          "deltas": {
+            "queryCount": {
+              "absolute": null,
+              "percent": null
+            },
+            "operationMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "admissionMs": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeRssPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "nodeHeapPeakBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "postgresTempBytes": {
+              "absolute": null,
+              "percent": null
+            },
+            "cleanupMs": {
+              "absolute": null,
+              "percent": null
+            }
+          }
+        }
+      ],
+      "limits": {
+        "operationMs": 10000,
+        "admissionMs": 5000,
+        "responseBytes": 1048576,
+        "candidates": 10000
+      },
+      "productionCapacityApproved": false
+    },
+    "productionCapacityApproved": false,
+    "integrationAuthorized": false
+  }
+}

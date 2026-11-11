@@ -1,0 +1,163 @@
+.organization-page { display: grid; gap: 1.25rem; min-width: 0; }
+.organization-page .tabs-header { margin: 0; flex-wrap: wrap; }
+.organization-page .tab-btn { display: inline-flex; align-items: center; gap: .5rem; text-decoration: none; }
+.organization-eyebrow { color: var(--color-text-secondary); font-size: .8rem; font-weight: 700; }
+.organization-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr); gap: 1.25rem; }
+.organization-card { padding: 1.5rem; min-width: 0; margin-top: 0; }
+.organization-card h3 { margin: 0 0 1rem; }
+.organization-card aside, .organization-card > a { display: block; margin: .75rem 0; }
+.organization-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.organization-heading h3 { margin-bottom: .4rem; }
+.organization-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+.organization-path { display: block; color: var(--text-muted, var(--color-text-secondary)); margin-top: .35rem; }
+.organization-description { white-space: pre-wrap; }
+.organization-page dd, .organization-page td { overflow-wrap: anywhere; }
+.organization-alert { padding: 1rem; background: var(--color-warning-soft); border: 1px solid var(--color-warning); border-radius: 8px; color: var(--color-warning); }
+.organization-notice { color: var(--color-success); }
+.organization-filters { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; }
+.organization-page label { display: grid; gap: .4rem; font-weight: 500; }
+.organization-filters label:first-child { flex: 1; min-width: 180px; }
+.organization-form > fieldset { border: 0; padding: 0; min-width: 0; }
+.organization-form .field-grid { align-items: start; }
+.organization-form textarea { width: 100%; }
+.form-modal .organization-form { padding:0; margin:1rem 0 0; border:0; box-shadow:none; }
+.form-modal .organization-form .field-grid { grid-template-columns:minmax(0,1fr); }
+.form-modal .organization-form label { display:grid; gap:.4rem; font-weight:500; }
+.form-modal .organization-form input:not([type=checkbox]),.form-modal .organization-form select { width:100%; min-width:0; min-height:44px; }
+.form-modal .organization-affiliations label { display:flex; align-items:center; }
+.form-modal .organization-alert { margin-top:1rem; }
+@media(max-width:640px) { .form-modal .organization-actions { flex-direction:column; } .form-modal .organization-actions .btn { justify-content:center; } }
+.organization-affiliations { border: 1px solid var(--border, var(--color-border)); padding: 1rem; margin: 1rem 0; border-radius: 8px; max-height: 320px; overflow-y: auto; }
+.organization-affiliations label { display: flex; gap: .6rem; margin-bottom: .6rem; }
+.organization-affiliations input { width: auto; }
+.organization-page input, .organization-page select, .organization-page textarea { max-width: 100%; min-width: 0; }
+.organization-page input[type="url"] { border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 10px; font: inherit; background: var(--bg-white); color: var(--text); width: 100%; }
+@media(max-width: 800px) { .organization-grid { grid-template-columns: 1fr; } .organization-card { padding: 1rem; } .organization-page .field-grid { grid-template-columns: 1fr; } .organization-filters > label { width: 100%; } }
+
+.people-directory .page-header { margin:0; padding-bottom:14px; border-bottom:1px solid var(--color-border); }
+.people-directory .page-header h1 { color:var(--color-text-primary); font-size:clamp(24px,2.4vw,32px); }
+.people-heading-actions { display:flex; flex-wrap:wrap; gap:.5rem; }
+.people-directory .organization-filters { margin:0; align-items:end; }
+.people-more-filters summary { padding:10px 12px; border:1px solid var(--color-border-strong); border-radius:7px; color:var(--color-action); cursor:pointer; font-weight:600; }
+.people-more-filters[open] { flex-basis:100%; }
+.people-more-filters > div { display:flex; flex-wrap:wrap; gap:12px; padding-top:12px; }
+.people-directory .people-count { margin:0; color:var(--color-text-secondary); font-weight:600; font-size:.85rem; }
+.people-directory .table-wrap { background:var(--color-surface); border-radius:10px; border:1px solid var(--color-border); }
+.people-directory th { color:var(--color-text-secondary); text-transform:none; }
+.people-directory td[data-label="Pessoa"] a { color:var(--color-action); font-size:1rem; }
+.people-directory :is(a,summary):focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; }
+@media(max-width:768px) {
+  .people-directory tbody { display:grid; padding:8px; gap:8px; }
+  .people-directory tbody tr { border:1px solid var(--color-border); border-radius:8px; }
+  .people-directory td[data-label="Pessoa"] { display:block; }
+  .people-directory td[data-label="Pessoa"]::before { content:none; }
+}
+
+.form-modal.people-areas-modal { display:flex; flex-direction:column; gap:16px; width:min(100%,1120px); overflow:hidden; }
+.people-areas-results {
+  min-height:0;
+  overflow:auto;
+  overscroll-behavior:contain;
+  border:1px solid var(--color-border);
+  border-radius:8px;
+}
+.people-areas-results:empty { display:none; }
+.people-areas-results .data-table { table-layout:fixed; min-width:0; }
+.people-areas-results thead th { position:sticky; top:0; background:var(--table-header-surface); color:var(--color-text-secondary); }
+.people-areas-results thead th:first-child { width:28%; }
+.people-areas-results :is(th,td) { padding:12px 16px; vertical-align:top; white-space:normal; overflow-wrap:anywhere; }
+.people-areas-results tbody th { background:transparent; border-bottom:1px solid var(--color-border); color:var(--color-text-primary); font-size:var(--fs-base); }
+.people-areas-results .organization-path { font-size:var(--fs-xs); font-weight:400; }
+.people-areas-results tr:last-child th { border-bottom:0; }
+.people-areas-results ul { margin:0; padding-inline-start:1.15em; }
+.people-areas-results li + li { margin-top:.25rem; }
+.people-areas-footer { display:flex; align-items:center; justify-content:space-between; gap:8px 16px; flex-wrap:wrap; }
+.people-areas-footer p { margin:0; color:var(--color-text-secondary); font-size:.85rem; }
+@media(max-width:768px) {
+  .people-areas-results .data-table th[scope="row"] { display:block; padding:0 0 6px; border:0; }
+  .people-areas-results .mobile-card-table td { grid-template-columns:minmax(0,1fr); gap:4px; }
+  .people-areas-results td::before { font-size:.8rem; font-weight:600; letter-spacing:normal; text-transform:none; }
+}
+
+.units-directory .page-header { margin:0; padding-bottom:14px; border-bottom:1px solid var(--color-border); }
+.units-directory .page-header h1 { color:var(--color-text-primary); font-size:clamp(24px,2.4vw,32px); }
+.units-directory .table-wrap { background:var(--color-surface); border:1px solid var(--color-border); border-radius:10px; }
+.units-directory th { color:var(--color-text-secondary); text-transform:none; }
+.unit-people-link { color:var(--color-action); font-size:1rem; font-weight:650; text-underline-offset:3px; }
+.unit-people-link:focus-visible,.people-unit-context a:focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; }
+.people-unit-context { display:flex; align-items:center; flex-wrap:wrap; gap:8px 18px; padding:10px 14px; background:var(--color-neutral-soft); border-radius:7px; color:var(--color-text-secondary); }
+.people-unit-context strong { margin-left:6px; color:var(--color-text-primary); }
+.people-unit-context a { color:var(--color-action); }
+@media(max-width:768px) {
+  .units-directory tbody { display:grid; padding:8px; gap:8px; }
+  .units-directory tbody tr { border:1px solid var(--color-border); border-radius:8px; }
+  .units-directory td[data-label="Unidade"] { display:block; }
+  .units-directory td[data-label="Unidade"]::before { content:none; }
+}
+
+.institutional-profile .page-header { margin:0; padding-bottom:14px; border-bottom:1px solid var(--color-border); }
+.institutional-profile .page-header h1 { color:var(--color-text-primary); font-size:clamp(24px,2.4vw,32px); }
+.institutional-profile :is(.organization-card,.entity-profile-sheet) { background:var(--color-surface); border:1px solid var(--color-border); border-radius:12px; }
+.institutional-profile .organization-card .organization-form { padding:0; border:0; margin-top:12px; }
+.institutional-profile .entity-profile-title-line { color:var(--color-focus); flex-wrap:wrap; }
+.institutional-profile .entity-profile-document dt,.institutional-profile .entity-profile-identity span { color:#536579; }
+.institutional-profile .entity-profile-document dd { color:var(--color-text-primary); }
+.institutional-profile .entity-profile-document section { border-color:var(--color-border); }
+.institutional-profile .entity-profile-fields input[readonly] { color:#475569; background:#f3f6f9; }
+.institutional-profile :is(a,button):focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; }
+.organization-strategy h4 { margin:16px 0 8px; }
+.strategy-summary ul { margin:0; padding-inline-start:20px; }
+.strategy-fields,.strategy-objectives { display:grid; gap:16px; }
+.strategy-interests { display:grid; gap:6px; }
+.strategy-fields .area-checkboxes { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:8px 16px; }
+.strategy-fields .checkbox-label { display:flex; align-items:flex-start; gap:8px; }
+.strategy-fields .checkbox-label input { flex:0 0 auto; width:auto; }
+.strategy-objective-list { padding:0; list-style:none; }
+.strategy-objective,.strategy-fields fieldset.strategy-objective { min-width:0; border:1px solid var(--color-border); border-radius:8px; padding:12px; }
+.strategy-objective p { margin:4px 0 0; overflow-wrap:anywhere; }
+.strategy-objective strong { overflow-wrap:anywhere; }
+.strategy-objective > :is(details,button) { margin-top:12px; }
+.strategy-objectives > button { justify-self:start; }
+.form-modal.strategy-edit-modal { display:flex; flex-direction:column; gap:12px; width:min(100%,920px); overflow:hidden; }
+.strategy-edit-modal .form-modal-heading { flex:none; }
+.strategy-edit-content { min-height:0; overflow:auto; overscroll-behavior:contain; padding:0 5px 5px; }
+.strategy-edit-modal .strategy-fields > fieldset { min-width:0; border:1px solid var(--color-border); border-radius:8px; padding:12px; }
+.strategy-edit-modal .organization-form .checkbox-label { display:flex; }
+.strategy-edit-modal .organization-form .field-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.strategy-edit-modal .organization-actions { margin-top:16px; }
+@media(max-width:640px) {
+  .strategy-edit-modal .organization-form .field-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:720px) {
+  .institutional-profile .organization-card,.institutional-profile .entity-profile-sheet { min-width:0; padding:16px; }
+  .institutional-profile .entity-profile-title-line { gap:8px; }
+}
+
+
+.units-directory .data-table th { background: var(--color-table-header); font-weight: 600; }
+.units-directory .data-table td { color: var(--color-text-primary); vertical-align: middle; }
+.units-directory .organization-path { color: var(--color-text-secondary); }
+.units-directory .organization-actions { align-items: center; margin-top: 0; }
+.units-directory .btn { min-height: 36px; border-radius: 7px; font-weight: 600; }
+.units-directory .badge-green { color: var(--color-success); background: var(--color-success-soft); }
+.units-directory .badge-grey { color: var(--color-text-secondary); background: var(--color-neutral-soft); }
+.units-directory .unit-people-link:hover { color: var(--color-action-hover); text-decoration: underline; }
+.units-directory .data-table { table-layout:fixed; }
+.units-directory .data-table th:first-child { width:64%; }
+.units-directory .data-table th:nth-child(2) { width:18%; }
+.units-directory .data-table th:nth-child(3) { width:18%; }
+.units-directory .data-table :is(th,td) { padding:15px 20px; }
+.units-directory .data-table td:first-child { overflow-wrap:anywhere; }
+.units-directory .organization-path { display:block; margin-top:5px; line-height:1.45; }
+.units-directory .data-table tbody tr:hover { background:var(--color-neutral-soft); }
+.units-directory .data-table :is(a,button):focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; }
+.organization-directory-table td { white-space:normal; overflow-wrap:anywhere; }
+.organization-directory-table td .btn { max-width:100%; white-space:normal; overflow-wrap:anywhere; text-align:start; }
+@media (min-width: 769px) {
+  .people-directory .organization-directory-table { min-width: 600px; }
+}
+@media (max-width: 768px) {
+  .units-directory .organization-actions .btn { min-height: 44px; }
+  .units-directory .data-table { table-layout:auto; }
+  .units-directory .data-table td { padding:10px 14px; }
+}

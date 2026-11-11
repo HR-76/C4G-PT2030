@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-10-27T20:03:54.713Z",
+  "scope": "Validation only: full HTTP/OIDC gate and unchanged standard profile including C1.",
+  "startupAttempt": {
+    "exitCode": 1,
+    "reason": "Docker Linux engine unavailable; no fixture created.",
+    "log": "startup-failure.log",
+    "resolved": "Started Docker Desktop hidden; retry succeeded."
+  },
+  "fullGate": {
+    "exitCode": 0,
+    "status": "PASS",
+    "checks": 33,
+    "samples": 108,
+    "successes": 108,
+    "errors": 0,
+    "warmups": 9,
+    "warmupFailures": 0,
+    "observerFailuresExpected": [
+      {
+        "code": "RESOURCE_NOT_AVAILABLE",
+        "constraint": null,
+        "column": null,
+        "routine": null
+      },
+      {
+        "code": "RESOURCE_NOT_AVAILABLE",
+        "constraint": null,
+        "column": null,
+        "routine": null
+      },
+      {
+        "code": "ORGANIZATION_MISMATCH",
+        "constraint": null,
+        "column": null,
+        "routine": null
+      }
+    ],
+    "cleanupError": null,
+    "report": "results.json"
+  },
+  "standard": {
+    "exitCode": 0,
+    "status": "COMPLETE",
+    "checks": 5,
+    "samples": 36,
+    "successes": 36,
+    "errors": 0,
+    "warmups": 6,
+    "warmupFailures": 0,
+    "admissionErrors": 0,
+    "afterResponseQueryCompletions": 0,
+    "cleanupError": null,
+    "report": "../http-audit-dashboard-c1/results.json"
+  },
+  "dashboardC1": {
+    "regressionPersists": true,
+    "p95BeforeMs": 7401.16,
+    "p95FirstAfterMs": 9733.63,
+    "p95RepeatMs": 10642.51,
+    "report": "c1-comparison.json"
+  },
+  "sourcePreservation": true,
+  "ownedContainersRemaining": 0,
+  "containerVerification": "docker ps -a --filter label=c4g.http-proof and c4g.audit-dashboard-proof returned no names after both wrappers exited.",
+  "unitSuitesBuildRepeated": false,
+  "reason": "No product or harness code changes; this stage reruns the requested integration and load gates.",
+  "productionPerformanceApproved": false,
+  "fullFeatureComplete": false,
+  "status": "Functional gates PASS; C1 latency regression persists; validation in Review."
+}

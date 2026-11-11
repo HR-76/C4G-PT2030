@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),path=require('node:path');
+module.exports=async function run(clients,origin,record){const results=[];for(const [index,width] of [1440,390].entries()){
+ const {context,tenant}=clients[index],page=await context.newPage(),out=path.resolve(__dirname,'../../../context/reviews',process.env.HTTP_PROOF_REPORT);let stage='start';await page.setViewportSize({width,height:900});
+ try{stage='catalog';await page.goto(origin+'/catalogo');const interest=page.getByRole('button',{name:'Registar interesse em Oportunidade sintética de teste'}).first();await interest.waitFor({timeout:60000});await interest.click();
+ stage='interest-dialog';const dialog=page.getByRole('dialog');await dialog.waitFor({timeout:60000});await dialog.getByLabel('Interesse transversal à C4G').check();await dialog.getByRole('button',{name:'Guardar interesse'}).click();await dialog.waitFor({state:'hidden',timeout:60000});
+ stage='interest-list';await page.getByRole('link',{name:'Consultar na lista de interesses'}).first().click();await page.getByRole('heading',{name:'Interesses da organização'}).waitFor({timeout:60000});const item=page.getByRole('link',{name:'Oportunidade sintética de teste'}).first();await item.waitFor({timeout:60000});await item.click();
+ stage='interest-detail';await page.getByRole('heading',{name:'Preparar candidatura'}).waitFor({timeout:60000});await page.getByRole('button',{name:'Preparar candidatura'}).click();await page.getByRole('heading',{name:'Nova candidatura'}).waitFor({timeout:60000});
+ stage='application-form';await page.getByLabel('Título',{exact:true}).fill('Candidatura sintética '+width);await page.getByLabel('Prazo interno').fill('2099-10-01');const responsible=page.getByLabel('Responsável da organização');await responsible.selectOption(tenant.owner.membershipId);await page.screenshot({path:path.join(out,'form-'+width+'.png'),fullPage:true});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+ stage='submit';await page.getByRole('button',{name:'Criar candidatura',exact:true}).click();await page.waitForURL(u=>/^\/candidaturas\/[0-9a-f-]+$/.test(u.pathname),{timeout:60000});await page.getByText('Candidatura sintética '+width).first().waitFor({timeout:60000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await page.screenshot({path:path.join(out,'created-'+width+'.png'),fullPage:true});
+ results.push({width,status:'PASS',interestRegistered:true,applicationCreated:true,noHorizontalOverflow:true});record(results);console.log('CATALOG_APPLICATION '+width+' PASS');
+ }catch(e){results.push({width,status:'FAIL',stage,error:e.name});record(results);throw e}finally{await page.close()}}
+ return results;};

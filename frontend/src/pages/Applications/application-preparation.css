@@ -1,0 +1,36 @@
+.preparation-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.preparation-card {min-width:0;padding:16px;border:1px solid var(--border);border-radius:8px;overflow-wrap:anywhere;}
+.preparation-card h3 {margin:0 0 12px;}
+.preparation-card ul {list-style:none;padding:0;}
+.preparation-card li {display:flex;flex-direction:column;gap:4px;padding:8px 0;}
+.preparation-card li span {color:var(--text-muted);font-size:12px;}
+.preparation-card a {text-underline-offset:3px;}
+.preparation-priorities {margin-bottom:16px;}
+.preparation-priorities h3 {margin:0 0 8px;}
+.preparation-items {display:grid;gap:8px;list-style:none;padding:0;margin:0;}
+.preparation-item {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  gap:4px 16px;
+  padding:8px 14px;
+  border-inline-start:3px solid var(--color-action);
+  border-radius:6px;
+  background:var(--color-info-soft);
+  overflow-wrap:anywhere;
+}
+.preparation-item[data-kind="overdue"] {border-inline-start-color:var(--color-danger);background:var(--color-danger-soft);}
+.preparation-item:is([data-kind="changes"],[data-kind="document"]) {border-inline-start-color:var(--color-warning);background:var(--color-warning-soft);}
+.preparation-item-label,.preparation-item-detail {display:block;}
+.preparation-item-label {font-size:.85rem;}
+.preparation-item-detail {color:var(--color-text-secondary);font-size:.85rem;}
+.preparation-item a {display:flex;align-items:center;justify-self:end;min-height:44px;color:var(--color-action);font-weight:650;text-decoration:underline;text-underline-offset:3px;}
+.preparation-priorities .preparation-clear,.preparation-priorities .preparation-incomplete {margin:8px 0 0;padding:10px 14px;border-radius:6px;}
+.preparation-clear {background:var(--color-success-soft);color:var(--color-success);}
+.preparation-incomplete {background:var(--color-info-soft);color:var(--color-text-secondary);}
+.application-work [id^="tarefa-"],.application-documents [id^="documento-"],.application-documents [id^="revisao-"] {scroll-margin-top:140px;}
+@media(max-width:1000px){.preparation-grid {grid-template-columns:minmax(0,1fr);}}
+@media(max-width:640px){
+  .preparation-item {grid-template-columns:minmax(0,1fr);}
+  .preparation-item a {justify-self:start;}
+}

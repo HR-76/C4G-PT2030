@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-28",
+  "kind": "AUTHORIZED_START_ATTEMPT_BLOCKED_BEFORE_INFRASTRUCTURE",
+  "runnerExitCode": 1,
+  "runnerErrorCode": "GATE_FAILED",
+  "execution": "NOT_RUN",
+  "postgresExecuted": false,
+  "containerCreated": false,
+  "runIdAvailable": false,
+  "newExecutionDirectories": [],
+  "preconditionDiagnostic": {
+    "dockerCliAvailable": true,
+    "contextShowExit": 0,
+    "contextNameValid": true,
+    "newExecutionStarted": false,
+    "contextInspectExit": 0,
+    "localEndpoint": true,
+    "daemonInfoExit": 1,
+    "daemonAvailable": false,
+    "daemonFailure": "LOCAL_DOCKER_PIPE_NOT_FOUND"
+  },
+  "sourceFiles": 1014,
+  "sourceManifestHash": "4aa729c1e1528df52433cb53ca7b181d7ef92b26e429cb47549dc9da1b703bb5",
+  "selectedImageId": "sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3",
+  "testRerun": {
+    "temporalRegressionPass": 12,
+    "fail": 0,
+    "skip": 0
+  },
+  "previousFourRunFilesUnchanged": true
+}

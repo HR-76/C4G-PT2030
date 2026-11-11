@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-17T16:30:23.639Z",
+  "current": 4,
+  "preserved": 9,
+  "financialDescriptionLinks": 3,
+  "amountUnidentified": 1,
+  "applicationA": 1,
+  "applicationB": 0,
+  "crossTenantApplicationStatus": 404,
+  "domainWrites": 0,
+  "pageErrors": 0,
+  "summaryRequests": 16,
+  "privateListStatus": 200,
+  "viewports": [
+    1440,
+    768,
+    390
+  ],
+  "result": "PASS"
+}

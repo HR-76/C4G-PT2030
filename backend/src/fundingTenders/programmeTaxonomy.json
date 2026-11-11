@@ -1,0 +1,174 @@
+{
+  "version": "eu-framework-2026-11-11",
+  "observedAt": "2026-11-11",
+  "endpoint": "https://api.tech.ec.europa.eu/search-api/prod/rest/facet",
+  "documentation": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/support/apis",
+  "apiVersion": "2.157.1",
+  "programmes": [
+    {
+      "id": "111111",
+      "code": "RELEX-PROSPECT",
+      "label": "EU External Action - Prospect (RELEX-PROSPECT)"
+    },
+    {
+      "id": "31045243",
+      "code": "H2020",
+      "label": "Horizon 2020 Framework Programme (H2020 - 2014-2020)"
+    },
+    {
+      "id": "31059643",
+      "code": "COSME",
+      "label": "Programme for the Competitiveness of Enterprises and small and medium-sized enterprises (COSME - 2014-2020)"
+    },
+    {
+      "id": "42810547",
+      "code": "ED",
+      "label": "EUROPE DIRECT (ED - 2014-2020)"
+    },
+    {
+      "id": "43089234",
+      "code": "INNOVFUND",
+      "label": "Innovation Fund (INNOVFUND)"
+    },
+    {
+      "id": "43108390",
+      "code": "HORIZON",
+      "label": "Horizon Europe (HORIZON)"
+    },
+    {
+      "id": "43152860",
+      "code": "DIGITAL",
+      "label": "Digital Europe Programme (DIGITAL)"
+    },
+    {
+      "id": "43251567",
+      "code": "CEF",
+      "label": "Connecting Europe Facility (CEF)"
+    },
+    {
+      "id": "43251589",
+      "code": "CERV",
+      "label": "Citizens, Equality, Rights and Values programme (CERV)"
+    },
+    {
+      "id": "43251814",
+      "code": "CREA",
+      "label": "Creative Europe Programme (CREA)"
+    },
+    {
+      "id": "43251882",
+      "code": "IMCAP",
+      "label": "Support for information measures relating to the common agricultural policy (IMCAP)"
+    },
+    {
+      "id": "43252368",
+      "code": "ISF",
+      "label": "Internal Security Fund (ISF)"
+    },
+    {
+      "id": "43252386",
+      "code": "JUST",
+      "label": "Justice Programme (JUST)"
+    },
+    {
+      "id": "43252405",
+      "code": "LIFE",
+      "label": "Programme for the Environment and Climate Action (LIFE)"
+    },
+    {
+      "id": "43252433",
+      "code": "PERICLES IV",
+      "label": "Programme for the Protection of the Euro against Counterfeiting  (PERICLES IV)"
+    },
+    {
+      "id": "43252476",
+      "code": "SMP",
+      "label": "Single Market Programme (SMP)"
+    },
+    {
+      "id": "43252517",
+      "code": "SOCPL",
+      "label": "Social Prerogative and Specific Competencies Lines (SOCPL)"
+    },
+    {
+      "id": "43253952",
+      "code": "HUMA",
+      "label": "Humanitarian Aid (HUMA)"
+    },
+    {
+      "id": "43253967",
+      "code": "RENEWFM",
+      "label": "Renewable Energy Financing Mechanism (RENEWFM)"
+    },
+    {
+      "id": "43254019",
+      "code": "ESF",
+      "label": "European Social Fund   (ESF)"
+    },
+    {
+      "id": "43254037",
+      "code": "ESC",
+      "label": "European Solidarity Corps (ESC)"
+    },
+    {
+      "id": "43298916",
+      "code": "EURATOM",
+      "label": "Euratom Research and Training Programme (EURATOM)"
+    },
+    {
+      "id": "43332642",
+      "code": "EU4H",
+      "label": "EU4Health Programme (EU4H)"
+    },
+    {
+      "id": "43353764",
+      "code": "ERASMUS",
+      "label": "Erasmus  (ERASMUS )"
+    },
+    {
+      "id": "43392145",
+      "code": "EMFAF",
+      "label": "European Maritime, Fisheries and Aquaculture Fund (EMFAF)"
+    },
+    {
+      "id": "43637601",
+      "code": "PPPA",
+      "label": "Pilot Projects & Preparation Actions (PPPA)"
+    },
+    {
+      "id": "43697167",
+      "code": "EP",
+      "label": "European Parliament (EP)"
+    },
+    {
+      "id": "44181033",
+      "code": "EDF",
+      "label": "European Defence Fund (EDF)"
+    },
+    {
+      "id": "44416173",
+      "code": "I3",
+      "label": "Interregional Innovation Investments Instrument (I3)"
+    },
+    {
+      "id": "44773066",
+      "code": "JTM",
+      "label": "Just Transition Mechanism (JTM)"
+    },
+    {
+      "id": "44773133",
+      "code": "IMREG",
+      "label": "Information Measures for the EU Cohesion policy (IMREG)"
+    },
+    {
+      "id": "45532249",
+      "code": "EUBA",
+      "label": "EU Bodies and Agencies (EUBA)"
+    },
+    {
+      "id": "45876777",
+      "code": "NDICI",
+      "label": "Neighbourhood, Development and International Cooperation Instrument – Global Europe (NDICI)"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+﻿{
+    "valid":  {
+                  "result":  {
+                                 "policy":  "c6-admission-v1",
+                                 "verdict":  "PASS",
+                                 "variants":  [
+                                                  {
+                                                      "variant":  "before",
+                                                      "admissions":  108,
+                                                      "dataComplete":  true,
+                                                      "environmentValid":  true,
+                                                      "admissionErrors":  0,
+                                                      "httpErrors":  0,
+                                                      "p95Ms":  2479.51,
+                                                      "maxMs":  3137.52,
+                                                      "minHeadroomMs":  1862.48,
+                                                      "observedCriteriaPass":  true,
+                                                      "verdict":  "PASS",
+                                                      "burstsExceedingMax":  [
+
+                                                                             ]
+                                                  },
+                                                  {
+                                                      "variant":  "after",
+                                                      "admissions":  108,
+                                                      "dataComplete":  true,
+                                                      "environmentValid":  true,
+                                                      "admissionErrors":  0,
+                                                      "httpErrors":  0,
+                                                      "p95Ms":  2505.77,
+                                                      "maxMs":  2845.84,
+                                                      "minHeadroomMs":  2154.16,
+                                                      "observedCriteriaPass":  true,
+                                                      "verdict":  "PASS",
+                                                      "burstsExceedingMax":  [
+
+                                                                             ]
+                                                  }
+                                              ],
+                                 "comparisonSha256":  "d2eacf9790361166ff9db34b2c74893d9431b3bf45d0a2407c2e5a27f81ddbab",
+                                 "policySha256":  "a6188d931d406e54258bc01c0b06b208dc407708c1081e43a2ee1ae96e4e40ec"
+                             },
+                  "exitCode":  0
+              },
+    "status":  "PASS",
+    "invalid":  {
+                    "result":  {
+                                   "policy":  "c6-admission-v1",
+                                   "verdict":  "FAIL",
+                                   "reason":  "INVALID_ENVIRONMENT"
+                               },
+                    "exitCode":  1
+                },
+    "at":  "2026-10-27T22:16:05.0149727Z"
+}

@@ -1,0 +1,5 @@
+'use strict';
+const { ACTOR_TYPES }=require('./constants'); const { cloneFreeze }=require('./immutability'); const { validateProvenanceInput }=require('./contracts'); const { provenanceDigest }=require('./digests');
+function createProvenance(input,{provenanceId,revisionId,recordedAt,actor}){const value=validateProvenanceInput(input);if(typeof provenanceId!=='string'||typeof revisionId!=='string'||typeof recordedAt!=='string'||!actor||!ACTOR_TYPES.includes(actor.type)||typeof actor.reference!=='string')throw new TypeError('Trusted provenance context is invalid.');const projection={...value,provenanceId,revisionId,recordedAt,recordedByActorType:actor.type,recordedByActorReference:actor.reference};return cloneFreeze({...projection,sourceDigest:provenanceDigest(projection)});}
+function appendProvenance(history,entry){if(!Array.isArray(history)||!Object.isFrozen(entry)||history.some(item=>item.provenanceId===entry.provenanceId))throw new TypeError('Provenance append is invalid.');return Object.freeze([...history,entry]);}
+module.exports={appendProvenance,createProvenance};

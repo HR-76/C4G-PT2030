@@ -1,0 +1,29 @@
+.partner-heading p { margin:0; color:var(--color-text-secondary); font-size:.85rem; }
+.partner-heading h1 { margin:4px 0 18px; color:var(--color-text-primary); font-size:clamp(24px,2.4vw,32px); }
+.partner-filters-more summary { display:inline-flex; align-items:center; gap:7px; padding:10px 12px; border:1px solid var(--color-border-strong); border-radius:7px; color:var(--color-action); font-weight:600; cursor:pointer; }
+.partner-filters-more[open] { flex-basis:100%; }
+.partner-filters-more > div { display:flex; flex-wrap:wrap; gap:12px; padding-top:12px; }
+.application-partners-browse .table-meta { color:var(--color-text-secondary); font-weight:600; margin:16px 0 10px; }
+.application-partners-browse .table-wrap { border:1px solid var(--color-border); border-radius:10px; background:var(--color-surface); }
+.application-partners-browse .partners-table { width:100%; }
+.application-partners-browse .partners-table th { background:var(--color-table-header); color:var(--color-text-secondary); text-transform:none; }
+.application-partners-browse .partner-card-link { color:var(--color-text-primary); font-size:1rem; font-weight:650; line-height:1.4; text-decoration:none; }
+.application-partners-browse :is(.partner-card-link,summary):focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; }
+.form-modal .partner-card-detail { padding:14px 0 0; }
+.partner-card-detail .partner-name { color:var(--color-action); font-size:1.15rem; }
+.partner-return { margin-top:12px; }
+.application-partners-browse .partner-card-link:hover,
+.application-partners-browse .partner-card-link:focus-visible { text-decoration:underline; }
+.partner-filters-more summary:hover,
+.partner-filters-more[open] summary { background:var(--color-neutral-soft); }
+.application-partners-browse .partners-table td { vertical-align:middle; }
+.application-partners-browse .table-action { display:inline-flex; align-items:center; justify-content:center; min-width:36px; min-height:36px; border-radius:7px; color:var(--color-action); }
+.application-partners-browse .table-action:hover { background:var(--color-neutral-soft); }
+.application-partners-browse .pagination .btn { border-color:var(--color-border-strong); border-radius:7px; }
+@media(max-width:768px) {
+  .application-partners-browse .partners-table tbody { display:grid; padding:8px; gap:8px; }
+  .application-partners-browse .partners-table tbody tr { border:1px solid var(--color-border); border-radius:8px; }
+  .application-partners-browse .partners-table td[data-label="Entidade"] { display:block; }
+  .application-partners-browse td[data-label="Entidade"]::before { content:none; }
+  .application-partners-browse .partner-card-link { min-height:44px; }
+}

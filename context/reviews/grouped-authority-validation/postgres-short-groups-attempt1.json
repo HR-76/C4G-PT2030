@@ -1,0 +1,25 @@
+{
+  "startedAt": "2026-10-27T20:29:20.341Z",
+  "status": "FAIL",
+  "checks": [
+    "current real limited authority LOGIN cannot directly read central application tables"
+  ],
+  "pairs": [],
+  "boundaries": [],
+  "cleanupErrors": [],
+  "limits": [
+    "Exclusive disposable PostgreSQL using the current Central fixture also used by the HTTP/OIDC gate; no Dev connection is read.",
+    "Real limited authority LOGIN, session registry, persisted sessions, membership/F5 repositories and authority coordinator; synthetic identities, no OIDC browser.",
+    "Pair probes invoke the unchanged F3 methods inside the same short withAuthority callback used by production. Actual composition callsites and HTTP totals are verified by the separate unchanged HTTP/profile gates.",
+    "Prepare probes use a synthetic binding and an owned PostgreSQL client, and stop before issuing a guard. They prove fresh Central rejection, not a tenant commit or physical F4 binding.",
+    "The existing audit-dashboard proof covers tenant durability and commit uncertainty separately; the authority-metadata proof covers an actual advisory-lock wait and committed post-lock drift.",
+    "Clock advances below are deterministic dependency injections in this test process, not elapsed-time performance measurements.",
+    "Only SQL hashes and counts are persisted. No SID, query parameters, connection URL, credentials or authority tokens are written to the report."
+  ],
+  "postgres": "17.11",
+  "failure": {
+    "stage": "capture and resolve pair",
+    "code": "ERR_ASSERTION"
+  },
+  "finishedAt": "2026-10-27T20:29:23.706Z"
+}

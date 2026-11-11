@@ -1,0 +1,94 @@
+{
+  "status": "PASS",
+  "state": "EU_WRITER_V2_INTEGRATED_ISOLATED_REHEARSAL",
+  "verifiedAt": "2026-10-31T15:53:34.188Z",
+  "policy": "eu-existing-v2.0",
+  "package": {
+    "id": "opportunity-eu-writer-v2",
+    "digest": "2bdae82ddd6516e3b31bf33699f5213adaf6c36ae038a59c59f2123752033ee7",
+    "entry": {
+      "version": "043_opportunity_eu_writer_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "042_opportunity_eu_source_control_v2",
+      "requiresCatalogSecurityFingerprint": "b981504c0b991748fc33f2c073c5a4d9538f7038da821dbc8bd5fe906ee0574e",
+      "upChecksum": "68562ede29f9c6063105c132331d7defb7b776d6ad5e928b3b1e843925af3f62",
+      "schemaFingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591",
+      "authoritySecurityFingerprint": "ef5207fd05f4223c7ad824984e897542c3ea99f44a59211c8410aa64313a928f",
+      "catalogSecurityFingerprint": "677c31faad484bdd4afb9ea874d8a17556c44cadc9c08dba9e210112dec495cb",
+      "euWriterSecurityFingerprint": "00b44563b67e28912d8b71db5c0b0e09b7e396b5e8754ca99b870a31168db3da"
+    }
+  },
+  "habitualEnvironment": {
+    "accessed": false,
+    "migrated": false,
+    "configurationChanged": false,
+    "resumed": false
+  },
+  "gate": {
+    "path": "output/opportunity-v2-writer-2da50ff68436466da34be54c00c2c4bf/verification.json",
+    "sha256": "99f3630da150b03f6d15a7caeb36ee94dba9a938e3827bca1b70fb7f1f5d806f",
+    "checks": 23,
+    "inputHashes": 842,
+    "cleanup": true,
+    "elapsedMs": 29674
+  },
+  "facts11145": {
+    "numericAmount": 120000,
+    "currencyState": "NOT_FOUND",
+    "cutoffCount": 7
+  },
+  "audit": {
+    "events": 111,
+    "valid": true
+  },
+  "readers": {
+    "physicalCatalogLogin": true,
+    "physicalTenantLogin": true,
+    "v1HistoricalSnapshotPreserved": true,
+    "v2DetailAndListParity": true,
+    "tenantApplicationAndInterestFrozen": true,
+    "unitLinksPreserved": true,
+    "otherOrganizationHidden": true,
+    "missingOrganizationRejected": "22P02",
+    "tenantMetadataVersion": "034_application_snapshot_v2",
+    "catalogExecutableSecurityDefiners": 0
+  },
+  "tests": {
+    "backend": {
+      "passed": 2216,
+      "failed": 0,
+      "skipped": 7
+    },
+    "frontend": {
+      "passed": 494,
+      "failed": 0
+    },
+    "build": "PASS",
+    "operational": 5,
+    "syntax": 53
+  },
+  "integrity": {
+    "normativeArtifacts": 16,
+    "workbookRows": 177,
+    "sqlUnchanged": 148,
+    "oldPackageDigest": "4f83267f1c2d3f41c604453f3489136397f661fbc06a99de8b79ed2980674e7a"
+  },
+  "evidenceHashes": {
+    "output/opportunity-v2-writer-2da50ff68436466da34be54c00c2c4bf/verification.json": "99f3630da150b03f6d15a7caeb36ee94dba9a938e3827bca1b70fb7f1f5d806f",
+    "output/opportunity-eu-writer/backend-tests.log": "38e2f8f0b0c287c92f4ab28535ecca6dd06d41539aab37929b2ae98f038fd520",
+    "output/opportunity-eu-writer/backend-tests-first-failure.log": "d61971704a8e36f7f67c6987ef7d1f5e9fbe490ee53bc941c4708fa0e6e97ce0",
+    "output/opportunity-eu-writer/frontend-tests.log": "0623f46cb202ef2b0c590b8c60ba7e53994367450a998c17fd90fe047beb914c",
+    "output/opportunity-eu-writer/frontend-build.log": "f775ffa326a6fa9887d62b53e42edc76081e4799acfcb14163e306e5bfce940f",
+    "output/opportunity-eu-writer/operational-tests.log": "abf7819d0cf3b570e5919ab8fc8d6280df58643102680954e08b143ca1eb8dbe",
+    "output/opportunity-eu-writer/syntax.json": "5fe3df1b00c4d7258e7f6283debe3a33688b3aaf829168fb3f7f223ef8693065"
+  },
+  "limitations": [
+    "Isolated synthetic actors/sessions; no real OIDC provider login or habitual approval.",
+    "Worker uses isolated owner connection; dedicated helper role is tested separately, not a least-privilege worker login end to end.",
+    "No generic HTTP publication of new IDs; review receipts remain immutable historical decisions.",
+    "The habitual activation window requires fresh preview, backup/restore and authenticated configuration/resumption."
+  ],
+  "report": "context/reviews/opportunity-data-standardization/eu-writer.md",
+  "runbook": "context/references/opportunity-v2/eu-writer-runbook.md"
+}

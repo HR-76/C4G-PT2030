@@ -1,0 +1,243 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-10-28",
+  "scope": "Prepared isolated PostgreSQL gate and offline regressions; no Docker, SQL or active runtime integration",
+  "branch": "feat/f13-organizational-profile",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "baseline_file_count": 30942,
+  "baseline_worktree_entries": 2568,
+  "tdd": {
+    "redBeforeImplementation": true,
+    "initialRed": "New tests could not load modules that had not yet been implemented",
+    "additionalRed": "Counterexamples from independent review failed before runner/evaluator corrections",
+    "greenNewTests": 72,
+    "limitation": "Offline evidence is not a PostgreSQL execution"
+  },
+  "preparedScenarios": {
+    "repository": 14,
+    "authority": 9,
+    "capacity": 13,
+    "capacityPairsPerScenario": 2,
+    "measuredCapacityRequestsPlanned": 52,
+    "warmupsPlanned": 26
+  },
+  "tests": {
+    "new": 72,
+    "perFile": {
+      "runner": 15,
+      "authority": 7,
+      "evidence": 7,
+      "repository": 10,
+      "capacity": 22,
+      "capacityProbe": 11
+    },
+    "focused": {
+      "pass": 152,
+      "fail": 0,
+      "skip": 0
+    },
+    "backendBefore": {
+      "pass": 1418,
+      "fail": 0,
+      "skip": 7,
+      "source": "Previous completed increment"
+    },
+    "backendAfter": {
+      "pass": 1490,
+      "fail": 0,
+      "skip": 7,
+      "total": 1497
+    },
+    "frontend": {
+      "pass": 346,
+      "fail": 0,
+      "files": 55
+    },
+    "frontendBuild": "PASS",
+    "syntaxFiles": 14,
+    "commands": {
+      "backend": "npm test",
+      "frontend": "npm test",
+      "build": "npm run build",
+      "plan": "node test/integration/partner-portal/gate.js --plan"
+    },
+    "subprocessPermissionUsed": true,
+    "preexistingSkips": "Seven PostgreSQL integration tests; not enabled or replaced",
+    "preexistingWarnings": [
+      "jsdom navigation not implemented",
+      "Synthetic chunk failure in frontend error boundary tests"
+    ],
+    "newFailures": [],
+    "logs": [
+      {
+        "name": "c4g-partner-postgres-gate-focused.log",
+        "sha256": "7db843963d09de633f066f59c0421ab471af467039e2d0bc613d2b47eba4f04f"
+      },
+      {
+        "name": "c4g-partner-postgres-gate-backend.log",
+        "sha256": "b3e100099b7d674512046d6e8cccad5bb895f93e1a315efef496bcd4b15cbe53"
+      },
+      {
+        "name": "c4g-partner-postgres-gate-frontend.log",
+        "sha256": "d9c39dd00a3f7305b9313c05dfdbbc5ea62587c94b87e2b8f5eb2ee98f119edf"
+      },
+      {
+        "name": "c4g-partner-postgres-gate-build.log",
+        "sha256": "bfe210f0c5607b10c807ca08dfaa237fe093c0bdfb69234f4d87b61be073c628"
+      }
+    ]
+  },
+  "independentReview": {
+    "result": "PASS within preparation scope after fixes",
+    "code": [
+      "Local Docker endpoint and pinned daemon",
+      "Typed complete evidence and execution error retention",
+      "Bounded phases and environment close",
+      "Case-insensitive inherited environment checks",
+      "Typed revocation refusals"
+    ],
+    "documentation": [
+      "Controlled repository authority ports distinguished from real authority group",
+      "Manifest stores hashes and evaluation requires matching workspace sources"
+    ]
+  },
+  "sourceManifest": {
+    "path": "test/integration/partner-portal/sources.json",
+    "files": 1011,
+    "verified": true,
+    "sha256": "014b04f9250084eeacd481839c18e95b721f16ab7b6c46cf0c062ea6a8f77985"
+  },
+  "postgresStatus": "NOT_RUN",
+  "postgresExecuted": false,
+  "dockerExecuted": false,
+  "postgresEquivalenceRlsConcurrencyCleanupProven": false,
+  "beforeAfterPostgresMeasurements": null,
+  "productionCapacityApproved": false,
+  "integrationAuthorized": false,
+  "runtimeIntegrated": false,
+  "limitations": [
+    "First actual SQL/setup execution remains pending",
+    "Sequential capacity collector, not concurrent HTTP throughput",
+    "Synthetic authenticated sessions, no OIDC or browser",
+    "Concurrent team mutation probes use direct synthetic SQL, not the audited endpoint",
+    "Expected storage rejections are not counted as successful reads",
+    "RSS/heap includes harness and fixtures; PG temporary counters may lag",
+    "Observed operation interval begins at main BEGIN; admission is measured separately and executor deadline remains unchanged"
+  ],
+  "preservation": {
+    "method": "Repository metadata inventory and eight selected source hashes; no external database snapshot",
+    "allowedFiles": [
+      "backend/test/partnerPortalAuthorityGate.test.js",
+      "backend/test/partnerPortalCapacityGate.test.js",
+      "backend/test/partnerPortalCapacityProbe.test.js",
+      "backend/test/partnerPortalEvidenceGate.test.js",
+      "backend/test/partnerPortalRepositoryGate.test.js",
+      "backend/test/partnerPostgresGate.test.js",
+      "backend/test/support/partnerPortalGateEvidence.js",
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md",
+      "context/reviews/partner-postgres-gate-preparation/README.md",
+      "context/reviews/partner-postgres-gate-preparation/plan.json",
+      "context/reviews/partner-postgres-gate-preparation/verification.json",
+      "test/integration/partner-portal/README.md",
+      "test/integration/partner-portal/authorityProbe.js",
+      "test/integration/partner-portal/capacity.js",
+      "test/integration/partner-portal/capacityProbe.js",
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/evidence.js",
+      "test/integration/partner-portal/gate.js",
+      "test/integration/partner-portal/policy.json",
+      "test/integration/partner-portal/repositoryProbe.js",
+      "test/integration/partner-portal/sources.json"
+    ],
+    "validationStatus": "PASS",
+    "branchAndHeadUnchanged": true,
+    "currentFileCount": 30963,
+    "currentWorktreeEntries": 2589,
+    "addedFiles": [
+      "backend/test/partnerPortalAuthorityGate.test.js",
+      "backend/test/partnerPortalCapacityGate.test.js",
+      "backend/test/partnerPortalCapacityProbe.test.js",
+      "backend/test/partnerPortalEvidenceGate.test.js",
+      "backend/test/partnerPortalRepositoryGate.test.js",
+      "backend/test/partnerPostgresGate.test.js",
+      "backend/test/support/partnerPortalGateEvidence.js",
+      "context/features/partner-postgres-gate.md",
+      "context/reviews/partner-postgres-gate-preparation/README.md",
+      "context/reviews/partner-postgres-gate-preparation/plan.json",
+      "context/reviews/partner-postgres-gate-preparation/verification.json",
+      "test/integration/partner-portal/README.md",
+      "test/integration/partner-portal/authorityProbe.js",
+      "test/integration/partner-portal/capacity.js",
+      "test/integration/partner-portal/capacityProbe.js",
+      "test/integration/partner-portal/environment.js",
+      "test/integration/partner-portal/evidence.js",
+      "test/integration/partner-portal/gate.js",
+      "test/integration/partner-portal/policy.json",
+      "test/integration/partner-portal/repositoryProbe.js",
+      "test/integration/partner-portal/sources.json"
+    ],
+    "changedFiles": [
+      "context/current-work.md"
+    ],
+    "unexpectedChanges": [],
+    "removedFiles": [],
+    "generatedBuildAndCacheChanges": 65,
+    "activeRuntimePrototypeOracleDependenciesMigrationsPermissionsDevUnchanged": true,
+    "gitMutationsDeployOrDatabaseOperations": false,
+    "inventoryErrors": []
+  },
+  "sourceHashChecks": [
+    {
+      "path": "backend/src/applications/partners.js",
+      "sha256": "3272B2BFBFAA54AA3C4F35C5B9F4AFC3818BBB2BDDDE261F0A0286EA78AC9342",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/composition.js",
+      "sha256": "0F51E47FEE7E6016FC25F6A82DCDFFBE446CF25F6AC8B3C9D0D9F9F4E0F61CDF",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/applications/browseSql.js",
+      "sha256": "7D3AF38C0C106324FFB1C5AB19C30D38AC303EE372651CEB80D6115037D8C287",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/routes/applicationSliceRoutes.js",
+      "sha256": "7573E7A1D682DEF64CAFD1498EFA2B764382F00F7C713A4D076134DB55376DAC",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/pq1UiTokens.js",
+      "sha256": "1A10A1D109AD967B9922CCF0DBB164D45E7608B20E28B229305CEF67E19B3F64",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/organizationalProfile/canonicalization.js",
+      "sha256": "641A6980C356699FE4B3989DC9B1968E438835626933217F19A58BEAB7FEBF63",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/api/api.js",
+      "sha256": "F6BAC2DE291D63935E1B4A136DDD06532C2C8F1A5DF483D273B9A6B66BE7238B",
+      "unchanged": true
+    },
+    {
+      "path": "frontend/src/pages/Partners.jsx",
+      "sha256": "AF49B44AC114AB287ADDED4A4D99FA8C73F7D1067D6FF7FC958B58DD7DC38FB4",
+      "unchanged": true
+    }
+  ],
+  "runtimeImportSearch": {
+    "matches": 0,
+    "paths": [
+      "backend/src",
+      "backend/scripts",
+      "frontend/src",
+      "backend/package.json",
+      "frontend/package.json"
+    ]
+  },
+  "documentationLinks": "PASS"
+}

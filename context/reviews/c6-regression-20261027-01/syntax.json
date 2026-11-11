@@ -1,0 +1,17 @@
+﻿{
+    "checks":  [
+                   {
+                       "pass":  true,
+                       "file":  "preload.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "analyze.js"
+                   },
+                   {
+                       "pass":  true,
+                       "file":  "run.ps1"
+                   }
+               ],
+    "status":  "PASS"
+}

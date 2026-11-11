@@ -1,0 +1,67 @@
+{
+  "result": "PASS",
+  "environment": "http://localhost:5189",
+  "realOidc": true,
+  "buildStable": true,
+  "organizations": 2,
+  "unavailableShortcuts": 2,
+  "noUnavailableShortcutLinks": true,
+  "recheckOnPage": true,
+  "formsOpenedAndCancelled": true,
+  "widths": [
+    1440,
+    768,
+    390
+  ],
+  "businessWrites": 0,
+  "pageErrors": 0,
+  "publicOpportunities": 9,
+  "currentOpportunities": 4,
+  "applicationStatuses": [
+    200,
+    404
+  ],
+  "directoryReadStatuses": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "expectedServiceResponses": [
+    {
+      "path": "/api/organization-profile/editorial-ui/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organizational-profile/pq1-publication/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organization-profile/editorial-ui/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organizational-profile/pq1-publication/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organization-profile/editorial-ui/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organizational-profile/pq1-publication/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organization-profile/editorial-ui/context",
+      "status": 503
+    },
+    {
+      "path": "/api/organizational-profile/pq1-publication/context",
+      "status": 503
+    }
+  ]
+}

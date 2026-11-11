@@ -1,0 +1,725 @@
+{
+  "createdAt": "2026-10-27T19:59:15.064Z",
+  "baseline": "../http-session-epochs/results.json",
+  "current": "results.json",
+  "beforeStatus": "FAIL",
+  "afterStatus": "PASS",
+  "beforeChecks": 32,
+  "afterChecks": 33,
+  "addedChecks": [
+    "idle expiry crossing during real central validation is rejected at renewal finalization"
+  ],
+  "removedChecks": [],
+  "beforeDurationSeconds": 563.197,
+  "afterDurationSeconds": 417.298,
+  "beforeFailures": [
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "ORGANIZATION_MISMATCH",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "POOL_EXHAUSTED",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "LEASE_TIMEOUT",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    }
+  ],
+  "afterFailures": [
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    },
+    {
+      "code": "ORGANIZATION_MISMATCH",
+      "constraint": null,
+      "column": null,
+      "routine": null
+    }
+  ],
+  "concurrentRevocation": {
+    "databaseReadBlocked": true,
+    "blockedAt": "tenant-admission",
+    "writerRegistered": true,
+    "committedBeforeRelease": true,
+    "readStatus": 503,
+    "readMs": 2217
+  },
+  "scenarios": [
+    {
+      "name": "browse",
+      "volume": 25,
+      "people": 25,
+      "before": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 6384.92,
+        "p95SuccessMs": 10744.88,
+        "sqlCalls": {
+          "min": 1074,
+          "max": 1074
+        },
+        "payloadBytes": {
+          "min": 19867,
+          "max": 19867
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 5214.7,
+        "p95SuccessMs": 6865.97,
+        "sqlCalls": {
+          "min": 1036,
+          "max": 1036
+        },
+        "payloadBytes": {
+          "min": 19867,
+          "max": 19867
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "report",
+      "volume": 25,
+      "people": 25,
+      "before": {
+        "samples": 12,
+        "successes": 11,
+        "errors": 1,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 8971.8,
+        "p95SuccessMs": 11110.26,
+        "sqlCalls": {
+          "min": 1121,
+          "max": 1159
+        },
+        "payloadBytes": {
+          "min": 19121,
+          "max": 19121
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 5669.62,
+        "p95SuccessMs": 7808.3,
+        "sqlCalls": {
+          "min": 1117,
+          "max": 1117
+        },
+        "payloadBytes": {
+          "min": 19121,
+          "max": 19121
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "dashboard",
+      "volume": 25,
+      "people": 25,
+      "before": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 17411.26,
+        "p95SuccessMs": 21374.77,
+        "sqlCalls": {
+          "min": 2703,
+          "max": 2703
+        },
+        "payloadBytes": {
+          "min": 20567,
+          "max": 20567
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 13430.11,
+        "p95SuccessMs": 14605.3,
+        "sqlCalls": {
+          "min": 2619,
+          "max": 2619
+        },
+        "payloadBytes": {
+          "min": 20567,
+          "max": 20567
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "browse",
+      "volume": 1000,
+      "people": 250,
+      "before": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 6136.52,
+        "p95SuccessMs": 10382.15,
+        "sqlCalls": {
+          "min": 1074,
+          "max": 1074
+        },
+        "payloadBytes": {
+          "min": 20387,
+          "max": 20387
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 5322.92,
+        "p95SuccessMs": 7330.73,
+        "sqlCalls": {
+          "min": 1036,
+          "max": 1036
+        },
+        "payloadBytes": {
+          "min": 20387,
+          "max": 20387
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "report",
+      "volume": 1000,
+      "people": 250,
+      "before": {
+        "samples": 12,
+        "successes": 11,
+        "errors": 1,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 8865.01,
+        "p95SuccessMs": 10851.96,
+        "sqlCalls": {
+          "min": 985,
+          "max": 1159
+        },
+        "payloadBytes": {
+          "min": 19567,
+          "max": 19567
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 4186.11,
+        "p95SuccessMs": 7471.35,
+        "sqlCalls": {
+          "min": 1117,
+          "max": 1117
+        },
+        "payloadBytes": {
+          "min": 19567,
+          "max": 19567
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "dashboard",
+      "volume": 1000,
+      "people": 250,
+      "before": {
+        "samples": 12,
+        "successes": 10,
+        "errors": 2,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 17098.39,
+        "p95SuccessMs": 18617.82,
+        "sqlCalls": {
+          "min": 1871,
+          "max": 2703
+        },
+        "payloadBytes": {
+          "min": 21042,
+          "max": 21042
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 13154.56,
+        "p95SuccessMs": 15084.25,
+        "sqlCalls": {
+          "min": 2619,
+          "max": 2619
+        },
+        "payloadBytes": {
+          "min": 21042,
+          "max": 21042
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "browse",
+      "volume": 10000,
+      "people": 1000,
+      "before": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 6869.65,
+        "p95SuccessMs": 11205.3,
+        "sqlCalls": {
+          "min": 1074,
+          "max": 1074
+        },
+        "payloadBytes": {
+          "min": 20389,
+          "max": 20389
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 5051.65,
+        "p95SuccessMs": 6918.65,
+        "sqlCalls": {
+          "min": 1036,
+          "max": 1036
+        },
+        "payloadBytes": {
+          "min": 20389,
+          "max": 20389
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "report",
+      "volume": 10000,
+      "people": 1000,
+      "before": {
+        "samples": 12,
+        "successes": 11,
+        "errors": 1,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 9469.66,
+        "p95SuccessMs": 9922.12,
+        "sqlCalls": {
+          "min": 1159,
+          "max": 1159
+        },
+        "payloadBytes": {
+          "min": 19587,
+          "max": 19587
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 5517.81,
+        "p95SuccessMs": 7095.53,
+        "sqlCalls": {
+          "min": 1117,
+          "max": 1117
+        },
+        "payloadBytes": {
+          "min": 19587,
+          "max": 19587
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    },
+    {
+      "name": "dashboard",
+      "volume": 10000,
+      "people": 1000,
+      "before": {
+        "samples": 12,
+        "successes": 10,
+        "errors": 2,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 15072.58,
+        "p95SuccessMs": 20700.74,
+        "sqlCalls": {
+          "min": 1289,
+          "max": 2703
+        },
+        "payloadBytes": {
+          "min": 21079,
+          "max": 21079
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "after": {
+        "samples": 12,
+        "successes": 12,
+        "errors": 0,
+        "warmupFailed": false,
+        "concurrency": 4,
+        "p50SuccessMs": 12600.18,
+        "p95SuccessMs": 14605.92,
+        "sqlCalls": {
+          "min": 2619,
+          "max": 2619
+        },
+        "payloadBytes": {
+          "min": 21079,
+          "max": 21079
+        },
+        "applicationSelections": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "payloadRangeUnchanged": true
+    }
+  ],
+  "limits": [
+    "Successful-response quantiles only; all errors remain in counts. At n=12, nearest-rank p95 is maximum.",
+    "Current runtime includes prior metadata, session and audit/dashboard increments; no isolated attribution.",
+    "Local Docker and synthetic data; central fixture non-authority reader has pg_read_all_data; no production capacity or SLO claim.",
+    "Integral gate uses C4, not C1."
+  ]
+}

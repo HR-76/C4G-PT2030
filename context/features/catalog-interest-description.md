@@ -1,0 +1,7 @@
+# Catálogo unificado — interesse e descrição
+Estado: Complete — aplicado ao GCNI habitual e validado
+Pedido: registar interesse e apresentar descrição completa na ficha; tabela apenas com excerto útil.
+Âmbito: reutilizar o fluxo existente de interesses privados da organização, unidades, idempotência, revisão atual e permissões. O identificador do catálogo unificado é verificado no catálogo central, nunca convertido por título. Recusar divergência de revisão; manter retorno à ficha. Recuperar descrição EU integral da evidência arquivada, ligada por hash e digest à revisão já admitida; não alterar snapshots históricos nem inventar descrições PT. Sem fontes, recolhas ou alterações à janela de acesso.
+Aceitação: botão na ficha/tabela, criação confirmada, duplicado mostra Ver interesse, erro recuperável, autorização e seleção de revisão mantidas; descrição integral segura como texto, evidência correta, fallback explícito, excerto duplicado omitido. Testes e autorrevisão antes de aplicar ao GCNI habitual.
+
+Correção necessária na aceitação: leituras simultâneas dos interesses originaram LEASE_TIMEOUT/POOL_EXHAUSTED. Aplicar a política existente de auditoria de leitura à leitura de interesses, preservando todos os eventos, ordem, recusa/crítico imediatos e revalidação após o flush e antes do commit. Escritas mantêm o percurso imediato. Regressão antes da alteração e ensaio PostgreSQL obrigatório.

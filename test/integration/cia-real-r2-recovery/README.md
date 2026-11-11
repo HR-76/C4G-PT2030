@@ -1,0 +1,9 @@
+# Recuperação R2 real — prova isolada
+
+Preparada mas **não executada**. Usar apenas uma conta ou âmbito de teste confirmado, três buckets dedicados e credenciais restritas a esses buckets. Nunca usar buckets de produção, nem partilhar credenciais no chat. O harness valida nomes com segmento `test` ou `sandbox`, mas um nome não prova isolamento ou permissões; isso exige confirmação da configuração da conta.
+
+Variáveis no ambiente do processo: `CIA_R2_TEST_ISOLATED=YES`, `CIA_R2_ENDPOINT` (endpoint EU da conta de teste), `CIA_R2_SOURCE_BUCKET`, `CIA_R2_BACKUP_BUCKET`, `CIA_R2_QUARANTINE_BUCKET`, `CIA_R2_ACCESS_KEY_ID`, `CIA_R2_SECRET_ACCESS_KEY`. Os três buckets devem ser distintos e já existir; credenciais com acesso apenas a eles. O script não carrega `.env` nem regista credenciais. Um UUID aleatório identifica a organização sintética e outro o objeto; apenas a chave exata gerada é escrita ou apagada.
+
+Após configuração e confirmação do isolamento, executar na raiz `node test/integration/cia-real-r2-recovery/recovery.cjs`. O script escreve um PDF sintético, verifica leitura, copia-o para o bucket de backup, verifica a cópia, remove apenas o objeto sintético da origem, recupera-o e confere bytes/SHA-256. No sucesso remove apenas as duas chaves criadas e verifica ausência. Timeout por chamada e `maxAttempts: 1`; não faz listagem nem apaga por prefixo ou bucket.
+
+Em falha interrompe e conserva os objetos para reconciliação manual: o relatório local contém os nomes dos buckets e a chave exata, mas nunca credenciais. Um pedido com resultado incerto não é considerado prova de ausência. A fixture assinala `layerCValidated` apenas para exercitar o adaptador; não certifica essa capacidade. O ensaio não testa backups existentes, independência física, políticas de produção, RPO/RTO, scanner ou bases de dados.

@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-28",
+  "scope": "Second explicitly authorized isolated execution",
+  "exitCode": 1,
+  "status": "FAIL",
+  "setupDiagnostic": {
+    "phase": "TENANT_ENSURE",
+    "tenant": "A",
+    "status": "FAILED",
+    "classification": "UNKNOWN",
+    "errorCode": null,
+    "localCleanup": "COMPLETED"
+  },
+  "cleanup": {
+    "environmentClosed": false,
+    "containerRemoved": true,
+    "errors": []
+  },
+  "containerAbsenceConfirmedByIdAndLabel": true,
+  "independentVolumeInventory": false,
+  "reEvaluation": "FAIL",
+  "sourceManifestVerified": true,
+  "repositoryCases": 0,
+  "authorityCases": 0,
+  "capacitySamples": 0,
+  "warmups": 0,
+  "performanceMeasurements": null,
+  "codeChanged": false,
+  "testsAdded": 0,
+  "suitesAndBuildRerun": false,
+  "runtimeIntegrated": false,
+  "preservation": {
+    "status": "PASS",
+    "branch": "feat/f13-organizational-profile",
+    "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baselineFiles": 30970,
+    "currentFiles": 30974,
+    "baselineWorktreeEntries": 2596,
+    "currentWorktreeEntries": 2600,
+    "added": [
+      "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/README.md",
+      "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/evidence.json",
+      "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/sources.json",
+      "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md"
+    ],
+    "removed": [],
+    "unexpected": [],
+    "firstFailureUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  }
+}

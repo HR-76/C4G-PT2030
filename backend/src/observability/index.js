@@ -1,0 +1,4 @@
+'use strict';
+const {validateCatalogs}=require('./catalogs');const {createLogger}=require('./logger');const {HealthRegistry}=require('./health');const {MetricRegistry}=require('./metrics');const {createLifecycle}=require('./lifecycle');
+function createObservability({service,destination,clock=()=>new Date()}={}){validateCatalogs();const logger=createLogger({service,destination,clock});const registry=new HealthRegistry({clock:()=>clock().getTime()});const metrics=new MetricRegistry();const lifecycle=createLifecycle({flush:logger.flush,clock:()=>clock().getTime()});const health=Object.freeze({register:d=>registry.register(d),live:()=>registry.live(),check:async()=>lifecycle.state==='READY'?registry.check():Object.freeze({status:'UNAVAILABLE',reasons:Object.freeze([lifecycle.state==='NEW'?'STARTING':'DRAINING'])})});return Object.freeze({logger,health,metrics,lifecycle});}
+module.exports={createObservability};

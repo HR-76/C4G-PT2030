@@ -1,0 +1,5031 @@
+{
+  "startedAt": "2026-11-06T21:52:58.843Z",
+  "mode": "standard",
+  "status": "COMPLETE",
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection",
+    "combined dashboard binds organization before publishing",
+    "combined dashboard refuses missing application.read",
+    "combined dashboard refuses missing opportunity.read",
+    "optional directory denial removes unit data",
+    "synchronous audit failure prevents combined dashboard publication",
+    "revocation waits for the protected dashboard commit and denies subsequent reads",
+    "four concurrent dashboards retain complete totals and successful guarded commits"
+  ],
+  "scenarios": [],
+  "limits": [
+    "Local synthetic data; no production capacity claim.",
+    "Instrumentation adds timing and 100ms PostgreSQL sampling overhead.",
+    "Central non-authority reader uses fixture pg_read_all_data.",
+    "No changes to pool limits, deadlines or security checks.",
+    "Standard mixed-tenant scenario warms tenant A only; first tenant B access can be cold."
+  ],
+  "variant": "B",
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "050_billing_private_documents",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "securityRequests": [
+    {
+      "status": 200,
+      "failures": []
+    },
+    {
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": []
+    },
+    {
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": [
+        {
+          "code": "AUTHORITY_DENIED"
+        },
+        {
+          "code": "AUTHORITY_DENIED"
+        }
+      ]
+    },
+    {
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": [
+        {
+          "code": "AUTHORITY_DENIED"
+        },
+        {
+          "code": "AUTHORITY_DENIED"
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "failures": []
+    },
+    {
+      "status": 503,
+      "code": "SERVICE_UNAVAILABLE",
+      "failures": [
+        {
+          "code": "TENANT_QUERY_FAILED"
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "failures": []
+    },
+    {
+      "status": 403,
+      "code": "NOT_AUTHORIZED",
+      "failures": []
+    }
+  ],
+  "dashboardRevocation": {
+    "heldAfterReport": true,
+    "writerRegistered": true,
+    "status": 200,
+    "commitOrder": [
+      "tenantCommit",
+      "revocationCommit"
+    ]
+  },
+  "concurrentDashboard": [
+    {
+      "status": 200,
+      "code": null,
+      "ms": 4864.91,
+      "total": 1000,
+      "metrics": {
+        "id": 9,
+        "tag": "51d25b73-52bf-4a2f-9c5f-2b96002a5af6",
+        "phase": "setup",
+        "queryCount": 1033,
+        "authorityTransactions": 18,
+        "checkouts": [
+          {
+            "waitMs": 0.02,
+            "holdMs": 162.21,
+            "max": 8,
+            "total": 2,
+            "idle": 2,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 164.65,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 143.05,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 6.86,
+            "holdMs": 77.08,
+            "max": 4,
+            "total": 1,
+            "idle": 0,
+            "waiting": 0,
+            "role": "catalog",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 165.38,
+            "max": 8,
+            "total": 4,
+            "idle": 2,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 128.87,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.74,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 6.27,
+            "holdMs": 3862.69,
+            "max": 5,
+            "total": 2,
+            "idle": 0,
+            "waiting": 0,
+            "role": "tenant-2",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 1.5,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 124.08,
+            "max": 8,
+            "total": 4,
+            "idle": 2,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.75,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 134.36,
+            "max": 8,
+            "total": 4,
+            "idle": 2,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 138.11,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 135.13,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 159.24,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 203.51,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 1.8,
+            "holdMs": 154.15,
+            "max": 8,
+            "total": 6,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 17.95,
+            "holdMs": 205.09,
+            "max": 8,
+            "total": 6,
+            "idle": 1,
+            "waiting": 1,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 139.75,
+            "max": 8,
+            "total": 8,
+            "idle": 4,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 129.38,
+            "max": 8,
+            "total": 8,
+            "idle": 6,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.69,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 156.58,
+            "max": 8,
+            "total": 8,
+            "idle": 7,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 2.29,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.1,
+            "holdMs": 145.51,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.13,
+            "holdMs": 125.22,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          }
+        ],
+        "sqlErrors": [],
+        "failures": [],
+        "queries": {
+          "authority/other": {
+            "calls": 144,
+            "ms": 113.90750000000844,
+            "maxMs": 14.3266999999978
+          },
+          "authority/transaction": {
+            "calls": 72,
+            "ms": 74.77129999999306,
+            "maxMs": 4.601199999997334
+          },
+          "authority/metadata": {
+            "calls": 486,
+            "ms": 2073.73020000002,
+            "maxMs": 76.45390000000043
+          },
+          "authority/authority-lock": {
+            "calls": 18,
+            "ms": 126.96910000001662,
+            "maxMs": 48.777799999996205
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "ms": 110.92540000001463,
+            "maxMs": 5.900000000001455
+          },
+          "catalog/metadata": {
+            "calls": 4,
+            "ms": 54.45199999999022,
+            "maxMs": 47.586099999993166
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "ms": 4.985300000007555,
+            "maxMs": 2.0152000000016415
+          },
+          "catalog/other": {
+            "calls": 1,
+            "ms": 17.355400000000373,
+            "maxMs": 17.355400000000373
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "ms": 8.865700000002107,
+            "maxMs": 2.2559999999939464
+          },
+          "tenant-2/transaction": {
+            "calls": 13,
+            "ms": 11.545500000014727,
+            "maxMs": 2.4121999999988475
+          },
+          "tenant-2/metadata": {
+            "calls": 168,
+            "ms": 804.8312000000005,
+            "maxMs": 108.84509999999864
+          },
+          "tenant-2/other": {
+            "calls": 25,
+            "ms": 33.036200000016834,
+            "maxMs": 14.040600000000268
+          },
+          "tenant-2/application-selection": {
+            "calls": 1,
+            "ms": 102.88930000000255,
+            "maxMs": 102.88930000000255
+          },
+          "tenant-2/audit-prepare": {
+            "calls": 6,
+            "ms": 1111.9110999999975,
+            "maxMs": 1107.4765000000043
+          },
+          "tenant-2/audit-append": {
+            "calls": 6,
+            "ms": 15.712200000001758,
+            "maxMs": 5.766900000002352
+          }
+        },
+        "queryHashes": {
+          "6ec438bce08867f4": {
+            "calls": 18,
+            "ms": 31.609400000008463,
+            "maxMs": 14.3266999999978
+          },
+          "3eb12e5bafe877f8": {
+            "calls": 19,
+            "ms": 13.745300000009593,
+            "maxMs": 4.601199999997334
+          },
+          "74c89290b5bc0324": {
+            "calls": 21,
+            "ms": 13.811000000001513,
+            "maxMs": 3.387799999996787
+          },
+          "6de0ab5ecc04997d": {
+            "calls": 18,
+            "ms": 9.40169999999489,
+            "maxMs": 1.058499999999185
+          },
+          "1785d86a000b9d26": {
+            "calls": 18,
+            "ms": 12.332800000003772,
+            "maxMs": 1.9660000000003492
+          },
+          "5132894cb05b9550": {
+            "calls": 18,
+            "ms": 19.109400000008463,
+            "maxMs": 5.467900000003283
+          },
+          "0ac62896dcae5330": {
+            "calls": 18,
+            "ms": 848.9300000000221,
+            "maxMs": 76.45390000000043
+          },
+          "cfcd1108ca0c6a9f": {
+            "calls": 36,
+            "ms": 444.85850000000937,
+            "maxMs": 17.419699999998556
+          },
+          "e99a77f79a35884c": {
+            "calls": 18,
+            "ms": 56.02799999999843,
+            "maxMs": 5.166700000001583
+          },
+          "0d2fc793022bceff": {
+            "calls": 18,
+            "ms": 33.93110000000888,
+            "maxMs": 3.285600000002887
+          },
+          "5f3202c8e2710e93": {
+            "calls": 18,
+            "ms": 22.085499999993772,
+            "maxMs": 1.9518000000025495
+          },
+          "933e3ba410cb335c": {
+            "calls": 18,
+            "ms": 15.175699999992503,
+            "maxMs": 1.611799999998766
+          },
+          "134e69c66f0f2132": {
+            "calls": 18,
+            "ms": 36.02900000000227,
+            "maxMs": 8.517800000001444
+          },
+          "ad488789c5b185d7": {
+            "calls": 18,
+            "ms": 16.994700000002922,
+            "maxMs": 8.000299999999697
+          },
+          "ece0c3b122528358": {
+            "calls": 18,
+            "ms": 41.690500000011525,
+            "maxMs": 6.218400000005204
+          },
+          "2ba33ea79fa6200f": {
+            "calls": 18,
+            "ms": 25.545700000009674,
+            "maxMs": 6.503499999998894
+          },
+          "96e7cfc17fab9433": {
+            "calls": 18,
+            "ms": 23.536100000012084,
+            "maxMs": 2.1036999999996624
+          },
+          "100df8b38c17d223": {
+            "calls": 18,
+            "ms": 13.94100000000617,
+            "maxMs": 3.466899999999441
+          },
+          "fab63c837f779e3e": {
+            "calls": 18,
+            "ms": 30.777100000006612,
+            "maxMs": 8.33179999999993
+          },
+          "783d13417acd25bf": {
+            "calls": 18,
+            "ms": 39.23549999998795,
+            "maxMs": 7.505600000004051
+          },
+          "4ad6d90f7abdd067": {
+            "calls": 18,
+            "ms": 15.855100000007951,
+            "maxMs": 2.7492999999958556
+          },
+          "18967f5c79a0ec46": {
+            "calls": 18,
+            "ms": 19.955799999988812,
+            "maxMs": 1.6081999999951222
+          },
+          "f864efcc71a6c579": {
+            "calls": 18,
+            "ms": 15.714299999970535,
+            "maxMs": 1.1768000000010943
+          },
+          "2712b1e88642e19c": {
+            "calls": 18,
+            "ms": 22.957800000011048,
+            "maxMs": 7.228900000001886
+          },
+          "848df42650141cf9": {
+            "calls": 18,
+            "ms": 20.559199999988778,
+            "maxMs": 1.8483999999953085
+          },
+          "dc60eea8dfc8c89d": {
+            "calls": 18,
+            "ms": 31.49570000001404,
+            "maxMs": 6.189999999995052
+          },
+          "27bb21ef334ea8fd": {
+            "calls": 18,
+            "ms": 25.358200000002398,
+            "maxMs": 5.084799999996903
+          },
+          "41b9b3cd52bbbb1f": {
+            "calls": 18,
+            "ms": 23.7442999999912,
+            "maxMs": 3.950799999998708
+          },
+          "b8dee57b82d22e57": {
+            "calls": 18,
+            "ms": 12.080100000006496,
+            "maxMs": 1.2517000000007101
+          },
+          "1a17c51870491a03": {
+            "calls": 18,
+            "ms": 178.8848999999973,
+            "maxMs": 12.81600000000617
+          },
+          "27abf348b43e43cb": {
+            "calls": 18,
+            "ms": 32.24959999998828,
+            "maxMs": 9.754099999998289
+          },
+          "5b868d125175f6e1": {
+            "calls": 18,
+            "ms": 26.11679999998887,
+            "maxMs": 5.513099999996484
+          },
+          "79663c1d3b43ceaf": {
+            "calls": 39,
+            "ms": 54.92349999999715,
+            "maxMs": 4.081099999995786
+          },
+          "a8402858d4f1e1d2": {
+            "calls": 18,
+            "ms": 10.073899999988498,
+            "maxMs": 2.470499999995809
+          },
+          "832bdaa8fc857473": {
+            "calls": 18,
+            "ms": 10.07139999998617,
+            "maxMs": 1.2825000000011642
+          },
+          "18d98c1612e16751": {
+            "calls": 18,
+            "ms": 9.63550000001851,
+            "maxMs": 1.282600000005914
+          },
+          "bcd937c3e242e10d": {
+            "calls": 18,
+            "ms": 9.451799999987998,
+            "maxMs": 0.8791999999957625
+          },
+          "e457b9e54eecca47": {
+            "calls": 18,
+            "ms": 126.96910000001662,
+            "maxMs": 48.777799999996205
+          },
+          "6ffec628935eba85": {
+            "calls": 80,
+            "ms": 110.92540000001463,
+            "maxMs": 5.900000000001455
+          },
+          "ee3f0ab4dc9637fd": {
+            "calls": 1,
+            "ms": 2.869800000000396,
+            "maxMs": 2.869800000000396
+          },
+          "d6762ca289dc247d": {
+            "calls": 1,
+            "ms": 47.586099999993166,
+            "maxMs": 47.586099999993166
+          },
+          "1ef16a226485f8d6": {
+            "calls": 1,
+            "ms": 2.0240999999950873,
+            "maxMs": 2.0240999999950873
+          },
+          "6fa38779649dca65": {
+            "calls": 1,
+            "ms": 1.9720000000015716,
+            "maxMs": 1.9720000000015716
+          },
+          "d85f85aa1fb0cac6": {
+            "calls": 1,
+            "ms": 1.1772000000055414,
+            "maxMs": 1.1772000000055414
+          },
+          "f125ad4ce3df6dfb": {
+            "calls": 1,
+            "ms": 1.0720999999975902,
+            "maxMs": 1.0720999999975902
+          },
+          "2f0ad9318d8daad4": {
+            "calls": 1,
+            "ms": 2.0152000000016415,
+            "maxMs": 2.0152000000016415
+          },
+          "fd4033d6808ba219": {
+            "calls": 1,
+            "ms": 17.355400000000373,
+            "maxMs": 17.355400000000373
+          },
+          "b0b13d76e8815554": {
+            "calls": 5,
+            "ms": 8.865700000002107,
+            "maxMs": 2.2559999999939464
+          },
+          "788e526fe808f5b2": {
+            "calls": 3,
+            "ms": 5.484299999996438,
+            "maxMs": 3.1996999999973923
+          },
+          "9059403393303375": {
+            "calls": 1,
+            "ms": 0.4606000000057975,
+            "maxMs": 0.4606000000057975
+          },
+          "88615167c03add1a": {
+            "calls": 3,
+            "ms": 3.807200000002922,
+            "maxMs": 1.8705000000045402
+          },
+          "f7263e4d3062bfeb": {
+            "calls": 3,
+            "ms": 2.080900000008114,
+            "maxMs": 0.7637000000031549
+          },
+          "31f205c484d85379": {
+            "calls": 3,
+            "ms": 1.81869999999617,
+            "maxMs": 0.7633999999961816
+          },
+          "59b2a782f977eb75": {
+            "calls": 3,
+            "ms": 2.3977000000086264,
+            "maxMs": 0.9336000000039348
+          },
+          "ddd03a1849384c3d": {
+            "calls": 3,
+            "ms": 13.982100000008359,
+            "maxMs": 5.891300000002957
+          },
+          "88fbf505d4a23ec8": {
+            "calls": 6,
+            "ms": 396.08379999999306,
+            "maxMs": 108.84509999999864
+          },
+          "b2db7c944764af2c": {
+            "calls": 6,
+            "ms": 23.879599999992934,
+            "maxMs": 5.413199999995413
+          },
+          "d33a1f0fa97d98bc": {
+            "calls": 6,
+            "ms": 28.038600000007136,
+            "maxMs": 5.828900000000431
+          },
+          "1deed5146f01dffd": {
+            "calls": 6,
+            "ms": 27.996199999994133,
+            "maxMs": 5.971499999999651
+          },
+          "2f40db89f0a129a0": {
+            "calls": 6,
+            "ms": 41.929599999995844,
+            "maxMs": 23.27509999999893
+          },
+          "428c92fdbfab66df": {
+            "calls": 6,
+            "ms": 52.4091000000044,
+            "maxMs": 12.010199999996985
+          },
+          "4ce543e9aa18d379": {
+            "calls": 6,
+            "ms": 34.11750000000029,
+            "maxMs": 9.500399999997171
+          },
+          "d4e0741b77184920": {
+            "calls": 6,
+            "ms": 22.899600000004284,
+            "maxMs": 18.799099999996542
+          },
+          "1bba20580524a4c7": {
+            "calls": 6,
+            "ms": 31.017299999992247,
+            "maxMs": 6.452199999999721
+          },
+          "1ab17d91c5a63e4f": {
+            "calls": 6,
+            "ms": 3.8247000000046683,
+            "maxMs": 0.9207000000023982
+          },
+          "c2aaa742dcb1f8e5": {
+            "calls": 3,
+            "ms": 2.9694000000017695,
+            "maxMs": 2.08810000000085
+          },
+          "1307af40e2370ef9": {
+            "calls": 3,
+            "ms": 4.759200000000419,
+            "maxMs": 2.6586000000024796
+          },
+          "60d79c6a1a7556c2": {
+            "calls": 4,
+            "ms": 3.595900000000256,
+            "maxMs": 1.6858999999967637
+          },
+          "0ee22d0909bb7809": {
+            "calls": 3,
+            "ms": 1.834099999992759,
+            "maxMs": 0.7316999999966356
+          },
+          "7798d7fb19421d0c": {
+            "calls": 3,
+            "ms": 1.4614000000001397,
+            "maxMs": 0.5552999999999884
+          },
+          "7fe73ee93d74a4a9": {
+            "calls": 3,
+            "ms": 1.8961999999955879,
+            "maxMs": 0.7100999999966007
+          },
+          "6d9da93055384c0b": {
+            "calls": 3,
+            "ms": 4.397100000001956,
+            "maxMs": 2.881200000003446
+          },
+          "220c20d913e2ceed": {
+            "calls": 3,
+            "ms": 2.4240999999892665,
+            "maxMs": 1.1642999999967287
+          },
+          "ddb59461666a362b": {
+            "calls": 3,
+            "ms": 3.707800000003772,
+            "maxMs": 1.5143000000025495
+          },
+          "8dbb51cf095bb93d": {
+            "calls": 3,
+            "ms": 5.15240000000631,
+            "maxMs": 2.126400000001013
+          },
+          "e2c6fd7521dd1a1f": {
+            "calls": 3,
+            "ms": 2.735800000009476,
+            "maxMs": 1.092400000001362
+          },
+          "bfb1cf4ddf03c911": {
+            "calls": 3,
+            "ms": 2.8040000000037253,
+            "maxMs": 1.3509000000049127
+          },
+          "1ae166fff480c7ce": {
+            "calls": 3,
+            "ms": 2.477500000000873,
+            "maxMs": 0.9006999999983236
+          },
+          "3a7bfb458bc8b5ee": {
+            "calls": 18,
+            "ms": 14.114700000005541,
+            "maxMs": 1.8377000000036787
+          },
+          "6882f3091e3c27f3": {
+            "calls": 3,
+            "ms": 12.71650000000227,
+            "maxMs": 6.94260000000213
+          },
+          "b27132299719e3be": {
+            "calls": 3,
+            "ms": 6.170699999995122,
+            "maxMs": 2.4504999999990105
+          },
+          "8bb6ad1f270a2690": {
+            "calls": 3,
+            "ms": 10.224999999998545,
+            "maxMs": 4.046099999999569
+          },
+          "83d2d400d7caeef5": {
+            "calls": 3,
+            "ms": 7.595099999998638,
+            "maxMs": 5.9254000000000815
+          },
+          "a23fa378ebd8f4e4": {
+            "calls": 3,
+            "ms": 3.0446000000010827,
+            "maxMs": 1.2352000000028056
+          },
+          "bd72d38f88bc8231": {
+            "calls": 3,
+            "ms": 2.8320000000021537,
+            "maxMs": 0.9821000000010827
+          },
+          "783325ae3d25386c": {
+            "calls": 3,
+            "ms": 2.7021999999997206,
+            "maxMs": 0.9552000000039698
+          },
+          "77228c6923da288e": {
+            "calls": 3,
+            "ms": 2.829599999997299,
+            "maxMs": 1.0002000000022235
+          },
+          "5d8ff12ce411bf84": {
+            "calls": 3,
+            "ms": 2.5358999999953085,
+            "maxMs": 1.0680999999967753
+          },
+          "1ba7f288fb2e8051": {
+            "calls": 3,
+            "ms": 2.7568999999930384,
+            "maxMs": 1.047099999996135
+          },
+          "61c0205940aabe50": {
+            "calls": 3,
+            "ms": 2.342099999994389,
+            "maxMs": 0.9055000000007567
+          },
+          "4bb0354a0d0525aa": {
+            "calls": 3,
+            "ms": 2.8813000000081956,
+            "maxMs": 1.7237999999997555
+          },
+          "88ee429e48354c63": {
+            "calls": 3,
+            "ms": 2.7382999999972526,
+            "maxMs": 1.032999999995809
+          },
+          "20ccfa9eac39e255": {
+            "calls": 3,
+            "ms": 4.936700000005658,
+            "maxMs": 1.7213000000047032
+          },
+          "41d616ba86078843": {
+            "calls": 3,
+            "ms": 2.2444000000032247,
+            "maxMs": 0.8450000000011642
+          },
+          "215e68e69e1578e6": {
+            "calls": 3,
+            "ms": 5.0766999999978,
+            "maxMs": 2.253100000001723
+          },
+          "4a9f2a0d8944dc1c": {
+            "calls": 3,
+            "ms": 2.0745999999926426,
+            "maxMs": 1.1722999999983585
+          },
+          "7f2c8b9056bc0d80": {
+            "calls": 3,
+            "ms": 1.1830000000045402,
+            "maxMs": 0.4546000000045751
+          },
+          "ce26a2fdc49bce7f": {
+            "calls": 1,
+            "ms": 0.7794000000067172,
+            "maxMs": 0.7794000000067172
+          },
+          "b5297617afb2db1d": {
+            "calls": 1,
+            "ms": 0.5970000000015716,
+            "maxMs": 0.5970000000015716
+          },
+          "1c7e8dcc8b6995f5": {
+            "calls": 1,
+            "ms": 0.481500000001688,
+            "maxMs": 0.481500000001688
+          },
+          "00365bfe5664f00d": {
+            "calls": 1,
+            "ms": 1.0382000000026892,
+            "maxMs": 1.0382000000026892
+          },
+          "e4355d1e1b922e70": {
+            "calls": 1,
+            "ms": 0.3532000000050175,
+            "maxMs": 0.3532000000050175
+          },
+          "dd6b2daea1c7b19f": {
+            "calls": 1,
+            "ms": 0.5097999999998137,
+            "maxMs": 0.5097999999998137
+          },
+          "47d660f16ad200e2": {
+            "calls": 1,
+            "ms": 1.5077000000019325,
+            "maxMs": 1.5077000000019325
+          },
+          "44b13460e11fd4ad": {
+            "calls": 1,
+            "ms": 1.8966999999975087,
+            "maxMs": 1.8966999999975087
+          },
+          "397e2e1a8308c887": {
+            "calls": 1,
+            "ms": 102.88930000000255,
+            "maxMs": 102.88930000000255
+          },
+          "d173a31320174e91": {
+            "calls": 1,
+            "ms": 14.040600000000268,
+            "maxMs": 14.040600000000268
+          },
+          "1130bb78a9ac28aa": {
+            "calls": 6,
+            "ms": 1111.9110999999975,
+            "maxMs": 1107.4765000000043
+          },
+          "9532003c48cd8d04": {
+            "calls": 6,
+            "ms": 15.712200000001758,
+            "maxMs": 5.766900000002352
+          }
+        },
+        "spans": {
+          "assertCentralSchema": {
+            "calls": 18,
+            "ms": 1930.3516999999993,
+            "maxMs": 154.60889999999927
+          },
+          "assertAuthorityAdmission": {
+            "calls": 18,
+            "ms": 2153.3070000000153,
+            "maxMs": 178.90909999999712
+          },
+          "assertAuthoritySecurity": {
+            "calls": 18,
+            "ms": 239.8239000000176,
+            "maxMs": 18.27049999999872
+          },
+          "observeTenantRuntimeMetadata": {
+            "calls": 3,
+            "ms": 872.0248000000065,
+            "maxMs": 315.84649999999965
+          }
+        },
+        "locks": {
+          "central-held": {
+            "calls": 18,
+            "ms": 392.53639999999723,
+            "maxMs": 53.44990000000689
+          },
+          "audit-held": {
+            "calls": 1,
+            "ms": 463.71979999999894,
+            "maxMs": 463.71979999999894
+          }
+        },
+        "admissions": [
+          {
+            "before": {
+              "active": 2,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 6.42,
+            "after": {
+              "active": 3,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "leaseRemainingMs": 15000
+          }
+        ],
+        "responseAt": 63107.3746
+      }
+    },
+    {
+      "status": 200,
+      "code": null,
+      "ms": 3627.89,
+      "total": 1000,
+      "metrics": {
+        "id": 10,
+        "tag": "7c528398-8dd9-4a66-997b-d9d385ccd581",
+        "phase": "setup",
+        "queryCount": 1033,
+        "authorityTransactions": 18,
+        "checkouts": [
+          {
+            "waitMs": 0.01,
+            "holdMs": 146.63,
+            "max": 8,
+            "total": 2,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 158.04,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 147.57,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.04,
+            "holdMs": 29.29,
+            "max": 4,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "catalog",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 145.74,
+            "max": 8,
+            "total": 4,
+            "idle": 2,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 155.99,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 3.97,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 7.25,
+            "holdMs": 2675.11,
+            "max": 5,
+            "total": 0,
+            "idle": 0,
+            "waiting": 0,
+            "role": "tenant-2",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.62,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 120.1,
+            "max": 8,
+            "total": 4,
+            "idle": 4,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 1.55,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 136.6,
+            "max": 8,
+            "total": 4,
+            "idle": 4,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 136.9,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 131.68,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 157.38,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 162.19,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 1.63,
+            "holdMs": 196.71,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 13.99,
+            "holdMs": 223.12,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 1,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 144.25,
+            "max": 8,
+            "total": 8,
+            "idle": 3,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 124.88,
+            "max": 8,
+            "total": 8,
+            "idle": 7,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.63,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 121.49,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.83,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 142.19,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.16,
+            "holdMs": 134.06,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          }
+        ],
+        "sqlErrors": [],
+        "failures": [],
+        "queries": {
+          "authority/other": {
+            "calls": 144,
+            "ms": 99.49399999999878,
+            "maxMs": 14.02719999999681
+          },
+          "authority/transaction": {
+            "calls": 72,
+            "ms": 79.25219999996625,
+            "maxMs": 4.937100000002829
+          },
+          "authority/metadata": {
+            "calls": 486,
+            "ms": 2070.0536999999895,
+            "maxMs": 72.23479999999836
+          },
+          "authority/authority-lock": {
+            "calls": 18,
+            "ms": 100.35900000000402,
+            "maxMs": 50.81500000000233
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "ms": 120.13080000003538,
+            "maxMs": 6.679100000001199
+          },
+          "catalog/metadata": {
+            "calls": 4,
+            "ms": 7.566500000008091,
+            "maxMs": 3.5518000000010943
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "ms": 5.466200000002573,
+            "maxMs": 3.936999999998079
+          },
+          "catalog/other": {
+            "calls": 1,
+            "ms": 15.588900000002468,
+            "maxMs": 15.588900000002468
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "ms": 10.490100000009988,
+            "maxMs": 3.945900000006077
+          },
+          "tenant-2/transaction": {
+            "calls": 13,
+            "ms": 11.106599999999162,
+            "maxMs": 2.5566000000035274
+          },
+          "tenant-2/metadata": {
+            "calls": 168,
+            "ms": 763.2423999999737,
+            "maxMs": 92.20240000000194
+          },
+          "tenant-2/other": {
+            "calls": 25,
+            "ms": 40.30810000000929,
+            "maxMs": 16.334399999999732
+          },
+          "tenant-2/application-selection": {
+            "calls": 1,
+            "ms": 114.50040000000445,
+            "maxMs": 114.50040000000445
+          },
+          "tenant-2/audit-prepare": {
+            "calls": 6,
+            "ms": 5.437800000014249,
+            "maxMs": 1.9006000000008498
+          },
+          "tenant-2/audit-append": {
+            "calls": 6,
+            "ms": 19.583000000005995,
+            "maxMs": 7.30800000000454
+          }
+        },
+        "queryHashes": {
+          "6ec438bce08867f4": {
+            "calls": 18,
+            "ms": 24.262599999987287,
+            "maxMs": 14.02719999999681
+          },
+          "3eb12e5bafe877f8": {
+            "calls": 19,
+            "ms": 9.129499999973632,
+            "maxMs": 0.9855999999999767
+          },
+          "74c89290b5bc0324": {
+            "calls": 21,
+            "ms": 9.150400000013178,
+            "maxMs": 0.6514999999999418
+          },
+          "6de0ab5ecc04997d": {
+            "calls": 18,
+            "ms": 8.745599999980186,
+            "maxMs": 1.158900000002177
+          },
+          "1785d86a000b9d26": {
+            "calls": 18,
+            "ms": 10.985100000019884,
+            "maxMs": 1.9857000000047265
+          },
+          "5132894cb05b9550": {
+            "calls": 18,
+            "ms": 12.565499999996973,
+            "maxMs": 2.0023000000001048
+          },
+          "0ac62896dcae5330": {
+            "calls": 18,
+            "ms": 809.5384999999806,
+            "maxMs": 72.23479999999836
+          },
+          "cfcd1108ca0c6a9f": {
+            "calls": 36,
+            "ms": 481.274900000004,
+            "maxMs": 32.00440000000526
+          },
+          "e99a77f79a35884c": {
+            "calls": 18,
+            "ms": 68.82640000000538,
+            "maxMs": 8.599999999998545
+          },
+          "0d2fc793022bceff": {
+            "calls": 18,
+            "ms": 32.94480000000476,
+            "maxMs": 3.9205000000001746
+          },
+          "5f3202c8e2710e93": {
+            "calls": 18,
+            "ms": 19.437500000007276,
+            "maxMs": 2.1617000000042026
+          },
+          "933e3ba410cb335c": {
+            "calls": 18,
+            "ms": 17.193799999993644,
+            "maxMs": 5.802299999995739
+          },
+          "134e69c66f0f2132": {
+            "calls": 18,
+            "ms": 35.73359999999957,
+            "maxMs": 8.170200000000477
+          },
+          "ad488789c5b185d7": {
+            "calls": 18,
+            "ms": 11.094799999991665,
+            "maxMs": 1.373699999996461
+          },
+          "ece0c3b122528358": {
+            "calls": 18,
+            "ms": 38.927199999998265,
+            "maxMs": 6.707399999999325
+          },
+          "2ba33ea79fa6200f": {
+            "calls": 18,
+            "ms": 27.331499999992957,
+            "maxMs": 5.854200000001583
+          },
+          "96e7cfc17fab9433": {
+            "calls": 18,
+            "ms": 29.185999999994237,
+            "maxMs": 3.961799999997311
+          },
+          "100df8b38c17d223": {
+            "calls": 18,
+            "ms": 12.752400000004855,
+            "maxMs": 1.451199999995879
+          },
+          "fab63c837f779e3e": {
+            "calls": 18,
+            "ms": 24.494699999995646,
+            "maxMs": 3.59599999999773
+          },
+          "783d13417acd25bf": {
+            "calls": 18,
+            "ms": 24.19079999999667,
+            "maxMs": 2.111799999998766
+          },
+          "4ad6d90f7abdd067": {
+            "calls": 18,
+            "ms": 12.337900000005902,
+            "maxMs": 1.4283999999970547
+          },
+          "18967f5c79a0ec46": {
+            "calls": 18,
+            "ms": 33.45690000000468,
+            "maxMs": 8.775300000001153
+          },
+          "f864efcc71a6c579": {
+            "calls": 18,
+            "ms": 21.12619999999879,
+            "maxMs": 3.0560000000041327
+          },
+          "2712b1e88642e19c": {
+            "calls": 18,
+            "ms": 26.603399999999965,
+            "maxMs": 3.671699999998964
+          },
+          "848df42650141cf9": {
+            "calls": 18,
+            "ms": 19.535699999993085,
+            "maxMs": 1.8464999999996508
+          },
+          "dc60eea8dfc8c89d": {
+            "calls": 18,
+            "ms": 26.42480000001524,
+            "maxMs": 6.294000000001688
+          },
+          "27bb21ef334ea8fd": {
+            "calls": 18,
+            "ms": 11.27619999997114,
+            "maxMs": 0.8329999999987194
+          },
+          "41b9b3cd52bbbb1f": {
+            "calls": 18,
+            "ms": 20.503800000005867,
+            "maxMs": 5.76589999999851
+          },
+          "b8dee57b82d22e57": {
+            "calls": 18,
+            "ms": 17.480600000009872,
+            "maxMs": 6.073199999998906
+          },
+          "1a17c51870491a03": {
+            "calls": 18,
+            "ms": 200.6426999999967,
+            "maxMs": 19.691500000000815
+          },
+          "27abf348b43e43cb": {
+            "calls": 18,
+            "ms": 25.941200000001118,
+            "maxMs": 2.8734000000040396
+          },
+          "5b868d125175f6e1": {
+            "calls": 18,
+            "ms": 21.79740000001766,
+            "maxMs": 4.671399999999267
+          },
+          "79663c1d3b43ceaf": {
+            "calls": 39,
+            "ms": 62.68999999999505,
+            "maxMs": 4.937100000002829
+          },
+          "a8402858d4f1e1d2": {
+            "calls": 18,
+            "ms": 11.47320000000036,
+            "maxMs": 1.5829999999987194
+          },
+          "832bdaa8fc857473": {
+            "calls": 18,
+            "ms": 10.048499999997148,
+            "maxMs": 1.5161000000007334
+          },
+          "18d98c1612e16751": {
+            "calls": 18,
+            "ms": 13.73159999998461,
+            "maxMs": 5.674899999998161
+          },
+          "bcd937c3e242e10d": {
+            "calls": 18,
+            "ms": 11.270000000018626,
+            "maxMs": 1.826600000000326
+          },
+          "e457b9e54eecca47": {
+            "calls": 18,
+            "ms": 100.35900000000402,
+            "maxMs": 50.81500000000233
+          },
+          "6ffec628935eba85": {
+            "calls": 80,
+            "ms": 120.13080000003538,
+            "maxMs": 6.679100000001199
+          },
+          "ee3f0ab4dc9637fd": {
+            "calls": 1,
+            "ms": 1.4166000000041095,
+            "maxMs": 1.4166000000041095
+          },
+          "d6762ca289dc247d": {
+            "calls": 1,
+            "ms": 3.5518000000010943,
+            "maxMs": 3.5518000000010943
+          },
+          "1ef16a226485f8d6": {
+            "calls": 1,
+            "ms": 1.7877000000007683,
+            "maxMs": 1.7877000000007683
+          },
+          "6fa38779649dca65": {
+            "calls": 1,
+            "ms": 0.8104000000021188,
+            "maxMs": 0.8104000000021188
+          },
+          "d85f85aa1fb0cac6": {
+            "calls": 1,
+            "ms": 3.936999999998079,
+            "maxMs": 3.936999999998079
+          },
+          "f125ad4ce3df6dfb": {
+            "calls": 1,
+            "ms": 0.490300000004936,
+            "maxMs": 0.490300000004936
+          },
+          "2f0ad9318d8daad4": {
+            "calls": 1,
+            "ms": 0.39209999999729916,
+            "maxMs": 0.39209999999729916
+          },
+          "fd4033d6808ba219": {
+            "calls": 1,
+            "ms": 15.588900000002468,
+            "maxMs": 15.588900000002468
+          },
+          "b0b13d76e8815554": {
+            "calls": 5,
+            "ms": 10.490100000009988,
+            "maxMs": 3.945900000006077
+          },
+          "788e526fe808f5b2": {
+            "calls": 3,
+            "ms": 4.720600000000559,
+            "maxMs": 3.1849999999976717
+          },
+          "9059403393303375": {
+            "calls": 1,
+            "ms": 0.5509999999994761,
+            "maxMs": 0.5509999999994761
+          },
+          "88615167c03add1a": {
+            "calls": 3,
+            "ms": 2.4451000000044587,
+            "maxMs": 1.1705000000001746
+          },
+          "f7263e4d3062bfeb": {
+            "calls": 3,
+            "ms": 1.8284999999959837,
+            "maxMs": 0.730199999998149
+          },
+          "31f205c484d85379": {
+            "calls": 3,
+            "ms": 1.4253000000026077,
+            "maxMs": 0.5902999999962049
+          },
+          "59b2a782f977eb75": {
+            "calls": 3,
+            "ms": 2.0521999999982654,
+            "maxMs": 0.8868000000002212
+          },
+          "ddd03a1849384c3d": {
+            "calls": 3,
+            "ms": 12.61430000000837,
+            "maxMs": 5.933499999999185
+          },
+          "88fbf505d4a23ec8": {
+            "calls": 6,
+            "ms": 356.0202000000063,
+            "maxMs": 92.20240000000194
+          },
+          "b2db7c944764af2c": {
+            "calls": 6,
+            "ms": 22.95499999999447,
+            "maxMs": 4.569600000002538
+          },
+          "d33a1f0fa97d98bc": {
+            "calls": 6,
+            "ms": 25.45949999998993,
+            "maxMs": 4.579200000000128
+          },
+          "1deed5146f01dffd": {
+            "calls": 6,
+            "ms": 46.196299999988696,
+            "maxMs": 22.398999999997613
+          },
+          "2f40db89f0a129a0": {
+            "calls": 6,
+            "ms": 19.66420000000653,
+            "maxMs": 3.5653999999994994
+          },
+          "428c92fdbfab66df": {
+            "calls": 6,
+            "ms": 61.26829999999609,
+            "maxMs": 21.98819999999978
+          },
+          "4ce543e9aa18d379": {
+            "calls": 6,
+            "ms": 32.01900000000023,
+            "maxMs": 5.958700000002864
+          },
+          "d4e0741b77184920": {
+            "calls": 6,
+            "ms": 4.067599999994854,
+            "maxMs": 0.886899999997695
+          },
+          "1bba20580524a4c7": {
+            "calls": 6,
+            "ms": 29.954799999992247,
+            "maxMs": 6.592400000001362
+          },
+          "1ab17d91c5a63e4f": {
+            "calls": 6,
+            "ms": 3.2951000000102795,
+            "maxMs": 0.9565000000002328
+          },
+          "c2aaa742dcb1f8e5": {
+            "calls": 3,
+            "ms": 4.007200000000012,
+            "maxMs": 2.4380999999993946
+          },
+          "1307af40e2370ef9": {
+            "calls": 3,
+            "ms": 7.33640000000014,
+            "maxMs": 3.2937999999994645
+          },
+          "60d79c6a1a7556c2": {
+            "calls": 4,
+            "ms": 1.8888999999981024,
+            "maxMs": 0.6876999999949476
+          },
+          "0ee22d0909bb7809": {
+            "calls": 3,
+            "ms": 1.5705999999991036,
+            "maxMs": 0.5322000000014668
+          },
+          "7798d7fb19421d0c": {
+            "calls": 3,
+            "ms": 1.4486000000033528,
+            "maxMs": 0.5122000000046683
+          },
+          "7fe73ee93d74a4a9": {
+            "calls": 3,
+            "ms": 1.728399999999965,
+            "maxMs": 0.6273000000001048
+          },
+          "6d9da93055384c0b": {
+            "calls": 3,
+            "ms": 2.314700000009907,
+            "maxMs": 0.834500000004482
+          },
+          "220c20d913e2ceed": {
+            "calls": 3,
+            "ms": 1.7597999999925378,
+            "maxMs": 0.6395999999949709
+          },
+          "ddb59461666a362b": {
+            "calls": 3,
+            "ms": 6.0887000000002445,
+            "maxMs": 3.2384000000020023
+          },
+          "8dbb51cf095bb93d": {
+            "calls": 3,
+            "ms": 4.369800000000396,
+            "maxMs": 1.6446999999971013
+          },
+          "e2c6fd7521dd1a1f": {
+            "calls": 3,
+            "ms": 2.790099999998347,
+            "maxMs": 1.3804000000018277
+          },
+          "bfb1cf4ddf03c911": {
+            "calls": 3,
+            "ms": 2.1067000000111875,
+            "maxMs": 0.8047000000005937
+          },
+          "1ae166fff480c7ce": {
+            "calls": 3,
+            "ms": 22.273900000007416,
+            "maxMs": 20.960399999996298
+          },
+          "3a7bfb458bc8b5ee": {
+            "calls": 18,
+            "ms": 37.62650000000576,
+            "maxMs": 21.401899999997113
+          },
+          "6882f3091e3c27f3": {
+            "calls": 3,
+            "ms": 7.433799999998882,
+            "maxMs": 2.7699999999967986
+          },
+          "b27132299719e3be": {
+            "calls": 3,
+            "ms": 5.077599999996892,
+            "maxMs": 1.8119999999980791
+          },
+          "8bb6ad1f270a2690": {
+            "calls": 3,
+            "ms": 9.308800000006158,
+            "maxMs": 3.53530000000319
+          },
+          "83d2d400d7caeef5": {
+            "calls": 3,
+            "ms": 2.072599999999511,
+            "maxMs": 0.8038999999989755
+          },
+          "a23fa378ebd8f4e4": {
+            "calls": 3,
+            "ms": 2.34150000000227,
+            "maxMs": 0.8537999999971362
+          },
+          "bd72d38f88bc8231": {
+            "calls": 3,
+            "ms": 2.367899999997462,
+            "maxMs": 0.8358999999982188
+          },
+          "783325ae3d25386c": {
+            "calls": 3,
+            "ms": 2.53519999999844,
+            "maxMs": 0.9914999999964493
+          },
+          "77228c6923da288e": {
+            "calls": 3,
+            "ms": 4.21289999999135,
+            "maxMs": 2.358199999995122
+          },
+          "5d8ff12ce411bf84": {
+            "calls": 3,
+            "ms": 2.8299999999944703,
+            "maxMs": 1.1807999999946333
+          },
+          "1ba7f288fb2e8051": {
+            "calls": 3,
+            "ms": 2.640499999994063,
+            "maxMs": 0.9037000000025728
+          },
+          "61c0205940aabe50": {
+            "calls": 3,
+            "ms": 1.970099999998638,
+            "maxMs": 0.6615999999994528
+          },
+          "4bb0354a0d0525aa": {
+            "calls": 3,
+            "ms": 1.79840000000695,
+            "maxMs": 0.7309000000022934
+          },
+          "88ee429e48354c63": {
+            "calls": 3,
+            "ms": 2.454700000002049,
+            "maxMs": 0.853000000002794
+          },
+          "20ccfa9eac39e255": {
+            "calls": 3,
+            "ms": 4.34150000000227,
+            "maxMs": 1.5385000000023865
+          },
+          "41d616ba86078843": {
+            "calls": 3,
+            "ms": 1.9675999999963096,
+            "maxMs": 0.8313999999954831
+          },
+          "215e68e69e1578e6": {
+            "calls": 3,
+            "ms": 3.204699999994773,
+            "maxMs": 1.2088000000003376
+          },
+          "4a9f2a0d8944dc1c": {
+            "calls": 3,
+            "ms": 1.3411999999880209,
+            "maxMs": 0.5067999999955646
+          },
+          "7f2c8b9056bc0d80": {
+            "calls": 3,
+            "ms": 1.0820000000021537,
+            "maxMs": 0.3922999999995227
+          },
+          "ce26a2fdc49bce7f": {
+            "calls": 1,
+            "ms": 0.6716999999989639,
+            "maxMs": 0.6716999999989639
+          },
+          "b5297617afb2db1d": {
+            "calls": 1,
+            "ms": 0.6346000000048662,
+            "maxMs": 0.6346000000048662
+          },
+          "1c7e8dcc8b6995f5": {
+            "calls": 1,
+            "ms": 0.4933000000019092,
+            "maxMs": 0.4933000000019092
+          },
+          "00365bfe5664f00d": {
+            "calls": 1,
+            "ms": 1.1117000000012922,
+            "maxMs": 1.1117000000012922
+          },
+          "e4355d1e1b922e70": {
+            "calls": 1,
+            "ms": 0.5104999999966822,
+            "maxMs": 0.5104999999966822
+          },
+          "dd6b2daea1c7b19f": {
+            "calls": 1,
+            "ms": 0.5156999999962864,
+            "maxMs": 0.5156999999962864
+          },
+          "47d660f16ad200e2": {
+            "calls": 1,
+            "ms": 4.949199999995471,
+            "maxMs": 4.949199999995471
+          },
+          "44b13460e11fd4ad": {
+            "calls": 1,
+            "ms": 1.9487000000008265,
+            "maxMs": 1.9487000000008265
+          },
+          "397e2e1a8308c887": {
+            "calls": 1,
+            "ms": 114.50040000000445,
+            "maxMs": 114.50040000000445
+          },
+          "d173a31320174e91": {
+            "calls": 1,
+            "ms": 16.334399999999732,
+            "maxMs": 16.334399999999732
+          },
+          "1130bb78a9ac28aa": {
+            "calls": 6,
+            "ms": 5.437800000014249,
+            "maxMs": 1.9006000000008498
+          },
+          "9532003c48cd8d04": {
+            "calls": 6,
+            "ms": 19.583000000005995,
+            "maxMs": 7.30800000000454
+          }
+        },
+        "spans": {
+          "assertCentralSchema": {
+            "calls": 18,
+            "ms": 1901.8691999999864,
+            "maxMs": 163.56549999999697
+          },
+          "assertAuthorityAdmission": {
+            "calls": 18,
+            "ms": 2101.037000000004,
+            "maxMs": 174.13270000000193
+          },
+          "assertAuthoritySecurity": {
+            "calls": 18,
+            "ms": 260.8636000000042,
+            "maxMs": 32.78689999999915
+          },
+          "observeTenantRuntimeMetadata": {
+            "calls": 3,
+            "ms": 844.7876000000033,
+            "maxMs": 323.77649999999994
+          }
+        },
+        "locks": {
+          "central-held": {
+            "calls": 18,
+            "ms": 435.7412999999942,
+            "maxMs": 46.180099999997765
+          },
+          "audit-held": {
+            "calls": 1,
+            "ms": 395.0607999999993,
+            "maxMs": 395.0607999999993
+          }
+        },
+        "admissions": [
+          {
+            "before": {
+              "active": 0,
+              "queued": 0,
+              "pools": 1,
+              "tenants": 0,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 8.09,
+            "after": {
+              "active": 1,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "leaseRemainingMs": 14999
+          }
+        ],
+        "responseAt": 61870.0812
+      }
+    },
+    {
+      "status": 200,
+      "code": null,
+      "ms": 4440.96,
+      "total": 1000,
+      "metrics": {
+        "id": 11,
+        "tag": "697ecb2e-4f3c-432e-ba12-7b06304d6ad9",
+        "phase": "setup",
+        "queryCount": 1033,
+        "authorityTransactions": 18,
+        "checkouts": [
+          {
+            "waitMs": 28.1,
+            "holdMs": 187.02,
+            "max": 8,
+            "total": 2,
+            "idle": 0,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 156.55,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 138.61,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 22.61,
+            "max": 4,
+            "total": 2,
+            "idle": 1,
+            "waiting": 0,
+            "role": "catalog",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 152.1,
+            "max": 8,
+            "total": 4,
+            "idle": 3,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 128.35,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.67,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 9.32,
+            "holdMs": 3454.98,
+            "max": 5,
+            "total": 1,
+            "idle": 0,
+            "waiting": 0,
+            "role": "tenant-2",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.53,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 129,
+            "max": 8,
+            "total": 4,
+            "idle": 3,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 1.65,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.05,
+            "holdMs": 128.49,
+            "max": 8,
+            "total": 4,
+            "idle": 3,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 135.75,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 130.27,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 171.47,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 177.84,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 2.22,
+            "holdMs": 168.07,
+            "max": 8,
+            "total": 5,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 14.62,
+            "holdMs": 214.49,
+            "max": 8,
+            "total": 5,
+            "idle": 1,
+            "waiting": 1,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 143.76,
+            "max": 8,
+            "total": 8,
+            "idle": 4,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 123.3,
+            "max": 8,
+            "total": 8,
+            "idle": 7,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.61,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 128.74,
+            "max": 8,
+            "total": 8,
+            "idle": 7,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.06,
+            "holdMs": 3.6,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.03,
+            "holdMs": 171.1,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.15,
+            "holdMs": 140.04,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          }
+        ],
+        "sqlErrors": [],
+        "failures": [],
+        "queries": {
+          "authority/other": {
+            "calls": 144,
+            "ms": 92.51090000000113,
+            "maxMs": 7.9284999999945285
+          },
+          "authority/transaction": {
+            "calls": 72,
+            "ms": 75.47169999998732,
+            "maxMs": 6.321599999995669
+          },
+          "authority/metadata": {
+            "calls": 486,
+            "ms": 2119.3352000000305,
+            "maxMs": 83.67469999999594
+          },
+          "authority/authority-lock": {
+            "calls": 18,
+            "ms": 103.96390000000247,
+            "maxMs": 25.4033000000054
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "ms": 122.99119999997492,
+            "maxMs": 24.62709999999788
+          },
+          "catalog/metadata": {
+            "calls": 4,
+            "ms": 5.386700000002747,
+            "maxMs": 2.4910999999992782
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "ms": 1.783000000003085,
+            "maxMs": 0.9610000000029686
+          },
+          "catalog/other": {
+            "calls": 1,
+            "ms": 15.121199999994133,
+            "maxMs": 15.121199999994133
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "ms": 9.931100000001607,
+            "maxMs": 3.559000000001106
+          },
+          "tenant-2/transaction": {
+            "calls": 13,
+            "ms": 9.448499999984051,
+            "maxMs": 3.521499999995285
+          },
+          "tenant-2/metadata": {
+            "calls": 168,
+            "ms": 771.9972999999663,
+            "maxMs": 87.08380000000034
+          },
+          "tenant-2/other": {
+            "calls": 25,
+            "ms": 35.66649999998481,
+            "maxMs": 16.99279999999999
+          },
+          "tenant-2/application-selection": {
+            "calls": 1,
+            "ms": 112.14310000000114,
+            "maxMs": 112.14310000000114
+          },
+          "tenant-2/audit-prepare": {
+            "calls": 6,
+            "ms": 751.0760999999984,
+            "maxMs": 748.0118999999977
+          },
+          "tenant-2/audit-append": {
+            "calls": 6,
+            "ms": 12.908100000000559,
+            "maxMs": 7.654300000001967
+          }
+        },
+        "queryHashes": {
+          "6ec438bce08867f4": {
+            "calls": 18,
+            "ms": 13.485599999999977,
+            "maxMs": 1.9839999999967404
+          },
+          "3eb12e5bafe877f8": {
+            "calls": 19,
+            "ms": 8.734099999994214,
+            "maxMs": 0.8216000000029453
+          },
+          "74c89290b5bc0324": {
+            "calls": 21,
+            "ms": 11.026500000007218,
+            "maxMs": 1.1648999999961234
+          },
+          "6de0ab5ecc04997d": {
+            "calls": 18,
+            "ms": 9.11679999998887,
+            "maxMs": 0.7685999999957858
+          },
+          "1785d86a000b9d26": {
+            "calls": 18,
+            "ms": 10.32180000001972,
+            "maxMs": 0.85120000000461
+          },
+          "5132894cb05b9550": {
+            "calls": 18,
+            "ms": 19.230100000000675,
+            "maxMs": 7.9284999999945285
+          },
+          "0ac62896dcae5330": {
+            "calls": 18,
+            "ms": 880.8868999999831,
+            "maxMs": 83.67469999999594
+          },
+          "cfcd1108ca0c6a9f": {
+            "calls": 36,
+            "ms": 441.30509999999776,
+            "maxMs": 16.13810000000376
+          },
+          "e99a77f79a35884c": {
+            "calls": 18,
+            "ms": 62.33289999997942,
+            "maxMs": 7.584600000001956
+          },
+          "0d2fc793022bceff": {
+            "calls": 18,
+            "ms": 37.99910000000091,
+            "maxMs": 7.090299999996205
+          },
+          "5f3202c8e2710e93": {
+            "calls": 18,
+            "ms": 21.735600000007253,
+            "maxMs": 2.6934999999939464
+          },
+          "933e3ba410cb335c": {
+            "calls": 18,
+            "ms": 11.9656999999861,
+            "maxMs": 1.0478000000002794
+          },
+          "134e69c66f0f2132": {
+            "calls": 18,
+            "ms": 27.828300000001036,
+            "maxMs": 6.609699999993609
+          },
+          "ad488789c5b185d7": {
+            "calls": 18,
+            "ms": 15.071899999995367,
+            "maxMs": 2.8998999999967054
+          },
+          "ece0c3b122528358": {
+            "calls": 18,
+            "ms": 47.630799999999,
+            "maxMs": 6.407700000003388
+          },
+          "2ba33ea79fa6200f": {
+            "calls": 18,
+            "ms": 27.934200000025157,
+            "maxMs": 8.751000000003842
+          },
+          "96e7cfc17fab9433": {
+            "calls": 18,
+            "ms": 39.877799999987474,
+            "maxMs": 6.485400000005029
+          },
+          "100df8b38c17d223": {
+            "calls": 18,
+            "ms": 13.02970000001369,
+            "maxMs": 1.7586999999984982
+          },
+          "fab63c837f779e3e": {
+            "calls": 18,
+            "ms": 24.091099999997823,
+            "maxMs": 5.679599999995844
+          },
+          "783d13417acd25bf": {
+            "calls": 18,
+            "ms": 27.488000000019383,
+            "maxMs": 3.140000000006694
+          },
+          "4ad6d90f7abdd067": {
+            "calls": 18,
+            "ms": 16.248599999998987,
+            "maxMs": 3.0495000000009895
+          },
+          "18967f5c79a0ec46": {
+            "calls": 18,
+            "ms": 31.01360000000568,
+            "maxMs": 9.43080000000191
+          },
+          "f864efcc71a6c579": {
+            "calls": 18,
+            "ms": 24.97099999999773,
+            "maxMs": 5.6458999999958905
+          },
+          "2712b1e88642e19c": {
+            "calls": 18,
+            "ms": 24.20379999999568,
+            "maxMs": 6.065599999994447
+          },
+          "848df42650141cf9": {
+            "calls": 18,
+            "ms": 34.94180000000779,
+            "maxMs": 6.334200000004785
+          },
+          "dc60eea8dfc8c89d": {
+            "calls": 18,
+            "ms": 23.875000000014552,
+            "maxMs": 3.000899999999092
+          },
+          "27bb21ef334ea8fd": {
+            "calls": 18,
+            "ms": 15.244399999995949,
+            "maxMs": 1.2816000000020722
+          },
+          "41b9b3cd52bbbb1f": {
+            "calls": 18,
+            "ms": 22.794000000008964,
+            "maxMs": 6.11359999999695
+          },
+          "b8dee57b82d22e57": {
+            "calls": 18,
+            "ms": 11.372499999997672,
+            "maxMs": 1.0217999999949825
+          },
+          "1a17c51870491a03": {
+            "calls": 18,
+            "ms": 195.0384000000122,
+            "maxMs": 14.99720000000525
+          },
+          "27abf348b43e43cb": {
+            "calls": 18,
+            "ms": 23.37850000000617,
+            "maxMs": 2.557300000000396
+          },
+          "5b868d125175f6e1": {
+            "calls": 18,
+            "ms": 17.076499999995576,
+            "maxMs": 1.5451000000030035
+          },
+          "79663c1d3b43ceaf": {
+            "calls": 39,
+            "ms": 58.02759999999398,
+            "maxMs": 6.321599999995669
+          },
+          "a8402858d4f1e1d2": {
+            "calls": 18,
+            "ms": 14.027399999991758,
+            "maxMs": 3.224499999996624
+          },
+          "832bdaa8fc857473": {
+            "calls": 18,
+            "ms": 10.535100000000966,
+            "maxMs": 1.5204999999987194
+          },
+          "18d98c1612e16751": {
+            "calls": 18,
+            "ms": 8.697799999994459,
+            "maxMs": 1.013200000001234
+          },
+          "bcd937c3e242e10d": {
+            "calls": 18,
+            "ms": 11.374499999990803,
+            "maxMs": 1.7924999999959255
+          },
+          "e457b9e54eecca47": {
+            "calls": 18,
+            "ms": 103.96390000000247,
+            "maxMs": 25.4033000000054
+          },
+          "6ffec628935eba85": {
+            "calls": 80,
+            "ms": 122.99119999997492,
+            "maxMs": 24.62709999999788
+          },
+          "ee3f0ab4dc9637fd": {
+            "calls": 1,
+            "ms": 0.8815000000031432,
+            "maxMs": 0.8815000000031432
+          },
+          "d6762ca289dc247d": {
+            "calls": 1,
+            "ms": 2.4910999999992782,
+            "maxMs": 2.4910999999992782
+          },
+          "1ef16a226485f8d6": {
+            "calls": 1,
+            "ms": 1.3338000000003376,
+            "maxMs": 1.3338000000003376
+          },
+          "6fa38779649dca65": {
+            "calls": 1,
+            "ms": 0.6802999999999884,
+            "maxMs": 0.6802999999999884
+          },
+          "d85f85aa1fb0cac6": {
+            "calls": 1,
+            "ms": 0.32080000000132713,
+            "maxMs": 0.32080000000132713
+          },
+          "f125ad4ce3df6dfb": {
+            "calls": 1,
+            "ms": 0.25499999999738066,
+            "maxMs": 0.25499999999738066
+          },
+          "2f0ad9318d8daad4": {
+            "calls": 1,
+            "ms": 0.24620000000140863,
+            "maxMs": 0.24620000000140863
+          },
+          "fd4033d6808ba219": {
+            "calls": 1,
+            "ms": 15.121199999994133,
+            "maxMs": 15.121199999994133
+          },
+          "b0b13d76e8815554": {
+            "calls": 5,
+            "ms": 9.931100000001607,
+            "maxMs": 3.559000000001106
+          },
+          "788e526fe808f5b2": {
+            "calls": 3,
+            "ms": 4.788300000000163,
+            "maxMs": 3.137799999996787
+          },
+          "9059403393303375": {
+            "calls": 1,
+            "ms": 0.48339999999734573,
+            "maxMs": 0.48339999999734573
+          },
+          "88615167c03add1a": {
+            "calls": 3,
+            "ms": 2.444899999994959,
+            "maxMs": 1.0511999999944237
+          },
+          "f7263e4d3062bfeb": {
+            "calls": 3,
+            "ms": 1.7100999999893247,
+            "maxMs": 0.7266999999992549
+          },
+          "31f205c484d85379": {
+            "calls": 3,
+            "ms": 1.513599999998405,
+            "maxMs": 0.5297999999966123
+          },
+          "59b2a782f977eb75": {
+            "calls": 3,
+            "ms": 2.003099999987171,
+            "maxMs": 0.7196999999941909
+          },
+          "ddd03a1849384c3d": {
+            "calls": 3,
+            "ms": 15.270199999999022,
+            "maxMs": 7.728799999997136
+          },
+          "88fbf505d4a23ec8": {
+            "calls": 6,
+            "ms": 355.30829999999696,
+            "maxMs": 87.08380000000034
+          },
+          "b2db7c944764af2c": {
+            "calls": 6,
+            "ms": 21.760900000008405,
+            "maxMs": 4.24029999999766
+          },
+          "d33a1f0fa97d98bc": {
+            "calls": 6,
+            "ms": 47.614900000007765,
+            "maxMs": 22.022100000001956
+          },
+          "1deed5146f01dffd": {
+            "calls": 6,
+            "ms": 28.965599999995902,
+            "maxMs": 5.339899999999034
+          },
+          "2f40db89f0a129a0": {
+            "calls": 6,
+            "ms": 38.99989999999525,
+            "maxMs": 22.13579999999638
+          },
+          "428c92fdbfab66df": {
+            "calls": 6,
+            "ms": 81.77060000000347,
+            "maxMs": 29.299299999998766
+          },
+          "4ce543e9aa18d379": {
+            "calls": 6,
+            "ms": 28.188999999998487,
+            "maxMs": 5.5340999999971245
+          },
+          "d4e0741b77184920": {
+            "calls": 6,
+            "ms": 3.870999999999185,
+            "maxMs": 0.7849999999962165
+          },
+          "1bba20580524a4c7": {
+            "calls": 6,
+            "ms": 26.022399999994377,
+            "maxMs": 4.7479999999995925
+          },
+          "1ab17d91c5a63e4f": {
+            "calls": 6,
+            "ms": 3.625,
+            "maxMs": 1.1599999999962165
+          },
+          "c2aaa742dcb1f8e5": {
+            "calls": 3,
+            "ms": 1.9392000000007101,
+            "maxMs": 1.1250999999974738
+          },
+          "1307af40e2370ef9": {
+            "calls": 3,
+            "ms": 4.506999999997788,
+            "maxMs": 2.8902999999991152
+          },
+          "60d79c6a1a7556c2": {
+            "calls": 4,
+            "ms": 1.8008999999947264,
+            "maxMs": 0.6675999999933993
+          },
+          "0ee22d0909bb7809": {
+            "calls": 3,
+            "ms": 1.550599999995029,
+            "maxMs": 0.5489999999990687
+          },
+          "7798d7fb19421d0c": {
+            "calls": 3,
+            "ms": 1.3674000000100932,
+            "maxMs": 0.5045000000027358
+          },
+          "7fe73ee93d74a4a9": {
+            "calls": 3,
+            "ms": 1.7271999999938998,
+            "maxMs": 0.5970999999990454
+          },
+          "6d9da93055384c0b": {
+            "calls": 3,
+            "ms": 2.3184999999939464,
+            "maxMs": 0.8594999999986612
+          },
+          "220c20d913e2ceed": {
+            "calls": 3,
+            "ms": 1.3421000000016647,
+            "maxMs": 0.5377000000007683
+          },
+          "ddb59461666a362b": {
+            "calls": 3,
+            "ms": 4.9236000000091735,
+            "maxMs": 2.8642000000036205
+          },
+          "8dbb51cf095bb93d": {
+            "calls": 3,
+            "ms": 4.104899999991176,
+            "maxMs": 1.4756999999954132
+          },
+          "e2c6fd7521dd1a1f": {
+            "calls": 3,
+            "ms": 2.9039000000047963,
+            "maxMs": 1.371899999998277
+          },
+          "bfb1cf4ddf03c911": {
+            "calls": 3,
+            "ms": 2.1556999999884283,
+            "maxMs": 0.8015999999988708
+          },
+          "1ae166fff480c7ce": {
+            "calls": 3,
+            "ms": 2.048900000008871,
+            "maxMs": 0.8599000000031083
+          },
+          "3a7bfb458bc8b5ee": {
+            "calls": 18,
+            "ms": 12.886899999997695,
+            "maxMs": 1.182199999995646
+          },
+          "6882f3091e3c27f3": {
+            "calls": 3,
+            "ms": 7.702900000003865,
+            "maxMs": 2.8519000000014785
+          },
+          "b27132299719e3be": {
+            "calls": 3,
+            "ms": 9.618299999994633,
+            "maxMs": 6.232700000000477
+          },
+          "8bb6ad1f270a2690": {
+            "calls": 3,
+            "ms": 8.73799999999028,
+            "maxMs": 3.057300000000396
+          },
+          "83d2d400d7caeef5": {
+            "calls": 3,
+            "ms": 1.9585000000006403,
+            "maxMs": 0.6894000000029337
+          },
+          "a23fa378ebd8f4e4": {
+            "calls": 3,
+            "ms": 8.549299999998766,
+            "maxMs": 6.903800000000047
+          },
+          "bd72d38f88bc8231": {
+            "calls": 3,
+            "ms": 2.705100000006496,
+            "maxMs": 1.0096000000048662
+          },
+          "783325ae3d25386c": {
+            "calls": 3,
+            "ms": 2.9932000000044354,
+            "maxMs": 1.4853999999977532
+          },
+          "77228c6923da288e": {
+            "calls": 3,
+            "ms": 3.066400000010617,
+            "maxMs": 1.354700000003504
+          },
+          "5d8ff12ce411bf84": {
+            "calls": 3,
+            "ms": 2.486399999994319,
+            "maxMs": 0.9230999999999767
+          },
+          "1ba7f288fb2e8051": {
+            "calls": 3,
+            "ms": 3.5368000000089523,
+            "maxMs": 1.817300000002433
+          },
+          "61c0205940aabe50": {
+            "calls": 3,
+            "ms": 2.23689999999624,
+            "maxMs": 0.8134999999965657
+          },
+          "4bb0354a0d0525aa": {
+            "calls": 3,
+            "ms": 3.8792000000030384,
+            "maxMs": 2.615399999995134
+          },
+          "88ee429e48354c63": {
+            "calls": 3,
+            "ms": 4.8056999999898835,
+            "maxMs": 2.527299999994284
+          },
+          "20ccfa9eac39e255": {
+            "calls": 3,
+            "ms": 5.797399999995832,
+            "maxMs": 2.7907999999952153
+          },
+          "41d616ba86078843": {
+            "calls": 3,
+            "ms": 3.4334000000017113,
+            "maxMs": 2.094199999999546
+          },
+          "215e68e69e1578e6": {
+            "calls": 3,
+            "ms": 3.1682999999975436,
+            "maxMs": 1.0799999999944703
+          },
+          "4a9f2a0d8944dc1c": {
+            "calls": 3,
+            "ms": 1.2726000000038766,
+            "maxMs": 0.4559000000008382
+          },
+          "7f2c8b9056bc0d80": {
+            "calls": 3,
+            "ms": 1.2141000000046915,
+            "maxMs": 0.4495000000024447
+          },
+          "ce26a2fdc49bce7f": {
+            "calls": 1,
+            "ms": 0.5742000000027474,
+            "maxMs": 0.5742000000027474
+          },
+          "b5297617afb2db1d": {
+            "calls": 1,
+            "ms": 0.4386999999987893,
+            "maxMs": 0.4386999999987893
+          },
+          "1c7e8dcc8b6995f5": {
+            "calls": 1,
+            "ms": 0.4596000000019558,
+            "maxMs": 0.4596000000019558
+          },
+          "00365bfe5664f00d": {
+            "calls": 1,
+            "ms": 1.135599999994156,
+            "maxMs": 1.135599999994156
+          },
+          "e4355d1e1b922e70": {
+            "calls": 1,
+            "ms": 0.3390999999974156,
+            "maxMs": 0.3390999999974156
+          },
+          "dd6b2daea1c7b19f": {
+            "calls": 1,
+            "ms": 1.5424999999959255,
+            "maxMs": 1.5424999999959255
+          },
+          "47d660f16ad200e2": {
+            "calls": 1,
+            "ms": 1.1754999999975553,
+            "maxMs": 1.1754999999975553
+          },
+          "44b13460e11fd4ad": {
+            "calls": 1,
+            "ms": 1.7400999999954365,
+            "maxMs": 1.7400999999954365
+          },
+          "397e2e1a8308c887": {
+            "calls": 1,
+            "ms": 112.14310000000114,
+            "maxMs": 112.14310000000114
+          },
+          "d173a31320174e91": {
+            "calls": 1,
+            "ms": 16.99279999999999,
+            "maxMs": 16.99279999999999
+          },
+          "1130bb78a9ac28aa": {
+            "calls": 6,
+            "ms": 751.0760999999984,
+            "maxMs": 748.0118999999977
+          },
+          "9532003c48cd8d04": {
+            "calls": 6,
+            "ms": 12.908100000000559,
+            "maxMs": 7.654300000001967
+          }
+        },
+        "spans": {
+          "assertCentralSchema": {
+            "calls": 18,
+            "ms": 1979.9137000000192,
+            "maxMs": 162.77390000000014
+          },
+          "assertAuthorityAdmission": {
+            "calls": 18,
+            "ms": 2172.79280000001,
+            "maxMs": 173.78800000000047
+          },
+          "assertAuthoritySecurity": {
+            "calls": 18,
+            "ms": 232.2308000000121,
+            "maxMs": 16.126499999998487
+          },
+          "observeTenantRuntimeMetadata": {
+            "calls": 3,
+            "ms": 836.087099999997,
+            "maxMs": 322.5265999999974
+          }
+        },
+        "locks": {
+          "central-held": {
+            "calls": 18,
+            "ms": 401.61919999998645,
+            "maxMs": 44.93649999999616
+          },
+          "audit-held": {
+            "calls": 1,
+            "ms": 399.3718000000008,
+            "maxMs": 399.3718000000008
+          }
+        },
+        "admissions": [
+          {
+            "before": {
+              "active": 1,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 9.51,
+            "after": {
+              "active": 2,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "leaseRemainingMs": 15000
+          }
+        ],
+        "responseAt": 62683.5693
+      }
+    },
+    {
+      "status": 200,
+      "code": null,
+      "ms": 4001.57,
+      "total": 1000,
+      "metrics": {
+        "id": 12,
+        "tag": "9a8c9c21-c3b9-4efa-9fde-0ec58fb8d8d7",
+        "phase": "setup",
+        "queryCount": 1033,
+        "authorityTransactions": 18,
+        "checkouts": [
+          {
+            "waitMs": 15.65,
+            "holdMs": 207.23,
+            "max": 8,
+            "total": 3,
+            "idle": 0,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 157.29,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 131.89,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 7.51,
+            "holdMs": 74.17,
+            "max": 4,
+            "total": 2,
+            "idle": 0,
+            "waiting": 0,
+            "role": "catalog",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 162.06,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 134.71,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.75,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 6.79,
+            "holdMs": 2934.06,
+            "max": 5,
+            "total": 3,
+            "idle": 0,
+            "waiting": 0,
+            "role": "tenant-2",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.63,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.01,
+            "holdMs": 144.04,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 2.43,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 127.27,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 129.68,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 134.42,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 157.61,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 250.86,
+            "max": 8,
+            "total": 4,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 1.64,
+            "holdMs": 157.58,
+            "max": 8,
+            "total": 7,
+            "idle": 1,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 12.3,
+            "holdMs": 209.65,
+            "max": 8,
+            "total": 7,
+            "idle": 1,
+            "waiting": 1,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 129.56,
+            "max": 8,
+            "total": 8,
+            "idle": 6,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 149.61,
+            "max": 8,
+            "total": 8,
+            "idle": 6,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.79,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 120.03,
+            "max": 8,
+            "total": 8,
+            "idle": 7,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 1.67,
+            "max": 8,
+            "total": 1,
+            "idle": 1,
+            "waiting": 0,
+            "role": "central-reader",
+            "discard": false
+          },
+          {
+            "waitMs": 0.02,
+            "holdMs": 136.85,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          },
+          {
+            "waitMs": 0.1,
+            "holdMs": 134.68,
+            "max": 8,
+            "total": 8,
+            "idle": 8,
+            "waiting": 0,
+            "role": "authority",
+            "discard": false
+          }
+        ],
+        "sqlErrors": [],
+        "failures": [],
+        "queries": {
+          "authority/other": {
+            "calls": 144,
+            "ms": 99.7050000000163,
+            "maxMs": 7.342999999993481
+          },
+          "authority/transaction": {
+            "calls": 72,
+            "ms": 135.81550000001153,
+            "maxMs": 21.515100000004168
+          },
+          "authority/metadata": {
+            "calls": 486,
+            "ms": 2087.558299999997,
+            "maxMs": 89.05299999999988
+          },
+          "authority/authority-lock": {
+            "calls": 18,
+            "ms": 105.01110000000335,
+            "maxMs": 41.94810000000143
+          },
+          "authority/authority-protocol": {
+            "calls": 80,
+            "ms": 135.19389999997657,
+            "maxMs": 6.826099999998405
+          },
+          "catalog/metadata": {
+            "calls": 4,
+            "ms": 51.89679999999498,
+            "maxMs": 43.77079999999842
+          },
+          "catalog/transaction": {
+            "calls": 4,
+            "ms": 3.5587000000014086,
+            "maxMs": 1.5815999999977066
+          },
+          "catalog/other": {
+            "calls": 1,
+            "ms": 18.471400000002177,
+            "maxMs": 18.471400000002177
+          },
+          "central-reader/other": {
+            "calls": 5,
+            "ms": 9.172500000007858,
+            "maxMs": 2.417600000000675
+          },
+          "tenant-2/transaction": {
+            "calls": 13,
+            "ms": 10.467599999989034,
+            "maxMs": 2.1247999999977765
+          },
+          "tenant-2/metadata": {
+            "calls": 168,
+            "ms": 734.4657999999763,
+            "maxMs": 92.55619999999908
+          },
+          "tenant-2/other": {
+            "calls": 25,
+            "ms": 33.97559999999066,
+            "maxMs": 14.235000000000582
+          },
+          "tenant-2/application-selection": {
+            "calls": 1,
+            "ms": 105.37660000000324,
+            "maxMs": 105.37660000000324
+          },
+          "tenant-2/audit-prepare": {
+            "calls": 6,
+            "ms": 245.1166999999914,
+            "maxMs": 236.02209999999468
+          },
+          "tenant-2/audit-append": {
+            "calls": 6,
+            "ms": 8.021299999993062,
+            "maxMs": 2.441899999997986
+          }
+        },
+        "queryHashes": {
+          "6ec438bce08867f4": {
+            "calls": 18,
+            "ms": 12.802800000012212,
+            "maxMs": 1.5279000000009546
+          },
+          "3eb12e5bafe877f8": {
+            "calls": 19,
+            "ms": 10.417700000012701,
+            "maxMs": 1.9053000000058091
+          },
+          "74c89290b5bc0324": {
+            "calls": 21,
+            "ms": 9.819599999987986,
+            "maxMs": 0.8799999999973807
+          },
+          "6de0ab5ecc04997d": {
+            "calls": 18,
+            "ms": 9.59239999998681,
+            "maxMs": 0.8525999999983469
+          },
+          "1785d86a000b9d26": {
+            "calls": 18,
+            "ms": 14.453200000010838,
+            "maxMs": 4.2796999999991385
+          },
+          "5132894cb05b9550": {
+            "calls": 18,
+            "ms": 12.834699999984878,
+            "maxMs": 1.617099999995844
+          },
+          "0ac62896dcae5330": {
+            "calls": 18,
+            "ms": 885.3470000000088,
+            "maxMs": 89.05299999999988
+          },
+          "cfcd1108ca0c6a9f": {
+            "calls": 36,
+            "ms": 452.60839999996097,
+            "maxMs": 35.8718000000008
+          },
+          "e99a77f79a35884c": {
+            "calls": 18,
+            "ms": 76.51510000000417,
+            "maxMs": 10.322599999999511
+          },
+          "0d2fc793022bceff": {
+            "calls": 18,
+            "ms": 38.81259999998292,
+            "maxMs": 7.9187999999994645
+          },
+          "5f3202c8e2710e93": {
+            "calls": 18,
+            "ms": 21.482600000003004,
+            "maxMs": 2.2929000000003725
+          },
+          "933e3ba410cb335c": {
+            "calls": 18,
+            "ms": 13.041400000001886,
+            "maxMs": 1.5120999999999185
+          },
+          "134e69c66f0f2132": {
+            "calls": 18,
+            "ms": 21.865700000002107,
+            "maxMs": 3.2224999999962165
+          },
+          "ad488789c5b185d7": {
+            "calls": 18,
+            "ms": 12.081500000014785,
+            "maxMs": 2.1066000000064378
+          },
+          "ece0c3b122528358": {
+            "calls": 18,
+            "ms": 42.44489999999496,
+            "maxMs": 6.3835999999937485
+          },
+          "2ba33ea79fa6200f": {
+            "calls": 18,
+            "ms": 17.96799999999348,
+            "maxMs": 2.1823999999978696
+          },
+          "96e7cfc17fab9433": {
+            "calls": 18,
+            "ms": 33.805599999999686,
+            "maxMs": 6.961799999997311
+          },
+          "100df8b38c17d223": {
+            "calls": 18,
+            "ms": 17.767500000001746,
+            "maxMs": 5.854200000001583
+          },
+          "fab63c837f779e3e": {
+            "calls": 18,
+            "ms": 17.812100000010105,
+            "maxMs": 1.720100000005914
+          },
+          "783d13417acd25bf": {
+            "calls": 18,
+            "ms": 24.049100000011094,
+            "maxMs": 3.0045000000027358
+          },
+          "4ad6d90f7abdd067": {
+            "calls": 18,
+            "ms": 12.108200000009674,
+            "maxMs": 1.7946000000010827
+          },
+          "18967f5c79a0ec46": {
+            "calls": 18,
+            "ms": 25.5798000000068,
+            "maxMs": 7.726199999997334
+          },
+          "f864efcc71a6c579": {
+            "calls": 18,
+            "ms": 17.015299999999115,
+            "maxMs": 3.1067000000039116
+          },
+          "2712b1e88642e19c": {
+            "calls": 18,
+            "ms": 26.922100000017963,
+            "maxMs": 6.057500000002619
+          },
+          "848df42650141cf9": {
+            "calls": 18,
+            "ms": 21.184699999983422,
+            "maxMs": 2.238499999999476
+          },
+          "dc60eea8dfc8c89d": {
+            "calls": 18,
+            "ms": 25.37269999999262,
+            "maxMs": 2.9954999999972642
+          },
+          "27bb21ef334ea8fd": {
+            "calls": 18,
+            "ms": 13.955399999991641,
+            "maxMs": 2.2445999999981723
+          },
+          "41b9b3cd52bbbb1f": {
+            "calls": 18,
+            "ms": 15.226099999992584,
+            "maxMs": 2.135099999999511
+          },
+          "b8dee57b82d22e57": {
+            "calls": 18,
+            "ms": 17.64160000000993,
+            "maxMs": 5.818199999994249
+          },
+          "1a17c51870491a03": {
+            "calls": 18,
+            "ms": 178.96389999998792,
+            "maxMs": 14.956399999995483
+          },
+          "27abf348b43e43cb": {
+            "calls": 18,
+            "ms": 28.141800000004878,
+            "maxMs": 3.2813999999998487
+          },
+          "5b868d125175f6e1": {
+            "calls": 18,
+            "ms": 29.845200000010664,
+            "maxMs": 5.899599999997008
+          },
+          "79663c1d3b43ceaf": {
+            "calls": 39,
+            "ms": 120.24970000002213,
+            "maxMs": 21.515100000004168
+          },
+          "a8402858d4f1e1d2": {
+            "calls": 18,
+            "ms": 10.560099999973318,
+            "maxMs": 1.552400000000489
+          },
+          "832bdaa8fc857473": {
+            "calls": 18,
+            "ms": 12.010600000015984,
+            "maxMs": 1.936200000003737
+          },
+          "18d98c1612e16751": {
+            "calls": 18,
+            "ms": 16.618800000011106,
+            "maxMs": 7.342999999993481
+          },
+          "bcd937c3e242e10d": {
+            "calls": 18,
+            "ms": 12.707099999999627,
+            "maxMs": 3.5800000000017462
+          },
+          "e457b9e54eecca47": {
+            "calls": 18,
+            "ms": 105.01110000000335,
+            "maxMs": 41.94810000000143
+          },
+          "6ffec628935eba85": {
+            "calls": 80,
+            "ms": 135.19389999997657,
+            "maxMs": 6.826099999998405
+          },
+          "ee3f0ab4dc9637fd": {
+            "calls": 1,
+            "ms": 3.213899999995192,
+            "maxMs": 3.213899999995192
+          },
+          "d6762ca289dc247d": {
+            "calls": 1,
+            "ms": 43.77079999999842,
+            "maxMs": 43.77079999999842
+          },
+          "1ef16a226485f8d6": {
+            "calls": 1,
+            "ms": 1.9153000000005704,
+            "maxMs": 1.9153000000005704
+          },
+          "6fa38779649dca65": {
+            "calls": 1,
+            "ms": 2.9968000000008033,
+            "maxMs": 2.9968000000008033
+          },
+          "d85f85aa1fb0cac6": {
+            "calls": 1,
+            "ms": 1.5815999999977066,
+            "maxMs": 1.5815999999977066
+          },
+          "f125ad4ce3df6dfb": {
+            "calls": 1,
+            "ms": 0.3628000000026077,
+            "maxMs": 0.3628000000026077
+          },
+          "2f0ad9318d8daad4": {
+            "calls": 1,
+            "ms": 0.3153999999994994,
+            "maxMs": 0.3153999999994994
+          },
+          "fd4033d6808ba219": {
+            "calls": 1,
+            "ms": 18.471400000002177,
+            "maxMs": 18.471400000002177
+          },
+          "b0b13d76e8815554": {
+            "calls": 5,
+            "ms": 9.172500000007858,
+            "maxMs": 2.417600000000675
+          },
+          "788e526fe808f5b2": {
+            "calls": 3,
+            "ms": 4.772199999992154,
+            "maxMs": 3.0953999999983353
+          },
+          "9059403393303375": {
+            "calls": 1,
+            "ms": 1.0622000000003027,
+            "maxMs": 1.0622000000003027
+          },
+          "88615167c03add1a": {
+            "calls": 3,
+            "ms": 2.399700000001758,
+            "maxMs": 0.986800000006042
+          },
+          "f7263e4d3062bfeb": {
+            "calls": 3,
+            "ms": 1.7851000000009662,
+            "maxMs": 0.7091000000000349
+          },
+          "31f205c484d85379": {
+            "calls": 3,
+            "ms": 1.5460000000093714,
+            "maxMs": 0.6160000000018044
+          },
+          "59b2a782f977eb75": {
+            "calls": 3,
+            "ms": 1.8364000000001397,
+            "maxMs": 0.66990000000078
+          },
+          "ddd03a1849384c3d": {
+            "calls": 3,
+            "ms": 13.927500000005239,
+            "maxMs": 7.647300000004179
+          },
+          "88fbf505d4a23ec8": {
+            "calls": 6,
+            "ms": 346.4366000000009,
+            "maxMs": 92.55619999999908
+          },
+          "b2db7c944764af2c": {
+            "calls": 6,
+            "ms": 24.446799999997893,
+            "maxMs": 7.185700000001816
+          },
+          "d33a1f0fa97d98bc": {
+            "calls": 6,
+            "ms": 48.45589999999356,
+            "maxMs": 21.21349999999802
+          },
+          "1deed5146f01dffd": {
+            "calls": 6,
+            "ms": 27.25329999999667,
+            "maxMs": 5.358800000001793
+          },
+          "2f40db89f0a129a0": {
+            "calls": 6,
+            "ms": 22.626100000001315,
+            "maxMs": 6.160900000002584
+          },
+          "428c92fdbfab66df": {
+            "calls": 6,
+            "ms": 66.32949999999255,
+            "maxMs": 24.900799999995797
+          },
+          "4ce543e9aa18d379": {
+            "calls": 6,
+            "ms": 29.91940000001341,
+            "maxMs": 5.520100000001548
+          },
+          "d4e0741b77184920": {
+            "calls": 6,
+            "ms": 3.4671999999991385,
+            "maxMs": 0.7174999999988358
+          },
+          "1bba20580524a4c7": {
+            "calls": 6,
+            "ms": 34.39360000001034,
+            "maxMs": 8.791199999999662
+          },
+          "1ab17d91c5a63e4f": {
+            "calls": 6,
+            "ms": 4.4680999999982305,
+            "maxMs": 2.3906999999962864
+          },
+          "c2aaa742dcb1f8e5": {
+            "calls": 3,
+            "ms": 1.6097000000008848,
+            "maxMs": 0.6584000000002561
+          },
+          "1307af40e2370ef9": {
+            "calls": 3,
+            "ms": 4.2149999999965075,
+            "maxMs": 2.6437000000005355
+          },
+          "60d79c6a1a7556c2": {
+            "calls": 4,
+            "ms": 1.4843999999939115,
+            "maxMs": 0.4375999999974738
+          },
+          "0ee22d0909bb7809": {
+            "calls": 3,
+            "ms": 1.6544000000139931,
+            "maxMs": 0.7179000000032829
+          },
+          "7798d7fb19421d0c": {
+            "calls": 3,
+            "ms": 1.3012999999991735,
+            "maxMs": 0.4760999999998603
+          },
+          "7fe73ee93d74a4a9": {
+            "calls": 3,
+            "ms": 1.7654999999940628,
+            "maxMs": 0.6977999999944586
+          },
+          "6d9da93055384c0b": {
+            "calls": 3,
+            "ms": 4.369699999995646,
+            "maxMs": 3.06699999999546
+          },
+          "220c20d913e2ceed": {
+            "calls": 3,
+            "ms": 2.026499999992666,
+            "maxMs": 1.015399999996589
+          },
+          "ddb59461666a362b": {
+            "calls": 3,
+            "ms": 3.574800000002142,
+            "maxMs": 1.3914999999979045
+          },
+          "8dbb51cf095bb93d": {
+            "calls": 3,
+            "ms": 7.001000000003842,
+            "maxMs": 4.208899999997811
+          },
+          "e2c6fd7521dd1a1f": {
+            "calls": 3,
+            "ms": 2.2677999999941676,
+            "maxMs": 0.9104999999981374
+          },
+          "bfb1cf4ddf03c911": {
+            "calls": 3,
+            "ms": 2.1388999999981024,
+            "maxMs": 0.821299999995972
+          },
+          "1ae166fff480c7ce": {
+            "calls": 3,
+            "ms": 1.8493999999918742,
+            "maxMs": 0.7372999999934109
+          },
+          "3a7bfb458bc8b5ee": {
+            "calls": 18,
+            "ms": 12.956699999987904,
+            "maxMs": 1.1332999999940512
+          },
+          "6882f3091e3c27f3": {
+            "calls": 3,
+            "ms": 7.25810000000638,
+            "maxMs": 2.8372999999992317
+          },
+          "b27132299719e3be": {
+            "calls": 3,
+            "ms": 5.173800000004121,
+            "maxMs": 1.7671000000045751
+          },
+          "8bb6ad1f270a2690": {
+            "calls": 3,
+            "ms": 11.501200000006065,
+            "maxMs": 5.751200000006065
+          },
+          "83d2d400d7caeef5": {
+            "calls": 3,
+            "ms": 3.1336000000010245,
+            "maxMs": 1.424700000003213
+          },
+          "a23fa378ebd8f4e4": {
+            "calls": 3,
+            "ms": 2.538300000000163,
+            "maxMs": 0.930000000000291
+          },
+          "bd72d38f88bc8231": {
+            "calls": 3,
+            "ms": 2.458200000000943,
+            "maxMs": 0.8988000000026659
+          },
+          "783325ae3d25386c": {
+            "calls": 3,
+            "ms": 2.5894999999945867,
+            "maxMs": 0.9720000000015716
+          },
+          "77228c6923da288e": {
+            "calls": 3,
+            "ms": 2.5270000000018626,
+            "maxMs": 1.0280999999959022
+          },
+          "5d8ff12ce411bf84": {
+            "calls": 3,
+            "ms": 2.494399999988673,
+            "maxMs": 0.9104000000006636
+          },
+          "1ba7f288fb2e8051": {
+            "calls": 3,
+            "ms": 3.542299999993702,
+            "maxMs": 1.6790999999939231
+          },
+          "61c0205940aabe50": {
+            "calls": 3,
+            "ms": 2.9558000000033644,
+            "maxMs": 1.6177999999999884
+          },
+          "4bb0354a0d0525aa": {
+            "calls": 3,
+            "ms": 1.7601999999969848,
+            "maxMs": 0.7162000000025728
+          },
+          "88ee429e48354c63": {
+            "calls": 3,
+            "ms": 2.598699999995006,
+            "maxMs": 1.1014999999970314
+          },
+          "20ccfa9eac39e255": {
+            "calls": 3,
+            "ms": 6.604800000000978,
+            "maxMs": 3.5362999999997555
+          },
+          "41d616ba86078843": {
+            "calls": 3,
+            "ms": 2.2903000000005704,
+            "maxMs": 0.8680000000022119
+          },
+          "215e68e69e1578e6": {
+            "calls": 3,
+            "ms": 3.649199999999837,
+            "maxMs": 1.468300000000454
+          },
+          "4a9f2a0d8944dc1c": {
+            "calls": 3,
+            "ms": 2.4351000000024214,
+            "maxMs": 1.1229999999995925
+          },
+          "7f2c8b9056bc0d80": {
+            "calls": 3,
+            "ms": 1.625,
+            "maxMs": 0.7246999999988475
+          },
+          "ce26a2fdc49bce7f": {
+            "calls": 1,
+            "ms": 2.1247999999977765,
+            "maxMs": 2.1247999999977765
+          },
+          "b5297617afb2db1d": {
+            "calls": 1,
+            "ms": 0.8010999999969499,
+            "maxMs": 0.8010999999969499
+          },
+          "1c7e8dcc8b6995f5": {
+            "calls": 1,
+            "ms": 0.5896999999968102,
+            "maxMs": 0.5896999999968102
+          },
+          "00365bfe5664f00d": {
+            "calls": 1,
+            "ms": 1.4248999999981606,
+            "maxMs": 1.4248999999981606
+          },
+          "e4355d1e1b922e70": {
+            "calls": 1,
+            "ms": 0.334500000004482,
+            "maxMs": 0.334500000004482
+          },
+          "dd6b2daea1c7b19f": {
+            "calls": 1,
+            "ms": 0.7361999999993714,
+            "maxMs": 0.7361999999993714
+          },
+          "47d660f16ad200e2": {
+            "calls": 1,
+            "ms": 1.1400999999968917,
+            "maxMs": 1.1400999999968917
+          },
+          "44b13460e11fd4ad": {
+            "calls": 1,
+            "ms": 1.7992000000012922,
+            "maxMs": 1.7992000000012922
+          },
+          "397e2e1a8308c887": {
+            "calls": 1,
+            "ms": 105.37660000000324,
+            "maxMs": 105.37660000000324
+          },
+          "d173a31320174e91": {
+            "calls": 1,
+            "ms": 14.235000000000582,
+            "maxMs": 14.235000000000582
+          },
+          "1130bb78a9ac28aa": {
+            "calls": 6,
+            "ms": 245.1166999999914,
+            "maxMs": 236.02209999999468
+          },
+          "9532003c48cd8d04": {
+            "calls": 6,
+            "ms": 8.021299999993062,
+            "maxMs": 2.441899999997986
+          }
+        },
+        "spans": {
+          "assertCentralSchema": {
+            "calls": 18,
+            "ms": 1930.0177000000112,
+            "maxMs": 161.44219999999768
+          },
+          "assertAuthorityAdmission": {
+            "calls": 18,
+            "ms": 2130.9379000000044,
+            "maxMs": 173.09709999999905
+          },
+          "assertAuthoritySecurity": {
+            "calls": 18,
+            "ms": 252.50979999999254,
+            "maxMs": 36.68439999999828
+          },
+          "observeTenantRuntimeMetadata": {
+            "calls": 3,
+            "ms": 803.0089999999982,
+            "maxMs": 308.60020000000077
+          }
+        },
+        "locks": {
+          "central-held": {
+            "calls": 18,
+            "ms": 485.25770000000193,
+            "maxMs": 79.04849999999715
+          },
+          "audit-held": {
+            "calls": 1,
+            "ms": 379.2882000000027,
+            "maxMs": 379.2882000000027
+          }
+        },
+        "admissions": [
+          {
+            "before": {
+              "active": 3,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "ms": 6.97,
+            "after": {
+              "active": 4,
+              "queued": 0,
+              "pools": 2,
+              "tenants": 1,
+              "circuitsOpen": 0,
+              "credentialDisposalsPending": 0,
+              "credentialCleanupTimeouts": 0,
+              "credentialCleanupFailures": 0,
+              "cleanupFailures": 0
+            },
+            "leaseRemainingMs": 15000
+          }
+        ],
+        "responseAt": 62244.1159
+      }
+    }
+  ],
+  "instrumentation": {
+    "queries": [
+      {
+        "hash": "6ec438bce08867f4",
+        "category": "other",
+        "caller": [
+          "at Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:112:32)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:46:180",
+          "at Object.measure (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionTiming.js:4:81)"
+        ]
+      },
+      {
+        "hash": "3eb12e5bafe877f8",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:25:18)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "74c89290b5bc0324",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at assertSupportedPostgresMajor (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:9:31)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:27:33)"
+        ]
+      },
+      {
+        "hash": "6de0ab5ecc04997d",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:28:11)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "1785d86a000b9d26",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at async Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:28:5)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "5132894cb05b9550",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:29:33)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "0ac62896dcae5330",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:100:31)",
+          "at assertCentralSchema (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:148:26)"
+        ]
+      },
+      {
+        "hash": "cfcd1108ca0c6a9f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.authoritySecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:99:28)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:111:107)"
+        ]
+      },
+      {
+        "hash": "e99a77f79a35884c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.catalogReaderSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:9:29)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:114:66)"
+        ]
+      },
+      {
+        "hash": "0d2fc793022bceff",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:5:34)",
+          "at Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:26)"
+        ]
+      },
+      {
+        "hash": "5f3202c8e2710e93",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:10:32)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "933e3ba410cb335c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:12:30)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "134e69c66f0f2132",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:14:36)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "ad488789c5b185d7",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:17:31)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "ece0c3b122528358",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:6:32)",
+          "at Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:23)"
+        ]
+      },
+      {
+        "hash": "2ba33ea79fa6200f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:12:32)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "96e7cfc17fab9433",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:16:30)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "100df8b38c17d223",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:19:28)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "fab63c837f779e3e",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:23:34)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "783d13417acd25bf",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:4:32)",
+          "at Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:88)"
+        ]
+      },
+      {
+        "hash": "4ad6d90f7abdd067",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:5:28)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "18967f5c79a0ec46",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:6:34)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "f864efcc71a6c579",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:7:32)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "2712b1e88642e19c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:8:30)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "848df42650141cf9",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:9:36)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "dc60eea8dfc8c89d",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:4:35)",
+          "at Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:33)"
+        ]
+      },
+      {
+        "hash": "27bb21ef334ea8fd",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:13:35)",
+          "at async Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:27)"
+        ]
+      },
+      {
+        "hash": "41b9b3cd52bbbb1f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:19:34)",
+          "at async Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:27)"
+        ]
+      },
+      {
+        "hash": "b8dee57b82d22e57",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.normalReadFingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\dedicatedCredentials.js:19:27)",
+          "at validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:142:92)"
+        ]
+      },
+      {
+        "hash": "1a17c51870491a03",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.fingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\readSchema.js:24:29)",
+          "at Object.normalReadFingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\dedicatedCredentials.js:20:52)"
+        ]
+      },
+      {
+        "hash": "27abf348b43e43cb",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.assertCentralImportSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralImportSecurity.js:5:27)",
+          "at validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:143:126)"
+        ]
+      },
+      {
+        "hash": "5b868d125175f6e1",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.assertCentralImportSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralImportSecurity.js:18:29)",
+          "at async validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:143:85)"
+        ]
+      },
+      {
+        "hash": "79663c1d3b43ceaf",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:44:18)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "a8402858d4f1e1d2",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:47:20)"
+        ]
+      },
+      {
+        "hash": "832bdaa8fc857473",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:48:20)"
+        ]
+      },
+      {
+        "hash": "18d98c1612e16751",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:49:20)"
+        ]
+      },
+      {
+        "hash": "bcd937c3e242e10d",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:50:35)"
+        ]
+      },
+      {
+        "hash": "e457b9e54eecca47",
+        "category": "authority-lock",
+        "caller": [
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:52:56",
+          "at Object.measure (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionTiming.js:4:81)",
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:52:20)"
+        ]
+      },
+      {
+        "hash": "6ffec628935eba85",
+        "category": "authority-protocol",
+        "caller": [
+          "at Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityProtocolQueries.js:88:31)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:59:59)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:90:46"
+        ]
+      },
+      {
+        "hash": "ee3f0ab4dc9637fd",
+        "category": "metadata",
+        "caller": [
+          "at assertReaderLogin (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:27:31)",
+          "at ready (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:20:16)",
+          "at async Object.connect (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:26:21)"
+        ]
+      },
+      {
+        "hash": "d6762ca289dc247d",
+        "category": "metadata",
+        "caller": [
+          "at assertReaderSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:42:29)",
+          "at async ready (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:20:143)",
+          "at async Object.connect (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:26:21)"
+        ]
+      },
+      {
+        "hash": "1ef16a226485f8d6",
+        "category": "metadata",
+        "caller": [
+          "at assertReaderSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:54:33)",
+          "at async ready (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:20:143)",
+          "at async Object.connect (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:26:21)"
+        ]
+      },
+      {
+        "hash": "6fa38779649dca65",
+        "category": "metadata",
+        "caller": [
+          "at assertReaderSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:67:31)",
+          "at async ready (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:20:143)",
+          "at async Object.connect (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\catalogReader.js:26:21)"
+        ]
+      },
+      {
+        "hash": "d85f85aa1fb0cac6",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\repository.js:49:77)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\routes\\organizationDashboardRoutes.js:36:24"
+        ]
+      },
+      {
+        "hash": "f125ad4ce3df6dfb",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\repository.js:49:149)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\routes\\organizationDashboardRoutes.js:36:24"
+        ]
+      },
+      {
+        "hash": "2f0ad9318d8daad4",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\repository.js:49:206)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\routes\\organizationDashboardRoutes.js:36:24"
+        ]
+      },
+      {
+        "hash": "fd4033d6808ba219",
+        "category": "other",
+        "caller": [
+          "at Object.opportunitySummary (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\opportunitySummary.js:11:29)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\repository.js:388:106",
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\fundingTenders\\repository.js:49:394)"
+        ]
+      },
+      {
+        "hash": "b0b13d76e8815554",
+        "category": "other",
+        "caller": []
+      },
+      {
+        "hash": "788e526fe808f5b2",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:58:31)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "9059403393303375",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:65:49)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "88615167c03add1a",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:67:36)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "f7263e4d3062bfeb",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:72:33)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "31f205c484d85379",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:75:52)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "59b2a782f977eb75",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:79:31)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "ddd03a1849384c3d",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:87:32)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "88fbf505d4a23ec8",
+        "category": "metadata",
+        "caller": [
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:26:31)",
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:59)",
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:26)"
+        ]
+      },
+      {
+        "hash": "b2db7c944764af2c",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:113:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "d33a1f0fa97d98bc",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:156:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "1deed5146f01dffd",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:196:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "2f40db89f0a129a0",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:219:90)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "428c92fdbfab66df",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:240:43)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "4ce543e9aa18d379",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:261:34)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "d4e0741b77184920",
+        "category": "metadata",
+        "caller": [
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:279:32)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "1bba20580524a4c7",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:281:36)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "1ab17d91c5a63e4f",
+        "category": "other",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:13:32)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "c2aaa742dcb1f8e5",
+        "category": "transaction",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:17:18)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "1307af40e2370ef9",
+        "category": "other",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:18:28)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "60d79c6a1a7556c2",
+        "category": "transaction",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:22:18)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "0ee22d0909bb7809",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateDatabaseContract (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:65:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:514:22)"
+        ]
+      },
+      {
+        "hash": "7798d7fb19421d0c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateDatabaseContract (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:80:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:514:22)"
+        ]
+      },
+      {
+        "hash": "7fe73ee93d74a4a9",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:527:38)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "6d9da93055384c0b",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:90:30)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:11)"
+        ]
+      },
+      {
+        "hash": "220c20d913e2ceed",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:104:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "ddb59461666a362b",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:121:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "8dbb51cf095bb93d",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:144:28)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "e2c6fd7521dd1a1f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:180:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "bfb1cf4ddf03c911",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:195:30)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:11)"
+        ]
+      },
+      {
+        "hash": "1ae166fff480c7ce",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:203:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "3a7bfb458bc8b5ee",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:246:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "6882f3091e3c27f3",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:259:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "b27132299719e3be",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:296:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "8bb6ad1f270a2690",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:333:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "83d2d400d7caeef5",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:364:30)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "a23fa378ebd8f4e4",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:368:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "bd72d38f88bc8231",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:373:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "783325ae3d25386c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:381:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "77228c6923da288e",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:392:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "5d8ff12ce411bf84",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:410:39)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "1ba7f288fb2e8051",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:41:33)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:420:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "61c0205940aabe50",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:430:42)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "4bb0354a0d0525aa",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:439:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "88ee429e48354c63",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:445:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "20ccfa9eac39e255",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:455:42)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "41d616ba86078843",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:484:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "215e68e69e1578e6",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:496:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "4a9f2a0d8944dc1c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:562:35)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "7f2c8b9056bc0d80",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:102:34)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "ce26a2fdc49bce7f",
+        "category": "transaction",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:152:18)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:32",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "b5297617afb2db1d",
+        "category": "transaction",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:154:18)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "1c7e8dcc8b6995f5",
+        "category": "other",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:162:20)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "00365bfe5664f00d",
+        "category": "other",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:163:35)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "e4355d1e1b922e70",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at run (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:112:16)",
+          "at Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:90:51)"
+        ]
+      },
+      {
+        "hash": "dd6b2daea1c7b19f",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at run (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:114:16)",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:90:45)"
+        ]
+      },
+      {
+        "hash": "47d660f16ad200e2",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at readResponsibleDirectory (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:53:30)",
+          "at async Object.report (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\reportSql.js:21:47)"
+        ]
+      },
+      {
+        "hash": "44b13460e11fd4ad",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at reportDirectory (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:167:26)",
+          "at Object.report (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\reportSql.js:21:92)"
+        ]
+      },
+      {
+        "hash": "397e2e1a8308c887",
+        "category": "application-selection",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at Object.report (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\reportSql.js:25:30)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:208:18"
+        ]
+      },
+      {
+        "hash": "d173a31320174e91",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at Object.opportunitySummary (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\opportunitySummary.js:11:29)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:210:64"
+        ]
+      },
+      {
+        "hash": "1130bb78a9ac28aa",
+        "category": "audit-prepare",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at PostgresAppendRepository.prepare (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\postgresAppendRepository.js:4:35)",
+          "at Object.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\appendService.js:8:39)"
+        ]
+      },
+      {
+        "hash": "9532003c48cd8d04",
+        "category": "audit-append",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at PostgresAppendRepository.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\postgresAppendRepository.js:19:35)",
+          "at Object.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\appendService.js:22:37)"
+        ]
+      },
+      {
+        "hash": "587fa628a9fe4642",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:72:30)",
+          "at async Object.prepare (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:308:19)",
+          "at async Object.protect (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:251:21)"
+        ]
+      },
+      {
+        "hash": "8f5133b30305947b",
+        "category": "application-selection",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at Object.report (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\reportSql.js:25:30)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:208:18"
+        ]
+      },
+      {
+        "hash": "9c1682fef1eba34c",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:99:44)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:53:22)"
+        ]
+      },
+      {
+        "hash": "99957baa815ba260",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:100:45)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:100:22)"
+        ]
+      }
+    ],
+    "policies": [
+      {
+        "globalLimit": 20,
+        "perTenantLimit": 5,
+        "operationalReserve": 2,
+        "globalQueueLimit": 40,
+        "perTenantQueueLimit": 10,
+        "operationalQueueReserve": 2,
+        "acquireTimeoutMs": 5000,
+        "leaseTimeoutMs": 15000,
+        "idleTimeoutMs": 30000,
+        "drainTimeoutMs": 10000,
+        "circuitFailureThreshold": 3,
+        "circuitResetMs": 10000,
+        "backoffBaseMs": 25,
+        "maxBackoffMs": 250
+      }
+    ],
+    "samples": []
+  },
+  "integrity": {
+    "unchanged": true
+  },
+  "finishedAt": "2026-11-06T21:54:01.895Z"
+}

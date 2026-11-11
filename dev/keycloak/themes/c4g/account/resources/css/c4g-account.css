@@ -1,0 +1,523 @@
+/* Metronic settings surfaces adapted to the native Keycloak account console. */
+body[data-page-id='account'] {
+  color-scheme: light;
+  --account-action: #075b59;
+  --account-action-hover: #064846;
+  --account-action-soft: #e7f4f1;
+  --account-ink: #273534;
+  --account-muted: #5f706c;
+  --account-border: #dfe7e5;
+  --account-canvas: #f7f9f8;
+  --account-surface: #fff;
+  --account-radius: 12px;
+  --account-card-padding: clamp(16px, 2.4vw, 28px);
+
+  --pf-v5-global--primary-color--100: var(--account-action);
+  --pf-v5-global--primary-color--200: var(--account-action-hover);
+  --pf-v5-global--link--Color: var(--account-action);
+  --pf-v5-global--link--Color--hover: var(--account-action-hover);
+  --pf-v5-global--active-color--100: var(--account-action);
+  --pf-v5-global--Color--100: var(--account-ink);
+  --pf-v5-global--Color--200: var(--account-muted);
+  --pf-v5-global--FontFamily--text: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pf-v5-global--FontFamily--heading: var(--pf-v5-global--FontFamily--text);
+
+  background: var(--account-canvas);
+  color: var(--account-ink);
+  font: 400 14px/1.55 var(--pf-v5-global--FontFamily--text);
+}
+
+[data-page-id='account'] :is(a, button, input, select, textarea, .pf-v5-c-menu__item):focus-visible {
+  outline: 2px solid var(--account-action);
+  outline-offset: 3px;
+}
+
+/* Header and navigation */
+[data-page-id='account'] .pf-v5-c-masthead {
+  --pf-v5-c-masthead--BackgroundColor: var(--account-surface);
+  --pf-v5-c-masthead--PaddingLeft: 24px;
+  --pf-v5-c-masthead--PaddingRight: 24px;
+
+  border-bottom: 1px solid var(--account-border);
+}
+
+[data-page-id='account'] .pf-v5-c-masthead__brand img {
+  width: 144px;
+  height: auto;
+  max-height: 66px;
+  object-fit: contain;
+}
+
+[data-page-id='account'] .pf-v5-c-masthead :is(.pf-v5-c-button, .pf-v5-c-menu-toggle) {
+  color: var(--account-ink);
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar {
+  --pf-v5-c-toolbar--BackgroundColor: var(--account-surface);
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__content-section {
+  align-items: center;
+  column-gap: 12px;
+}
+
+[data-page-id='account'] .pf-v5-c-masthead :is(.pf-v5-c-button.pf-m-link, .pf-v5-c-menu-toggle) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--account-border);
+  border-radius: 8px;
+  background: var(--account-surface);
+  color: var(--account-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle {
+  background: var(--account-canvas);
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle::before,
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle::after {
+  border: 0;
+}
+
+[data-page-id='account'] .pf-v5-c-masthead :is(.pf-v5-c-button.pf-m-link, .pf-v5-c-menu-toggle):hover,
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle[aria-expanded='true'] {
+  background: var(--account-action-soft);
+  color: var(--account-action);
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-button__icon.pf-m-end {
+  margin-inline: 0;
+}
+
+[data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-avatar {
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  border: 1px solid var(--account-border);
+  border-radius: 50%;
+  background: var(--account-canvas);
+}
+
+[data-page-id='account'] .pf-v5-c-menu {
+  --pf-v5-c-menu--BackgroundColor: var(--account-surface);
+
+  border: 1px solid var(--account-border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgb(39 53 52 / 12%);
+}
+
+[data-page-id='account'] .pf-v5-c-menu__item {
+  min-height: 40px;
+  border-radius: 6px;
+  color: var(--account-ink);
+  font-size: 14px;
+}
+
+[data-page-id='account'] .pf-v5-c-menu__item:is(:hover, :focus-visible) {
+  background: var(--account-action-soft);
+  color: var(--account-action);
+}
+
+[data-page-id='account'] .pf-v5-c-page__sidebar {
+  --pf-v5-c-page__sidebar--BackgroundColor: var(--account-surface);
+  --pf-v5-c-page__sidebar--Width: 248px;
+
+  border-inline-end: 1px solid var(--account-border);
+}
+
+[data-page-id='account'] .pf-v5-c-nav {
+  padding: 16px;
+}
+
+[data-page-id='account'] :is(.pf-v5-c-nav__item, .pf-v5-c-nav__link)::before {
+  border-color: var(--account-border);
+}
+
+[data-page-id='account'] .pf-v5-c-nav__link::after {
+  border: 0;
+}
+
+[data-page-id='account'] .pf-v5-c-nav__link {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--account-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: start;
+}
+
+[data-page-id='account'] .pf-v5-c-nav__subnav {
+  padding-inline-start: 12px;
+}
+
+[data-page-id='account'] .pf-v5-c-nav__link:hover {
+  background: var(--account-canvas);
+  color: var(--account-ink);
+}
+
+[data-page-id='account'] .pf-v5-c-nav__link.pf-m-current {
+  background: var(--account-action-soft);
+  border-inline-start: 3px solid var(--account-action);
+  color: var(--account-action);
+  padding-inline-start: 9px;
+  font-weight: 600;
+}
+
+/* Shared page headings, forms and data lists */
+[data-page-id='account'] .pf-v5-c-page__main {
+  background: var(--account-canvas);
+}
+
+[data-page-id='account'] .pf-v5-c-page__main > .pf-v5-c-page__main-section {
+  --pf-v5-c-page__main-section--BackgroundColor: var(--account-canvas);
+  --pf-v5-c-page__main-section--m-light--BackgroundColor: var(--account-canvas);
+
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: clamp(20px, 3vw, 40px);
+}
+
+[data-page-id='account'] .pf-v5-c-page__main > .pf-v5-c-page__main-section + .pf-v5-c-page__main-section {
+  padding-block-start: 0;
+}
+
+[data-page-id='account'] .pf-v5-c-page__main .pf-v5-c-content {
+  max-width: 72ch;
+  color: var(--account-muted);
+}
+
+[data-page-id='account'] .pf-v5-c-title {
+  color: var(--account-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+[data-page-id='account'] [data-testid='page-heading'] {
+  margin-block-end: 6px;
+  font-size: clamp(24px, 2.3vw, 32px);
+  line-height: 1.25;
+}
+
+[data-page-id='account'] :is(h1.pf-v5-c-title:not([data-testid='page-heading']), h2.pf-v5-c-title) {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+[data-page-id='account'] h3.pf-v5-c-title {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+[data-page-id='account'] .pf-v5-c-page__main-section:has(> h2[id$='-categ-title']),
+[data-page-id='account'] .pf-v5-c-page__main-section .pf-v5-c-form {
+  --pf-v5-c-page__main-section--m-light--BackgroundColor: var(--account-surface);
+
+  width: 100%;
+  margin-block-end: 20px;
+  padding: var(--account-card-padding) !important;
+  border: 1px solid var(--account-border);
+  border-radius: var(--account-radius);
+  background: var(--account-surface);
+}
+
+[data-page-id='account'] .pf-v5-c-data-list {
+  --pf-v5-c-data-list--BorderTopWidth: 0;
+  --pf-v5-c-data-list__item--BorderBottomWidth: 0;
+
+  border: 1px solid var(--account-border);
+  border-radius: 8px;
+  background: var(--account-surface);
+  overflow-wrap: anywhere;
+}
+
+[data-page-id='account'] .pf-v5-c-data-list > li + li {
+  border-block-start: 1px solid var(--account-border);
+}
+
+[data-page-id='account'] .pf-v5-c-data-list__item {
+  background: transparent;
+}
+
+[data-page-id='account'] .pf-v5-c-data-list__item-row {
+  padding-inline: 16px;
+}
+
+[data-page-id='account'] .pf-v5-c-data-list__item-content {
+  min-width: 0;
+  align-items: center;
+}
+
+[data-page-id='account'] .pf-v5-c-form :is(.pf-v5-c-form-control, .pf-v5-c-menu-toggle) {
+  --pf-v5-c-form-control--before--BorderColor: var(--account-border);
+  --pf-v5-c-menu-toggle--before--BorderColor: var(--account-border);
+
+  min-width: 0;
+  min-height: 40px;
+  border-radius: 8px;
+}
+
+[data-page-id='account'] .pf-v5-c-form :is(.pf-v5-c-form-control, .pf-v5-c-menu-toggle)::before,
+[data-page-id='account'] .pf-v5-c-form :is(.pf-v5-c-form-control, .pf-v5-c-menu-toggle)::after {
+  border-radius: inherit;
+}
+
+[data-page-id='account'] .pf-v5-c-form .pf-v5-c-form-control:focus-within {
+  outline: 2px solid var(--account-action);
+  outline-offset: 2px;
+}
+
+[data-page-id='account'] .pf-v5-c-form .pf-v5-c-form-control :is(input, select, textarea):focus-visible {
+  outline: none;
+}
+
+[data-page-id='account'] .pf-v5-c-button {
+  --pf-v5-c-button--BorderRadius: 8px;
+
+  min-height: 40px;
+  max-width: 100%;
+  border-radius: 8px;
+  font-weight: 600;
+  white-space: normal;
+}
+
+[data-page-id='account'] .pf-v5-c-button::after {
+  border-radius: inherit;
+}
+
+[data-page-id='account'] .pf-v5-c-button.pf-m-primary {
+  --pf-v5-c-button--m-primary--BackgroundColor: var(--account-action);
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--account-action-hover);
+  --pf-v5-c-button--m-primary--active--BackgroundColor: var(--account-action-hover);
+}
+
+[data-page-id='account'] .pf-v5-c-button.pf-m-secondary {
+  --pf-v5-c-button--m-secondary--Color: var(--account-action);
+  --pf-v5-c-button--m-secondary--BorderColor: var(--account-border);
+  --pf-v5-c-button--m-secondary--hover--Color: var(--account-action-hover);
+  --pf-v5-c-button--m-secondary--hover--BorderColor: var(--account-action);
+  --pf-v5-c-button--m-secondary--hover--BackgroundColor: var(--account-action-soft);
+}
+
+[data-page-id='account'] .pf-v5-c-button.pf-m-secondary:not(:disabled, .pf-m-disabled, [aria-disabled='true'])::after {
+  border-color: var(--account-border);
+}
+
+[data-page-id='account'] .pf-v5-c-button.pf-m-secondary:hover:not(:disabled, .pf-m-disabled, [aria-disabled='true'])::after {
+  border-color: var(--account-action);
+}
+
+/* Each native method pairs a heading and its action with the credential list. */
+[data-page-id='account'] .pf-v5-c-page__main-section > h2[id$='-categ-title'] {
+  margin: calc(-1 * var(--account-card-padding)) calc(-1 * var(--account-card-padding)) 0;
+  padding: 16px var(--account-card-padding);
+  border-block-end: 1px solid var(--account-border);
+  border-start-start-radius: calc(var(--account-radius) - 1px);
+  border-start-end-radius: calc(var(--account-radius) - 1px);
+  background: var(--account-canvas);
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(> .pf-v5-l-split__item .cred-title) {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-block: 18px 10px !important;
+  color: var(--account-muted);
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(.cred-title) > .pf-v5-l-split__item {
+  min-width: 0;
+  max-width: 100%;
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(.cred-title) h3 {
+  margin-block-end: 4px !important;
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(.cred-title) .pf-v5-c-button.pf-m-link {
+  padding: 8px 14px;
+  border: 1px solid var(--account-border);
+  background: var(--account-action-soft);
+  color: var(--account-action);
+  text-align: start;
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(.cred-title) .pf-v5-c-button.pf-m-link:hover {
+  border-color: var(--account-action);
+}
+
+[data-page-id='account'] .pf-v5-l-split:has(.cred-title) .pf-v5-c-menu-toggle {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--account-border);
+  border-radius: 8px;
+  background: var(--account-action-soft);
+  color: var(--account-action);
+}
+
+[data-page-id='account'] .pf-v5-c-data-list[data-testid$='/credential-list'] {
+  margin-block-end: 0 !important;
+}
+
+[data-page-id='account'] [data-testid$='/credential-list'] + .pf-v5-l-split {
+  margin-block-start: 20px !important;
+  padding-block-start: 18px;
+  border-block-start: 1px solid var(--account-border);
+}
+
+[data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__item-row {
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 12px;
+}
+
+[data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__cell,
+[data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__item-action {
+  padding-block: 0;
+}
+
+[data-page-id='account'] [data-testrole='label'] {
+  font-weight: 600;
+}
+
+[data-page-id='account'] [data-testrole='created-at'] {
+  color: var(--account-muted);
+}
+
+[data-page-id='account'] [data-testrole='created-at'] strong {
+  margin-inline-end: 6px !important;
+  font-weight: 600;
+}
+
+[data-page-id='account'] [data-testid$='/credential-list']:has([data-testid$='/not-set-up']) {
+  background: var(--account-canvas);
+  color: var(--account-muted);
+}
+
+[data-page-id='account'] [data-testid$='/credential-list']:has([data-testid$='/not-set-up']) .pf-v5-c-data-list__item-content {
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+[data-page-id='account'] [data-testid$='/not-set-up'] {
+  width: 100%;
+  text-align: start !important;
+}
+
+@media (max-width: 991px) {
+  [data-page-id='account'] .pf-v5-l-split:has(.cred-title) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+@media (max-width: 600px) {
+  [data-page-id='account'] .pf-v5-c-masthead {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead__brand img {
+    width: 136px;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead__content {
+    flex-basis: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar {
+    width: 100%;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead :is(.pf-v5-c-button.pf-m-link, .pf-v5-c-menu-toggle) {
+    width: 100%;
+    min-height: 44px;
+    padding-inline: 8px;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__content {
+    padding-inline: 0;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__content-section {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__item {
+    min-width: 0;
+    margin: 0;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__item:has(> [data-testid='options-toggle']) {
+    display: flex;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-toolbar__item:has(> :is([data-testid='options-kebab-toggle'], .pf-v5-c-avatar)) {
+    display: none;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle__text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  [data-page-id='account'] .pf-v5-c-masthead .pf-v5-c-menu-toggle__controls {
+    flex-shrink: 0;
+  }
+
+  [data-page-id='account'] .pf-v5-c-page__main > .pf-v5-c-page__main-section {
+    padding-inline: 16px;
+  }
+
+  [data-page-id='account'] .pf-v5-c-page__main .pf-v5-c-button {
+    min-height: 44px;
+  }
+
+  [data-page-id='account'] .pf-v5-l-split:has(> .pf-v5-l-split__item > h2) {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  [data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  [data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  [data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__item-action {
+    order: 1;
+    align-self: flex-start;
+    margin-inline: 0;
+  }
+
+  [data-page-id='account'] [data-testid$='/credential-list'] .pf-v5-c-data-list__cell {
+    width: 100%;
+    text-align: start;
+  }
+}

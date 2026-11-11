@@ -1,0 +1,8 @@
+.application-area-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:6px 0 16px; }
+.application-area-header h1 { margin:3px 0 0; color:var(--color-text-primary); font-size:clamp(1.5rem,2.2vw,2rem); line-height:1.2; }
+.application-area-header p { margin:0; color:var(--color-text-secondary); font-size:.85rem; }
+.application-area-header .btn { min-height:42px; border-radius:7px; }
+.application-area-nav { display:flex; gap:14px; margin:0 0 16px; border-bottom:1px solid var(--color-border); }
+.application-area-nav a { padding:10px 5px; border-bottom:3px solid transparent; color:var(--color-text-secondary); font-weight:600; text-decoration:none; }
+.application-area-nav a[aria-current=page] { border-color:var(--color-info); color:var(--color-info); }
+.application-area-nav a:focus-visible { outline:2px solid var(--color-info); outline-offset:2px; }

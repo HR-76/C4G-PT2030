@@ -1,0 +1,16 @@
+{
+  "status": "FAIL",
+  "checks": [],
+  "limits": [
+    "Real directory writer, F4, F5 and Central session/authority with synthetic identities; no HTTP/OIDC browser.",
+    "Experimental external guard has no enforcement in production writers: the negative bypass is intentional and demonstrates the candidate is not safe to integrate.",
+    "No simulated real network partition, exhaustive writer coverage, snapshot publication or matching pagination."
+  ],
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution",
+  "error": {
+    "stage": "session",
+    "name": "Error",
+    "code": "42501"
+  }
+}

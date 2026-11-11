@@ -1,0 +1,61 @@
+import { SectionBreadcrumb } from './MetronicCatalog'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Bell, Menu } from 'lucide-react'
+import { organizationNotificationsApi } from '../../api/api'
+import { useAuth } from '../../contexts/AuthContext'
+import OrganizationSelector from '../OrganizationSelector'
+
+export default function Header({ metronicSection, title, onMenuToggle, menuOpen, menuButtonRef }) {
+  const pathname = useLocation().pathname
+  const pq1 = pathname.startsWith('/publicacao-perfil') || pathname.startsWith('/pre-qualificacao')
+  const editorial = pq1 || pathname.startsWith('/perfil-organizacao')
+  const { user, organization } = useAuth()
+
+  return (
+    <header className={`top-header${editorial ? ' editorial-header' : ''}`}>
+      <div className="header-left">
+        <button ref={menuButtonRef} className="hamburger-btn" onClick={onMenuToggle} aria-label={menuOpen ? 'Recolher menu' : 'Abrir menu'}
+          aria-expanded={!!menuOpen} aria-controls="primary-navigation">
+          <Menu size={20} />
+        </button>
+        <SectionBreadcrumb title={title} section={metronicSection} detail={Boolean(metronicSection && pathname.split("/")[2])} />
+      </div>
+      <div className="header-actions">
+        <OrganizationSelector />
+        {organization && <AlertBell key={`${user?.id}:${organization?.id}:${organization?.membershipVersion || ''}`} organizationId={organization?.id} />}
+      </div>
+    </header>
+  )
+}
+
+export function AlertBell({ organizationId }) {
+  const [unread, setUnread] = useState(null)
+  useEffect(() => {
+    let active = true, sequence = 0, readController = null
+    const api = organizationNotificationsApi
+    const load = async (refresh = false) => {
+      const current = ++sequence
+      readController?.abort()
+      const controller = new AbortController()
+      readController = controller
+      try {
+        if (refresh) {
+          try { await api.refresh(organizationId, true) }
+          catch (e) { if (e.response?.status && e.response.status < 500) throw e }
+        }
+        if (!active || current !== sequence) return
+        const r = await api.list({ unread: true, limit: 1 }, organizationId, controller.signal, true)
+        if (active && current === sequence) setUnread(Number.isSafeInteger(r.data?.unread_count) ? r.data.unread_count : null)
+      } catch { if (active && current === sequence) setUnread(null) }
+    }
+    const reload = () => load()
+    load(true)
+    window.addEventListener('notifications:changed', reload)
+    window.addEventListener('focus', reload)
+    return () => { active = false; sequence++; readController?.abort(); window.removeEventListener('notifications:changed', reload); window.removeEventListener('focus', reload) }
+  }, [organizationId])
+  return <Link to="/notificacoes" className="notif-btn" aria-label={unread === null ? 'Alertas' : `Alertas · ${unread} não lidos`}>
+    <Bell size={20} />{unread > 0 && <span className="notif-badge">{unread > 99 ? '99+' : unread}</span>}
+  </Link>
+}

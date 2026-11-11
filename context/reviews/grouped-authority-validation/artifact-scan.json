@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-27T20:48:11.299Z",
+  "status": "PASS",
+  "directories": [
+    "grouped-authority-validation",
+    "grouped-authority-drift",
+    "grouped-authority-durability",
+    "grouped-authority-http",
+    "grouped-authority-standard",
+    "grouped-authority-capacity"
+  ],
+  "files": 40,
+  "bytes": 13730368,
+  "findings": [],
+  "limits": [
+    "Pattern scan of report artifacts, not a guarantee against every form of sensitive data.",
+    "UTF-8 and UTF-16LE logs included; no matched text is printed or persisted."
+  ]
+}

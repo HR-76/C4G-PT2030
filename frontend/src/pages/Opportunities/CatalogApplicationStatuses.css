@@ -1,0 +1,16 @@
+.cr-application-statuses,
+.cr-application-status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px;
+}
+.cr-application-statuses {
+  flex-direction: column;
+}
+.cr-application-statuses .chip {
+  white-space: normal;
+}
+.cr-application-error {
+  margin: 12px 0;
+}

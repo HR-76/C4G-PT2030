@@ -1,0 +1,2 @@
+# Registo e análise de interesses
+No registo exigir departamentos ou uma declaração explícita de interesse transversal; aceitar notas iniciais. Gravar no mesmo comando, com recibo e histórico. Distinguir registos antigos sem unidade de uma decisão transversal explícita. A partir do catálogo abrir a lista com o interesse identificado; mostrar excerto das notas e preparar candidatura apenas por ação explícita de pessoa autorizada.

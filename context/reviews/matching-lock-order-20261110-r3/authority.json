@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "checks": [
+    "committed membership revocation rejects a fresh prepare and creates no guard",
+    "committed session revocation rejects a fresh prepare and creates no guard"
+  ],
+  "limits": [
+    "Real Central coordinator and session/membership revocation with synthetic identity and synthetic prepare binding; no tenant commit, proposed matching fence, OIDC, or end-to-end pagination."
+  ]
+}

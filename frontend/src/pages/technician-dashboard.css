@@ -1,0 +1,30 @@
+.technician-dashboard { max-width:1280px; margin:auto; color:var(--color-text-primary); }
+.technician-header { display:flex; align-items:center; justify-content:space-between; gap:20px; padding-bottom:20px; border-bottom:1px solid var(--color-border); }
+.technician-header p { margin:0 0 4px; font-size:12px; color:var(--color-text-secondary); }
+.technician-header h1 { margin:0 0 6px; }
+.technician-header span,.technician-shortcut-grid span,.technician-list-note { color:var(--color-text-secondary); font-size:13px; line-height:1.5; }
+.technician-priorities { margin-top:24px; background:var(--color-surface); border:1px solid var(--color-border); border-radius:12px; box-shadow:var(--shadow-card); overflow:hidden; }
+.technician-section-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 20px; border-bottom:1px solid var(--color-border); }
+.technician-section-heading > div { display:flex; align-items:center; gap:10px; color:var(--color-action); }
+.technician-section-heading h2,.technician-shortcuts h2 { margin:0; color:var(--color-text-primary); font-size:16px; }
+.technician-section-heading a { color:var(--color-action); font-weight:600; }
+.technician-task-list { list-style:none; margin:0; padding:0; }
+.technician-task-list li + li { border-top:1px solid var(--color-border); }
+.technician-task-list a { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 20px; color:var(--color-text-primary); text-decoration:none; }
+.technician-task-list a:hover,.technician-shortcut-grid a:hover { background:var(--color-neutral-soft); }
+.technician-task-list a > span:first-child { min-width:0; display:grid; gap:4px; }
+.technician-task-list strong,.technician-task-list small { overflow-wrap:anywhere; }
+.technician-task-list small { color:var(--color-text-secondary); }
+.technician-task-date { display:inline-flex; align-items:center; gap:6px; flex-shrink:0; color:var(--color-text-secondary); font-size:12px; }
+.technician-task-date[data-group=overdue] { color:var(--color-danger); }
+.technician-list-note,.technician-feedback { margin:0; padding:16px 20px; }
+.technician-feedback p { margin:0 0 10px; }
+.technician-shortcuts { margin-top:28px; }
+.technician-panels { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.technician-shortcut-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-top:14px; }
+.technician-shortcut-grid a { display:grid; align-content:start; gap:9px; padding:20px; border:1px solid var(--color-border); border-radius:12px; background:var(--color-surface); color:var(--color-action); text-decoration:none; box-shadow:var(--shadow-card); }
+.technician-shortcut-grid strong { color:var(--color-text-primary); }
+.technician-dashboard :is(a,button):focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; }
+.c4g-shell .technician-task-list a:focus-visible { outline-offset:-3px; }
+@media(max-width:900px){.technician-shortcut-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.technician-panels{grid-template-columns:1fr;gap:0}}
+@media(max-width:600px){.technician-header,.technician-task-list a{align-items:flex-start;flex-direction:column}.technician-section-heading{align-items:flex-start;flex-wrap:wrap}.technician-shortcut-grid{grid-template-columns:1fr}.technician-task-list a{gap:8px}}

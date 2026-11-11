@@ -1,0 +1,14 @@
+{
+  "originalBaselineFile": "composition-before.cjs",
+  "originalBaselineSha256": "cec6036997941ebf27a1f4cdef370e7699eda7eed401b6f7cb083bbaa66bf0ca",
+  "sharedBaselineFile": "composition-shared-before.cjs",
+  "sharedBaselineSha256": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a",
+  "candidateFile": "backend/src/applications/composition.js",
+  "candidateSha256": "013800a63552e5112a16ff8af43edcb2dc876049dbc9ef3b3630603f0a2094aa",
+  "reason": "Independent parallel change readResponsibleDirectory and its repository wiring/export are shared by both measured variants; only report withAuthorityReads grouping differs.",
+  "baselineDerivation": {
+    "replace": "['partnersBrowse','report'].includes(scope.getStore()?.method)",
+    "with": "scope.getStore()?.method==='partnersBrowse'"
+  },
+  "independentChangeAttribution": "Excluded from attribution of report authority grouping latency and transaction reduction."
+}

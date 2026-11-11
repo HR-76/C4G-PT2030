@@ -1,0 +1,1035 @@
+{
+  "at": "2026-10-27T21:02:09.344Z",
+  "status": "COMPLETE",
+  "allRequestsPassed": true,
+  "controlledChecksPassed": true,
+  "sources": [
+    {
+      "path": "context/reviews/c6-alternating-host/host-control.json",
+      "sha256": "db05b9d56d76fc33d00def792cead238e8f157c9590052d6fd5b2c3a1803d575"
+    },
+    {
+      "path": "context/reviews/grouped-authority-validation/baseline.json",
+      "sha256": "c78d86efbec21100e44756f5d238e7a5ec71abd771517afbb7f025bf81fb3e74"
+    },
+    {
+      "path": "context/reviews/grouped-authority-validation/verification.json",
+      "sha256": "d52cdf38707899c768b6612f68812cab23e91fe66732002bd6e2174eee9c3d19"
+    },
+    {
+      "path": "context/reviews/c6-ab-1-before/results.json",
+      "sha256": "617f5d794ee5c656a07fedc8615ed5d36c68e11b0c25f66331ac7621b6cdc1d5"
+    },
+    {
+      "path": "context/reviews/c6-ab-1-before/summary.json",
+      "sha256": "c4baf0fd8d4c447f69849a928f7591a23e8d1bb5b75d79e92b869e99d2dc82b0"
+    },
+    {
+      "path": "context/reviews/c6-ab-1-before/host-variant.json",
+      "sha256": "68bf05bf16a89c3072a3a3f403c4232f89fc7d4592acf8967af833fb5afef4c1"
+    },
+    {
+      "path": "context/reviews/c6-ab-1-before/idle-1.json",
+      "sha256": "1c8321d7a37d9a541e36f6c95ad0b923312e393ff121e6330775814ebb58f77d"
+    },
+    {
+      "path": "context/reviews/c6-ab-2-after/results.json",
+      "sha256": "3a64aea6312aa0c920c06e81ee729d6950d9fb89d51df171a10aa4e9ef2966d0"
+    },
+    {
+      "path": "context/reviews/c6-ab-2-after/summary.json",
+      "sha256": "a5d0a4bfe2dd45f5f58811faaad6effd47e75463325a0eb1f40f3200a2e678ef"
+    },
+    {
+      "path": "context/reviews/c6-ab-2-after/host-variant.json",
+      "sha256": "c0970075e235f559956d20afd6f88c61768bbf556341afcda055f875c8dc7814"
+    },
+    {
+      "path": "context/reviews/c6-ab-2-after/idle-1.json",
+      "sha256": "fb407831d65a4c5a2dec031a2f214ab6b9948d1111463e82971740d6394bb405"
+    },
+    {
+      "path": "context/reviews/c6-ab-2-after/idle-2.json",
+      "sha256": "fd96b5539d0f0a07e87b5b7593ef7fefcfb71da0f9f8a75caff3c94ada30246c"
+    },
+    {
+      "path": "context/reviews/c6-ab-3-before/results.json",
+      "sha256": "94960c5a5adb99b110ed0dce3bc2e7028325a0e3d05b83b0cc065d36592af56c"
+    },
+    {
+      "path": "context/reviews/c6-ab-3-before/summary.json",
+      "sha256": "ae773165a4eda7ec50145bab940f8f97518590293b6e8af791479ca23415c3bd"
+    },
+    {
+      "path": "context/reviews/c6-ab-3-before/host-variant.json",
+      "sha256": "ef943c707b5e5b3493e6932c0e290dfe4db7535b00732c2737fa30a9fecd4b4f"
+    },
+    {
+      "path": "context/reviews/c6-ab-3-before/idle-1.json",
+      "sha256": "a54c7f0e6b791f5ad47685a800cc4b39cf455c8f20417908ec19a9b427702e80"
+    },
+    {
+      "path": "context/reviews/c6-ab-4-after/results.json",
+      "sha256": "c11a455aaa30453a445e4fb13cd9ed911dd4fa9c26ac251f9dc716ff963e63cc"
+    },
+    {
+      "path": "context/reviews/c6-ab-4-after/summary.json",
+      "sha256": "c7803edb4b163c335ccaf950372bc142029e3f18031ec7fc376a4fc47abbc863"
+    },
+    {
+      "path": "context/reviews/c6-ab-4-after/host-variant.json",
+      "sha256": "30b50de12d524d18485686cef29d1a1e45ecc70b02fff056183173ba63c7f79b"
+    },
+    {
+      "path": "context/reviews/c6-ab-4-after/idle-1.json",
+      "sha256": "e572db7528c2c7773c6128d9cf2e14748a7f8757541ac89f4dc8c59a98c15047"
+    },
+    {
+      "path": "context/reviews/c6-ab-5-before/results.json",
+      "sha256": "c8045896fa1e1624ec86b05c010172909d27c5c0e9cc2155555d9f585ac4041c"
+    },
+    {
+      "path": "context/reviews/c6-ab-5-before/summary.json",
+      "sha256": "02b79bde5ed6bc1f47e700792576f966b31183eb7003f137f568353b3918c72a"
+    },
+    {
+      "path": "context/reviews/c6-ab-5-before/host-variant.json",
+      "sha256": "2a3f5ed08a13be6ccd5e5fa75a414b6fdc0ead1455dd6bee7df987d9194e8221"
+    },
+    {
+      "path": "context/reviews/c6-ab-5-before/idle-1.json",
+      "sha256": "2145697aa61a69143b00c891383ab24ad77a645cf22027e7b000237cfd3adb9b"
+    },
+    {
+      "path": "context/reviews/c6-ab-6-after/results.json",
+      "sha256": "0bbb6c4564dc154af9e72322e5a5d655129c5036c777cbcc707bcefea739925b"
+    },
+    {
+      "path": "context/reviews/c6-ab-6-after/summary.json",
+      "sha256": "f74056f63312f246d324714706801541f85186ec35c358cfa065c97b7475874d"
+    },
+    {
+      "path": "context/reviews/c6-ab-6-after/host-variant.json",
+      "sha256": "256622edbd6eb0de07ab9f79ae2a7a0ac973df60c3e6b6ab5f044ec214238729"
+    },
+    {
+      "path": "context/reviews/c6-ab-6-after/idle-1.json",
+      "sha256": "277c5c35dd1e0f9b33bd308fca66fc83c8b089c64736cf93cc15afbe553d02fe"
+    }
+  ],
+  "configuration": {
+    "docker": "24|33344757760|29.7.2",
+    "powerPlan": "381b4222-f694-41f0-9685-ff5bb260df2e",
+    "postgresImage": "sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+    "keycloakImage": "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+  },
+  "policies": [
+    {
+      "globalLimit": 20,
+      "perTenantLimit": 5,
+      "operationalReserve": 2,
+      "globalQueueLimit": 40,
+      "perTenantQueueLimit": 10,
+      "operationalQueueReserve": 2,
+      "acquireTimeoutMs": 5000,
+      "leaseTimeoutMs": 15000,
+      "idleTimeoutMs": 30000,
+      "drainTimeoutMs": 10000,
+      "circuitFailureThreshold": 3,
+      "circuitResetMs": 10000,
+      "backoffBaseMs": 25,
+      "maxBackoffMs": 250
+    }
+  ],
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection"
+  ],
+  "runs": [
+    {
+      "index": 1,
+      "variant": "before",
+      "report": "c6-ab-1-before",
+      "startedAt": "2026-10-27T20:53:16.404Z",
+      "finishedAt": "2026-10-27T20:54:34.524Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 18447.68,
+      "p95Ms": 20622.7,
+      "elapsedMs": 20623,
+      "warmupMs": 11009.64,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16821.41,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 17751.88,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18447.68,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19264.43,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19971.23,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 20622.7,
+          "queries": 2619,
+          "tx": 42
+        }
+      ],
+      "queryCounts": [
+        2619
+      ],
+      "authorityTransactions": [
+        42
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 10976.66,
+      "meanAuthorityMetadataMs": 6168.2,
+      "meanTenantMetadataMs": 4783.73,
+      "meanAuditPrepareMs": 1162.97,
+      "meanCentralLockWaitMs": 1783.92,
+      "meanAuditHeldMs": 2470.24,
+      "maxAuditHeldMs": 1021.21,
+      "meanCentralHeldMs": 2185.55,
+      "meanTenantHoldMs": 4721.81,
+      "tenantCheckoutMaxMs": 65.88,
+      "authorityCheckoutMaxMs": 77.56,
+      "admissionMaxMs": 4712.82,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 4.78,
+      "samplerMaxMs": 61.95,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 1,
+        "externalCpuBefore": 0.09,
+        "backgroundContainerSamples": 4,
+        "backgroundContainerCpuMax": 0.09,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 24.07,
+        "hostCpuMax": 48.03,
+        "freeMemoryMinGiB": 35.25,
+        "nodeCpuOneCoreMean": 84.9,
+        "eventLoopUtilizationMean": 0.76,
+        "eventLoopDelayMaxMs": 95.88,
+        "sampleIntervalMaxMs": 554.07,
+        "sampleCount": 41,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "e62ca2e17a9cd9872feaa75edc44a03f4b01f0824f2a3542d561a947b77d457b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "854357ac43bdc021297eddf5bdbe1b9ed3cfea71aaac678af5943180a7fea426"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "298d64c9f3565f3c61c32a9669f2a0411b1686ea6bf5bcd17b9f30edb85aadeb"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "variant": "after",
+      "report": "c6-ab-2-after",
+      "startedAt": "2026-10-27T20:54:53.836Z",
+      "finishedAt": "2026-10-27T20:56:12.001Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 17503.14,
+      "p95Ms": 19246.08,
+      "elapsedMs": 19247,
+      "warmupMs": 9693.85,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15338.33,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16688.88,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 17503.14,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18020.23,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18594.62,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19246.08,
+          "queries": 2421,
+          "tx": 36
+        }
+      ],
+      "queryCounts": [
+        2421
+      ],
+      "authorityTransactions": [
+        36
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 10134.68,
+      "meanAuthorityMetadataMs": 5489.83,
+      "meanTenantMetadataMs": 4609.1,
+      "meanAuditPrepareMs": 1178.82,
+      "meanCentralLockWaitMs": 1525.11,
+      "meanAuditHeldMs": 2522.85,
+      "maxAuditHeldMs": 1071.37,
+      "meanCentralHeldMs": 1970.18,
+      "meanTenantHoldMs": 4447.08,
+      "tenantCheckoutMaxMs": 64.71,
+      "authorityCheckoutMaxMs": 66.79,
+      "admissionMaxMs": 4687.59,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 5.07,
+      "samplerMaxMs": 68.03,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 2,
+        "externalCpuBefore": 3.02,
+        "backgroundContainerSamples": 4,
+        "backgroundContainerCpuMax": 0.49,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 25.61,
+        "hostCpuMax": 40.43,
+        "freeMemoryMinGiB": 35.16,
+        "nodeCpuOneCoreMean": 81.29,
+        "eventLoopUtilizationMean": 0.77,
+        "eventLoopDelayMaxMs": 104.14,
+        "sampleIntervalMaxMs": 524.98,
+        "sampleCount": 38,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "fd24468d04a3623e34079a1aae725805f08d9be2a84f97013ec98bba9cdb682b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "39ffdf7f0f7baa19c8fc35d2a50150ddd5fc1f36ad121c60c06028bc511e5772"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "0f51e47fee7e6016fc25f6a82dcdffbe446cf25f6ac8b3c9d0d9f9f4e0f61cdf"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "variant": "before",
+      "report": "c6-ab-3-before",
+      "startedAt": "2026-10-27T20:56:23.074Z",
+      "finishedAt": "2026-10-27T20:57:34.684Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 15337.91,
+      "p95Ms": 17394.17,
+      "elapsedMs": 17394,
+      "warmupMs": 7465.98,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 13705.67,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 14611.88,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15337.91,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16022.51,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16768.62,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 17394.17,
+          "queries": 2619,
+          "tx": 42
+        }
+      ],
+      "queryCounts": [
+        2619
+      ],
+      "authorityTransactions": [
+        42
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 9387.04,
+      "meanAuthorityMetadataMs": 5253.83,
+      "meanTenantMetadataMs": 4115.23,
+      "meanAuditPrepareMs": 924.43,
+      "meanCentralLockWaitMs": 1453.6,
+      "meanAuditHeldMs": 2442.21,
+      "maxAuditHeldMs": 1010.55,
+      "meanCentralHeldMs": 1953.72,
+      "meanTenantHoldMs": 4006.34,
+      "tenantCheckoutMaxMs": 15.02,
+      "authorityCheckoutMaxMs": 29.34,
+      "admissionMaxMs": 2639.67,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 4.23,
+      "samplerMaxMs": 83.66,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 1,
+        "externalCpuBefore": 0.11,
+        "backgroundContainerSamples": 4,
+        "backgroundContainerCpuMax": 4.66,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 29.87,
+        "hostCpuMax": 61.73,
+        "freeMemoryMinGiB": 34.59,
+        "nodeCpuOneCoreMean": 80.74,
+        "eventLoopUtilizationMean": 0.74,
+        "eventLoopDelayMaxMs": 87.49,
+        "sampleIntervalMaxMs": 556.87,
+        "sampleCount": 34,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "e62ca2e17a9cd9872feaa75edc44a03f4b01f0824f2a3542d561a947b77d457b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "854357ac43bdc021297eddf5bdbe1b9ed3cfea71aaac678af5943180a7fea426"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "298d64c9f3565f3c61c32a9669f2a0411b1686ea6bf5bcd17b9f30edb85aadeb"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "variant": "after",
+      "report": "c6-ab-4-after",
+      "startedAt": "2026-10-27T20:57:45.580Z",
+      "finishedAt": "2026-10-27T20:58:59.035Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 15207.16,
+      "p95Ms": 16958.37,
+      "elapsedMs": 16959,
+      "warmupMs": 9701.15,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 13044.27,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 14386.89,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15207.16,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15770.15,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16397.71,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16958.37,
+          "queries": 2421,
+          "tx": 36
+        }
+      ],
+      "queryCounts": [
+        2421
+      ],
+      "authorityTransactions": [
+        36
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 9316.28,
+      "meanAuthorityMetadataMs": 4975.54,
+      "meanTenantMetadataMs": 4305.41,
+      "meanAuditPrepareMs": 676.09,
+      "meanCentralLockWaitMs": 1181.78,
+      "meanAuditHeldMs": 2135.19,
+      "maxAuditHeldMs": 1011.39,
+      "meanCentralHeldMs": 1817.41,
+      "meanTenantHoldMs": 3805.14,
+      "tenantCheckoutMaxMs": 62.67,
+      "authorityCheckoutMaxMs": 71.5,
+      "admissionMaxMs": 3854.77,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 4.6,
+      "samplerMaxMs": 70.74,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 1,
+        "externalCpuBefore": 0.17,
+        "backgroundContainerSamples": 4,
+        "backgroundContainerCpuMax": 0.07,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 29.35,
+        "hostCpuMax": 54.03,
+        "freeMemoryMinGiB": 34.69,
+        "nodeCpuOneCoreMean": 76.52,
+        "eventLoopUtilizationMean": 0.72,
+        "eventLoopDelayMaxMs": 94.04,
+        "sampleIntervalMaxMs": 553.27,
+        "sampleCount": 34,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "fd24468d04a3623e34079a1aae725805f08d9be2a84f97013ec98bba9cdb682b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "39ffdf7f0f7baa19c8fc35d2a50150ddd5fc1f36ad121c60c06028bc511e5772"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "0f51e47fee7e6016fc25f6a82dcdffbe446cf25f6ac8b3c9d0d9f9f4e0f61cdf"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "variant": "before",
+      "report": "c6-ab-5-before",
+      "startedAt": "2026-10-27T20:59:10.567Z",
+      "finishedAt": "2026-10-27T21:00:25.957Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 17625.04,
+      "p95Ms": 19692.22,
+      "elapsedMs": 19693,
+      "warmupMs": 11643.76,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15881.75,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16955.19,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 17625.04,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18210.79,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19034.16,
+          "queries": 2619,
+          "tx": 42
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19692.22,
+          "queries": 2619,
+          "tx": 42
+        }
+      ],
+      "queryCounts": [
+        2619
+      ],
+      "authorityTransactions": [
+        42
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 10832.04,
+      "meanAuthorityMetadataMs": 6333.47,
+      "meanTenantMetadataMs": 4486.41,
+      "meanAuditPrepareMs": 610.77,
+      "meanCentralLockWaitMs": 1667.48,
+      "meanAuditHeldMs": 2281.01,
+      "maxAuditHeldMs": 1030.82,
+      "meanCentralHeldMs": 2198.59,
+      "meanTenantHoldMs": 4441.97,
+      "tenantCheckoutMaxMs": 45.83,
+      "authorityCheckoutMaxMs": 65.03,
+      "admissionMaxMs": 4692.71,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 4.95,
+      "samplerMaxMs": 67.53,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 1,
+        "externalCpuBefore": 0.09,
+        "backgroundContainerSamples": 5,
+        "backgroundContainerCpuMax": 5.46,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 24.85,
+        "hostCpuMax": 54.14,
+        "freeMemoryMinGiB": 34.74,
+        "nodeCpuOneCoreMean": 79.75,
+        "eventLoopUtilizationMean": 0.75,
+        "eventLoopDelayMaxMs": 139.72,
+        "sampleIntervalMaxMs": 565.53,
+        "sampleCount": 39,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "e62ca2e17a9cd9872feaa75edc44a03f4b01f0824f2a3542d561a947b77d457b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "854357ac43bdc021297eddf5bdbe1b9ed3cfea71aaac678af5943180a7fea426"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "298d64c9f3565f3c61c32a9669f2a0411b1686ea6bf5bcd17b9f30edb85aadeb"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "variant": "after",
+      "report": "c6-ab-6-after",
+      "startedAt": "2026-10-27T21:00:38.756Z",
+      "finishedAt": "2026-10-27T21:01:54.299Z",
+      "successes": 6,
+      "errors": 0,
+      "p50Ms": 17633.65,
+      "p95Ms": 19305.09,
+      "elapsedMs": 19306,
+      "warmupMs": 10539.65,
+      "requests": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 15703.75,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 16888.27,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 17633.65,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18168.24,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 18728.86,
+          "queries": 2421,
+          "tx": 36
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 19305.09,
+          "queries": 2421,
+          "tx": 36
+        }
+      ],
+      "queryCounts": [
+        2421
+      ],
+      "authorityTransactions": [
+        36
+      ],
+      "protocolCalls": [
+        198
+      ],
+      "auditAppends": [
+        10
+      ],
+      "meanMetadataMs": 10408.12,
+      "meanAuthorityMetadataMs": 5577.03,
+      "meanTenantMetadataMs": 4805.76,
+      "meanAuditPrepareMs": 1269.91,
+      "meanCentralLockWaitMs": 1323.62,
+      "meanAuditHeldMs": 2527.58,
+      "maxAuditHeldMs": 1054.98,
+      "meanCentralHeldMs": 1973.33,
+      "meanTenantHoldMs": 4477.83,
+      "tenantCheckoutMaxMs": 62.59,
+      "authorityCheckoutMaxMs": 68.39,
+      "admissionMaxMs": 4649.52,
+      "admissionErrors": 0,
+      "maxActive": 5,
+      "maxQueued": 1,
+      "afterResponseQueries": 0,
+      "samplerMeanMs": 4.78,
+      "samplerMaxMs": 80.73,
+      "host": {
+        "preflightPass": true,
+        "preflightAttempts": 1,
+        "externalCpuBefore": 0.04,
+        "backgroundContainerSamples": 5,
+        "backgroundContainerCpuMax": 0.08,
+        "backgroundContainersQuiet": true,
+        "samplingErrors": [],
+        "hostCpuMean": 24.65,
+        "hostCpuMax": 44.41,
+        "freeMemoryMinGiB": 34.8,
+        "nodeCpuOneCoreMean": 84.61,
+        "eventLoopUtilizationMean": 0.76,
+        "eventLoopDelayMaxMs": 89,
+        "sampleIntervalMaxMs": 551.43,
+        "sampleCount": 38,
+        "controlledChecksPass": true
+      },
+      "loadedSources": [
+        {
+          "path": "backend/src/security/authorityCoordinator.js",
+          "sha256": "fd24468d04a3623e34079a1aae725805f08d9be2a84f97013ec98bba9cdb682b"
+        },
+        {
+          "path": "backend/src/opportunities/httpComposition.js",
+          "sha256": "39ffdf7f0f7baa19c8fc35d2a50150ddd5fc1f36ad121c60c06028bc511e5772"
+        },
+        {
+          "path": "backend/src/applications/composition.js",
+          "sha256": "0f51e47fee7e6016fc25f6a82dcdffbe446cf25f6ac8b3c9d0d9f9f4e0f61cdf"
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "pair": 1,
+      "beforeRun": 1,
+      "afterRun": 2,
+      "controlledChecksPass": true,
+      "p50": {
+        "before": 18447.68,
+        "after": 17503.14,
+        "delta": -944.54,
+        "percent": -5.12
+      },
+      "p95": {
+        "before": 20622.7,
+        "after": 19246.08,
+        "delta": -1376.62,
+        "percent": -6.68
+      },
+      "metadata": {
+        "before": 10976.66,
+        "after": 10134.68,
+        "delta": -841.98,
+        "percent": -7.67
+      },
+      "auditHeld": {
+        "before": 2470.24,
+        "after": 2522.85,
+        "delta": 52.61,
+        "percent": 2.13
+      },
+      "admissionMax": {
+        "before": 4712.82,
+        "after": 4687.59,
+        "delta": -25.23,
+        "percent": -0.54
+      },
+      "hostCpuMean": {
+        "before": 24.07,
+        "after": 25.61,
+        "delta": 1.54,
+        "percent": 6.4
+      },
+      "beforeErrors": 0,
+      "afterErrors": 0
+    },
+    {
+      "pair": 2,
+      "beforeRun": 3,
+      "afterRun": 4,
+      "controlledChecksPass": true,
+      "p50": {
+        "before": 15337.91,
+        "after": 15207.16,
+        "delta": -130.75,
+        "percent": -0.85
+      },
+      "p95": {
+        "before": 17394.17,
+        "after": 16958.37,
+        "delta": -435.8,
+        "percent": -2.51
+      },
+      "metadata": {
+        "before": 9387.04,
+        "after": 9316.28,
+        "delta": -70.76,
+        "percent": -0.75
+      },
+      "auditHeld": {
+        "before": 2442.21,
+        "after": 2135.19,
+        "delta": -307.02,
+        "percent": -12.57
+      },
+      "admissionMax": {
+        "before": 2639.67,
+        "after": 3854.77,
+        "delta": 1215.1,
+        "percent": 46.03
+      },
+      "hostCpuMean": {
+        "before": 29.87,
+        "after": 29.35,
+        "delta": -0.52,
+        "percent": -1.74
+      },
+      "beforeErrors": 0,
+      "afterErrors": 0
+    },
+    {
+      "pair": 3,
+      "beforeRun": 5,
+      "afterRun": 6,
+      "controlledChecksPass": true,
+      "p50": {
+        "before": 17625.04,
+        "after": 17633.65,
+        "delta": 8.61,
+        "percent": 0.05
+      },
+      "p95": {
+        "before": 19692.22,
+        "after": 19305.09,
+        "delta": -387.13,
+        "percent": -1.97
+      },
+      "metadata": {
+        "before": 10832.04,
+        "after": 10408.12,
+        "delta": -423.92,
+        "percent": -3.91
+      },
+      "auditHeld": {
+        "before": 2281.01,
+        "after": 2527.58,
+        "delta": 246.57,
+        "percent": 10.81
+      },
+      "admissionMax": {
+        "before": 4692.71,
+        "after": 4649.52,
+        "delta": -43.19,
+        "percent": -0.92
+      },
+      "hostCpuMean": {
+        "before": 24.85,
+        "after": 24.65,
+        "delta": -0.2,
+        "percent": -0.8
+      },
+      "beforeErrors": 0,
+      "afterErrors": 0
+    }
+  ],
+  "aggregates": [
+    {
+      "variant": "before",
+      "bursts": 3,
+      "successes": 18,
+      "errors": 0,
+      "medianBurstP50Ms": 17625.04,
+      "medianBurstP95Ms": 19692.22,
+      "pooledP50Ms": 17394.17,
+      "pooledP95Ms": 20622.7,
+      "worstAdmissionMs": 4712.82
+    },
+    {
+      "variant": "after",
+      "bursts": 3,
+      "successes": 18,
+      "errors": 0,
+      "medianBurstP50Ms": 17503.14,
+      "medianBurstP95Ms": 19246.08,
+      "pooledP50Ms": 16888.27,
+      "pooledP95Ms": 19305.09,
+      "worstAdmissionMs": 4687.59
+    }
+  ],
+  "medianPairedP95ChangePercent": -2.51,
+  "limits": [
+    "A/B/A/B/A/B is alternating but not randomized or order-balanced; temporal drift remains possible.",
+    "Three paired bursts, not eighteen independent experiments per variant; pooled quantiles are descriptive only.",
+    "Each burst p95 is its maximum of six requests. No production SLO or capacity conclusion.",
+    "Host is shared; baseline Docker containers observed, but Windows background processes, temperature and effective frequency are not fully controlled.",
+    "Same added host instrumentation in both variants. Historical results without it are not interchangeable.",
+    "Driver SQL sums and overlapping lock/checkout times are not additive to HTTP wall time.",
+    "Any contaminated run is retained; control flags do not prove full host isolation."
+  ]
+}

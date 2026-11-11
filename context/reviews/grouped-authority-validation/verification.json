@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-27T20:47:54.572Z",
+  "status": "PASS",
+  "focused": {
+    "tests": 120,
+    "pass": 120,
+    "fail": 0,
+    "skipped": 0
+  },
+  "backend": {
+    "tests": 1308,
+    "pass": 1298,
+    "fail": 3,
+    "skipped": 7
+  },
+  "knownBackendFailures": [
+    "ClamAV cancellation",
+    "F12/F11 ObjectStoragePort fixture",
+    "historical closed SQL catalog pin"
+  ],
+  "proofs": [
+    {
+      "path": "grouped-authority-validation/postgres-short-groups.json",
+      "status": "PASS",
+      "checks": 11
+    },
+    {
+      "path": "grouped-authority-drift/postgres-proof.json",
+      "status": "PASS",
+      "checks": 19
+    },
+    {
+      "path": "grouped-authority-durability/postgres-proof.json",
+      "status": "PASS",
+      "checks": 10
+    }
+  ],
+  "http": {
+    "checks": 33,
+    "successes": 108,
+    "errors": 0
+  },
+  "profiles": [
+    {
+      "path": "grouped-authority-standard",
+      "successes": 36,
+      "errors": 0,
+      "warmups": 6
+    },
+    {
+      "path": "grouped-authority-capacity",
+      "successes": 6,
+      "errors": 0,
+      "warmups": 1
+    }
+  ],
+  "syntaxChecks": 8,
+  "sourceHashes": {
+    "backend/src/applications/composition.js": "0f51e47fee7e6016fc25f6a82dcdffbe446cf25f6ac8b3c9d0d9f9f4e0f61cdf",
+    "backend/src/opportunities/httpComposition.js": "39ffdf7f0f7baa19c8fc35d2a50150ddd5fc1f36ad121c60c06028bc511e5772",
+    "backend/src/security/authorityCoordinator.js": "fd24468d04a3623e34079a1aae725805f08d9be2a84f97013ec98bba9cdb682b",
+    "backend/test/groupedAuthorityValidation.test.js": "6e6abe80b3e417416a8ced4c46f701f7e1532edcd40e6320dc28ca3c8303a25f",
+    "test/integration/authority-short-groups/proof.js": "d3b5210a19de64b3944b42ad73b9542ca9707c3e05493d83aae61f8a64eac68a",
+    "test/integration/authority-short-groups/proof.ps1": "5f348302ed446b6a0ffdbafdc31ac49ed60f2c09814dddf013f37cc2f9bf84c4"
+  }
+}

@@ -1,0 +1,5 @@
+'use strict';
+const {createMetricsPort}=require('../authorization/metrics');const {auditMetric}=require('../audit/metrics');const {metric:asyncMetric}=require('../async/metrics');const {documentMetric}=require('../documents/metrics');
+const MAP=Object.freeze({F5:['c4g.authorization.decision','{request}'],F7:['c4g.audit.operation','{event}'],F9:['c4g.worker.job','{job}'],F11:['c4g.document.operation','{request}']});
+function createFeatureMetricAdapter({registry}){if(!registry||typeof registry.record!=='function')throw new TypeError('Common metric registry is required.');return Object.freeze({record(feature,value,labels){if(!MAP[feature])throw new TypeError('Feature signal is unknown.');let checked;if(feature==='F5'){createMetricsPort(x=>{checked=x;}).record(labels);}else checked=feature==='F7'?auditMetric(labels):feature==='F9'?asyncMetric(labels):documentMetric(labels);const common={operation:feature,resultClass:String(checked.result||checked.reasonCode||'observed').slice(0,64)};return registry.record(MAP[feature][0],value,common);}});}
+module.exports={MAP,createFeatureMetricAdapter};

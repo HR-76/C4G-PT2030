@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-26T23:26:15.958Z",
+  "fullGate": {
+    "command": "gate.ps1 -Samples 12 -Report http-session-epochs",
+    "exitCode": 1,
+    "status": "FAIL",
+    "checks": 32,
+    "successes": 101,
+    "samples": 108,
+    "failures": 7,
+    "failureCodes": {
+      "LEASE_TIMEOUT": 6,
+      "POOL_EXHAUSTED": 1
+    },
+    "fixtureError": false,
+    "cleanupError": false,
+    "precedesOnlyFinalIdleBoundaryCheck": true
+  },
+  "finalSessionGate": {
+    "command": "gate.ps1 -Scope sessions -Report http-session-epochs",
+    "exitCode": 0,
+    "status": "PASS",
+    "checks": 22,
+    "fixtureError": false,
+    "cleanupError": false
+  },
+  "backendFocused": {
+    "tests": 86,
+    "pass": 86,
+    "fail": 0,
+    "skipped": 0
+  },
+  "dashboardFocused": {
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "skipped": 0
+  },
+  "backendSuite": {
+    "tests": 1257,
+    "pass": 1247,
+    "fail": 3,
+    "skipped": 7
+  },
+  "frontend": {
+    "passed": 337,
+    "failed": 0
+  },
+  "viteBuild": "PASS",
+  "syntax": {
+    "javascriptFiles": 10,
+    "powershell": "PASS"
+  },
+  "scopedWhitespace": "PASS",
+  "ownedContainersRemaining": 0,
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "branch": "feat/f13-organizational-profile",
+  "migrationSourcesChanged": false,
+  "grantDefinitionsChanged": false,
+  "devDataAccessed": false,
+  "deployConfigurationChanged": false,
+  "productionPerformanceApproved": false
+}

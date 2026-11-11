@@ -1,0 +1,18 @@
+# Revisão humana OIDC — arquivo prévio EU legado
+
+Pacote ativo em 31/10/2026: `70ddd8ae-e9ea-4611-b8f2-8cc386ade24d`, expiração **23:18:19 UTC**. [Fila de revisão](../../../output/eu-legacy-preapproval-70ddd8ae-e9ea-4611-b8f2-8cc386ade24d/queue.csv) com 391 itens elegíveis e sete conflitos não aprováveis. [Preview](../../../output/eu-legacy-migration-preview-ae47292c-3e48-4f85-904a-465e543ac6b9.json) read-only, 398/398 CAS, fonte `QUIESCED`/fence 7, zero escritas.
+
+Na APP local, abrir `http://localhost:3000/administracao/aprovacoes-eu?pacote=70ddd8ae-e9ea-4611-b8f2-8cc386ade24d` com sessão administrativa OIDC/MFA. O dashboard tem a ligação **Pré-aprovações EU**. A página valida o pacote e apresenta as 391 identidades; o botão **Emitir 391 aprovações OIDC** envia uma decisão individual por identidade, conservando o mesmo UUIDv7 perante resposta incerta e parando no primeiro erro. Rever a fila e o preview antes de acionar o botão. Exportar os recibos e reconciliar os 391 eventos no ledger antes da janela de arquivo. O progresso no navegador é apenas apoio operacional, não prova de autorização. Se o pacote expirar, renovar preview e pacote; não reutilizar recibos antigos.
+
+Se a fila mostrar `OPPORTUNITY_V2_AUTHORITY_DENIED`, usar **Reautenticar com OIDC** e voltar à fila. A política local exige autenticação administrativa nos últimos cinco minutos; estar autenticado no dashboard não basta. A ação consulta a política de conta publicada pelo servidor para escolher `recent-auth` ou `recent-mfa`, não aprova itens automaticamente. Se a recusa persistir após reautenticação, confirmar a atribuição Central `C4G_ADMIN` e a validade da sessão sem alterar os gates de autoridade.
+
+**Sincronização da janela:** o pacote e cada recibo expiram em uma hora. O pacote acima foi criado para ensaiar a pré-aprovação; a migração 045 e o executor habitual por identidade ainda não estão prontos. Não iniciar a emissão de 391 recibos para uma janela posterior a 23:18:19 UTC. Preparar primeiro o executor, o backup/restauro e o preview atualizado; só então renovar o pacote e recolher os recibos imediatamente antes do arquivo. Se houver recibos já emitidos, preservar o export e reconciliar o ledger, sem os reutilizar depois do prazo.
+
+Para cada identidade que um administrador humano decida aprovar:
+
+1. Confirmar título, referência, orçamento e estado da moeda, prazos, concedente direto, evidência oficial e motivo de revisão na fila e no artefacto indicado pelo preview. Se houver dúvida ou conflito, não aprovar.
+2. Com sessão administrativa OIDC/MFA atual, consultar `GET /api/admin/opportunity-activation/eu-legacy/preapprovals/{packageId}/{itemDigest}`. Confirmar a resposta e o `bindingDigest` do CSV.
+3. Na mesma sessão, enviar `POST /api/admin/opportunity-activation/eu-legacy/preapprovals/{packageId}/{itemDigest}/approve` com JSON `{ "requestId": "<UUIDv7 novo>", "bindingDigest": "<digest da fila>" }`. A rota exige proteção de origem/CSRF, autoridade atual e grava um evento crítico auditado.
+4. Guardar o recibo devolvido pela API para a janela de arquivo; ele identifica o evento, ator, item e binding. Não o confundir com aceitação do candidato. Cada identidade exige decisão própria.
+
+Não usar uma resposta desta conversa, um CSV ou um teste sintético como aprovação OIDC. Não instalar 045, arquivar candidatos nem retomar o escritor automático com base apenas no pacote. Se o pacote expirar ou se CAS/fence/evidência mudarem, gerar novo preview e novo pacote; não reutilizar o recibo antigo. A futura janela habitual requer backup/restauro próprios e aprovação posterior de aceitação para cada candidato arquivado.

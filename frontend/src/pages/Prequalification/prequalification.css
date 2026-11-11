@@ -1,0 +1,33 @@
+.prequalification .prequalification-criteria { display: grid; gap: 12px; list-style: none; padding: 0; margin: 16px 0; }
+.prequalification-criteria .prequalification-criterion {
+  min-width: 0; margin: 0; padding: 14px 16px 8px;
+  border: 1px solid var(--color-border-strong); border-radius: 8px;
+  background: var(--color-surface); overflow-wrap: anywhere;
+}
+.prequalification-criterion-heading { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 16px; }
+.prequalification-criterion-heading h4 { flex: 1 1 22rem; min-width: 0; margin: 0; font-size: 1rem; color: var(--color-text-primary); }
+.prequalification-result-label {
+  max-width: 100%; padding: 3px 8px; border-radius: 5px; font-size: .85rem; font-weight: 650;
+  color: var(--color-info); background: var(--color-info-soft);
+}
+.prequalification-result-label[data-result="SATISFIED"] { color: var(--color-success); background: var(--color-success-soft); }
+.prequalification-result-label[data-result="UNKNOWN"] { color: var(--color-warning); background: var(--color-warning-soft); }
+.prequalification-result-label[data-result="AFFINITY_NOT_OBSERVED"] { color: var(--color-text-secondary); background: var(--color-neutral-soft); }
+.prequalification-reason { margin: 8px 0 0; color: var(--color-text-secondary); }
+.prequalification-disclosure summary {
+  box-sizing: border-box; width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 4px;
+  cursor: pointer; color: var(--color-action); font-weight: 650;
+}
+.prequalification-evidence {
+  display: grid; gap: 10px; margin: 4px 0 8px; padding: 12px 14px;
+  border-inline-start: 3px solid var(--color-action); background: var(--color-info-soft);
+}
+.prequalification-evidence dt { font-weight: 650; }
+.prequalification-evidence dd { margin: 3px 0 0; color: var(--color-text-secondary); white-space: pre-wrap; }
+.prequalification-evidence blockquote { margin: 0; }
+.prequalification textarea { width: min(100%, 36rem); min-height: 5rem; font: inherit; padding: .5rem; }
+.prequalification aside { border: 1px solid var(--color-warning); background: var(--color-warning-soft); padding: 1rem; margin-block: 1rem; }
+@media(max-width:480px) {
+  .prequalification-criteria .prequalification-criterion { padding-inline: 12px; }
+  .prequalification-evidence { padding-inline: 10px; }
+}

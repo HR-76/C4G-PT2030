@@ -1,0 +1,1306 @@
+{
+  "schemaVersion": 1,
+  "status": "INDEPENDENT_REVIEW_COMPLETE_PROTOCOL_NOT_APPROVED",
+  "generatedAt": "2026-10-31T22:49:11.110Z",
+  "protocolApproved": false,
+  "frozenAnalysisStatusUnchanged": "INVALID_OR_INCOMPLETE",
+  "identity": {
+    "abId": "tenant-snapshot-ab-75babcee99ce418a",
+    "sourceSetDigest": "75babcee99ce418a4ba25da7a539dbbb247062b911e19d62d553fd59001f5e58",
+    "manifestSha256": "f646bd89ae53c24846618a4627706fc80714a7612c2dd084c2f4ba6a3568c7ec",
+    "harnessDigest": "1e43d3a6e7dc220dcf58e26f9542f3a0fc26d667f44ce40d74026abfccb95b3f",
+    "variantDigests": {
+      "A": "30005d5709224972d241530ff197282a75826ada308f7a3699e07b73002c952c",
+      "B": "fca8ee8341b57ef78f3cada9ecf14494e01c72973ed01447d75e55e3ce19e986"
+    }
+  },
+  "method": {
+    "independentBuiltinsOnly": true,
+    "analyzerNotExecuted": true,
+    "runtimeOrInfrastructureNotExecuted": true,
+    "rawChildParsedSequentially": true,
+    "rawChildIdentityAndByteHashesChecked": true,
+    "csvScalarAndPopulationsRecomputed": true,
+    "quantiles": "nearest-rank; index ceil(p*n)-1; paired percent=(B-A)/A*100",
+    "numericChecks": 9672,
+    "numericToleranceRelative": 0.000001,
+    "sourceTreeVerificationRerun": false,
+    "sourceTreeVerificationReported": {
+      "before": "PASS",
+      "after": "PASS",
+      "dependencyVersions": {
+        "A": {
+          "status": "PASS",
+          "checkedVersions": 38,
+          "treeBytesPinned": false
+        },
+        "B": {
+          "status": "PASS",
+          "checkedVersions": 38,
+          "treeBytesPinned": false
+        }
+      },
+      "runtimeDifferences": [
+        "backend/src/security/tenantSchemaFingerprint.js"
+      ]
+    },
+    "metadataPairCsvEffectsIndependentlyCompared": true,
+    "httpPairCsvEffectsIndependentlyCompared": true
+  },
+  "newProvenanceOrNumericalBlockers": [],
+  "readiness": {
+    "standaloneStages": [
+      {
+        "index": 0,
+        "revision": "043",
+        "arm": "AB",
+        "kind": "equivalence",
+        "status": "PASS"
+      },
+      {
+        "index": 1,
+        "revision": "042",
+        "arm": "AB",
+        "kind": "equivalence",
+        "status": "PASS"
+      },
+      {
+        "index": 2,
+        "revision": "043",
+        "arm": "A",
+        "kind": "http-readiness",
+        "status": "PASS"
+      },
+      {
+        "index": 3,
+        "revision": "043",
+        "arm": "B",
+        "kind": "http-readiness",
+        "status": "PASS"
+      }
+    ],
+    "httpStages": [
+      {
+        "index": 0,
+        "arm": "A",
+        "pair": 0,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 1,
+        "arm": "B",
+        "pair": 0,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 2,
+        "arm": "B",
+        "pair": 1,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 3,
+        "arm": "A",
+        "pair": 1,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 4,
+        "arm": "A",
+        "pair": 2,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 5,
+        "arm": "B",
+        "pair": 2,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 6,
+        "arm": "B",
+        "pair": 3,
+        "status": "PASS",
+        "httpStatus": "PASS",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": true
+      },
+      {
+        "index": 7,
+        "arm": "A",
+        "pair": 3,
+        "status": "FAIL",
+        "httpStatus": "FAIL",
+        "measured": 36,
+        "warmups": 7,
+        "readinessAttempts": 17,
+        "readinessDrains": 9,
+        "cleanup": true,
+        "sourceIntegrityAfter": "PASS",
+        "finalDrainRecorded": false
+      }
+    ],
+    "observedHttpAttempts": 136,
+    "observedHttpDrains": 72,
+    "allReadinessPassed": true
+  },
+  "metadata": {
+    "status": "PASS",
+    "target": "TENANT_034_SNAPSHOT",
+    "measured": 2400,
+    "warmups": 240,
+    "functionalCalls": 16,
+    "totalCalls": 2656,
+    "totalMeasuredQueries": 60000,
+    "queriesPerSnapshot": 25,
+    "baseQueriesPerSnapshot": 1,
+    "securityQueriesPerSnapshot": 24,
+    "pairs": 12,
+    "pairsBFasterAtP50": 12,
+    "pairsBFasterAtP95": 11,
+    "tenants": [
+      {
+        "tenantIndex": 0,
+        "measuredPerArm": 600,
+        "warmupsPerArm": 60,
+        "totalCalls": 1328,
+        "queriesPerCall": {
+          "base": 1,
+          "security": 24,
+          "total": 25
+        },
+        "checks": {
+          "exactJsonBytes": true,
+          "exactFingerprint": true,
+          "freshReadsPerCall": true,
+          "securityReadsPreserved": true
+        },
+        "arms": {
+          "A": {
+            "n": 600,
+            "minimum": 93.55189999999129,
+            "p50": 101.97900000000664,
+            "p95": 114.63390000000072,
+            "maximum": 166.15589999999793,
+            "mean": 103.42341999999971
+          },
+          "B": {
+            "n": 600,
+            "minimum": 86.1880999999994,
+            "p50": 95.15590000001248,
+            "p95": 107.07459999999264,
+            "maximum": 133.92900000000373,
+            "mean": 96.36095899999965
+          }
+        },
+        "pairs": [
+          {
+            "tenantIndex": 0,
+            "pair": 0,
+            "bMinusAMs": {
+              "p50": -7.4746999999988475,
+              "p95": -5.173699999999371,
+              "maximum": 3.1326999999946565,
+              "mean": -7.332330999999897
+            },
+            "bRelativeChangePercent": {
+              "p50": -7.23198027791144,
+              "p95": -4.589502257626166,
+              "maximum": 2.483506447583416,
+              "mean": -7.023917524461601
+            }
+          },
+          {
+            "tenantIndex": 0,
+            "pair": 1,
+            "bMinusAMs": {
+              "p50": -7.45690000000468,
+              "p95": -6.355499999997846,
+              "maximum": -8.898500000010245,
+              "mean": -6.969035999999761
+            },
+            "bRelativeChangePercent": {
+              "p50": -7.295908483409405,
+              "p95": -5.544171488536817,
+              "maximum": -6.317834988679019,
+              "mean": -6.707641362546564
+            }
+          },
+          {
+            "tenantIndex": 0,
+            "pair": 2,
+            "bMinusAMs": {
+              "p50": -10.86030000000028,
+              "p95": -10.931299999996554,
+              "maximum": -17.797100000010687,
+              "mean": -10.030058999999454
+            },
+            "bRelativeChangePercent": {
+              "p50": -10.303792184135334,
+              "p95": -9.598896389906509,
+              "maximum": -13.386411330667883,
+              "mean": -9.510989789229779
+            }
+          },
+          {
+            "tenantIndex": 0,
+            "pair": 3,
+            "bMinusAMs": {
+              "p50": -6.048599999994622,
+              "p95": -14.843000000008033,
+              "maximum": -32.2268999999942,
+              "mean": -7.2937520000003815
+            },
+            "bRelativeChangePercent": {
+              "p50": -5.963547880128133,
+              "p95": -12.228044839191263,
+              "maximum": -19.39557969352554,
+              "mean": -6.987856218178473
+            }
+          },
+          {
+            "tenantIndex": 0,
+            "pair": 4,
+            "bMinusAMs": {
+              "p50": -7.197699999989709,
+              "p95": -4.125900000013644,
+              "maximum": -0.3222000000241678,
+              "mean": -6.819709999999617
+            },
+            "bRelativeChangePercent": {
+              "p50": -7.221110841337524,
+              "p95": -3.7928986685125747,
+              "maximum": -0.26285304053267733,
+              "mean": -6.7916126908010455
+            }
+          },
+          {
+            "tenantIndex": 0,
+            "pair": 5,
+            "bMinusAMs": {
+              "p50": -4.304299999988871,
+              "p95": -3.0988000000070315,
+              "maximum": -9.432499999995343,
+              "mean": -3.9298780000011817
+            },
+            "bRelativeChangePercent": {
+              "p50": -4.269554366553706,
+              "p95": -2.7468855098038563,
+              "maximum": -7.255255781894906,
+              "mean": -3.852676715538408
+            }
+          }
+        ]
+      },
+      {
+        "tenantIndex": 1,
+        "measuredPerArm": 600,
+        "warmupsPerArm": 60,
+        "totalCalls": 1328,
+        "queriesPerCall": {
+          "base": 1,
+          "security": 24,
+          "total": 25
+        },
+        "checks": {
+          "exactJsonBytes": true,
+          "exactFingerprint": true,
+          "freshReadsPerCall": true,
+          "securityReadsPreserved": true
+        },
+        "arms": {
+          "A": {
+            "n": 600,
+            "minimum": 92.79079999998794,
+            "p50": 103.73709999996936,
+            "p95": 116.08389999999781,
+            "maximum": 138.9658000000054,
+            "mean": 105.07046033333293
+          },
+          "B": {
+            "n": 600,
+            "minimum": 88.13839999999618,
+            "p50": 95.90100000001257,
+            "p95": 109.75410000002012,
+            "maximum": 133.04279999999562,
+            "mean": 97.49372249999996
+          }
+        },
+        "pairs": [
+          {
+            "tenantIndex": 1,
+            "pair": 0,
+            "bMinusAMs": {
+              "p50": -8.544499999959953,
+              "p95": -13.122700000036275,
+              "maximum": -10.314400000002934,
+              "mean": -8.716404999998929
+            },
+            "bRelativeChangePercent": {
+              "p50": -8.309297038003345,
+              "p95": -11.016665995085743,
+              "maximum": -7.721214625574412,
+              "mean": -8.327745614516473
+            }
+          },
+          {
+            "tenantIndex": 1,
+            "pair": 1,
+            "bMinusAMs": {
+              "p50": -10.85740000003716,
+              "p95": -12.065299999987474,
+              "maximum": -22.372099999978673,
+              "mean": -10.880346999997272
+            },
+            "bRelativeChangePercent": {
+              "p50": -10.340883223885278,
+              "p95": -10.254551326716333,
+              "maximum": -16.09899701939456,
+              "mean": -10.240720506583028
+            }
+          },
+          {
+            "tenantIndex": 1,
+            "pair": 2,
+            "bMinusAMs": {
+              "p50": -6.6995999999926426,
+              "p95": -7.090700000000652,
+              "maximum": 1.468399999983376,
+              "mean": -7.124409000001322
+            },
+            "bRelativeChangePercent": {
+              "p50": -6.493779653864129,
+              "p95": -6.127897068407252,
+              "maximum": 1.1235980848813585,
+              "mean": -6.780173360718105
+            }
+          },
+          {
+            "tenantIndex": 1,
+            "pair": 3,
+            "bMinusAMs": {
+              "p50": -8.049300000013318,
+              "p95": -6.273400000005495,
+              "maximum": -1.8218000000051688,
+              "mean": -7.253643000001901
+            },
+            "bRelativeChangePercent": {
+              "p50": -7.790823837553697,
+              "p95": -5.5232245897730925,
+              "maximum": -1.3700144461437072,
+              "mean": -6.954417103440426
+            }
+          },
+          {
+            "tenantIndex": 1,
+            "pair": 4,
+            "bMinusAMs": {
+              "p50": -7.615400000009686,
+              "p95": -8.377700000040932,
+              "maximum": -1.6607999999832828,
+              "mean": -7.295460000001768
+            },
+            "bRelativeChangePercent": {
+              "p50": -7.341800463921587,
+              "p95": -7.38092783826528,
+              "maximum": -1.2329291867355756,
+              "mean": -6.959574111224681
+            }
+          },
+          {
+            "tenantIndex": 1,
+            "pair": 5,
+            "bMinusAMs": {
+              "p50": -5.708700000017416,
+              "p95": 2.014999999955762,
+              "maximum": 0.5993000000016764,
+              "mean": -4.190162999996673
+            },
+            "bRelativeChangePercent": {
+              "p50": -5.498227838365896,
+              "p95": 1.7366542644171628,
+              "maximum": 0.4762373987422945,
+              "mean": -3.979118550126394
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "http": {
+    "status": "FAIL",
+    "plannedAttempts": 288,
+    "recordedAttempts": 288,
+    "successfulAttempts": 287,
+    "failedAttempts": 1,
+    "warmups": 56,
+    "failedWarmups": 0,
+    "matchedAttempts": 272,
+    "unpairedAttempts": 16,
+    "failedPairUnpairedSuccessful": 15,
+    "failedPairUnpairedFailed": 1,
+    "successfulRequestsWithCountsAndCostsVerified": 287,
+    "successfulReportCounts": {
+      "queries": 1195,
+      "transactions": 52,
+      "centralBase": 25,
+      "authoritySecurity": 50,
+      "centralCheckpoints": 25,
+      "tenantCheckpoints": 3,
+      "tenantSnapshots": 6
+    },
+    "successfulDashboardCounts": {
+      "queries": 2841,
+      "transactions": 113,
+      "centralBase": 53,
+      "authoritySecurity": 106,
+      "centralCheckpoints": 53,
+      "tenantCheckpoints": 9,
+      "tenantSnapshots": 18
+    },
+    "failure": {
+      "index": 7,
+      "arm": "A",
+      "pair": 3,
+      "scenario": "dashboard-c4",
+      "attempt": 2,
+      "tenant": 0,
+      "status": 503,
+      "ms": 11879.1587,
+      "complete": false,
+      "code": "SERVICE_UNAVAILABLE",
+      "failures": [
+        {
+          "code": "LEASE_TIMEOUT"
+        }
+      ],
+      "sqlErrors": [],
+      "counts": {
+        "queryCount": 1195,
+        "transactionCount": 52,
+        "centralBaseQueryCount": 25,
+        "authoritySecurityQueryCount": 50,
+        "tenantBaseQueryCount": 6,
+        "centralCheckpointCount": 25,
+        "tenantMetadataCheckpointCount": 3
+      },
+      "pendingQueries": 0,
+      "queryEvents": 1195,
+      "closedQueryEvents": 1195,
+      "closedSpans": 78,
+      "spans": 78,
+      "checkouts": 26,
+      "closedCheckoutHolds": 26,
+      "afterResponseQueries": 0,
+      "csvRetained": "UNPAIRED",
+      "analyzerComputedCostsAbsent": true,
+      "stageFinalDrainRecorded": false
+    },
+    "scenarioComparisons": [
+      {
+        "scenario": "report-c1",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 4,
+        "pairedP50ChangePercentNearestRankMedian": -2.6341616524414144,
+        "pairedP95ChangePercentNearestRankMedian": -3.4359246704005373,
+        "pairsBFasterAtP50": 3,
+        "pairsBFasterAtP95": 4,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          }
+        ]
+      },
+      {
+        "scenario": "report-c2",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 4,
+        "pairedP50ChangePercentNearestRankMedian": -5.032361300809447,
+        "pairedP95ChangePercentNearestRankMedian": -3.397629458274586,
+        "pairsBFasterAtP50": 3,
+        "pairsBFasterAtP95": 2,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          }
+        ]
+      },
+      {
+        "scenario": "report-c4",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 4,
+        "pairedP50ChangePercentNearestRankMedian": -3.414242690353226,
+        "pairedP95ChangePercentNearestRankMedian": -2.051934888194393,
+        "pairsBFasterAtP50": 3,
+        "pairsBFasterAtP95": 3,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          }
+        ]
+      },
+      {
+        "scenario": "dashboard-c1",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 4,
+        "pairedP50ChangePercentNearestRankMedian": -0.8984102144145303,
+        "pairedP95ChangePercentNearestRankMedian": -3.4492579272795405,
+        "pairsBFasterAtP50": 3,
+        "pairsBFasterAtP95": 3,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": true,
+            "A": 4,
+            "B": 4,
+            "errors": 0
+          }
+        ]
+      },
+      {
+        "scenario": "dashboard-c4",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 3,
+        "pairedP50ChangePercentNearestRankMedian": -1.8213589097503506,
+        "pairedP95ChangePercentNearestRankMedian": -2.7040313138191663,
+        "pairsBFasterAtP50": 2,
+        "pairsBFasterAtP95": 2,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": false,
+            "A": 8,
+            "B": 8,
+            "errors": 1
+          }
+        ]
+      },
+      {
+        "scenario": "dashboard-c4-two-tenants",
+        "interpretation": "DIAGNOSTIC_ONLY_CAMPAIGN_FAILED",
+        "matchedPairs": 4,
+        "pairedP50ChangePercentNearestRankMedian": -1.981565009917998,
+        "pairedP95ChangePercentNearestRankMedian": -1.9523617979491468,
+        "pairsBFasterAtP50": 2,
+        "pairsBFasterAtP95": 3,
+        "pairs": [
+          {
+            "pair": 0,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 1,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 2,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          },
+          {
+            "pair": 3,
+            "complete": true,
+            "A": 8,
+            "B": 8,
+            "errors": 0
+          }
+        ]
+      }
+    ],
+    "allRawAttemptsRetained": true,
+    "failedPairEffectNull": true,
+    "c1AggregatedDiagnostics": [
+      {
+        "scenario": "report-c1",
+        "population": "MATCHED_PAIRS_CAMPAIGN_FAILED",
+        "arms": {
+          "A": {
+            "n": 16,
+            "p50Ms": 3372.330600000001,
+            "p95Ms": 3492.220199999996,
+            "metadataUnionMs": 2617.845500000185,
+            "metadataUnionToHttpRatio": 0.7767704764436031,
+            "centralMetadataMs": 1894.1475999997783,
+            "tenantMetadataMs": 713.5207999998238,
+            "tenantBaseUnionMs": 349.2273999999743,
+            "centralBaseUnionMs": 955.9868999999744,
+            "authoritySecurityUnionMs": 604.2641999999614,
+            "centralMetadataToHttpRatio": 0.5646295475840766,
+            "tenantMetadataToHttpRatio": 0.21241658741271818
+          },
+          "B": {
+            "n": 16,
+            "p50Ms": 3332.8620999999985,
+            "p95Ms": 3453.7753999999986,
+            "metadataUnionMs": 2544.9681000000564,
+            "metadataUnionToHttpRatio": 0.7731081627995731,
+            "centralMetadataMs": 1895.6090000000695,
+            "tenantMetadataMs": 654.3088000001735,
+            "tenantBaseUnionMs": 300.44849999998405,
+            "centralBaseUnionMs": 962.3428000000276,
+            "authoritySecurityUnionMs": 598.5997999999818,
+            "centralMetadataToHttpRatio": 0.5719613044049714,
+            "tenantMetadataToHttpRatio": 0.19761755721340998
+          }
+        },
+        "p50ChangePercent": -1.1703627159212286,
+        "p95ChangePercent": -1.1008698706913593
+      },
+      {
+        "scenario": "dashboard-c1",
+        "population": "MATCHED_PAIRS_CAMPAIGN_FAILED",
+        "arms": {
+          "A": {
+            "n": 16,
+            "p50Ms": 8149.666100000002,
+            "p95Ms": 8764.8597,
+            "metadataUnionMs": 6299.27149999977,
+            "metadataUnionToHttpRatio": 0.7822445103523417,
+            "centralMetadataMs": 4130.78120000026,
+            "tenantMetadataMs": 2196.37189999962,
+            "tenantBaseUnionMs": 1065.4085999999952,
+            "centralBaseUnionMs": 2104.824100000027,
+            "authoritySecurityUnionMs": 1295.3942000000388,
+            "centralMetadataToHttpRatio": 0.5092689968994591,
+            "tenantMetadataToHttpRatio": 0.2707004497382905
+          },
+          "B": {
+            "n": 16,
+            "p50Ms": 7942.398599999986,
+            "p95Ms": 12769.516400000022,
+            "metadataUnionMs": 6103.799400000367,
+            "metadataUnionToHttpRatio": 0.7761935572045953,
+            "centralMetadataMs": 4090.5408999993524,
+            "tenantMetadataMs": 1995.5275000002293,
+            "tenantBaseUnionMs": 917.9030000000203,
+            "centralBaseUnionMs": 2094.2867000002007,
+            "authoritySecurityUnionMs": 1282.4276999997965,
+            "centralMetadataToHttpRatio": 0.5184614199727099,
+            "tenantMetadataToHttpRatio": 0.2527068711963277
+          }
+        },
+        "p50ChangePercent": -2.543263705000334,
+        "p95ChangePercent": 45.689912184219224
+      }
+    ]
+  },
+  "frozenIssues": {
+    "count": 17,
+    "distinctObservedHttpFailures": 1,
+    "originalDataQualityIssues": 14,
+    "originalProtocolIssues": 3,
+    "originalUnexpectedIssueCount": 17,
+    "reclassified": false,
+    "interpretation": "All17 checks are explainable from the single retained HTTP503 plus fail-path omission of final aggregate fields. They remain blocking for protocol approval; they are not17 independent backend faults. No additional numerical or provenance mismatch was found by this review if newProvenanceOrNumericalBlockers is empty.",
+    "issues": [
+      {
+        "ordinal": 1,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "REPORT_SCOPE_OR_STATUS_INVALID",
+          "mode": "measure-http"
+        },
+        "explanation": "Parent status FAIL is rejected by the normal all-PASS scope check."
+      },
+      {
+        "ordinal": 2,
+        "original": {
+          "classification": "PROTOCOL",
+          "code": "CAMPAIGN_EXECUTION_FAILED",
+          "mode": "measure-http"
+        },
+        "explanation": "Parent execution failed after retaining the failed child; this is the campaign protocol failure."
+      },
+      {
+        "ordinal": 3,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "CHILD_SCOPE_OR_STATUS_INVALID",
+          "mode": "measure-http",
+          "index": 7
+        },
+        "explanation": "Child7 status FAIL is rejected by the normal all-PASS child scope check."
+      },
+      {
+        "ordinal": 4,
+        "original": {
+          "classification": "PROTOCOL",
+          "code": "HTTP_STAGE_EXECUTION_FAILED",
+          "mode": "measure-http",
+          "index": 7
+        },
+        "explanation": "Child7 execution failed when its HTTP result was asserted PASS."
+      },
+      {
+        "ordinal": 5,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_STAGE_STATUS_INVALID",
+          "index": 7,
+          "arm": "A",
+          "pair": 3
+        },
+        "explanation": "Child7 HTTP replica has status FAIL because one measured request returned 503."
+      },
+      {
+        "ordinal": 6,
+        "original": {
+          "classification": "PROTOCOL",
+          "code": "HTTP_WORKLOAD_FAILED",
+          "index": 7,
+          "arm": "A",
+          "pair": 3
+        },
+        "explanation": "The HTTP workload failed; all planned attempts were nevertheless recorded."
+      },
+      {
+        "ordinal": 7,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_WARMUP_DIGEST_MISMATCH",
+          "index": 7,
+          "arm": "A",
+          "pair": 3,
+          "scenario": "dashboard-c4",
+          "attempt": 2
+        },
+        "explanation": "The failed response digest differs from the successful warmup; the warmup itself returned 200."
+      },
+      {
+        "ordinal": 8,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_SCENARIO_BUDGET_OR_DRAIN_INVALID",
+          "index": 7,
+          "arm": "A",
+          "pair": 3,
+          "scenario": "dashboard-c4"
+        },
+        "explanation": "This conjunction includes scenario.status===PASS. Actual elapsed32075.9993ms was below180000ms and scenario drain0.2157ms was below30000ms."
+      },
+      {
+        "ordinal": 9,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_METRICS_INCOMPLETE",
+          "replica": 7,
+          "scenario": "dashboard-c4",
+          "attempt": 2,
+          "tenant": 0
+        },
+        "explanation": "The analyzer complete predicate requires failures.length===0. All1195 query events and all spans were closed and pendingQueries=0; this label is not evidence of lost raw intervals."
+      },
+      {
+        "ordinal": 10,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_FUNCTIONAL_FAILURE",
+          "replica": 7,
+          "scenario": "dashboard-c4",
+          "attempt": 2,
+          "tenant": 0
+        },
+        "explanation": "The failed503 response cannot pass the successful dashboard functional assertion."
+      },
+      {
+        "ordinal": 11,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "SERVICE_UNAVAILABLE",
+          "replica": 7,
+          "scenario": "dashboard-c4",
+          "attempt": 2,
+          "tenant": 0,
+          "status": 503
+        },
+        "explanation": "This is the same503. requestCost context.code SERVICE_UNAVAILABLE replaces the generic HTTP_ATTEMPT_FAILURE label in the issue object."
+      },
+      {
+        "ordinal": 12,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_SQL_OR_CHECKPOINT_COUNT_CHANGED",
+          "scenario": "dashboard-c4",
+          "arm": "A",
+          "pair": 3,
+          "index": 7,
+          "attempt": 2,
+          "expected": {
+            "queryCount": 2841,
+            "transactionCount": 113,
+            "centralBaseQueryCount": 53,
+            "authoritySecurityQueryCount": 106,
+            "centralCheckpointCount": 53,
+            "tenantMetadataCheckpointCount": 9,
+            "tenantBaseQueryCount": 18
+          },
+          "actual": {
+            "queryCount": 1195,
+            "transactionCount": 52,
+            "centralBaseQueryCount": null,
+            "authoritySecurityQueryCount": null,
+            "centralCheckpointCount": null,
+            "tenantMetadataCheckpointCount": null,
+            "tenantBaseQueryCount": null
+          }
+        },
+        "explanation": "The failed dashboard stopped after the report path:1195queries/52transactions rather than2841/113. Derived hash/span counts are omitted by the analyzer on failure; independently counted raw values are retained below."
+      },
+      {
+        "ordinal": 13,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_FINAL_DRAIN_INVALID",
+          "index": 7,
+          "arm": "A",
+          "pair": 3
+        },
+        "explanation": "Child final drainMs is unassigned because assertion of http.status PASS throws before that assignment. Scenario drains and cleanup passed; no synthetic final-drain duration is inferred."
+      },
+      {
+        "ordinal": 14,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_REPORTED_COUNTS_INVALID"
+        },
+        "explanation": "Parent httpCounts is unassigned because a child FAIL triggers assertion before parent totals assignment. Independent raw totals are288/56."
+      },
+      {
+        "ordinal": 15,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_CROSS_ARM_OR_PAIR_RESPONSE_MISMATCH",
+          "scenario": "dashboard-c4",
+          "tenant": 0
+        },
+        "explanation": "Only the failed response digest differs; all287 successful response digests remain invariant for each scenario/tenant."
+      },
+      {
+        "ordinal": 16,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_MATCHED_PAIR_COUNT_INVALID",
+          "scenario": "dashboard-c4"
+        },
+        "explanation": "dashboard-c4 pair3 is not a complete successful pair. Its16 attempts remain UNPAIRED, including503."
+      },
+      {
+        "ordinal": 17,
+        "original": {
+          "classification": "DATA_QUALITY",
+          "code": "HTTP_UNINTERRUPTED_PAIR_SET_INCOMPLETE",
+          "scenario": "dashboard-c4"
+        },
+        "explanation": "Only3 successful dashboard-c4 pairs satisfy the full4-pair criterion; no effect is calculated for failed pair3."
+      }
+    ]
+  },
+  "diagnosisPeerReview": {
+    "path": "context/reviews/tenant-snapshot-sql-performance/http-failure-diagnosis.json",
+    "sha256": "bd40f34f127a880b50c381ad118e6ff5687b2ea67ad16374c563f5d5b0c6a65d",
+    "verdict": "NO_BLOCKING_CAUSAL_OVERCLAIM_FOUND",
+    "directEvidence": "LEASE_TIMEOUT and committed report-path trace are directly recorded. Timer callback, initiating blocker and request-to-PID lock assignment are not directly recorded.",
+    "limits": "The10s operation-timer localization is a bounded reconstruction. Scenario-level contention supports a possible contributor but does not establish per-request lock wait or host cause. A failure does not show that B fixes reliability."
+  },
+  "conclusions": [
+    "M shows lower complete tenant-snapshot latency in12/12 paired p50 comparisons and11/12 p95 comparisons on the frozen043/034 fixture, preserving1+24 fresh queries per call.",
+    "H is fully recorded but failed:288 attempts include287 successful responses and one503. No blanket HTTP performance or reliability approval follows.",
+    "C1 has all4 pairs and may be described diagnostically. dashboard-c4 has3 successful pairs; failed pair3 remains16 UNPAIRED attempts with no estimated paired effect.",
+    "Reported cost fractions are computed per request from interval unions. Quantiles and percent-change medians are not additive; SQL/span/checkouts overlap and do not partition CPU.",
+    "Pooled dashboard-C1 p95 worsened45.6899% (8764.8597ms A to12769.5164ms B), although its median paired p95 change is negative. These statistics answer different questions; the outlier and deterioration must both remain visible. With16 samples per arm, nearest-rank p95 equals the observed maximum."
+  ],
+  "limits": [
+    "API server/driver wall time in a synthetic local fixture; no browser/UI rendering latency, production capacity or SLA result.",
+    "Host was not reserved and external load was not controlled; small sample pair effects are observations, not isolated causal attribution or statistical significance.",
+    "No claim about live workspace parallel25-to9 batching or044. Measured A/B differ by the pinned tenant SQL patch, with validation-only overlays declared.",
+    "The first readiness FAIL is preserved and remains unclassified; the later explicit LEASE_TIMEOUT must not be projected backwards onto it.",
+    "Source/dependency PASS and cleanup are present in the original evidence; this review checks evidence hashes/identities and does not rerun tree/dependency/Docker verification.",
+    "17 analyzer findings remain unchanged; independent interpretation does not reclassify the campaign as VALID or PASS."
+  ],
+  "sources": [
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/analyze.cjs",
+      "sha256": "34a0dff9e1fc431984927e76f1c968928c3e9da0bb68e7da6f69c486848bf29a",
+      "bytes": 79489
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/summary.json",
+      "sha256": "1f20d3ff9421cb057078d9e0ceb20939d57658d1ce9b199addd84e436ae819ee",
+      "bytes": 6879621
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/equivalence-plans.csv",
+      "sha256": "d437c85531b3bbd3ae2ae2116288848eaecb675947db626ded8597de7e53c1a4",
+      "bytes": 1714
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-checkpoint-counts.csv",
+      "sha256": "a3bbe5ea30226ccb330092b768ceac0805b7cfe5329c4292b8e5c4275c8236d4",
+      "bytes": 12604
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-pairs.csv",
+      "sha256": "0e3f7fe3d22b4c1d7df0156111656fc201ac242b9f59e79df9a636b43deb3c19",
+      "bytes": 56687
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-populations.csv",
+      "sha256": "ddbb5862675beb668c26cd9481c7673c5eeb6f6b1218989ed073283b537154c4",
+      "bytes": 1064079
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-query-costs.csv",
+      "sha256": "fa655123e042f382cc719e79f180de811ee3acdc8d4d5d4fc2d524e1d283c8f2",
+      "bytes": 1712290
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-requests.csv",
+      "sha256": "699211c6dc477be80575fda1bd1fc1ca46fa193dac402519081a83e33be71f6d",
+      "bytes": 219022
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-sampler-phases.csv",
+      "sha256": "50a60f2b568b4a20fd74aaac06a896ad6f8ca3f3344fce1cc8911f7286067838",
+      "bytes": 175196
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-sampler.csv",
+      "sha256": "1d42e418435174860ec8a4d36ac0125155c93c29014e7616268e0b58bc2987a8",
+      "bytes": 2095180
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-scenarios.csv",
+      "sha256": "b9e91d998419c683bb6d1fd8615c098f7f2ded1730efec16a0cb45bd8aaca35d",
+      "bytes": 9537
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/http-warmups.csv",
+      "sha256": "49830a12222384d135bd98e71dafea60e39e64d4035a993094ac4ab3d98f4bc6",
+      "bytes": 7302
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-blocks.csv",
+      "sha256": "f09d3628e0a6eb209bae74e3abb1eb5a814ec4efa6828ef247fb2be9ba6eccf2",
+      "bytes": 20683
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-pairs.csv",
+      "sha256": "ac55a18c810ace7608c25b0d2085fa11c4067e2769c7ca114f0ab21f9f7c74d7",
+      "bytes": 3196
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/analysis-6853f1cd88024cc1981b126414781fd5/metadata-samples.csv",
+      "sha256": "0a743a24d0f44b2a1fab92c44bed344363bdc497493548923d98ad41d5149280",
+      "bytes": 608969
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/ab.json",
+      "sha256": "f646bd89ae53c24846618a4627706fc80714a7612c2dd084c2f4ba6a3568c7ec",
+      "bytes": 486285
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/report.json",
+      "sha256": "23aede86f14eb82064369ecf008c295807d58e06b13c8a0a16223f87083c66f0",
+      "bytes": 16906389
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/stage-0-043-AB.json",
+      "sha256": "cca90d16d2f2c0b87f0291332a17c2eba3e9c39dd186692ef5bd77c6e379fcdc",
+      "bytes": 1235827
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/stage-1-042-AB.json",
+      "sha256": "54ddb493701db98340b18b3e3ae503d5164fc25f33632b889873e2411bd33883",
+      "bytes": 1235301
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/stage-2-043-A.json",
+      "sha256": "1b2beed84a3102a3120c899d17ad3eee31fade4a5b93fc7e093704170f659ade",
+      "bytes": 6083391
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/030f83e7ef2b4a6ca54f7624fd8763ad/stage-3-043-B.json",
+      "sha256": "5d3d178058b7cf81d5d5f7717b819a36bab68766420535d401c6848a8fd3b8b9",
+      "bytes": 6070215
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/552a6cecd0f849aeb35873adba590b73/report.json",
+      "sha256": "cf651f12f5c3621ac08009a73c5663666b1fec629a4fb0ea642f226ad8e4519b",
+      "bytes": 23775062
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/552a6cecd0f849aeb35873adba590b73/stage-0-043-AB.json",
+      "sha256": "51f7e83b95f3bede4ad3a411b8906393bbcb82810f62c31a601c23dbf90fa2bf",
+      "bytes": 20688416
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/report.json",
+      "sha256": "0e74c14a84a6921a2b3364dd90a50a8e2f112443fa452ff9dc56c852b3360d4c",
+      "bytes": 368214286
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-0-043-A.json",
+      "sha256": "2d680bf6f0d24511af862dc5745e718cae2fe08f64794054bedd31e596e24821",
+      "bytes": 39725863
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-1-043-B.json",
+      "sha256": "3e948c33c5d8935031fd07e8d3f171ec1a0059233a414bd88280ff430e43e55c",
+      "bytes": 39847879
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-2-043-B.json",
+      "sha256": "ecb67f073203279164e716ebcccbf5bf910ed9bafc58bd66cdd523363c1d0a65",
+      "bytes": 39630332
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-3-043-A.json",
+      "sha256": "2f4423de16d0d7d575f06c15b0124928615b5539ca4b489f552721b13098dd02",
+      "bytes": 39575234
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-4-043-A.json",
+      "sha256": "a2c40e76bdb4c22f0cfd4cb99d1e7fbb08b0e4307a3aacafd480dfbb6e3e5ffd",
+      "bytes": 39522880
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-5-043-B.json",
+      "sha256": "8723dd661812f0d12d79851d0407c50f50c496262b04a8059d71a9afb07d0517",
+      "bytes": 39481965
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-6-043-B.json",
+      "sha256": "8c9bcb049bd4d68b5d3fb5b434409f6fe62780d12faf302cb5c9ebee386f2fd4",
+      "bytes": 39582500
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/evidence/b59bc7c381f5464b9c1f1d478db83bca/stage-7-043-A.json",
+      "sha256": "3fde0c1f8b1ec100c2d6bce9d1c32992058eb2d2719dbcf307fa57f0a4641cb8",
+      "bytes": 39392901
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/http-failure-diagnosis.json",
+      "sha256": "bd40f34f127a880b50c381ad118e6ff5687b2ea67ad16374c563f5d5b0c6a65d",
+      "bytes": 25842
+    },
+    {
+      "path": "context/features/tenant-snapshot-sql-performance.md",
+      "sha256": "c1ee5e4edeb29ce4a6fb1def5f386b2ed0a8d5bbce1f35ddbf1b5f32b6803652",
+      "bytes": 8545
+    },
+    {
+      "path": "output/tenant-snapshot-ab-6e878cc249d44bf09781c51e856aa711/common/test/integration/tenant-snapshot-ab/run.cjs",
+      "sha256": "df03d9469f1a4853aa839afbcd7598f5801a2153ae09d3e22bc12e25734d4837",
+      "bytes": 18814
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/resource-source-verification.json",
+      "sha256": "cfcbfc3e60611f594f8ad8a647f3537239c9f69a9f155f0def6b747f5dee2e5d",
+      "bytes": 15779
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance/workspace-task-verification.json",
+      "sha256": "74cdba9f6947dcfc2dde027a7eb434ff33930fdfc8cdf8feeafce29a3124db0f",
+      "bytes": 5631
+    },
+    {
+      "path": "context/reviews/tenant-snapshot-sql-performance.md",
+      "sha256": "ca727c4e0727bc049b9d1f38236871b5440144809f38203f86c2a48e2188522f",
+      "bytes": 14814
+    }
+  ],
+  "closureEvidenceReviewed": {
+    "status": "PASS",
+    "ownedContainersAbsent": 34,
+    "childExitsVerified": 17,
+    "scope": "EVIDENCE_SOURCE_AND_RESOURCE_CLOSURE_NOT_HTTP_ACCEPTANCE",
+    "verificationNotRepeated": true
+  },
+  "editorialReview": {
+    "path": "context/reviews/tenant-snapshot-sql-performance.md",
+    "mainConclusionsConsistent": true,
+    "tablesChecked": "M pooled quantiles,12/11 paired improvements, C1 pooled latencies/p95 deterioration and cost medians/ratios agree with raw-derived CSVs; no additive interpretation.",
+    "requestedWordingQualification": "Investigation of audit/Central contention is a hypothesis; do not describe it as an established cause of this timeout.",
+    "sha256": "ca727c4e0727bc049b9d1f38236871b5440144809f38203f86c2a48e2188522f",
+    "requestedWordingQualificationResolved": true,
+    "finalVerdict": "CONCLUSIONS_CONSISTENT_WITH_PROTOCOL_FAILURE_AND_OBSERVED_DATA"
+  }
+}

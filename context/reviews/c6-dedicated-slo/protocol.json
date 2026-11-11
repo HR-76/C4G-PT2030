@@ -1,0 +1,108 @@
+{
+  "status": "COMPLETE_INVALID_ENVIRONMENT",
+  "executionStatus": "COMPLETE",
+  "host": {
+    "identifier": "current-workstation",
+    "operatingSystem": "Windows",
+    "configuredAccess": "existing local execution tools",
+    "exclusiveWindow": "User agreed to leave this computer unused during this test session",
+    "dedicationVerified": false
+  },
+  "variants": {
+    "A": "before the three adjacent authority groups; pinned sources in grouped-authority-validation/before",
+    "B": "current grouped sources; pinned hashes in grouped-authority-validation/verification.json"
+  },
+  "pairs": [
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "A"
+    ],
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "A"
+    ],
+    [
+      "A",
+      "B"
+    ],
+    [
+      "B",
+      "A"
+    ]
+  ],
+  "workload": {
+    "bursts": 12,
+    "concurrency": 6,
+    "requestsPerBurst": 6,
+    "warmupsPerBurst": 1,
+    "measuredRequestsTotal": 72,
+    "applicationsPerTenant": 1000,
+    "peoplePerTenant": 250,
+    "freshFixturePerBurst": true,
+    "expectedAdmissionsPerSuccessfulDashboard": 3,
+    "expectedAdmissionsPerVariantIfAllSucceed": 108
+  },
+  "unchangedLimits": {
+    "perTenantActive": 5,
+    "acquireTimeoutMs": 5000,
+    "leaseTimeoutMs": 15000,
+    "allOtherPolicies": "exact equality with existing capacity profile"
+  },
+  "admissionSlo": {
+    "approvalStatus": "APPROVED_BY_USER",
+    "scope": "observed positive C6 workload only; not a production availability SLO",
+    "p95WaitMsMaximum": 3000,
+    "maxWaitMsMaximum": 4000,
+    "minObservedHeadroomMs": 1000,
+    "admissionErrorsMaximum": 0,
+    "httpFailuresMaximum": 0,
+    "quantile": "nearest rank, ceil(0.95 * n), all measured logical admission attempts per variant",
+    "warmupsExcluded": true,
+    "failedAttemptsExcluded": false,
+    "maxCheckedPerBurstAndVariant": true
+  },
+  "invariants": {
+    "queriesPerSuccess": {
+      "A": 2619,
+      "B": 2421
+    },
+    "authorityTransactionsPerSuccess": {
+      "A": 42,
+      "B": 36
+    },
+    "authorityProtocolCallsPerSuccess": 198,
+    "auditPreparePerSuccess": 10,
+    "auditAppendPerSuccess": 10,
+    "applicationSelectionsPerSuccess": 1,
+    "responseTotal": 1000,
+    "afterResponseQueryCompletions": 0
+  },
+  "decision": {
+    "hostOrSloUnconfirmed": "NOT_RUN",
+    "hostInterferenceOrConfigurationDrift": "INVALID_ENVIRONMENT; preserve all evidence",
+    "missingMetrics": "INCOMPLETE_EVIDENCE; also report every observed request/admission failure",
+    "sloViolated": "FAIL for that variant, even if relative latency improves",
+    "allCriteriaMet": "PASS for this experimental SLO and workload only"
+  },
+  "hostControls": {
+    "pauseExistingContainers": [
+      "c4g-postgres17-dev",
+      "c4g-collabora-code"
+    ],
+    "resumeInFinally": true,
+    "backgroundCpuMeanPercentMaximum": 5,
+    "backgroundCpuSamplePercentMaximum": 10,
+    "backgroundCpuScale": "normalized by logical CPU count",
+    "globalIdleCpuMaximum": 25,
+    "freeMemoryGiBMinimum": 4
+  },
+  "measurementIntegrity": "Windows CPU counter v1 truncated fractional deltas; initial series preserved, not approved"
+}

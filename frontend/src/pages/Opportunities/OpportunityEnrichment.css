@@ -1,0 +1,16 @@
+.opportunity-overview .opportunity-enrichment { scroll-margin-top: 24px; }
+.opportunity-overview .opportunity-enrichment:focus-visible { outline: 2px solid var(--navigation-surface); outline-offset: 6px; }
+.opportunity-enrichment .enrichment-items { list-style: none; margin: 0; padding: 0; }
+.opportunity-enrichment .enrichment-items > li + li { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.opportunity-enrichment .enrichment-items p { margin: 0 0 6px; }
+.opportunity-enrichment .enrichment-amount { font-variant-numeric: tabular-nums; font-weight: 650; overflow-wrap: anywhere; }
+.opportunity-enrichment .enrichment-context { color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+.opportunity-enrichment .enrichment-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.enrichment-warning { color: var(--color-warning); margin: 0 0 10px; }
+.enrichment-uncollected { margin: 24px 0; }
+.opportunity-enrichment .enrichment-evidence { margin: 8px 0 12px; font-size: 12px; }
+.opportunity-enrichment .enrichment-evidence summary { cursor: pointer; color: var(--color-success); line-height: 1.6; }
+.opportunity-enrichment .enrichment-evidence summary:focus-visible { outline: 2px solid var(--navigation-surface); outline-offset: 4px; }
+.opportunity-enrichment .enrichment-evidence dl { display: block; margin: 10px 0 0; padding: 12px; background: var(--color-neutral-soft); border-left: 2px solid var(--color-success); }
+.opportunity-enrichment .enrichment-evidence dt { margin: 8px 0 2px; font-size: 11px; }
+.opportunity-enrichment .enrichment-evidence dd { font-size: 12px; font-weight: 400; }

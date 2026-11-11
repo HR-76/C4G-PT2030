@@ -1,0 +1,1467 @@
+{
+  "startedAt": "2026-11-06T22:23:05.722Z",
+  "mode": "standard",
+  "status": "COMPLETE",
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection",
+    "combined browse matches existing list and units, preserves filters and rejects tampered cursors",
+    "combined refresh creates due alerts once, matches stored inbox, excludes other recipients and requires CSRF",
+    "both combined operations refuse crossed organization headers",
+    "browse refuses missing application.read",
+    "alerts refuses missing notification.read",
+    "notification visibility freshly excludes inaccessible application.read",
+    "notification visibility freshly excludes inaccessible opportunity.read",
+    "browse withholds data on synchronous audit failure",
+    "alerts withholds data on synchronous audit failure",
+    "creation audit failure rolls back newly inserted deadline alerts",
+    "four concurrent browse operations return complete authorized results",
+    "four concurrent alerts operations return complete authorized results",
+    "concurrent first generation creates exactly two events and two audit entries; stale deadlines remain hidden",
+    "browse preserves protected commit ordering and refuses reads after revocation",
+    "alerts preserves protected commit ordering and refuses reads after revocation"
+  ],
+  "scenarios": [],
+  "limits": [
+    "Local synthetic data; no production capacity claim.",
+    "Instrumentation adds timing and 100ms PostgreSQL sampling overhead.",
+    "Central non-authority reader uses fixture pg_read_all_data.",
+    "No changes to pool limits, deadlines or security checks.",
+    "Standard mixed-tenant scenario warms tenant A only; first tenant B access can be cold."
+  ],
+  "variant": "B",
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "050_billing_private_documents",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "fixture": {
+    "applications": 1000,
+    "people": 250,
+    "storedAlerts": 6,
+    "dueApplications": 2,
+    "hiddenRecipientAlerts": 1
+  },
+  "securityRequests": [
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 400,
+      "code": "INVALID_CURSOR",
+      "failures": [
+        {
+          "code": "INVALID_CURSOR"
+        },
+        {
+          "code": "INVALID_CURSOR"
+        }
+      ]
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 403,
+      "code": "CSRF_INVALID",
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": [
+        {
+          "code": "AUTHORITY_DENIED"
+        },
+        {
+          "code": "AUTHORITY_DENIED"
+        }
+      ]
+    },
+    {
+      "kind": "alerts",
+      "status": 404,
+      "code": "RESOURCE_NOT_AVAILABLE",
+      "failures": [
+        {
+          "code": "AUTHORITY_DENIED"
+        },
+        {
+          "code": "AUTHORITY_DENIED"
+        }
+      ]
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 503,
+      "code": "SERVICE_UNAVAILABLE",
+      "failures": [
+        {
+          "code": "TENANT_QUERY_FAILED"
+        }
+      ]
+    },
+    {
+      "kind": "alerts",
+      "status": 503,
+      "code": "SERVICE_UNAVAILABLE",
+      "failures": [
+        {
+          "code": "SYNTHETIC_AUDIT_FAILURE"
+        },
+        {
+          "code": "SYNTHETIC_AUDIT_FAILURE"
+        }
+      ]
+    },
+    {
+      "kind": "alerts",
+      "status": 503,
+      "code": "SERVICE_UNAVAILABLE",
+      "failures": [
+        {
+          "code": "SYNTHETIC_CREATION_AUDIT_FAILURE"
+        },
+        {
+          "code": "SYNTHETIC_CREATION_AUDIT_FAILURE"
+        }
+      ]
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "browse",
+      "status": 403,
+      "code": "NOT_AUTHORIZED",
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 200,
+      "failures": []
+    },
+    {
+      "kind": "alerts",
+      "status": 409,
+      "code": "ORGANIZATION_SELECTION_REQUIRED",
+      "failures": []
+    }
+  ],
+  "concurrent": {
+    "browse": [
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      }
+    ],
+    "alerts": [
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      }
+    ]
+  },
+  "creation": {
+    "before": {
+      "alerts": 2,
+      "audit": 2
+    },
+    "after": {
+      "alerts": 4,
+      "audit": 4
+    }
+  },
+  "revocation": {
+    "browse": {
+      "held": true,
+      "registered": true,
+      "status": 200,
+      "commitOrder": [
+        "tenantCommit",
+        "revocationCommit"
+      ]
+    },
+    "alerts": {
+      "held": true,
+      "registered": true,
+      "status": 200,
+      "commitOrder": [
+        "tenantCommit",
+        "revocationCommit"
+      ]
+    }
+  },
+  "instrumentation": {
+    "queries": [
+      {
+        "hash": "6ec438bce08867f4",
+        "category": "other",
+        "caller": [
+          "at Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:112:32)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:46:180",
+          "at Object.measure (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionTiming.js:4:81)"
+        ]
+      },
+      {
+        "hash": "3eb12e5bafe877f8",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:25:18)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "74c89290b5bc0324",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at assertSupportedPostgresMajor (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:9:31)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:27:33)"
+        ]
+      },
+      {
+        "hash": "6de0ab5ecc04997d",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:28:11)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "1785d86a000b9d26",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at async Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:28:5)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "5132894cb05b9550",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:29:33)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "0ac62896dcae5330",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:100:31)",
+          "at assertCentralSchema (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:148:26)"
+        ]
+      },
+      {
+        "hash": "cfcd1108ca0c6a9f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.authoritySecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:99:28)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:111:107)"
+        ]
+      },
+      {
+        "hash": "e99a77f79a35884c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.catalogReaderSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogReaderSecurity.js:9:29)",
+          "at centralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:114:66)"
+        ]
+      },
+      {
+        "hash": "0d2fc793022bceff",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:5:34)",
+          "at Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:26)"
+        ]
+      },
+      {
+        "hash": "5f3202c8e2710e93",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:10:32)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "933e3ba410cb335c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:12:30)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "134e69c66f0f2132",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:14:36)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "ad488789c5b185d7",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at catalogSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:17:31)",
+          "at async Object.assertCatalogSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\catalogSecurityManifest.js:22:20)"
+        ]
+      },
+      {
+        "hash": "ece0c3b122528358",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:6:32)",
+          "at Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:23)"
+        ]
+      },
+      {
+        "hash": "2ba33ea79fa6200f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:12:32)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "96e7cfc17fab9433",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:16:30)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "100df8b38c17d223",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:19:28)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "fab63c837f779e3e",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euWriterSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:23:34)",
+          "at async Object.assertEuWriterSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euWriterSecurityManifest.js:32:17)"
+        ]
+      },
+      {
+        "hash": "783d13417acd25bf",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:4:32)",
+          "at Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:88)"
+        ]
+      },
+      {
+        "hash": "4ad6d90f7abdd067",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:5:28)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "18967f5c79a0ec46",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:6:34)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "f864efcc71a6c579",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:7:32)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "2712b1e88642e19c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:8:30)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "848df42650141cf9",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at euRunReconciliationSecuritySnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:9:36)",
+          "at async Object.assertEuRunReconciliationSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euRunReconciliationSecurityManifest.js:13:82)"
+        ]
+      },
+      {
+        "hash": "dc60eea8dfc8c89d",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:4:35)",
+          "at Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:33)"
+        ]
+      },
+      {
+        "hash": "27bb21ef334ea8fd",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:13:35)",
+          "at async Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:27)"
+        ]
+      },
+      {
+        "hash": "41b9b3cd52bbbb1f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at snapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:19:34)",
+          "at async Object.assertEuLegacyPrearchiveSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\euLegacyPrearchiveSecurityManifest.js:28:27)"
+        ]
+      },
+      {
+        "hash": "b8dee57b82d22e57",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.normalReadFingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\dedicatedCredentials.js:19:27)",
+          "at validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:142:92)"
+        ]
+      },
+      {
+        "hash": "1a17c51870491a03",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.fingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\readSchema.js:24:29)",
+          "at Object.normalReadFingerprint (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\opportunities\\catalogRead\\dedicatedCredentials.js:20:52)"
+        ]
+      },
+      {
+        "hash": "27abf348b43e43cb",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.assertCentralImportSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralImportSecurity.js:5:27)",
+          "at validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:143:126)"
+        ]
+      },
+      {
+        "hash": "5b868d125175f6e1",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.assertCentralImportSecurity (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralImportSecurity.js:18:29)",
+          "at async validateCentralSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralSchemaManifest.js:143:85)"
+        ]
+      },
+      {
+        "hash": "79663c1d3b43ceaf",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:124)",
+          "at Object.preflightCentral (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\centralMigrationPreflight.js:44:18)",
+          "at async Object.assertAuthorityAdmission (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authoritySecurityManifest.js:117:18)"
+        ]
+      },
+      {
+        "hash": "a8402858d4f1e1d2",
+        "category": "transaction",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:47:20)"
+        ]
+      },
+      {
+        "hash": "832bdaa8fc857473",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:48:20)"
+        ]
+      },
+      {
+        "hash": "18d98c1612e16751",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:49:20)"
+        ]
+      },
+      {
+        "hash": "bcd937c3e242e10d",
+        "category": "other",
+        "caller": [
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:50:35)"
+        ]
+      },
+      {
+        "hash": "e457b9e54eecca47",
+        "category": "authority-lock",
+        "caller": [
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:52:56",
+          "at Object.measure (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionTiming.js:4:81)",
+          "at transaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:52:20)"
+        ]
+      },
+      {
+        "hash": "6ffec628935eba85",
+        "category": "authority-protocol",
+        "caller": [
+          "at Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityProtocolQueries.js:88:31)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:59:59)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:90:46"
+        ]
+      },
+      {
+        "hash": "b0b13d76e8815554",
+        "category": "other",
+        "caller": []
+      },
+      {
+        "hash": "788e526fe808f5b2",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:58:31)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "9059403393303375",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:65:49)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "88615167c03add1a",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:67:36)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "f7263e4d3062bfeb",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:72:33)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "31f205c484d85379",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:75:52)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "59b2a782f977eb75",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:79:31)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "ddd03a1849384c3d",
+        "category": "metadata",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:87:32)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "88fbf505d4a23ec8",
+        "category": "metadata",
+        "caller": [
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:26:31)",
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:59)",
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:26)"
+        ]
+      },
+      {
+        "hash": "b2db7c944764af2c",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:113:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "d33a1f0fa97d98bc",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:156:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "1deed5146f01dffd",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:196:62)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "2f40db89f0a129a0",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:219:90)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "428c92fdbfab66df",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:240:43)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "4ce543e9aa18d379",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:261:34)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "d4e0741b77184920",
+        "category": "metadata",
+        "caller": [
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:279:32)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "1bba20580524a4c7",
+        "category": "metadata",
+        "caller": [
+          "at securityCatalogBatch (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:13:31)",
+          "at tenantSchemaSnapshot (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantSchemaFingerprint.js:281:36)",
+          "at async observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:10:53)"
+        ]
+      },
+      {
+        "hash": "1ab17d91c5a63e4f",
+        "category": "other",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:13:32)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "c2aaa742dcb1f8e5",
+        "category": "transaction",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:17:18)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "1307af40e2370ef9",
+        "category": "other",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:18:28)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "60d79c6a1a7556c2",
+        "category": "transaction",
+        "caller": [
+          "at observeTenantRuntimeMetadata (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:22:18)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)"
+        ]
+      },
+      {
+        "hash": "0ee22d0909bb7809",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateDatabaseContract (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:65:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:514:22)"
+        ]
+      },
+      {
+        "hash": "7798d7fb19421d0c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateDatabaseContract (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:80:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:514:22)"
+        ]
+      },
+      {
+        "hash": "7fe73ee93d74a4a9",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:527:38)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "6d9da93055384c0b",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:90:30)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:11)"
+        ]
+      },
+      {
+        "hash": "220c20d913e2ceed",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:104:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "ddb59461666a362b",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:121:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "8dbb51cf095bb93d",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:144:28)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "e2c6fd7521dd1a1f",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateRolesAndPrivileges (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:180:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:560:5)"
+        ]
+      },
+      {
+        "hash": "bfb1cf4ddf03c911",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:195:30)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:11)"
+        ]
+      },
+      {
+        "hash": "1ae166fff480c7ce",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:203:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "3a7bfb458bc8b5ee",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:246:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "6882f3091e3c27f3",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:259:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "b27132299719e3be",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:296:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "8bb6ad1f270a2690",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:333:35)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "83d2d400d7caeef5",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:364:30)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "a23fa378ebd8f4e4",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:368:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "bd72d38f88bc8231",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:373:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "783325ae3d25386c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:381:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "77228c6923da288e",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:392:32)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "5d8ff12ce411bf84",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:410:39)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "1ba7f288fb2e8051",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:41:33)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:420:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "61c0205940aabe50",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:430:42)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "4bb0354a0d0525aa",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:439:36)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "88ee429e48354c63",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:445:33)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "20ccfa9eac39e255",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:455:42)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "41d616ba86078843",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:484:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "215e68e69e1578e6",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at validateFeatureCapabilities (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:496:31)",
+          "at async preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:561:5)"
+        ]
+      },
+      {
+        "hash": "4a9f2a0d8944dc1c",
+        "category": "metadata",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantRuntimeMetadata.js:44:19)",
+          "at preflightTenantClient (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantMigrationPreflight.js:562:35)",
+          "at async Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:101:20)"
+        ]
+      },
+      {
+        "hash": "7f2c8b9056bc0d80",
+        "category": "other",
+        "caller": [
+          "at Object.observe (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\config\\opportunityRuntime.js:102:34)",
+          "at async Object.verify (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantBindingVerifier.js:10:24)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantResolver.js:114:13"
+        ]
+      },
+      {
+        "hash": "ce26a2fdc49bce7f",
+        "category": "transaction",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:152:18)",
+          "at C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:32",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "b5297617afb2db1d",
+        "category": "transaction",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:154:18)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "1c7e8dcc8b6995f5",
+        "category": "other",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:162:20)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "00365bfe5664f00d",
+        "category": "other",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:163:35)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "e4355d1e1b922e70",
+        "category": "transaction",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at run (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:112:16)",
+          "at Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:90:51)"
+        ]
+      },
+      {
+        "hash": "dd6b2daea1c7b19f",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at run (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:114:16)",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:90:45)"
+        ]
+      },
+      {
+        "hash": "47d660f16ad200e2",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at readResponsibleDirectory (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:53:30)",
+          "at async browse (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\browseSql.js:42:47)"
+        ]
+      },
+      {
+        "hash": "ac311aaf4c97df38",
+        "category": "application-selection",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at browse (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\browseSql.js:48:30)",
+          "at async Object.browsePage (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:172:14)"
+        ]
+      },
+      {
+        "hash": "27bd1f912b2c332f",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at hydratePageUnits (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\interestLink.js:14:28)",
+          "at browse (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\browseSql.js:60:40)"
+        ]
+      },
+      {
+        "hash": "49590db678eb7fe8",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at protectedUnitOptions (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:117:33)",
+          "at Object.browsePage (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:173:21)"
+        ]
+      },
+      {
+        "hash": "dcc0bbe0f7205c61",
+        "category": "application-selection",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at protectedUnitOptions (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:120:28)",
+          "at async Object.browsePage (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:173:15)"
+        ]
+      },
+      {
+        "hash": "1130bb78a9ac28aa",
+        "category": "audit-prepare",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at PostgresAppendRepository.prepare (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\postgresAppendRepository.js:4:35)",
+          "at Object.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\appendService.js:8:39)"
+        ]
+      },
+      {
+        "hash": "9532003c48cd8d04",
+        "category": "audit-append",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at PostgresAppendRepository.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\postgresAppendRepository.js:19:35)",
+          "at Object.append (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\audit\\appendService.js:22:37)"
+        ]
+      },
+      {
+        "hash": "587fa628a9fe4642",
+        "category": "transaction",
+        "caller": [
+          "at executeTransaction (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:214:26)",
+          "at async C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:350:26",
+          "at async Object.execute (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:358:26)"
+        ]
+      },
+      {
+        "hash": "5735e62fe9e9b904",
+        "category": "application-selection",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at browse (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\browseSql.js:48:30)",
+          "at async Object.browsePage (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\repository.js:172:14)"
+        ]
+      },
+      {
+        "hash": "1a7ba15459b04a49",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at acquireApplicationMutationLock (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:46:15)",
+          "at run (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\composition.js:115:10)"
+        ]
+      },
+      {
+        "hash": "38bf7cb7fc315ca7",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at available (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:19:64)",
+          "at guard (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:39:13)"
+        ]
+      },
+      {
+        "hash": "2c7d7badfd63ddcc",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at refreshProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:129:28)",
+          "at Object.alertsRefreshList (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:146:9)"
+        ]
+      },
+      {
+        "hash": "cfc32c5ee407f22c",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at insert (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:21:29)",
+          "at refreshProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:139:24)"
+        ]
+      },
+      {
+        "hash": "344bfc1c33a95bcb",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at visible (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:48:28)",
+          "at listProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:104:20)"
+        ]
+      },
+      {
+        "hash": "7e4b2c158d92cd5b",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at visible (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:61:20)",
+          "at async listProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:104:14)"
+        ]
+      },
+      {
+        "hash": "16d77ca347b2858a",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at visible (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:62:32)",
+          "at async listProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:104:14)"
+        ]
+      },
+      {
+        "hash": "ec1e7f969ef4d144",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\tenantLeaseExecutor.js:125:21)",
+          "at hydrateContent (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:77:30)",
+          "at listProtected (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\applications\\alerts.js:106:20)"
+        ]
+      },
+      {
+        "hash": "b807330e4152ebcf",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:99:44)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:53:22)"
+        ]
+      },
+      {
+        "hash": "735f02f7803440b3",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:100:45)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:100:22)"
+        ]
+      },
+      {
+        "hash": "0acfbe3bbb8ec3f3",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:99:44)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:53:22)"
+        ]
+      },
+      {
+        "hash": "ec25cf9675909277",
+        "category": "other",
+        "caller": [
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:58:138)",
+          "at Object.query (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\authorityCoordinator.js:100:45)",
+          "at rotateSession (C:\\Users\\Utilizador\\Documents\\07_Profissional\\3_CAND_C4G_APP\\GCNI_C4G\\backend\\src\\security\\sessionRegistry.js:100:22)"
+        ]
+      }
+    ],
+    "policies": [
+      {
+        "globalLimit": 20,
+        "perTenantLimit": 5,
+        "operationalReserve": 2,
+        "globalQueueLimit": 40,
+        "perTenantQueueLimit": 10,
+        "operationalQueueReserve": 2,
+        "acquireTimeoutMs": 5000,
+        "leaseTimeoutMs": 15000,
+        "idleTimeoutMs": 30000,
+        "drainTimeoutMs": 10000,
+        "circuitFailureThreshold": 3,
+        "circuitResetMs": 10000,
+        "backoffBaseMs": 25,
+        "maxBackoffMs": 250
+      }
+    ],
+    "samples": []
+  },
+  "integrity": {
+    "unchanged": true
+  },
+  "finishedAt": "2026-11-06T22:24:49.165Z"
+}

@@ -1,0 +1,44 @@
+.alerts-header p { margin:0; color:var(--color-text-secondary); font-size:.85rem; }
+.alerts-header h1 { color:var(--color-text-primary); font-size:clamp(24px,2.4vw,32px); margin:4px 0 16px; }
+.alerts-workspace .filter-options button[aria-pressed=true] { color:var(--color-action); background:var(--ui-action-soft); border-color:var(--color-border-strong); }
+.alerts-workspace .notif-list { border:1px solid var(--color-border); border-radius:12px; overflow:hidden; background:var(--color-surface); }
+.alerts-workspace .notif-item { padding:16px; background:var(--color-surface); border-bottom:1px solid var(--color-border); align-items:flex-start; }
+.alerts-workspace .notif-item.unread { background:var(--color-background); box-shadow:inset 3px 0 var(--ui-turquoise); }
+.alerts-workspace .notif-body { min-width:0; overflow-wrap:anywhere; }
+.alerts-workspace .notif-target { display:inline-flex; gap:6px; align-items:center; color:var(--color-action); font-weight:650; }
+.alerts-workspace :is(.notif-target,button):focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; }
+@media(max-width:768px) {
+ .alerts-workspace .notif-list { display:grid; padding:8px; gap:8px; }
+ .alerts-workspace .notif-item { border:1px solid var(--color-border); border-radius:8px; }
+ .alerts-workspace .notif-target { min-height:44px; }
+}
+.alerts-workspace [role="tablist"] { display:flex; flex-wrap:wrap; gap:8px; }
+
+.alerts-workspace .notif-date-group { min-width:0; }
+.alerts-workspace .notif-date-group > h2 { margin:0; padding:14px 16px; font-size:15px; background:var(--ui-heading-surface); border-bottom:1px solid var(--color-border); }
+.alerts-workspace .notif-unread-label { font-size:12px; font-weight:650; color:var(--color-action); }
+.alerts-workspace .notif-line { flex-wrap:wrap; }
+.alerts-workspace .notif-item > .btn-icon { flex-shrink:0; min-width:44px; min-height:44px; }
+@media(max-width:768px) { .alerts-workspace .notif-date-group { display:grid; gap:8px; } }
+
+/* Filtros compactos e leitura confortável dos alertas. */
+.alerts-workspace .filter-bar.filter-bar { align-items:center; gap:12px 20px; }
+.alerts-workspace .filter-bar.filter-bar .filter-options { width:auto; flex:1 1 360px; }
+.alerts-workspace .filter-bar.filter-bar .filter-options + .filter-actions { flex:0 1 auto; width:auto; padding:0; border:0; }
+.alerts-workspace .filter-bar .checkbox-label { margin-right:8px; color:var(--color-text-primary); font-size:13px; }
+.alerts-workspace .notif-date-group > h2 { padding:15px 20px; color:var(--color-text-primary); font-weight:650; }
+.alerts-workspace .notif-item { gap:16px; padding:20px; cursor:default; }
+.alerts-workspace .notif-icon { width:36px; height:36px; margin-top:0; }
+.alerts-workspace .notif-line { gap:8px 10px; margin-bottom:8px; }
+.alerts-workspace .notif-title { font-size:15px; line-height:1.45; font-weight:650; }
+.alerts-workspace .notif-msg { margin:0; font-size:14px; line-height:1.55; color:var(--color-text-secondary); }
+.alerts-workspace .notif-actions { margin-top:10px; }
+.alerts-workspace .notif-target { font-size:13px; text-underline-offset:3px; }
+.alerts-workspace .notif-target:hover { text-decoration:underline; }
+.alerts-workspace .notif-ts { margin-top:8px; font-size:12px; }
+@media(max-width:700px) {
+ .alerts-workspace .filter-bar.filter-bar .filter-options { flex-basis:100%; }
+ .alerts-workspace .filter-bar.filter-bar .filter-options + .filter-actions { flex:1 1 100%; }
+ .alerts-workspace .notif-item { padding:16px; gap:12px; }
+ .alerts-workspace .notif-icon { width:32px; height:32px; }
+}

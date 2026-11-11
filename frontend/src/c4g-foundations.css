@@ -1,0 +1,398 @@
+/* C4G foundations: one scale for type, controls, radii and elevation.
+   Proportions follow Metronic 9.5 Demo 1; colours stay on the approved petrol palette.
+   Rules are scoped through #main-content so they prevail over per-page sizes. */
+:root {
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 16px;
+  --fs-title: 20px;
+  --radius-control: 6px;
+  --radius-card: 12px;
+  --control-h: 34px;
+  --control-h-touch: 44px;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / .05);
+  --content-max: 1280px;
+  --table-header-surface: #F4F6F9;
+}
+
+/* ── Content width ─────────────────────────────────────────────────────── */
+.c4g-shell .page-content {
+  padding: 20px max(var(--space-24), calc((100% - var(--content-max)) / 2)) var(--space-32);
+}
+.c4g-shell .page-content:has(.catalog-wide) {
+  padding-left: var(--space-24);
+  padding-right: var(--space-24);
+}
+
+/* ── Page title and card titles ────────────────────────────────────────── */
+.c4g-shell #main-content h1 {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--ui-ink);
+}
+.c4g-shell #main-content :is(.chart-panel, .dash-section .section-hd, .directory-register, .billing-register) h2 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) .btn {
+  min-height: var(--control-h);
+  padding: 6px 12px;
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.3;
+}
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) .btn-sm {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: var(--fs-xs);
+}
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) .btn-icon {
+  min-width: var(--control-h);
+  padding: 6px;
+  justify-content: center;
+}
+
+/* ── Text fields and selects ───────────────────────────────────────────── */
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) :is(input[type="text"], input[type="search"], input:not([type]), input[type="email"], input[type="password"], input[type="date"], input[type="number"], input[type="url"], select) {
+  min-height: var(--control-h);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+}
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) textarea {
+  border-radius: var(--radius-control);
+  font-size: var(--fs-sm);
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────────── */
+.c4g-shell #main-content :is(
+  .table-wrap, .cr-table-scroll, .dash-section, .chart-panel, .admin-metric,
+  .organization-dashboard .stat-item, .organization-card, .directory-register,
+  .billing-register, .account-security-panel, .account-security-guide,
+  .filter-bar:not(.filter-bar-integrated, .filter-bar-compact), [data-slot="card"]
+) {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.c4g-shell #main-content :is(.directory-register, .billing-register, .organization-card, .dash-section, .chart-panel) :is(.table-wrap, .cr-table-scroll) {
+  box-shadow: none;
+}
+.c4g-shell #main-content [data-slot="card"] :is(.table-wrap, .cr-table-scroll) {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ── Page-level tabs ───────────────────────────────────────────────────── */
+.c4g-shell #main-content :is(.dashboard-tabs, .tabs-header, .application-area-nav, .directory-tabs) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin: 0 0 20px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ui-border);
+  border-radius: 0;
+}
+.c4g-shell #main-content :is(.dashboard-tabs, .tabs-header, .application-area-nav, .directory-tabs) > :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 40px;
+  margin: 0 0 -1px;
+  padding: 0 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--ui-muted);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+.c4g-shell #main-content :is(.dashboard-tabs, .tabs-header, .application-area-nav, .directory-tabs) > :is(a, button):hover {
+  background: transparent;
+  color: var(--ui-ink);
+}
+.c4g-shell #main-content :is(.dashboard-tabs, .tabs-header, .application-area-nav, .directory-tabs) > :is([aria-current], [aria-pressed="true"], .active) {
+  background: transparent;
+  color: var(--ui-action);
+  border-bottom-color: var(--ui-action);
+}
+
+/* ── Narrow touch screens ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .c4g-shell .page-content,
+  .c4g-shell .page-content:has(.catalog-wide) {
+    padding: var(--space-16);
+  }
+}
+@media (max-width: 700px) {
+  .c4g-shell #main-content .btn:not(.btn-sm, .btn-icon) {
+    min-height: var(--control-h-touch);
+  }
+  .c4g-shell #main-content :is(.dashboard-tabs, .tabs-header, .application-area-nav, .directory-tabs) > :is(a, button) {
+    min-height: var(--control-h-touch);
+  }
+}
+
+/* ── Table headers ─────────────────────────────────────────────────────── */
+/* One header for every list: tinted band, small muted labels on a single line,
+   sort control next to its label. The sorted column is marked by ink and a blue arrow. */
+.c4g-shell #main-content :is(.data-table, .catalog-read table) thead th {
+  padding: 10px 14px;
+  vertical-align: middle;
+  background: var(--table-header-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--color-border-strong);
+  box-shadow: none;
+}
+.c4g-shell #main-content :is(.data-table, .catalog-read table) thead th:is([aria-sort="ascending"], [aria-sort="descending"]) {
+  color: var(--color-text-primary);
+}
+.c4g-shell #main-content thead th :is(.application-sort, .catalog-sort-button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  margin: -2px -6px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.c4g-shell #main-content thead th :is(.application-sort, .catalog-sort-button):hover {
+  background: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+  color: var(--color-text-primary);
+}
+.c4g-shell #main-content thead th :is(.application-sort, .catalog-sort-button) svg {
+  flex: none;
+  margin: 0 !important;
+}
+.c4g-shell #main-content thead th:is([aria-sort="ascending"], [aria-sort="descending"]) :is(.application-sort, .catalog-sort-button) svg {
+  color: var(--action-primary);
+  opacity: 1 !important;
+}
+.c4g-shell #main-content .data-table:is(.habitual-catalog-table, .access-table, .organization-directory-table) thead th,
+.c4g-shell #main-content .habitual-catalog-table thead th .catalog-sort-button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.c4g-shell #main-content .data-table.habitual-catalog-table thead th {
+  padding-inline: var(--space-8);
+}
+
+/* ── Page-by-page pass: shared headings, labels, chips and remaining cards ── */
+.c4g-shell #main-content h2 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.c4g-shell #main-content .admin-metric h2 {
+  font-size: var(--fs-base);
+}
+.c4g-shell #main-content h3 {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+/* Label above the page title and sentence below it. */
+.c4g-shell #main-content :is(p, span):is(:has(+ h1), :has(+ .heading-with-info > h1)) {
+  margin: 0 0 2px;
+  color: var(--ui-muted);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.c4g-shell #main-content h1 + p {
+  margin: 4px 0 0;
+  color: var(--ui-muted);
+  font-size: var(--fs-base);
+  font-weight: 400;
+}
+.c4g-shell #main-content :is(.chip, .badge) {
+  padding: 3px 8px;
+  border-radius: var(--radius-control);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+.c4g-shell #main-content :is(
+  .detail-section, .entity-profile-sheet, .customer-billing-filters, .billing-ledger,
+  .customer-billing > section, .admin-panel, .admin-activity, .admin-totals
+) {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.c4g-shell #main-content .billing-empty {
+  border-radius: var(--radius-card);
+  box-shadow: none;
+}
+.c4g-shell #main-content :is(.entity-profile-sheet, .admin-totals) :is(.detail-section, .organization-card, .admin-metric) {
+  box-shadow: none;
+}
+.c4g-shell #main-content .organization-dashboard .dash-section {
+  padding: clamp(18px, 2vw, 24px);
+}
+/* Second-level tabs inside the organisation report use the same underline. */
+.c4g-shell #main-content .dashboard-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.c4g-shell #main-content .dashboard-subtabs > button {
+  min-height: 36px;
+  margin: 0 0 -1px;
+  padding: 0 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--ui-muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.c4g-shell #main-content .dashboard-subtabs > :is([aria-pressed="true"], [aria-selected="true"], .active) {
+  color: var(--ui-action);
+  border-bottom-color: var(--ui-action);
+}
+@media (max-width: 700px) {
+  :is(.c4g-shell #main-content, .form-modal, .billing-dialog) :is(input[type="text"], input[type="search"], input:not([type]), input[type="email"], input[type="password"], input[type="date"], input[type="number"], input[type="url"], select) {
+    min-height: var(--control-h-touch);
+  }
+}
+
+/* ── Platform administration leftovers ─────────────────────────────────── */
+.c4g-shell #main-content :is(.entity-invitations, .admin-shortcuts) {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.c4g-shell #main-content :is(.directory-status, .operational-badge) {
+  border-radius: var(--radius-control);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+
+/* ── Detail pages and dialogs ──────────────────────────────────────────── */
+.c4g-shell #main-content :is(.cr-status, .entity-profile-state, .member-state) {
+  border-radius: var(--radius-control);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+.c4g-shell #main-content .directory-identity {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.c4g-shell #main-content .column-presets button {
+  border-radius: var(--radius-control);
+}
+:is(.c4g-shell #main-content, .form-modal, .billing-dialog) :is(input[type="text"], input[type="search"], input:not([type]), input[type="email"], input[type="password"], input[type="date"], input[type="number"], input[type="url"], select) {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.form-modal.form-modal {
+  border-color: var(--ui-border);
+  border-radius: var(--radius-card);
+}
+.form-modal .form-modal-heading h2 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.form-modal h3 {
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+.form-modal label {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.form-modal .form-modal-close {
+  width: var(--control-h);
+  height: var(--control-h);
+  border-color: var(--ui-border);
+  border-radius: var(--radius-control);
+}
+@media (max-width: 700px) {
+  .form-modal .form-modal-close {
+    width: var(--control-h-touch);
+    height: var(--control-h-touch);
+  }
+}
+@media (max-width: 700px) {
+  :is(.form-modal, .billing-dialog) .btn:not(.btn-sm, .btn-icon) {
+    min-height: var(--control-h-touch);
+  }
+}
+@media (max-width: 700px) {
+  :is(.c4g-shell #main-content, .form-modal, .billing-dialog) .btn:not(.btn-sm, .btn-icon) {
+    min-height: var(--control-h-touch);
+  }
+}
+
+/* Dashboard: explicit hover, pressed and selected feedback. */
+.c4g-shell #main-content .dashboard-tabs {
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--surface-default);
+}
+.c4g-shell #main-content .dashboard-tabs > button {
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  line-height: 1.4;
+  transform: none;
+  box-shadow: none;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+.c4g-shell #main-content .dashboard-tabs > button:hover {
+  background: var(--ui-action-soft);
+  color: var(--ui-action);
+  border-color: var(--ui-border);
+}
+.c4g-shell #main-content .dashboard-tabs > button[aria-pressed="true"] {
+  background: var(--action-primary-soft);
+  color: var(--action-primary-hover);
+  border-color: var(--action-primary-border);
+  font-weight: 600;
+}
+.c4g-shell #main-content .dashboard-tabs > button:active {
+  transform: none;
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.c4g-shell #main-content .dashboard-tabs > button:focus-visible {
+  outline: 2px solid var(--ui-action);
+  outline-offset: 2px;
+}
+@media(max-width:600px){
+  .c4g-shell #main-content .dashboard-tabs > button { flex: 1 1 100%; justify-content: flex-start; }
+}
+@media(prefers-reduced-motion:reduce){
+  .c4g-shell #main-content .dashboard-tabs > button { transition:none; }
+}

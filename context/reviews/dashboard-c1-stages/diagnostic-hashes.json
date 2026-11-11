@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-27T20:17:08.068Z",
+  "sha256": {
+    "test/integration/dashboard-c1/stageObserver.js": "985c52007ff6ebc49e46983e5d1e600dd91e9cbd9ce10dbddaae4b01aef125f5",
+    "test/integration/dashboard-c1/analyze.js": "8374475d9e8ebc29c111c69c5e43cc046aee5f8bbc9845eb68e7b45ef2d948db",
+    "test/integration/dashboard-c1/profile.ps1": "544a18708df8a054ee16e71d13ef9762f19d6dde164ef6012fc786af3e3366a2",
+    "test/integration/dashboard-c1/README.md": "ebb1f377f13e50f336889fc2eeb2d9f6b03bea34a19d0e74d63053067636fbda",
+    "context/research/dashboard-c1-sequential-cost.md": "88a0ce80700017737234ed69de5cbab3f36d6006eb55a92ec16196e96c61af19"
+  }
+}

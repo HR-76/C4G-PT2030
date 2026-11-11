@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "scope": "existing-public-evidence-only",
+  "files": {
+    "eu-11145.json": "21e07eb79a478de23ca126fd8377733f82c6731ac24fe91313a79b2ed186f2a6",
+    "eu-11145.metadata.json": "0449058b636bd2699bf4045de48ec4d35a63446abf10fe1e7e7c83d8decc5276",
+    "pt2030-plan-177.json": "33916c726c41c869d3d38b8637812102c6d23538af280d1cdd0790098b2b009f"
+  },
+  "ptObservedAt": "2026-10-30T22:47:58.470Z",
+  "ptObservedAtBasis": "Existing normative examples/pt2030-8485.json observation for this workbook",
+  "expected": {
+    "EU_FUNDING_TENDERS": 1,
+    "PORTUGAL2030_PLAN": 177
+  }
+}

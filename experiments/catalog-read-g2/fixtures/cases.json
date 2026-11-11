@@ -1,0 +1,1728 @@
+[
+  {
+    "id": "G2-001",
+    "description": "reject invalid civil date 2027-02-29",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "2027-02-29"
+    },
+    "expected": false,
+    "error": "format"
+  },
+  {
+    "id": "G2-002",
+    "description": "reject invalid civil date 2026-04-31",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "2026-04-31"
+    },
+    "expected": false,
+    "error": "format"
+  },
+  {
+    "id": "G2-003",
+    "description": "reject invalid civil date 0000-01-01",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "0000-01-01"
+    },
+    "expected": false,
+    "error": "format"
+  },
+  {
+    "id": "G2-004",
+    "description": "reject invalid civil date 2026-13-01",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "2026-13-01"
+    },
+    "expected": false,
+    "error": "format"
+  },
+  {
+    "id": "G2-005",
+    "description": "reject invalid civil date 01/11/2026",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "01/11/2026"
+    },
+    "expected": false,
+    "error": "format"
+  },
+  {
+    "id": "G2-006",
+    "description": "accept leap day",
+    "schema": "Date",
+    "value": {
+      "kind": "date",
+      "date": "2028-02-29"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-007",
+    "description": "unknown timezone is preserved",
+    "schema": "LocalDatetime",
+    "value": {
+      "kind": "local_datetime",
+      "local": "2027-02-26T18:00:00",
+      "timezone": null
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-008",
+    "description": "reject local hour 24",
+    "schema": "LocalDatetime",
+    "value": {
+      "kind": "local_datetime",
+      "local": "2027-02-26T24:00:00",
+      "timezone": null
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-009",
+    "description": "reject timezone invented on unknown local time",
+    "schema": "LocalDatetime",
+    "value": {
+      "kind": "local_datetime",
+      "local": "2027-02-26T18:00:00",
+      "timezone": "UTC"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-010",
+    "description": "known timezone maps UTC to original local",
+    "schema": "Instant",
+    "value": {
+      "kind": "instant",
+      "utc": "2026-07-01T17:00:00.000Z",
+      "originalLocal": "2026-07-01T18:00:00",
+      "originalTimezone": "Europe/Lisbon"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-011",
+    "description": "reject UTC/local mismatch",
+    "schema": "Instant",
+    "value": {
+      "kind": "instant",
+      "utc": "2026-07-01T17:00:00Z",
+      "originalLocal": "2026-07-01T17:00:00",
+      "originalTimezone": "Europe/Lisbon"
+    },
+    "expected": false,
+    "error": "INSTANT_LOCAL_MISMATCH"
+  },
+  {
+    "id": "G2-012",
+    "description": "accept fixed offset",
+    "schema": "Instant",
+    "value": {
+      "kind": "instant",
+      "utc": "2026-07-01T17:00:00Z",
+      "originalLocal": "2026-07-01T19:00:00",
+      "originalTimezone": "+02:00"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-013",
+    "description": "reject unknown named timezone",
+    "schema": "Instant",
+    "value": {
+      "kind": "instant",
+      "utc": "2026-07-01T17:00:00Z",
+      "originalLocal": "2026-07-01T17:00:00",
+      "originalTimezone": "Europe/Invented"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-014",
+    "description": "reject precision beyond milliseconds",
+    "schema": "Instant",
+    "value": {
+      "kind": "instant",
+      "utc": "2026-07-01T17:00:00.0001Z",
+      "originalLocal": "2026-07-01T17:00:00",
+      "originalTimezone": "UTC"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-015",
+    "description": "label-only period",
+    "schema": "Period",
+    "value": {
+      "kind": "period",
+      "from": null,
+      "to": null,
+      "label": "Primeiro trimestre"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-016",
+    "description": "empty period",
+    "schema": "Period",
+    "value": {
+      "kind": "period",
+      "from": null,
+      "to": null,
+      "label": " "
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-017",
+    "description": "reversed period",
+    "schema": "Period",
+    "value": {
+      "kind": "period",
+      "from": {
+        "kind": "date",
+        "date": "2027-03-01"
+      },
+      "to": {
+        "kind": "date",
+        "date": "2027-02-01"
+      },
+      "label": ""
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-018",
+    "description": "exact money 0",
+    "schema": "Money",
+    "value": {
+      "amount": "0",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-019",
+    "description": "exact money 999999999999999999999999.12345678",
+    "schema": "Money",
+    "value": {
+      "amount": "999999999999999999999999.12345678",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-020",
+    "description": "exact money 1000000000000000000000000",
+    "schema": "Money",
+    "value": {
+      "amount": "1000000000000000000000000",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-021",
+    "description": "exact money 1.123456789",
+    "schema": "Money",
+    "value": {
+      "amount": "1.123456789",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-022",
+    "description": "exact money -1",
+    "schema": "Money",
+    "value": {
+      "amount": "-1",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-023",
+    "description": "exact money 1e6",
+    "schema": "Money",
+    "value": {
+      "amount": "1e6",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-024",
+    "description": "exact money 1,000",
+    "schema": "Money",
+    "value": {
+      "amount": "1,000",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-025",
+    "description": "exact money 01",
+    "schema": "Money",
+    "value": {
+      "amount": "01",
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-026",
+    "description": "exact money 0",
+    "schema": "Money",
+    "value": {
+      "amount": 0,
+      "currency": "EUR",
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-027",
+    "description": "unknown money currency remains null",
+    "schema": "Money",
+    "value": {
+      "amount": "999999999999999999999999.12345678",
+      "currency": null,
+      "scope": "topic",
+      "basis": "confirmed",
+      "sharedGroupId": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-028",
+    "description": "percentage 100.00000000",
+    "schema": "FactRate",
+    "value": {
+      "state": "PRESENT",
+      "value": "100.00000000",
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-029",
+    "description": "percentage 100.00000001",
+    "schema": "FactRate",
+    "value": {
+      "state": "PRESENT",
+      "value": "100.00000001",
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-030",
+    "description": "percentage 0",
+    "schema": "FactRate",
+    "value": {
+      "state": "PRESENT",
+      "value": "0",
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-031",
+    "description": "percentage 101",
+    "schema": "FactRate",
+    "value": {
+      "state": "PRESENT",
+      "value": "101",
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-032",
+    "description": "percentage -1",
+    "schema": "FactRate",
+    "value": {
+      "state": "PRESENT",
+      "value": "-1",
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-033",
+    "description": "NOT_FOUND is distinct and null",
+    "schema": "FactText",
+    "value": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-034",
+    "description": "NOT_COLLECTED is distinct and null",
+    "schema": "FactText",
+    "value": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-035",
+    "description": "NOT_APPLICABLE is distinct and null",
+    "schema": "FactText",
+    "value": {
+      "state": "NOT_APPLICABLE",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-036",
+    "description": "CONFLICT is distinct and null",
+    "schema": "FactText",
+    "value": {
+      "state": "CONFLICT",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-037",
+    "description": "UNSUPPORTED is distinct and null",
+    "schema": "FactText",
+    "value": {
+      "state": "UNSUPPORTED",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-038",
+    "description": "PRESENT cannot be null",
+    "schema": "FactText",
+    "value": {
+      "state": "PRESENT",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-039",
+    "description": "CONFLICT cannot silently select a value",
+    "schema": "FactText",
+    "value": {
+      "state": "CONFLICT",
+      "value": "chosen",
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-040",
+    "description": "unknown quality enum rejected",
+    "schema": "FactText",
+    "value": {
+      "state": "MISSING",
+      "value": null,
+      "evidenceIds": []
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-041",
+    "description": "conditional deadline needs condition",
+    "schema": "WindowResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "condition"
+        ],
+        "op": "set",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": "G2-042",
+    "description": "conditional deadline rejects whitespace condition",
+    "schema": "WindowResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "condition"
+        ],
+        "op": "set",
+        "value": "   "
+      }
+    ]
+  },
+  {
+    "id": "G2-043",
+    "description": "round numbers start at one",
+    "schema": "WindowResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "round"
+        ],
+        "op": "set",
+        "value": 0
+      }
+    ]
+  },
+  {
+    "id": "G2-044",
+    "description": "window cannot supersede itself",
+    "schema": "WindowResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "supersedesId"
+        ],
+        "op": "set",
+        "value": "10000000-0000-4000-8000-000000000005"
+      }
+    ],
+    "error": "SELF_SUPERSESSION"
+  },
+  {
+    "id": "G2-045",
+    "description": "summary funding may not be individual project grant",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "funding",
+          "value",
+          "scope"
+        ],
+        "op": "set",
+        "value": "project"
+      }
+    ]
+  },
+  {
+    "id": "G2-046",
+    "description": "unknown deadline may not publish a selected date",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "deadline",
+          "state"
+        ],
+        "op": "set",
+        "value": "unknown"
+      }
+    ]
+  },
+  {
+    "id": "G2-047",
+    "description": "supported deadline requires window reference",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "deadline"
+        ],
+        "op": "set",
+        "value": {
+          "state": "supported",
+          "at": {
+            "kind": "local_datetime",
+            "local": "2027-02-26T18:00:00",
+            "timezone": null
+          },
+          "label": "Até 26/02/2027, se houver verba",
+          "scopeLabel": "Aviso completo",
+          "windowId": null
+        }
+      }
+    ]
+  },
+  {
+    "id": "G2-048",
+    "description": "quality flags unique",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "quality",
+          "flags"
+        ],
+        "op": "set",
+        "value": [
+          "partial",
+          "partial"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "G2-049",
+    "description": "reference_only document accepted without invented hash",
+    "schema": "DocumentVersionResponse",
+    "expected": true,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "contentSha256"
+        ],
+        "op": "set",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": "G2-050",
+    "description": "archived document requires digest",
+    "schema": "DocumentVersionResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "preservation"
+        ],
+        "op": "set",
+        "value": "archived"
+      }
+    ]
+  },
+  {
+    "id": "G2-051",
+    "description": "invalid digest rejected",
+    "schema": "DocumentVersionResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "contentSha256"
+        ],
+        "op": "set",
+        "value": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+      }
+    ]
+  },
+  {
+    "id": "G2-052",
+    "description": "supersession requires scope",
+    "schema": "DocumentVersionResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "supersessionScope"
+        ],
+        "op": "set",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": "G2-053",
+    "description": "document cannot supersede itself",
+    "schema": "DocumentVersionResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "supersedesVersionId"
+        ],
+        "op": "set",
+        "value": "10000000-0000-4000-8000-000000000007"
+      }
+    ],
+    "error": "SELF_SUPERSESSION"
+  },
+  {
+    "id": "G2-054",
+    "description": "unresolved conflict cannot select winner",
+    "schema": "ConflictResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "selectedAlternativeId"
+        ],
+        "op": "set",
+        "value": "20000000-0000-4000-8000-000000000005"
+      }
+    ]
+  },
+  {
+    "id": "G2-055",
+    "description": "resolved conflict requires decision",
+    "schema": "ConflictResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "status"
+        ],
+        "op": "set",
+        "value": "resolved"
+      }
+    ]
+  },
+  {
+    "id": "G2-056",
+    "description": "resolution can decline both alternatives with reason",
+    "schema": "ConflictResponse",
+    "value": {
+      "data": [
+        {
+          "id": "20000000-0000-4000-8000-000000000004",
+          "fieldPath": "schedule.closing",
+          "scopeLabel": "Aviso",
+          "severity": "material",
+          "status": "resolved",
+          "reason": "Fontes oficiais divergentes.",
+          "alternatives": [
+            {
+              "id": "20000000-0000-4000-8000-000000000005",
+              "valueText": "2027-01-31",
+              "evidenceIds": [
+                "20000000-0000-4000-8000-000000000008"
+              ]
+            },
+            {
+              "id": "20000000-0000-4000-8000-000000000006",
+              "valueText": "2027-02-26",
+              "evidenceIds": [
+                "20000000-0000-4000-8000-000000000008"
+              ]
+            }
+          ],
+          "selectedAlternativeId": null,
+          "decision": {
+            "decidedAt": "2027-01-20T11:30:00Z",
+            "reason": "Both superseded by clarification."
+          }
+        }
+      ],
+      "page": {
+        "limit": 25,
+        "returned": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "meta": {
+        "contractVersion": "gcni-catalog-read/1.0",
+        "requestId": "10000000-0000-4000-8000-000000000001",
+        "generationId": "10000000-0000-4000-8000-000000000002",
+        "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+        "asOf": "2027-01-20T12:00:00.000Z",
+        "expiresAt": "2027-01-20T12:15:00.000Z",
+        "normalizationVersion": "gcni-cat-normalization-proposed-1"
+      }
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-057",
+    "description": "selected conflict alternative must exist",
+    "schema": "ConflictResponse",
+    "value": {
+      "data": [
+        {
+          "id": "20000000-0000-4000-8000-000000000004",
+          "fieldPath": "schedule.closing",
+          "scopeLabel": "Aviso",
+          "severity": "material",
+          "status": "resolved",
+          "reason": "Fontes oficiais divergentes.",
+          "alternatives": [
+            {
+              "id": "20000000-0000-4000-8000-000000000005",
+              "valueText": "2027-01-31",
+              "evidenceIds": [
+                "20000000-0000-4000-8000-000000000008"
+              ]
+            },
+            {
+              "id": "20000000-0000-4000-8000-000000000006",
+              "valueText": "2027-02-26",
+              "evidenceIds": [
+                "20000000-0000-4000-8000-000000000008"
+              ]
+            }
+          ],
+          "selectedAlternativeId": "90000000-0000-4000-8000-000000000001",
+          "decision": {
+            "decidedAt": "2027-01-20T11:30:00Z",
+            "reason": "Both superseded by clarification."
+          }
+        }
+      ],
+      "page": {
+        "limit": 25,
+        "returned": 1,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "meta": {
+        "contractVersion": "gcni-catalog-read/1.0",
+        "requestId": "10000000-0000-4000-8000-000000000001",
+        "generationId": "10000000-0000-4000-8000-000000000002",
+        "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+        "asOf": "2027-01-20T12:00:00.000Z",
+        "expiresAt": "2027-01-20T12:15:00.000Z",
+        "normalizationVersion": "gcni-cat-normalization-proposed-1"
+      }
+    },
+    "expected": false,
+    "error": "UNKNOWN_ALTERNATIVE"
+  },
+  {
+    "id": "G2-058",
+    "description": "partial document substitution retains namespace and facts",
+    "schema": "DocumentVersionResponse",
+    "expected": true,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "supersessionScope"
+        ],
+        "op": "set",
+        "value": "Cláusula 7.2, apenas prazo"
+      }
+    ]
+  },
+  {
+    "id": "G2-059",
+    "description": "page count must equal items",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "page",
+          "returned"
+        ],
+        "op": "set",
+        "value": 2
+      }
+    ],
+    "error": "PAGE_COUNT"
+  },
+  {
+    "id": "G2-060",
+    "description": "hasMore needs cursor",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "page",
+          "hasMore"
+        ],
+        "op": "set",
+        "value": true
+      }
+    ]
+  },
+  {
+    "id": "G2-061",
+    "description": "terminal page must not include cursor",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "page",
+          "nextCursor"
+        ],
+        "op": "set",
+        "value": "UNUSED"
+      }
+    ]
+  },
+  {
+    "id": "G2-062",
+    "description": "valid empty list",
+    "schema": "ListResponse",
+    "value": {
+      "data": [],
+      "page": {
+        "limit": 25,
+        "returned": 0,
+        "hasMore": false,
+        "nextCursor": null
+      },
+      "meta": {
+        "contractVersion": "gcni-catalog-read/1.0",
+        "requestId": "10000000-0000-4000-8000-000000000001",
+        "generationId": "10000000-0000-4000-8000-000000000002",
+        "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+        "asOf": "2027-01-20T12:00:00.000Z",
+        "expiresAt": "2027-01-20T12:15:00.000Z",
+        "normalizationVersion": "gcni-cat-normalization-proposed-1"
+      }
+    },
+    "expected": true
+  },
+  {
+    "id": "G2-063",
+    "description": "empty page cannot loop forever",
+    "schema": "ListResponse",
+    "value": {
+      "data": [],
+      "page": {
+        "limit": 25,
+        "returned": 0,
+        "hasMore": true,
+        "nextCursor": "SYNTHETIC"
+      },
+      "meta": {
+        "contractVersion": "gcni-catalog-read/1.0",
+        "requestId": "10000000-0000-4000-8000-000000000001",
+        "generationId": "10000000-0000-4000-8000-000000000002",
+        "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+        "asOf": "2027-01-20T12:00:00.000Z",
+        "expiresAt": "2027-01-20T12:15:00.000Z",
+        "normalizationVersion": "gcni-cat-normalization-proposed-1"
+      }
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-064",
+    "description": "production limit fixed to 25",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "page",
+          "limit"
+        ],
+        "op": "set",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "id": "G2-065",
+    "description": "TTL cannot slide past fifteen minutes",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "meta",
+          "expiresAt"
+        ],
+        "op": "set",
+        "value": "2027-01-20T12:16:00.000Z"
+      }
+    ],
+    "error": "SNAPSHOT_TTL"
+  },
+  {
+    "id": "G2-066",
+    "description": "contract version is explicit",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "meta",
+          "contractVersion"
+        ],
+        "op": "set",
+        "value": "opportunity-read-v2.0"
+      }
+    ]
+  },
+  {
+    "id": "G2-067",
+    "description": "observation after snapshot rejected",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "freshness",
+          "observedAt"
+        ],
+        "op": "set",
+        "value": "2027-01-21T12:00:00Z"
+      }
+    ],
+    "error": "AFTER_SNAPSHOT"
+  },
+  {
+    "id": "G2-068",
+    "description": "future recorded retroactive event excluded",
+    "schema": "EventResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "recordedAt"
+        ],
+        "op": "set",
+        "value": "2027-01-21T12:00:00Z"
+      }
+    ],
+    "error": "AFTER_SNAPSHOT"
+  },
+  {
+    "id": "G2-069",
+    "description": "private membership data not in public DTO",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "organizationId"
+        ],
+        "op": "set",
+        "value": "private"
+      }
+    ]
+  },
+  {
+    "id": "G2-070",
+    "description": "private reviewer identity rejected",
+    "schema": "ConflictResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "reviewerEmail"
+        ],
+        "op": "set",
+        "value": "private@example.org"
+      }
+    ]
+  },
+  {
+    "id": "G2-071",
+    "description": "missing field is not equivalent to null",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "freshness",
+          "reviewedAt"
+        ],
+        "op": "delete",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": "G2-072",
+    "description": "truncated description requires source",
+    "schema": "DetailResponse",
+    "expected": true,
+    "edits": [
+      {
+        "path": [
+          "data",
+          "descriptionTruncated"
+        ],
+        "op": "set",
+        "value": true
+      }
+    ]
+  },
+  {
+    "id": "G2-073",
+    "description": "truncated description with no source rejected",
+    "schema": "DetailResponse",
+    "value": {
+      "data": {
+        "summary": {
+          "id": "10000000-0000-4000-8000-000000000003",
+          "revisionId": "10000000-0000-4000-8000-000000000004",
+          "externalCode": {
+            "state": "PRESENT",
+            "value": "DEMO-PT-03",
+            "evidenceIds": [
+              "10000000-0000-4000-8000-000000000008"
+            ]
+          },
+          "title": {
+            "state": "PRESENT",
+            "value": "Inovação em processos produtivos",
+            "evidenceIds": [
+              "10000000-0000-4000-8000-000000000008"
+            ]
+          },
+          "kind": "published_notice",
+          "descriptionExcerpt": {
+            "state": "PRESENT",
+            "value": "Exemplo sintético de modernização de processos.",
+            "evidenceIds": [
+              "10000000-0000-4000-8000-000000000008"
+            ]
+          },
+          "programmes": {
+            "items": [
+              {
+                "id": "DEMO-PT2030",
+                "label": "Portugal 2030 (exemplo)"
+              }
+            ],
+            "completeness": "complete"
+          },
+          "sources": [
+            {
+              "namespace": "PORTUGAL2030_NOTICE",
+              "externalId": "DEMO-PT-03",
+              "officialUrl": "https://example.org/aviso"
+            }
+          ],
+          "opening": {
+            "state": "PRESENT",
+            "value": {
+              "kind": "date",
+              "date": "2026-11-01"
+            },
+            "evidenceIds": [
+              "10000000-0000-4000-8000-000000000008"
+            ]
+          },
+          "deadline": {
+            "state": "conditional",
+            "at": {
+              "kind": "local_datetime",
+              "local": "2027-02-26T18:00:00",
+              "timezone": null
+            },
+            "label": "Até 26/02/2027, se houver verba",
+            "scopeLabel": "Aviso completo",
+            "windowId": "10000000-0000-4000-8000-000000000005"
+          },
+          "funding": {
+            "state": "PRESENT",
+            "value": {
+              "amount": "800000",
+              "currency": "EUR",
+              "scope": "notice",
+              "basis": "confirmed",
+              "sharedGroupId": null
+            },
+            "evidenceIds": [
+              "10000000-0000-4000-8000-000000000008"
+            ]
+          },
+          "fundingLabel": "Dotação do aviso",
+          "status": {
+            "code": "conditional",
+            "label": "Condicionado",
+            "basis": "reviewed",
+            "scopeLabel": "Prorrogação do aviso"
+          },
+          "quality": {
+            "flags": [
+              "partial"
+            ],
+            "reviewRequired": true
+          },
+          "freshness": {
+            "observedAt": "2027-01-20T11:00:00.000Z",
+            "reviewedAt": "2027-01-20T11:30:00.000Z",
+            "expectedRefreshAt": null,
+            "state": "unknown"
+          },
+          "officialLinks": [
+            {
+              "label": "Fonte ilustrativa",
+              "url": "https://example.org/aviso"
+            }
+          ]
+        },
+        "description": {
+          "state": "PRESENT",
+          "value": "Exemplo sintético. A prorrogação depende de verba disponível.",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "descriptionTruncated": true,
+        "descriptionSourceUrl": null,
+        "sourceStatus": {
+          "state": "PRESENT",
+          "value": "Estado ilustrativo publicado",
+          "evidenceIds": [
+            "10000000-0000-4000-8000-000000000008"
+          ]
+        },
+        "statusExplanation": "Prazo condicionado; não confirma elegibilidade.",
+        "collections": {
+          "windows": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/windows"
+          },
+          "funding": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/funding"
+          },
+          "fundingRules": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/funding-rules"
+          },
+          "documents": {
+            "completeness": "partial",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/documents"
+          },
+          "conflicts": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/conflicts"
+          },
+          "relationships": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/relationships"
+          },
+          "history": {
+            "completeness": "unknown",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/history"
+          },
+          "evidence": {
+            "completeness": "partial",
+            "href": "/api/catalog-read/v1/opportunities/10000000-0000-4000-8000-000000000003/evidence"
+          }
+        }
+      },
+      "meta": {
+        "contractVersion": "gcni-catalog-read/1.0",
+        "requestId": "10000000-0000-4000-8000-000000000001",
+        "generationId": "10000000-0000-4000-8000-000000000002",
+        "snapshot": "SNAPSHOT_ILUSTRATIVO_NAO_VALIDO",
+        "asOf": "2027-01-20T12:00:00.000Z",
+        "expiresAt": "2027-01-20T12:15:00.000Z",
+        "normalizationVersion": "gcni-cat-normalization-proposed-1"
+      }
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-074",
+    "description": "cross-opportunity collection href rejected",
+    "schema": "DetailResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          "collections",
+          "windows",
+          "href"
+        ],
+        "op": "set",
+        "value": "/api/catalog-read/v1/opportunities/90000000-0000-4000-8000-000000000001/windows"
+      }
+    ],
+    "error": "COLLECTION_BINDING"
+  },
+  {
+    "id": "G2-075",
+    "description": "unsafe collection URL rejected",
+    "schema": "DetailResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          "collections",
+          "windows",
+          "href"
+        ],
+        "op": "set",
+        "value": "https://example.org/windows"
+      }
+    ]
+  },
+  {
+    "id": "G2-076",
+    "description": "reject unsafe external URL http://example.org/",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "http://example.org/"
+      }
+    ]
+  },
+  {
+    "id": "G2-077",
+    "description": "reject unsafe external URL javascript:alert(1)",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "javascript:alert(1)"
+      }
+    ]
+  },
+  {
+    "id": "G2-078",
+    "description": "reject unsafe external URL https://user:pass@example.org/",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "https://user:pass@example.org/"
+      }
+    ]
+  },
+  {
+    "id": "G2-079",
+    "description": "reject unsafe external URL https://example.org/",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "https://example.org/?access_token=secret"
+      }
+    ]
+  },
+  {
+    "id": "G2-080",
+    "description": "reject unsafe external URL https://example.org/",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "https://example.org/?x-amz-signature=secret"
+      }
+    ]
+  },
+  {
+    "id": "G2-081",
+    "description": "reject unsafe external URL https://example.org/\n",
+    "schema": "ListResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "officialLinks",
+          0,
+          "url"
+        ],
+        "op": "set",
+        "value": "https://example.org/\n"
+      }
+    ]
+  },
+  {
+    "id": "G2-082",
+    "description": "page locator cannot use zero",
+    "schema": "EvidenceResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "locator",
+          "pages"
+        ],
+        "op": "set",
+        "value": [
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "id": "G2-083",
+    "description": "JSON pointer escape must be valid",
+    "schema": "EvidenceResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "locator",
+          "jsonPointer"
+        ],
+        "op": "set",
+        "value": "/a~2b"
+      }
+    ]
+  },
+  {
+    "id": "G2-084",
+    "description": "JSON pointer empty root allowed",
+    "schema": "EvidenceResponse",
+    "expected": true,
+    "edits": [
+      {
+        "path": [
+          "data",
+          0,
+          "locator",
+          "jsonPointer"
+        ],
+        "op": "set",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "id": "G2-085",
+    "description": "invalid query {'areas': 'energy'}",
+    "schema": "ListQuery",
+    "value": {
+      "areas": "energy"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-086",
+    "description": "invalid query {'organizationId': 'tenant-B'}",
+    "schema": "ListQuery",
+    "value": {
+      "organizationId": "tenant-B"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-087",
+    "description": "invalid query {'limit': '100'}",
+    "schema": "ListQuery",
+    "value": {
+      "limit": "100"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-088",
+    "description": "invalid query {'limit': 25}",
+    "schema": "ListQuery",
+    "value": {
+      "limit": 25
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-089",
+    "description": "invalid query {'q': ''}",
+    "schema": "ListQuery",
+    "value": {
+      "q": ""
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-090",
+    "description": "invalid query {'q': '  '}",
+    "schema": "ListQuery",
+    "value": {
+      "q": "  "
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-091",
+    "description": "invalid query {'funding_min': '100'}",
+    "schema": "ListQuery",
+    "value": {
+      "funding_min": "100"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-092",
+    "description": "invalid query {'cursor': 'C'}",
+    "schema": "ListQuery",
+    "value": {
+      "cursor": "C"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-093",
+    "description": "invalid query {'status': 'OPEN'}",
+    "schema": "ListQuery",
+    "value": {
+      "status": "OPEN"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-094",
+    "description": "invalid query {'deadline_from': '2027-03-01', 'deadline_to': '2027-02-01'}",
+    "schema": "ListQuery",
+    "value": {
+      "deadline_from": "2027-03-01",
+      "deadline_to": "2027-02-01"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-095",
+    "description": "invalid query {'q': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "schema": "ListQuery",
+    "value": {
+      "q": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-096",
+    "description": "reject duplicate query parameter",
+    "schema": "ListQuery",
+    "pairs": [
+      [
+        "q",
+        "energy"
+      ],
+      [
+        "q",
+        "health"
+      ]
+    ],
+    "expected": false,
+    "error": "DUPLICATE_PARAMETER"
+  },
+  {
+    "id": "G2-097",
+    "description": "query value cannot be an array",
+    "schema": "ListQuery",
+    "pairs": [
+      [
+        "q",
+        [
+          "energy"
+        ]
+      ]
+    ],
+    "expected": false,
+    "error": "QUERY_SCALAR_REQUIRED"
+  },
+  {
+    "id": "G2-098",
+    "description": "normalization accepts surrounding spaces",
+    "schema": "ListQuery",
+    "pairs": [
+      [
+        "q",
+        "  energia  "
+      ]
+    ],
+    "expected": true
+  },
+  {
+    "id": "G2-099",
+    "description": "cursor in options also requires snapshot",
+    "schema": "OptionsQuery",
+    "value": {
+      "dimension": "programme",
+      "cursor": "C"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-100",
+    "description": "collection requires snapshot",
+    "schema": "CollectionQuery",
+    "value": {},
+    "expected": false
+  },
+  {
+    "id": "G2-101",
+    "description": "detail rejects filters",
+    "schema": "DetailQuery",
+    "value": {
+      "q": "energy"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-102",
+    "description": "evidence rejects ids and cursor together",
+    "schema": "EvidenceQuery",
+    "value": {
+      "snapshot": "S",
+      "cursor": "C",
+      "ids": "20000000-0000-4000-8000-000000000008"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-103",
+    "description": "evidence rejects duplicate ids",
+    "schema": "EvidenceQuery",
+    "value": {
+      "snapshot": "S",
+      "ids": "20000000-0000-4000-8000-000000000008,20000000-0000-4000-8000-000000000008"
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-104",
+    "description": "error cannot leak stack",
+    "schema": "ErrorResponse",
+    "value": {
+      "error": {
+        "code": "SNAPSHOT_EXPIRED",
+        "message": "A consulta expirou. Atualize os resultados.",
+        "requestId": "10000000-0000-4000-8000-000000000011",
+        "fields": [],
+        "retryable": false,
+        "stack": "private stack"
+      }
+    },
+    "expected": false
+  },
+  {
+    "id": "G2-105",
+    "description": "unknown error code rejected",
+    "schema": "ErrorResponse",
+    "expected": false,
+    "edits": [
+      {
+        "path": [
+          "error",
+          "code"
+        ],
+        "op": "set",
+        "value": "SQL_ERROR"
+      }
+    ]
+  }
+]

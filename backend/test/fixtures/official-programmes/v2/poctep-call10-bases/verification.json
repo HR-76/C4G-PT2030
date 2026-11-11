@@ -1,0 +1,30 @@
+{
+  "tool": "pypdf",
+  "scope": "Research extraction, not runtime ingestion; no language precedence inferred",
+  "entries": [
+    {
+      "filename": "Bases_Convo10_PT_VF.pdf",
+      "sha256": "223d8e02453eecab6b1c286467559987a3fbca5af79fdad448ee3a8f9c87965b",
+      "printedPage": 13,
+      "pdfPageIndex": 12,
+      "coverage": "SELECTED_FIELDS",
+      "values": {
+        "openingLocal": "2026-09-29T09:00:00",
+        "closingLocal": "2026-11-17T13:00:00",
+        "timezoneQuote": "hora da Espanha continental"
+      }
+    },
+    {
+      "filename": "Bases_Convo10_ES_VF.pdf",
+      "sha256": "fe755ffc42aac1ed203f3fbb41e36c1eb3a00c603d2a8ce787ee627b91d1d61f",
+      "printedPage": 12,
+      "pdfPageIndex": 11,
+      "coverage": "SELECTED_FIELDS",
+      "values": {
+        "openingLocal": "2026-09-29T10:00:00",
+        "closingLocal": "2026-11-17T14:00:00",
+        "timezoneQuote": "hora peninsular española"
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Lista completa de candidaturas — contrato do incremento
+
+2026-10-17. Continuação autorizada após revisão da comparação de estados/campos. Critério E3-02 da entrega 3; sem migração nem alteração de grants.
+
+`GET /api/applications/browse` usa a mesma operação APPLICATION_READ e sessão/membership das consultas atuais. A rota de lista anterior permanece compatível para Dashboard e consumidores existentes.
+
+A lista e os envios/repetições iniciados nela incluem `X-C4G-Organization` com o contexto apresentado. O servidor compara-o com a organização resolvida da sessão antes da operação; divergência recusa com 404. O cabeçalho não seleciona uma organização nem concede acesso. Clientes anteriores sem esse cabeçalho conservam o comportamento anterior.
+
+Autorizações de leitura continuam auditadas por recurso; uma oportunidade repetida no mesmo pedido usa a decisão já verificada, somente enquanto o guard da transação é válido. As opções de transição são capacidades de apresentação calculadas pela política F5 existente, com membership/snapshot obtidos sob o guard e sem cache entre pedidos. Não substituem a autorização auditada do comando. Falha de auditoria ou de autoridade recusa a consulta, sem devolver contagens parciais.
+
+Query: `q` (texto até 200 caracteres, pesquisa literal sem distinguir maiúsculas nos títulos da candidatura/oportunidade e nome do responsável); `status` (um dos oito estados); `sort` (`title`, `opportunityTitle`, `status`, `statusChangedAt`, `responsibleName`, `totalBudget`, `organizationBudget`, `opportunityClosingDate`; por omissão title); `direction` (`asc`/`desc`, por omissão asc); `opportunityId` opcional; `cursor` opaco assinado. Campos desconhecidos/arrays inválidos recusados. Página fixa de 25.
+
+Resposta: `items`, `total`, `countsByStatus`, `page`, `pageSize`, `nextCursor`, `previousCursor`. Cada item conserva o DTO existente e acrescenta título/prazo da oportunidade, nome do responsável e `allowedTransitions`. Datas de oportunidade central vêm da revisão associada, privadas da oportunidade atual. Nome do responsável é resolvido pela membership da mesma organização, inclusive referências históricas; sem email/contactos. Valores ausentes ficam a null.
+
+Contagens por etapa respeitam pesquisa e oportunidade, antes do filtro de estado; total e páginas respeitam todos os filtros. Texto desta distinção visível na interface. Autorização de candidatura, oportunidade e avaliação associada antecede projeção, pesquisa, contagens e ordenação. Opções de transição exigem permissão atual; execução continua a revalidar permissão, revisão e motivo no endpoint existente. Ordenação monetária exata, nulos no fim em ambas as direções, UUID como desempate. Cursor ligado a utilizador/organização/filtros/ordenação e digest do conjunto autorizado; alterações entre páginas recusam cursor em vez de saltar/duplicar linhas. Leitura completa limitada a 10 000 linhas, sem apresentar contagens parciais como totais.
+
+UI reutiliza tabela/composição do piloto e apresenta oito colunas, etapas, pesquisa, ordenação no servidor, navegação anterior/seguinte e criação a partir do catálogo. Estado na lista abre confirmação com motivo; intenção guardada antes do envio e repetida com a mesma chave após falha/reload. Alterar organização descarta dados anteriores imediatamente. Erro não equivale a lista vazia. Filtros e ordenação ficam no URL e conservam-se ao voltar do detalhe.
+
+Aceitação: testes de contrato, pesquisa/ordenação entre páginas, nulos/decimais, contagens só de recursos autorizados, cursor adulterado/fora de contexto/desatualizado, permissão de transição, erro/vazio/resposta antiga, envio incerto; PostgreSQL/HTTP A/B e Chrome com comparação piloto/C4G, depois leituras na instalação habitual. Parceiros e transporte documental permanecem no âmbito posterior da entrega 3.

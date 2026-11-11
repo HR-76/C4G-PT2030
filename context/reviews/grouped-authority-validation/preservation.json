@@ -1,0 +1,579 @@
+{
+  "at": "2026-10-27T20:46:43.376Z",
+  "baselineAt": "2026-10-27T20:25:14.0543923Z",
+  "baselineFileCount": 2685,
+  "unchangedFiles": 2680,
+  "changedExistingFileCount": 5,
+  "expectedChangedExistingFiles": [
+    "backend/src/applications/composition.js",
+    "backend/src/opportunities/httpComposition.js",
+    "backend/src/security/authorityCoordinator.js",
+    "context/current-work.md",
+    "context/features/http-flows-performance.md"
+  ],
+  "changedExistingFiles": [
+    "backend/src/applications/composition.js",
+    "backend/src/opportunities/httpComposition.js",
+    "backend/src/security/authorityCoordinator.js",
+    "context/current-work.md",
+    "context/features/http-flows-performance.md"
+  ],
+  "unexpectedChangedFiles": [],
+  "expectedChangesNotObserved": [],
+  "missingFiles": [],
+  "unreadableFiles": [],
+  "headUnchanged": true,
+  "branchUnchanged": true,
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "branch": "feat/f13-organizational-profile",
+  "baselineStatusEntries": 2235,
+  "finalStatusEntries": 2260,
+  "groups": {
+    "runtime": {
+      "count": 466,
+      "unchangedCount": 463,
+      "changed": [
+        "backend/src/applications/composition.js",
+        "backend/src/opportunities/httpComposition.js",
+        "backend/src/security/authorityCoordinator.js"
+      ],
+      "missing": [],
+      "unreadable": []
+    },
+    "frontend": {
+      "count": 179,
+      "unchangedCount": 179,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "priorHarness": {
+      "count": 14,
+      "unchangedCount": 14,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "protected": {
+      "count": 190,
+      "unchangedCount": 190,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    }
+  },
+  "protectedCategories": {
+    "databaseAndMigrations": {
+      "count": 136,
+      "unchangedCount": 136,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "grantsAndPermissions": {
+      "count": 0,
+      "unchangedCount": 0,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "manifestsAndMetadata": {
+      "count": 13,
+      "unchangedCount": 13,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "pools": {
+      "count": 2,
+      "unchangedCount": 2,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "configurationAndDeploy": {
+      "count": 32,
+      "unchangedCount": 32,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    },
+    "packages": {
+      "count": 7,
+      "unchangedCount": 7,
+      "changed": [],
+      "missing": [],
+      "unreadable": []
+    }
+  },
+  "filesOutsideBaselineInGitStatus": {
+    "count": 114,
+    "entries": [
+      {
+        "status": " D",
+        "path": "backend/scripts/ensureAdmin.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/scripts/runMigration.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/scripts/seedUbiResearchTestData.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/scripts/startLocal.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/scripts/testUbiResearchInvestigatorFlow.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/audit/postgresQueryRepository.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/config/db.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/applicationController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/authController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/dashboardController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/importController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/integrationController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/matchingController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/notificationController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/opportunityController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/partnerController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/professorController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/researchAreaController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/ubiStructureController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/controllers/userController.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/documents/versionService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/applicationRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/authRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/dashboardRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/importRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/integrationRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/matchingRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/notificationRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/opportunityRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/partnerRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/professorRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/researchAreaRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/ubiStructureRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/routes/userRoutes.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/cordisSyncService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/emailService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/emailTemplates.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/erasmusSyncService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/euFundingSyncService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/externalOpportunitySyncService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/notificationService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/opportunityResearchAreaService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/opportunityRetentionService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/passwordSetupService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/src/services/researchAreaSeedService.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/test/f3CentralMigrationContract.test.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/test/localDatabaseConfiguration.test.js"
+      },
+      {
+        "status": " D",
+        "path": "backend/test/opportunityRetentionDisabled.test.js"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/check.js"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/common.ps1"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/compose.yaml"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/down.ps1"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/legacy-schema.sql"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/legacy-seed.synthetic.sql"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/legacySchemaManifest.js"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/purge.ps1"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/setupLegacy.js"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/status.ps1"
+      },
+      {
+        "status": " D",
+        "path": "dev/local/up.ps1"
+      },
+      {
+        "status": " D",
+        "path": "frontend/public/logotipo_UBI.png"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/components/OppPicker.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/components/QuickInterestModal.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Applications/ApplicationDetail.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Applications/ApplicationForm.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Applications/ApplicationsList.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Areas.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Integrations.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Investigators.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Login.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/ResearchCenterDetail.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/SetPassword.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Signup.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/UserDetail.jsx"
+      },
+      {
+        "status": " D",
+        "path": "frontend/src/pages/Users.jsx"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/central-marker.sql"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/central-preflight-gate.js"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/check.js"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/common.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/compose.yaml"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/down.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/legacy-synthetic.sql"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/migration-gate.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/migration002-gate.js"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/purge.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/status.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/f3/up.ps1"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/ubi/browser-flow.js"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/ubi/private-opportunity-gate.js"
+      },
+      {
+        "status": " D",
+        "path": "test/integration/ubi/private-opportunity-gate.ps1"
+      },
+      {
+        "status": "??",
+        "path": "backend/test/groupedAuthorityValidation.test.js"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-capacity/results.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-capacity/summary.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-drift/postgres-proof.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-durability/postgres-proof.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-http/results.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-http/run-1fd9aa5211cb4181a79fee0617476c07.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-standard/results.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-standard/stages-summary.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-standard/summary.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/README.md"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/baseline.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/before/applicationComposition.js"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/before/authorityCoordinator.js"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/before/opportunityHttpComposition.js"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/compare.js"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/comparison.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/inventory.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/postgres-short-groups-attempt1.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/postgres-short-groups.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/syntax.json"
+      },
+      {
+        "status": "??",
+        "path": "context/reviews/grouped-authority-validation/verify-preservation.js"
+      },
+      {
+        "status": "??",
+        "path": "test/integration/authority-short-groups/README.md"
+      },
+      {
+        "status": "??",
+        "path": "test/integration/authority-short-groups/proof.js"
+      },
+      {
+        "status": "??",
+        "path": "test/integration/authority-short-groups/proof.ps1"
+      }
+    ],
+    "note": "Paths absent from the hash inventory, not proof of their creation time. Existing untracked baseline files were hashed and compared above."
+  },
+  "limits": [
+    "Sequential comparison of 2685 baseline paths, not an atomic or immutable repository snapshot.",
+    "Git status reports visible tracked/untracked paths; ignored files and live database state are not inventoried.",
+    "No file contents, environment values, credentials, tokens, connection strings or URLs are included in this report.",
+    "Category counts overlap; protected rules and the exact expected-change allowlist are defined in verify-preservation.js.",
+    "The output preservation.json is written after the status observation and is not itself covered by this baseline."
+  ],
+  "pass": true
+}

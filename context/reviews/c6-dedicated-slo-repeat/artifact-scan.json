@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-27T21:46:48.859Z",
+  "status": "PASS",
+  "directories": 26,
+  "files": 183,
+  "findings": [],
+  "limits": "Pattern scan only; not proof that every possible credential representation is absent."
+}

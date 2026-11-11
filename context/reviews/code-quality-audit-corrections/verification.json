@@ -1,0 +1,69 @@
+﻿{
+    "schema_version":  "1.0",
+    "date":  "2026-10-27",
+    "branch":  "feat/f13-organizational-profile",
+    "head":  "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baseline_file_count":  30908,
+    "tests":  {
+                  "new_backend":  16,
+                  "new_frontend":  9,
+                  "backend_before":  {
+                                         "skip":  7,
+                                         "pass":  1298,
+                                         "fail":  3
+                                     },
+                  "backend_after":  {
+                                        "skip":  7,
+                                        "pass":  1314,
+                                        "fail":  3
+                                    },
+                  "frontend_before":  337,
+                  "frontend_after":  346,
+                  "build":  "PASS",
+                  "backend_syntax_files":  12
+              },
+    "measurement":  {
+                        "probes_before":  20,
+                        "concurrent_readers":  20,
+                        "probes_after":  1,
+                        "kind":  "deterministic fixture, not production latency"
+                    },
+    "preservation":  {
+                         "unexpectedChanges":  [
+
+                                               ],
+                         "protectedChanges":  [
+
+                                              ],
+                         "headUnchanged":  true,
+                         "branchUnchanged":  true,
+                         "fileMetadataErrorsChanged":  false,
+                         "sourceAndDocumentationChanged":  [
+                                                               "backend/test/auditHttpCorrections.test.js",
+                                                               "backend/test/healthConcurrency.test.js",
+                                                               "backend/test/partnerBrowseBoundary.test.js",
+                                                               "context/features/code-quality-audit-corrections.md",
+                                                               "context/reviews/code-quality-audit-corrections/README.md",
+                                                               "frontend/src/components/ConfirmDialog.test.jsx",
+                                                               "AGENTS.md",
+                                                               "backend/src/app.js",
+                                                               "backend/src/applications/partners.js",
+                                                               "backend/src/observability/health.js",
+                                                               "backend/src/productionComposition.js",
+                                                               "backend/src/routes/applicationSliceRoutes.js",
+                                                               "backend/src/routes/platformDirectoryRoutes.js",
+                                                               "backend/src/routes/privateOpportunityRoutes.js",
+                                                               "backend/test/f13EditorialRecovery.test.js",
+                                                               "backend/test/f13Pq1HttpBoundary.test.js",
+                                                               "context/coding-standards.md",
+                                                               "context/current-work.md",
+                                                               "frontend/src/components/ConfirmDialog.jsx",
+                                                               "frontend/src/components/Layout/Header.jsx",
+                                                               "frontend/src/pages/Notifications.test.jsx",
+                                                               "frontend/src/pages/Organization/MatchingWorkspace.jsx",
+                                                               "frontend/src/pages/Organization/MatchingWorkspace.test.jsx"
+                                                           ],
+                         "generatedBuildAndCacheChanges":  108,
+                         "scope":  "filesystem metadata and git state, no external data snapshot"
+                     }
+}

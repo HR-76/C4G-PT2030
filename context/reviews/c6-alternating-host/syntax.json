@@ -1,0 +1,18 @@
+﻿[
+    {
+        "file":  "test/integration/c6-alternating/preload.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "test/integration/c6-alternating/hostCheck.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "test/integration/c6-alternating/analyze.js",
+        "status":  "PASS"
+    },
+    {
+        "file":  "test/integration/c6-alternating/run.ps1",
+        "status":  "PASS"
+    }
+]

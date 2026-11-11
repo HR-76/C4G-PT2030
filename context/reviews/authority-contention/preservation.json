@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-26T23:44:38.155Z",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "branch": "feat/f13-organizational-profile",
+  "baselineFiles": 2590,
+  "baselineStatusEntries": 2140,
+  "currentStatusEntries": 2153,
+  "changed": [
+    "context/current-work.md"
+  ],
+  "missing": [],
+  "unexpectedChanges": [],
+  "sameHead": true,
+  "sameBranch": true,
+  "applicationFilesCompared": 1019,
+  "applicationFilesChanged": []
+}

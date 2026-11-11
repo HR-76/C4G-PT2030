@@ -1,0 +1,112 @@
+﻿{
+    "status":  "COMPLETE_PENDING_GATE",
+    "executionStatus":  "COMPLETE",
+    "seriesReason":  "Apply mandatory C6 gate to a fresh series; preserve every earlier result",
+    "gatePolicy":  "c6-admission-v1",
+    "sourceManifests":  {
+                            "before":  "variant-before.json",
+                            "after":  "variant-after.json"
+                        },
+    "host":  {
+                 "identifier":  "current-workstation",
+                 "operatingSystem":  "Windows",
+                 "exclusiveWindow":  "User explicitly reserved this computer now and authorized temporary pause/resume of PostgreSQL Dev and Collabora",
+                 "dedicationVerified":  false,
+                 "dedicationScope":  "Reserved operational window under observed controls; physical isolation is not asserted"
+             },
+    "variants":  {
+                     "A":  "Before the three adjacent authority groups; pinned historical copies",
+                     "B":  "Current grouped sources; verified against prior and new manifests"
+                 },
+    "pairs":  [
+                  [
+                      "A",
+                      "B"
+                  ],
+                  [
+                      "B",
+                      "A"
+                  ],
+                  [
+                      "A",
+                      "B"
+                  ],
+                  [
+                      "B",
+                      "A"
+                  ],
+                  [
+                      "A",
+                      "B"
+                  ],
+                  [
+                      "B",
+                      "A"
+                  ]
+              ],
+    "workload":  {
+                     "bursts":  12,
+                     "concurrency":  6,
+                     "requestsPerBurst":  6,
+                     "warmupsPerBurst":  1,
+                     "measuredRequestsTotal":  72,
+                     "applicationsPerTenant":  1000,
+                     "peoplePerTenant":  250,
+                     "freshFixturePerBurst":  true,
+                     "expectedAdmissionsPerSuccessfulDashboard":  3,
+                     "expectedAdmissionsPerVariantIfAllSucceed":  108
+                 },
+    "unchangedLimits":  {
+                            "perTenantActive":  5,
+                            "acquireTimeoutMs":  5000,
+                            "leaseTimeoutMs":  15000,
+                            "allOtherPolicies":  "Exact equality with c6-admission-v1 and existing capacity profile"
+                        },
+    "admissionSlo":  {
+                         "approvalStatus":  "APPROVED_BY_USER",
+                         "scope":  "Observed local C6 regression only; not a production availability SLO",
+                         "p95WaitMsMaximum":  3000,
+                         "maxWaitMsMaximum":  4000,
+                         "minObservedHeadroomMs":  1000,
+                         "admissionErrorsMaximum":  0,
+                         "httpFailuresMaximum":  0,
+                         "quantile":  "nearest rank, ceil(0.95 * n), all measured logical admissions per variant",
+                         "warmupsExcluded":  true,
+                         "failedAttemptsExcluded":  false,
+                         "maxCheckedPerBurstAndVariant":  true
+                     },
+    "invariants":  {
+                       "queriesPerSuccess":  {
+                                                 "A":  2619,
+                                                 "B":  2421
+                                             },
+                       "authorityTransactionsPerSuccess":  {
+                                                               "A":  42,
+                                                               "B":  36
+                                                           },
+                       "authorityProtocolCallsPerSuccess":  198,
+                       "auditPreparePerSuccess":  10,
+                       "auditAppendPerSuccess":  10,
+                       "applicationSelectionsPerSuccess":  1,
+                       "responseTotal":  1000,
+                       "afterResponseQueryCompletions":  0
+                   },
+    "hostControls":  {
+                         "pauseExistingContainers":  [
+                                                         "c4g-postgres17-dev",
+                                                         "c4g-collabora-code"
+                                                     ],
+                         "resumeInFinally":  true,
+                         "backgroundCpuMeanPercentMaximum":  5,
+                         "backgroundCpuSamplePercentMaximum":  10,
+                         "backgroundCpuScale":  "normalized by logical CPU count",
+                         "globalIdleCpuMaximum":  25,
+                         "freeMemoryGiBMinimum":  4
+                     },
+    "decision":  {
+                     "hostInterferenceOrConfigurationDrift":  "INVALID_ENVIRONMENT; preserve evidence",
+                     "missingMetrics":  "INCOMPLETE_EVIDENCE; preserve every observed error",
+                     "sloViolated":  "FAIL even if relative latency improves",
+                     "allCriteriaMet":  "PASS for this local workload only"
+                 }
+}

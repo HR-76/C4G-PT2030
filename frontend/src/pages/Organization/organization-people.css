@@ -1,0 +1,51 @@
+.organization-profile fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.organization-profile .field-grid { gap: 16px; }
+.organization-profile .personal-areas > .area-checkboxes { padding:12px 0 22px; margin-inline:22px; }
+@media (max-width: 768px) {
+ .organization-profile .toolbar { align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+}
+
+.people-record .toolbar { border-bottom:1px solid var(--color-border); padding-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.people-record .people-record-label { color:var(--color-text-secondary); font-size:.85rem; margin:0 0 4px; }
+.people-record .toolbar h1 { color:var(--color-text-primary); margin:0; font-size:clamp(24px,2.4vw,32px); }
+.people-record .detail-section { background:var(--color-surface); border:1px solid var(--color-border); border-radius:10px; }
+
+.organization-profile .toolbar .btn[href="/conta/seguranca"] {
+  background: var(--ui-action);
+  border-color: var(--ui-action);
+  color: var(--color-surface);
+}
+.organization-profile .toolbar .btn[href="/conta/seguranca"]:hover {
+  background: var(--ui-action-hover);
+  border-color: var(--ui-action-hover);
+}
+
+/* Ficha da pessoa: dados e edição com a mesma estrutura visual. */
+.people-record { max-width:1180px; margin:auto; color:var(--color-text-primary); }
+.people-record .toolbar { margin-bottom:22px; padding-bottom:20px; }
+.people-record .detail-section { margin-top:18px; overflow:hidden; }
+.people-record .detail-section h3 { margin:0; padding:18px 22px; border-bottom:1px solid var(--color-border); font-size:1rem; }
+.people-record .dl-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; margin:0; padding:4px 22px; }
+.people-record .dl-row { display:block; min-width:0; margin:0; padding:16px 12px 16px 0; border-bottom:1px solid var(--color-border); }
+.people-record .dl-row:nth-last-child(-n+2) { border-bottom:0; }
+.people-record .dl-row dt { width:auto; color:var(--color-text-secondary); font-size:.82rem; font-weight:500; text-transform:none; letter-spacing:0; }
+.people-record .dl-row dd { margin:5px 0 0; font-weight:600; line-height:1.5; overflow-wrap:anywhere; }
+.people-record .personal-competencies .field-grid { padding:20px 22px 24px; gap:18px; }
+.people-record .field { color:var(--color-text-primary); font-weight:600; gap:7px; }
+.people-record textarea { width:100%; padding:11px 12px; border:1px solid var(--ui-control); border-radius:7px; background:var(--color-surface); color:var(--color-text-primary); font:inherit; font-weight:400; line-height:1.5; resize:vertical; }
+.people-record .area-checkboxes .checkbox-label { display:flex; align-items:center; gap:10px; min-height:40px; padding:8px 0; }
+.people-record .area-checkboxes input { flex-shrink:0; accent-color:var(--ui-action); }
+.people-record .form-actions { padding:18px 0; }
+.people-record .personal-matching { padding:20px 22px; }
+.people-record .detail-section:not(.personal-competencies):not(.personal-areas):not(.personal-matching) > :is(p,button,form) { margin:18px 22px; }
+.people-record :is(button,a,input,textarea,select):focus-visible { outline:3px solid var(--ui-action); outline-offset:3px; }
+@media (max-width:600px) {
+ .people-record .toolbar { align-items:flex-start; }
+ .people-record .detail-section h3 { padding:16px; }
+ .people-record .dl-list { grid-template-columns:minmax(0,1fr); padding:0 16px; }
+ .people-record .dl-row, .people-record .dl-row:nth-last-child(-n+2) { padding:14px 0; border-bottom:1px solid var(--color-border); }
+ .people-record .dl-row:last-child { border-bottom:0; }
+ .people-record .personal-competencies .field-grid { padding:16px; }
+ .organization-profile .personal-areas > .area-checkboxes { margin-inline:16px; }
+ .people-record .personal-matching { padding:16px; }
+}

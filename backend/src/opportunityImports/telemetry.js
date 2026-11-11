@@ -1,0 +1,8 @@
+'use strict';
+const OPERATIONS=new Set(['opportunity_import.upload','opportunity_import.preview','opportunity_import.confirm','opportunity_import.list','opportunity_import.get','opportunity_import.cancel','opportunity_import.review','opportunity_import.downloadReport','opportunity_import.process']);
+const RESULTS=new Set(['success','denied','conflict','invalid','unavailable']);
+function createOpportunityImportTelemetry({metrics,clock=()=>Date.now()}={}){
+ if(!metrics||typeof metrics.record!=='function')throw new TypeError('F12 import metrics port is required.');
+ return Object.freeze({async observe(operation,work){if(!OPERATIONS.has(operation)||typeof work!=='function')throw new TypeError('F12 import telemetry input is invalid.');const started=clock();try{const result=await work();try{metrics.record('c4g.opportunity_import.operation',1,{operation,resultClass:'success'});metrics.record('c4g.opportunity_import.duration',Math.max(0,clock()-started)/1000,{operation,resultClass:'success'});}catch{}return result;}catch(error){const value=error?.code||error?.message||'',resultClass=/AUTHORITY|MFA|NOT_FOUND/.test(value)?'denied':/CONFLICT|DIGEST|STATE/.test(value)?'conflict':/INVALID|REQUIRED|LIMIT|SHEET|HEADER|ROW/.test(value)?'invalid':'unavailable';try{metrics.record('c4g.opportunity_import.operation',1,{operation,resultClass:RESULTS.has(resultClass)?resultClass:'unavailable'});metrics.record('c4g.opportunity_import.duration',Math.max(0,clock()-started)/1000,{operation,resultClass:RESULTS.has(resultClass)?resultClass:'unavailable'});}catch{}throw error;}}});
+}
+module.exports={OPERATIONS,RESULTS,createOpportunityImportTelemetry};

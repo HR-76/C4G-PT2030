@@ -1,0 +1,83 @@
+﻿{
+    "schema_version":  "1.0",
+    "date":  "2026-10-27",
+    "branch":  "feat/f13-organizational-profile",
+    "head":  "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "baseline_file_count":  30915,
+    "baseline_worktree_entries":  2540,
+    "tests":  {
+                  "new_backend":  27,
+                  "new_frontend":  0,
+                  "backend_before":  {
+                                         "skip":  7,
+                                         "pass":  1314,
+                                         "fail":  3,
+                                         "source":  "increment-1 final verification"
+                                     },
+                  "backend_after":  {
+                                        "skip":  7,
+                                        "pass":  1344,
+                                        "fail":  0,
+                                        "total":  1351
+                                    },
+                  "frontend_after":  {
+                                         "files":  55,
+                                         "pass":  346,
+                                         "fail":  0
+                                     },
+                  "build":  "PASS",
+                  "backend_syntax_files":  10,
+                  "focused_alerts_and_fixtures":  {
+                                                      "fail":  0,
+                                                      "pass":  32
+                                                  },
+                  "focused_r2_clamav_f11":  {
+                                                "fail":  0,
+                                                "pass":  32
+                                            }
+              },
+    "baseline_failures_resolved":  [
+                                       "ClamAV lifecycle cancellation",
+                                       "F12 incomplete ObjectStoragePort fixture",
+                                       "F5 query-to-function catalog mapping"
+                                   ],
+    "independent_review":  {
+                               "clamav":  "R2 deadline interaction found, fixed, retested and reviewed",
+                               "r2":  "Deadline and cancellation composition confirmed",
+                               "alerts":  "No concrete regression found"
+                           },
+    "measurement":  "alert-payload-measurement.json",
+    "preservation":  {
+                         "unexpectedChanges":  [
+
+                                               ],
+                         "protectedChanges":  [
+
+                                              ],
+                         "removedFiles":  [
+
+                                          ],
+                         "headUnchanged":  true,
+                         "branchUnchanged":  true,
+                         "fileMetadataErrorsChanged":  false,
+                         "sourceAndDocumentationChanged":  [
+                                                               "backend/test/alertReadPayload.test.js",
+                                                               "backend/test/clamavCancellation.test.js",
+                                                               "backend/test/r2CancellationDeadline.test.js",
+                                                               "backend/test/support/alertReadFixture.js",
+                                                               "context/features/code-quality-audit-increment-2.md",
+                                                               "context/reviews/code-quality-audit-increment-2/README.md",
+                                                               "context/reviews/code-quality-audit-increment-2/alert-payload-measurement.json",
+                                                               "context/reviews/code-quality-audit-increment-2/verification.json",
+                                                               "backend/src/applications/alerts.js",
+                                                               "backend/src/documents/clamavScanner.js",
+                                                               "backend/src/documents/r2Storage.js",
+                                                               "backend/test/f11RealTransportAdapters.test.js",
+                                                               "backend/test/f12Composition.test.js",
+                                                               "backend/test/f5AuthorityCommitGuard.test.js",
+                                                               "context/current-work.md"
+                                                           ],
+                         "generatedBuildAndCacheChanges":  65,
+                         "scope":  "Filesystem metadata and Git state; no external data snapshot; no Dev/database/deploy operations performed"
+                     }
+}

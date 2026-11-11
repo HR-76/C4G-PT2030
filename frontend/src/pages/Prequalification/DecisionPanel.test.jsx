@@ -1,0 +1,15 @@
+import {beforeEach,afterEach,it,expect,vi} from 'vitest'
+import {render,screen,fireEvent,cleanup} from '@testing-library/react'
+const api=vi.hoisted(()=>({decisions:vi.fn(),decide:vi.fn()}))
+vi.mock('../../api/api',()=>({prequalificationApi:api}))
+import DecisionPanel from './DecisionPanel'
+const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
+const result={evaluationId:id(3),freshness:'CURRENT',result:{identity:{opportunityId:id(4)},lines:[{criterionId:id(5),interpretationText:'Competência'}]}}
+const props=()=>({result,identity:{userId:id(1),organizationId:id(2)},pending:[],session:async()=>true,onPending:vi.fn(),onComplete:vi.fn()})
+beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();api.decisions.mockResolvedValue({data:{head:null,items:[],canDecide:true}})})
+afterEach(cleanup)
+async function confirm(){await screen.findByLabelText('Decisão');fireEvent.click(screen.getByLabelText('Competência'));fireEvent.change(screen.getByLabelText('Justificação ou informação necessária'),{target:{value:'Informação necessária'}});fireEvent.click(screen.getByLabelText('Confirmo esta decisão sobre a avaliação exata'))}
+it('changing justification invalidates explicit decision confirmation',async()=>{render(<DecisionPanel {...props()}/>);await confirm();fireEvent.change(screen.getByLabelText('Justificação ou informação necessária'),{target:{value:'Revista'}});expect(screen.getByLabelText('Confirmo esta decisão sobre a avaliação exata').checked).toBe(false);expect(screen.getByText('Registar decisão').disabled).toBe(true)})
+it('request information records local need against exact evaluation without communication',async()=>{api.decide.mockResolvedValue({data:{decisionId:id(6)}});const p=props();render(<DecisionPanel {...p}/>);await confirm();fireEvent.click(screen.getByText('Registar decisão'));await vi.waitFor(()=>expect(p.onComplete).toHaveBeenCalledOnce());expect(api.decide.mock.calls[0][0]).toBe(result.evaluationId);expect(api.decide.mock.calls[0][1]).toMatchObject({decision:'REQUEST_INFORMATION',reasonCode:'INFORMATION_MISSING',criterionIds:[id(5)],expectedDecisionId:null,expectedGeneration:0});expect(sessionStorage.length).toBe(0)})
+it('503 keeps the original decision envelope without text or re-execution',async()=>{api.decide.mockRejectedValue({response:{status:503}});render(<DecisionPanel {...props()}/>);await confirm();fireEvent.click(screen.getByText('Registar decisão'));await screen.findByRole('alert');expect(api.decide).toHaveBeenCalledOnce();const pending=JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));expect(pending).toMatchObject({operation:'PQ1_DECIDE',resourceId:id(3),opportunityId:id(4)});expect(JSON.stringify(pending)).not.toContain('Informação necessária')})
+it('stale evaluation exposes history without a decision form',async()=>{render(<DecisionPanel {...props()} result={{...result,freshness:'UNAVAILABLE'}}/>);await screen.findByText('É necessária uma avaliação atual e autorização para decidir.');expect(screen.queryByText('Registar decisão')).toBeNull();expect(api.decide).not.toHaveBeenCalled()})

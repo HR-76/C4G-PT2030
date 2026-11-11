@@ -1,0 +1,393 @@
+{
+  "comparison": "Sixth to seventh execution; same adapter variants, grouped authority correction changed in both adapters",
+  "previousDirectory": "context/reviews/partner-portal-pg-7c5816a90760a11c54b070cce86fa74b",
+  "currentDirectory": "context/reviews/partner-portal-pg-fa1ecdc4e3305af458dc4fb67a96154a",
+  "durationMs": {
+    "before": 188768,
+    "after": 201068,
+    "absolute": 12300,
+    "percent": 6.5159349042210435
+  },
+  "operations": {
+    "before": 32,
+    "after": 31
+  },
+  "matchedWarmup": {
+    "before": {
+      "variant": "before",
+      "scenarioId": "volume-10000",
+      "pair": 0,
+      "errorCode": "LEASE_TIMEOUT",
+      "rowsRead": 3700,
+      "operationMs": 9872.121299999999,
+      "cleanupMs": 49.14010000001872,
+      "authorizationCalls": 7200,
+      "missCount": 37,
+      "missMs": 8283.389700000029,
+      "missMeanMs": 223.87539729729806,
+      "centralQueriesCompleted": 2839,
+      "centralQueryMs": 8322.14100000073,
+      "readerMs": 9359.7641,
+      "temporalStatus": "VALID",
+      "pendingAfterCleanup": []
+    },
+    "after": {
+      "variant": "before",
+      "scenarioId": "volume-10000",
+      "pair": 0,
+      "errorCode": "LEASE_TIMEOUT",
+      "rowsRead": 5800,
+      "operationMs": 9864.748200000002,
+      "cleanupMs": 85.68369999999413,
+      "authorizationCalls": 11400,
+      "missCount": 58,
+      "missMs": 8235.303799999907,
+      "missMeanMs": 141.98799655172255,
+      "centralQueriesCompleted": 2288,
+      "centralQueryMs": 7737.270399999688,
+      "readerMs": 9352.636599999998,
+      "temporalStatus": "INCOMPLETE",
+      "pendingAfterCleanup": [
+        {
+          "label": "READER",
+          "inflight": 1,
+          "pendingMs": 9439.465100000001
+        },
+        {
+          "label": "AUTHORIZATION",
+          "inflight": 1,
+          "pendingMs": 88.3405999999959
+        },
+        {
+          "label": "SQL_CENTRAL",
+          "inflight": 1,
+          "pendingMs": 0.39230000000679865
+        }
+      ]
+    },
+    "missMeanMs": {
+      "before": 223.87539729729806,
+      "after": 141.98799655172255,
+      "absolute": -81.88740074557552,
+      "percent": -36.57722185382977
+    },
+    "rowsRead": {
+      "before": 3700,
+      "after": 5800,
+      "absolute": 2100,
+      "percent": 56.75675675675676
+    },
+    "centralQueriesCompleted": {
+      "before": 2839,
+      "after": 2288,
+      "absolute": -551,
+      "percent": -19.40824233885171
+    }
+  },
+  "completedSamples": [
+    {
+      "scenarioId": "volume-0",
+      "variant": "before",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1425.0815000000075,
+        "after": 1529.067200000005,
+        "absolute": 103.98569999999745,
+        "percent": 7.296824778091415
+      },
+      "tenantQueries": {
+        "before": 333,
+        "after": 333,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 0,
+        "after": 0,
+        "absolute": 0,
+        "percent": null
+      },
+      "authorizationCalls": {
+        "before": 0,
+        "after": 0,
+        "absolute": 0,
+        "percent": null
+      }
+    },
+    {
+      "scenarioId": "volume-0",
+      "variant": "after",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1376.0336499999976,
+        "after": 1588.0930999999982,
+        "absolute": 212.05945000000065,
+        "percent": 15.410920365210611
+      },
+      "tenantQueries": {
+        "before": 335,
+        "after": 335,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 0,
+        "after": 0,
+        "absolute": 0,
+        "percent": null
+      },
+      "authorizationCalls": {
+        "before": 0,
+        "after": 0,
+        "absolute": 0,
+        "percent": null
+      }
+    },
+    {
+      "scenarioId": "volume-25",
+      "variant": "before",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1628.7192000000068,
+        "after": 2009.364250000006,
+        "absolute": 380.6450499999992,
+        "percent": 23.370821072165015
+      },
+      "tenantQueries": {
+        "before": 337,
+        "after": 337,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 25,
+        "after": 25,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 50,
+        "after": 50,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-25",
+      "variant": "after",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1975.5303000000058,
+        "after": 2111.4591500000024,
+        "absolute": 135.9288499999966,
+        "percent": 6.880625926111894
+      },
+      "tenantQueries": {
+        "before": 339,
+        "after": 339,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 25,
+        "after": 25,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 50,
+        "after": 50,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-26",
+      "variant": "before",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1908.5369500000015,
+        "after": 1890.0144000000146,
+        "absolute": -18.52254999998695,
+        "percent": -0.9705104216078619
+      },
+      "tenantQueries": {
+        "before": 337,
+        "after": 337,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 26,
+        "after": 26,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 52,
+        "after": 52,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-26",
+      "variant": "after",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1896.3923499999946,
+        "after": 1975.059850000005,
+        "absolute": 78.66750000001048,
+        "percent": 4.148271321597075
+      },
+      "tenantQueries": {
+        "before": 339,
+        "after": 339,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 26,
+        "after": 26,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 52,
+        "after": 52,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-100",
+      "variant": "before",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1754.477199999994,
+        "after": 1886.08679999999,
+        "absolute": 131.60959999999614,
+        "percent": 7.50135709942521
+      },
+      "tenantQueries": {
+        "before": 338,
+        "after": 338,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 100,
+        "after": 100,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 200,
+        "after": 200,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-100",
+      "variant": "after",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 1902.8622999999934,
+        "after": 1897.3205999999918,
+        "absolute": -5.541700000001583,
+        "percent": -0.29122969118687836
+      },
+      "tenantQueries": {
+        "before": 340,
+        "after": 340,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 100,
+        "after": 100,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 200,
+        "after": 200,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-101",
+      "variant": "before",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 2090.350900000005,
+        "after": 2404.1896500000003,
+        "absolute": 313.83874999999534,
+        "percent": 15.013687414873477
+      },
+      "tenantQueries": {
+        "before": 340,
+        "after": 340,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 101,
+        "after": 101,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 202,
+        "after": 202,
+        "absolute": 0,
+        "percent": 0
+      }
+    },
+    {
+      "scenarioId": "volume-101",
+      "variant": "after",
+      "samplesPerRun": 2,
+      "operationMs": {
+        "before": 2100.856549999997,
+        "after": 2077.824250000005,
+        "absolute": -23.032299999991665,
+        "percent": -1.0963290187515073
+      },
+      "tenantQueries": {
+        "before": 342,
+        "after": 342,
+        "absolute": 0,
+        "percent": 0
+      },
+      "rowsRead": {
+        "before": 101,
+        "after": 101,
+        "absolute": 0,
+        "percent": 0
+      },
+      "authorizationCalls": {
+        "before": 202,
+        "after": 202,
+        "absolute": 0,
+        "percent": 0
+      }
+    }
+  ],
+  "completedSampleMeanMs": {
+    "before": 1805.8840900000002,
+    "after": 1936.8479250000019,
+    "absolute": 130.9638350000016,
+    "percent": 7.252062063407494
+  },
+  "limits": [
+    "One interrupted warmup per run is comparable; no measured sample of volume-10000",
+    "No candidate warmup of volume-10000 in seventh execution",
+    "Host conditions not controlled; no exclusive causal latency attribution",
+    "Group overhead moved outside membership/data subspans; compare inclusive authorization misses",
+    "SQL Central is global across operation; counts cannot be attributed wholly to reader authorization",
+    "No complete capacity matrix or production approval"
+  ]
+}

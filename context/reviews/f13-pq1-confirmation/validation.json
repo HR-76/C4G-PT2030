@@ -1,0 +1,28 @@
+{
+  "frontendSuite": {
+    "command": "npm test",
+    "cwd": "frontend",
+    "tests": 62,
+    "passed": 62,
+    "testFiles": 9,
+    "newRegressionCases": 14,
+    "result": "PASS"
+  },
+  "build": {
+    "command": "npm run build",
+    "cwd": "frontend",
+    "modules": 2062,
+    "result": "PASS",
+    "warning": "JS chunk >500 kB"
+  },
+  "whitespace": "PASS including untracked regression test",
+  "finalReview": "Read-only delta inspection: no remaining actionable finding in this correction",
+  "headAndIndexUnchanged": true,
+  "historicalArtifactsUnchanged": 22,
+  "notRerun": [
+    "backend suite",
+    "PostgreSQL gates",
+    "full browser"
+  ],
+  "note": "Observed results summary, not a raw tool transcript."
+}

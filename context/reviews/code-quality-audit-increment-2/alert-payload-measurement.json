@@ -1,0 +1,91 @@
+{
+  "fixture": {
+    "applicationAlerts": 1000,
+    "notices": 1000,
+    "applicationMessageCharacters": 2000,
+    "noticeMessageCharacters": 5000
+  },
+  "metric": "Sum of UTF-8 JSON byte sizes of query result rows in deterministic test double; not PostgreSQL wire bytes or production timings",
+  "measurements": [
+    {
+      "operation": "GET limit=1",
+      "before": {
+        "queries": 4,
+        "bytes": 7807713,
+        "contentRows": 2000,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "after": {
+        "queries": 5,
+        "bytes": 559070,
+        "contentRows": 1,
+        "hydratedRows": 1,
+        "hydrationQueries": 1
+      },
+      "authorizationCalls": 2000,
+      "auditCalls": 0,
+      "serializedBytesReductionPercent": 92.84
+    },
+    {
+      "operation": "GET limit=100",
+      "before": {
+        "queries": 4,
+        "bytes": 7807713,
+        "contentRows": 2000,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "after": {
+        "queries": 6,
+        "bytes": 915281,
+        "contentRows": 100,
+        "hydratedRows": 100,
+        "hydrationQueries": 2
+      },
+      "authorizationCalls": 2000,
+      "auditCalls": 0,
+      "serializedBytesReductionPercent": 88.28
+    },
+    {
+      "operation": "PATCH read",
+      "before": {
+        "queries": 5,
+        "bytes": 7807713,
+        "contentRows": 2000,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "after": {
+        "queries": 5,
+        "bytes": 553927,
+        "contentRows": 0,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "authorizationCalls": 2000,
+      "auditCalls": 1,
+      "serializedBytesReductionPercent": 92.91
+    },
+    {
+      "operation": "PATCH read-all",
+      "before": {
+        "queries": 2004,
+        "bytes": 7807713,
+        "contentRows": 2000,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "after": {
+        "queries": 2004,
+        "bytes": 553927,
+        "contentRows": 0,
+        "hydratedRows": 0,
+        "hydrationQueries": 0
+      },
+      "authorizationCalls": 2000,
+      "auditCalls": 2000,
+      "serializedBytesReductionPercent": 92.91
+    }
+  ]
+}

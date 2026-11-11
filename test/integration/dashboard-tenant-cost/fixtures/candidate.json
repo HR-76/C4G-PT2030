@@ -1,0 +1,7 @@
+{
+  "baselineSha256": "d0baa7265dbf86ada926fe783cf52d110f84dbdbbfe415c1df4ab07f89a972bf",
+  "candidateSha256": "6876998c3d37a255333a90c0bad3eeff784797e3ec82a08242c2785bbbc748d5",
+  "commandPairs": [[25, 9], [23, 8], [22, 7]],
+  "scope": "Batch contiguous safety queries within every fresh tenantSchemaSnapshot; preserve all snapshot checkpoints, values and fingerprints.",
+  "conditions": "Command counts depend on multipart/document-worker capabilities. Match the observed baseline/candidate pair; do not assume the historical branch."
+}

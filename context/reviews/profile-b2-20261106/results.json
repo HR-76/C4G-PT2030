@@ -1,0 +1,448 @@
+{
+  "startedAt": "2026-11-06T22:54:12.612Z",
+  "mode": "standard",
+  "status": "COMPLETE",
+  "checks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection"
+  ],
+  "scenarios": [],
+  "limits": [
+    "Local synthetic data; no production capacity claim.",
+    "Instrumentation adds timing and 100ms PostgreSQL sampling overhead.",
+    "Central non-authority reader uses fixture pg_read_all_data.",
+    "No changes to pool limits, deadlines or security checks.",
+    "Standard mixed-tenant scenario warms tenant A only; first tenant B access can be cold."
+  ],
+  "variant": "B",
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "050_billing_private_documents",
+  "roles": [
+    {
+      "tenant": "A",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    },
+    {
+      "tenant": "B",
+      "flags": {
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolbypassrls": false,
+        "rolreplication": false,
+        "rolinherit": false
+      },
+      "rls": [
+        {
+          "relname": "application",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_change",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "application_participant",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "opportunity",
+          "relrowsecurity": true,
+          "relforcerowsecurity": false
+        },
+        {
+          "relname": "person",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        },
+        {
+          "relname": "person_profile",
+          "relrowsecurity": true,
+          "relforcerowsecurity": true
+        }
+      ]
+    }
+  ],
+  "fixture": {
+    "applications": 1000,
+    "people": 250,
+    "storedAlerts": 6,
+    "dueApplications": 2,
+    "hiddenRecipientAlerts": 1
+  },
+  "pages": [
+    {
+      "route": "/dashboard",
+      "mode": "load",
+      "repetition": 0,
+      "ms": 4404.183100000002,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 366.0797999999995
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 326.7555000000066
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 678.2203999999983
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2787.8968999999997
+        },
+        {
+          "path": "/api/organizations/fbe95c4d-1859-4410-bb2a-8d6c5bf08325/dashboard/summary",
+          "status": 200,
+          "ms": 3633.2828999999983
+        }
+      ],
+      "settledMs": 4842.467599999996
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "load",
+      "repetition": 0,
+      "ms": 4245.175199999998,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 370.9809000000023
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 273.7505999999994
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 572.9921999999933
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2635.3044999999984
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3410.0161000000007
+        }
+      ],
+      "settledMs": 4644.977200000001
+    },
+    {
+      "route": "/perfil-organizacao",
+      "mode": "load",
+      "repetition": 0,
+      "ms": 3753.7549,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 376.2279000000053
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 287.75420000000304
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 616.6952000000019
+        },
+        {
+          "path": "/api/organization-directory",
+          "status": 200,
+          "ms": 2956.758099999999
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 3205.703499999996
+        }
+      ],
+      "settledMs": 4869.431499999999
+    },
+    {
+      "route": "/notificacoes",
+      "mode": "load",
+      "repetition": 0,
+      "ms": 5588.733100000005,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 364.03340000000026
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 280.33050000000367
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 628.7692000000025
+        },
+        {
+          "path": "/api/notifications/communication/context",
+          "status": 200,
+          "ms": 3220.5593999999983
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 3525.1022999999986
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 4442.4447
+        }
+      ],
+      "settledMs": 6061.083400000003
+    },
+    {
+      "route": "/dashboard",
+      "mode": "load",
+      "repetition": 1,
+      "ms": 4117.449499999995,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 391.5868999999948
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 257.85719999999856
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 583.4669999999969
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2560.5873999999967
+        },
+        {
+          "path": "/api/organizations/fbe95c4d-1859-4410-bb2a-8d6c5bf08325/dashboard/summary",
+          "status": 200,
+          "ms": 3296.4163000000044
+        }
+      ],
+      "settledMs": 4570.6029999999955
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "load",
+      "repetition": 1,
+      "ms": 4102.554800000005,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 356.6926999999996
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 290.9574999999968
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 593.3922999999995
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 2516.125399999997
+        },
+        {
+          "path": "/api/applications/browse-page",
+          "status": 200,
+          "ms": 3306.727200000001
+        }
+      ],
+      "settledMs": 4531.754699999998
+    },
+    {
+      "route": "/perfil-organizacao",
+      "mode": "load",
+      "repetition": 1,
+      "ms": 3713.4266999999963,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 370.48429999999644
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 266.2118000000046
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 560.7402000000002
+        },
+        {
+          "path": "/api/organization-directory",
+          "status": 200,
+          "ms": 2900.8366000000096
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 3238.7342000000062
+        }
+      ],
+      "settledMs": 4905.428100000005
+    },
+    {
+      "route": "/notificacoes",
+      "mode": "load",
+      "repetition": 1,
+      "ms": 5431.700499999992,
+      "requests": [
+        {
+          "path": "/api/auth/session",
+          "status": 200,
+          "ms": 367.0749000000069
+        },
+        {
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "ms": 270.6764000000112
+        },
+        {
+          "path": "/api/billing/access",
+          "status": 200,
+          "ms": 533.9505999999965
+        },
+        {
+          "path": "/api/notifications/communication/context",
+          "status": 200,
+          "ms": 3017.4361999999965
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 3318.254799999995
+        },
+        {
+          "path": "/api/notifications/refresh-list",
+          "status": 200,
+          "ms": 4254.338699999993
+        }
+      ],
+      "settledMs": 5865.9939999999915
+    },
+    {
+      "route": "/candidaturas",
+      "mode": "navigation",
+      "ms": 2795.7079999999987
+    },
+    {
+      "route": "/perfil-organizacao",
+      "mode": "navigation",
+      "ms": 2696.7379000000074
+    },
+    {
+      "route": "/notificacoes",
+      "mode": "navigation",
+      "ms": 2765.493499999997
+    },
+    {
+      "route": "/dashboard",
+      "mode": "navigation",
+      "ms": 3106.5977999999886
+    }
+  ],
+  "instrumentation": {
+    "queries": [],
+    "policies": [
+      {
+        "globalLimit": 20,
+        "perTenantLimit": 5,
+        "operationalReserve": 2,
+        "globalQueueLimit": 40,
+        "perTenantQueueLimit": 10,
+        "operationalQueueReserve": 2,
+        "acquireTimeoutMs": 5000,
+        "leaseTimeoutMs": 15000,
+        "idleTimeoutMs": 30000,
+        "drainTimeoutMs": 10000,
+        "circuitFailureThreshold": 3,
+        "circuitResetMs": 10000,
+        "backoffBaseMs": 25,
+        "maxBackoffMs": 250
+      }
+    ],
+    "samples": []
+  },
+  "integrity": {
+    "unchanged": true
+  },
+  "finishedAt": "2026-11-06T22:55:45.208Z"
+}

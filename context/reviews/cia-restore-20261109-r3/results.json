@@ -1,0 +1,160 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "target": "cia_restore_central",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.global_user",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization_membership",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "c4g_system.tenant_identity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "c4g_system.schema_migration",
+      "count": 33,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.opportunity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.application",
+      "count": 12,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.application_change",
+      "count": 12,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "organizational_scope.person",
+      "count": 3,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "organizational_scope.person_profile",
+      "count": 3,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "document_storage.document",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "audit.event",
+      "count": 0,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "c4g_system.tenant_identity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "c4g_system.schema_migration",
+      "count": 33,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.opportunity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.application",
+      "count": 7,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.application_change",
+      "count": 7,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "organizational_scope.person",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "organizational_scope.person_profile",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "document_storage.document",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "audit.event",
+      "count": 0,
+      "equivalent": true
+    },
+    {
+      "restoredTenantRls": "PASS",
+      "foreignOrganization": "DENIED"
+    },
+    {
+      "restoredTenantRls": "PASS",
+      "foreignOrganization": "DENIED"
+    },
+    {
+      "tenantMarkers": "PRESERVED_DISTINCT",
+      "note": "Markers are restored copies; no restored database is admitted to the live directory."
+    }
+  ],
+  "limits": [
+    "Synthetic data and same disposable cluster only; no provider objects, production backups, WAL or disaster recovery."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

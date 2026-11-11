@@ -1,0 +1,21 @@
+# Reconciliação do run EU expirado e revalidação do código
+
+31/10/2026 — pedido explícito: reconciliar o run expirado e revalidar o código antes de qualquer retoma. Este incremento continua a [janela043](../../reviews/opportunity-data-standardization/writer-execution-043.md). Não autoriza retoma, nova recolha, aceitação das migrações v1 ou resolução automática dos conflitos.
+
+## Âmbito e critérios de aceitação
+
+1. Observar por leitura o estado habitual043/034 e o ciclo `7266ad6b-8880-4ec1-9399-4751187831c5`. Exigir EU `QUIESCED`, fence atual vinculada ao preview, nenhuma lease ativa e identificação exata do único run/envelopes expirados. Recusar drift, outro ciclo, trabalho concorrente ou autoridades inválidas.
+2. Preservar o SQL036–043 e os artefactos históricos. A lacuna atual é fechada por pacote044 aditivo registado: capacidade administrativa estreita para terminalização por expiração enquanto a fonte permanece quiescente. Não desativar triggers, simular ACTIVE, prolongar deadlines ou criar novas identidades de execução.
+3. Fixar preview e digest dos efeitos propostos. Renovar aprovação por OIDC normal/autoridade administrativa persistida e auditar a intenção; confirmar novamente essa autoridade na aplicação. Plano/aprovação antigos da instalação043 são históricos, não uma aprovação do novo código.
+4. Usar os estados de erro/expiração já previstos no domínio: run e ciclo encerrados como `ERROR/FUNDING_EXECUTION_EXPIRED`, inbox/linhagem terminados por expiração. Manter outbox `PUBLISHED`, pois a publicação ocorreu, e preservar envelope, prazo e proveniência. Nenhum SUCCESS fabricado, retry, republicação, enqueue ou chamada à fonte. Conservar integralmente os alvos e resultados: os393 alvos não resolvidos continuam por observar/conferir, sem lhes atribuir uma falha de dados da fonte apenas porque o transporte expirou.
+5. Aplicação atómica, idempotente e auditada, com CAS/fences, locks e recibo durável. Replay da mesma intenção sem efeitos duplicados; recusa de pedido divergente, actor revogado, falta de autenticação recente, fonte ativa, lease ativa, prazo válido ou mudança do preview. Escritor automático e leitores não obtêm uma via genérica de escrita em quiescência.
+6. Antes da alteração habitual, congelar a versão e validar pacote, hashes, schemas e código atual. Renovar backup/restauro coordenado043/034/configuração numa pausa própria; a única pendência admissível é o run expirado explicitamente inventariado, sem leases ativas. Instalar somente044 via migrador registado e preservar tenant034. Não fazer restauro destrutivo ou downgrade automático.
+7. Provar num gate isolado o percurso real SQL/HTTP/autoridade, recusas, rollback, replay e preservação. Revalidar a otimização atual de metadados tenant contra a implementação anterior e reconhecer as cinco remoções intencionais de wrappers, sem as reverter. Executar regressões, suites backend/frontend, build e verificações de sintaxe; fixar os inputs efetivamente ensaiados.
+8. Depois da reconciliação, confirmar ausência de runs/leases EU pendentes, fonte ainda `QUIESCED` com a mesma fence, integridade dos138 arquivos/137 revisões pendentes/cinco conflitos/393 alvos por tratar,538 heads/1502 revisões/129 tabelas tenant e chamada11145 inalterada (`numeric`120000, moedaNOT_FOUND, sete prazos). Documentar separadamente o ciclo encerrado por expiração, os alvos por tratar, auditoria e estado de saúde.
+9. Emitir nova prova de paridade do código atual; não reescrever a evidência `INCOMPLETE_CODE_DRIFT` da janela anterior. Guardar relatório, descritor e procedimento de recuperação. Uma futura retoma exige outro âmbito operacional explícito.
+
+## Limites de implementação
+
+Catálogo e reconciliação pertencem à Central; nenhum dado de organização é promovido ou alterado. A capacidade nova serve encerramento administrativo de trabalho já expirado, não aceitação editorial de oportunidades. O runtime habitual local continua distinto da arquitetura futura API/worker separados. As alterações paralelas intencionais são integradas na validação, não substituídas pela baseline antiga.
+
+Estado: In Progress. A autorização deste pedido cobre os ensaios isolados e a operação limitada descrita; a execução depende da prova concreta e aprovação autenticada do plano atual.

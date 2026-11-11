@@ -1,0 +1,461 @@
+{
+  "schemaVersion": 1,
+  "kind": "EU_WRITER_V2_TRIAL_READINESS",
+  "status": "FUNCTIONAL_READINESS_VERIFIED_MEASUREMENT_PREPARED",
+  "completedAt": "2026-10-31T16:44:11.226Z",
+  "trial": {
+    "id": "eu-writer-trial-0ecb31dc7c705859",
+    "sourceSetDigest": "0ecb31dc7c70585959a97b38046e79c5aa0dec06b87763a557720ad3e8ce1d6c",
+    "sourceCount": 1844,
+    "manifest": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/trial.json",
+      "sha256": "767625d37bece93c7877a577c527324ce514cec3081ed57451d1677b04be7afc",
+      "bytes": 246991
+    },
+    "sourceRoot": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources",
+    "archive": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources.zip",
+      "sha256": "8570b0efe3c0a3cdcaab008d488a4689e6b8179dc8f243b77ed94e0683befe6a",
+      "bytes": 15679881
+    }
+  },
+  "provenance": {
+    "parentId": "eu-writer-v2-d2898861a25b4f6e",
+    "parentSourceSetDigest": "d2898861a25b4f6e4dcb7d4ec91cc42830042ea7bdcbeb3efb56ee5adcdea7b3",
+    "parentManifest": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/parent-baseline.json",
+      "sha256": "1346a1856fd3760adb32be8b900a12e8ec0a96b90b9de212102d3c69fe3e0426",
+      "bytes": 342839
+    },
+    "parentArchive": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/parent-sources.zip",
+      "sha256": "9f33fc940ce4cb42786cd6938cb2c0ca3037b5dd0d8b7e3323e83688c30eae4b",
+      "bytes": 15417439
+    },
+    "derivation": {
+      "unchangedParentSources": 1804,
+      "changedParentSources": 3,
+      "supplementalSources": 16,
+      "newTrialSources": 21,
+      "overlayPurposes": {
+        "backend/src/applications/composition.js": "Scoped responsible-directory names through the existing authority port; minimal separately pinned template excludes concurrent report authority-read optimization",
+        "backend/src/opportunities/httpComposition.js": "Explicit approved Tenant034 admission",
+        "backend/test/opportunityV2ConsumerAdmission.test.js": "Tenant034 admission regression"
+      },
+      "workspacePolicy": "All parent paths come from pinned archive bytes. Two exact Tenant034 overlays and enumerated trial extensions come from the workspace. The responsible-directory overlay comes from its separately pinned minimal template, not the evolving live composition. Other parallel changes are excluded."
+    },
+    "overlays": {
+      "backend/src/applications/composition.js": {
+        "before": "cec6036997941ebf27a1f4cdef370e7699eda7eed401b6f7cb083bbaa66bf0ca",
+        "after": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a",
+        "sourceOverride": "test/integration/eu-writer-performance/application-composition.candidate.cjs"
+      },
+      "backend/src/opportunities/httpComposition.js": {
+        "before": "2f4168b371fa603fee8ceba84c56d4c89ecc76dd59dc4aecf0c9f7af32ecc854",
+        "after": "1389118396991de48b1a1d3fb04524aedf8fc20e2051760b3df49c6b7472eff4"
+      },
+      "backend/test/opportunityV2ConsumerAdmission.test.js": {
+        "before": "4de7b4006bf271337202848e04aa68e77dd86b12dd188a6edd5da9d5f1f8cac7",
+        "after": "7e95752d7b58168c5367c75b74881e67cb131fe653f6bea0c20486cf70e9125a"
+      }
+    },
+    "supplements": [
+      {
+        "name": "public-test-fixtures-supplement",
+        "sourceCount": 5,
+        "manifest": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/public-test-fixtures-supplement.json",
+          "sha256": "771425e691049e23d143074f17c472a64167c2714041282a7951a0ba693df00f",
+          "bytes": 3191
+        },
+        "archive": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/public-test-fixtures-supplement.zip",
+          "sha256": "a933b40d638d377d5876d4c1da9809fb18cabbc4b86ca1e8c73dfa364e96ba57",
+          "bytes": 14569
+        },
+        "provenance": "Keycloak fixtures were captured from the workspace after the baseline; original baseline and gate closures did not pin them."
+      },
+      {
+        "name": "additional-test-inputs-supplement-v2",
+        "sourceCount": 11,
+        "manifest": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/additional-test-inputs-supplement-v2.json",
+          "sha256": "b507604cd75691ea867c5e3a4295c357068dbf5d47fa045cc1689fbedb89c648",
+          "bytes": 7225
+        },
+        "archive": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/provenance/additional-test-inputs-supplement-v2.zip",
+          "sha256": "e5237f12e833fba5ea6598de779478ea1422a6ef7881aa11f6d964ddd2bf5151",
+          "bytes": 10578
+        },
+        "provenance": "These files were omitted from source and gate closures, and are captured from the workspace after the original baseline. No original capture-time provenance is claimed."
+      }
+    ]
+  },
+  "package": {
+    "packageId": "opportunity-eu-writer-v2",
+    "version": "043_opportunity_eu_writer_v2",
+    "centralBaseline": "042_opportunity_eu_source_control_v2",
+    "packageDigest": "2bdae82ddd6516e3b31bf33699f5213adaf6c36ae038a59c59f2123752033ee7",
+    "legacyPackageDigest": "4f83267f1c2d3f41c604453f3489136397f661fbc06a99de8b79ed2980674e7a",
+    "sqlPath": "backend/database/central/candidates/opportunity_eu_writer_v2.up.sql",
+    "entry": {
+      "version": "043_opportunity_eu_writer_v2",
+      "irreversible": true,
+      "acceptsHistoricalCrlfChecksum": false,
+      "requiresPreflightVersion": "042_opportunity_eu_source_control_v2",
+      "requiresCatalogSecurityFingerprint": "b981504c0b991748fc33f2c073c5a4d9538f7038da821dbc8bd5fe906ee0574e",
+      "upChecksum": "68562ede29f9c6063105c132331d7defb7b776d6ad5e928b3b1e843925af3f62",
+      "schemaFingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591",
+      "authoritySecurityFingerprint": "ef5207fd05f4223c7ad824984e897542c3ea99f44a59211c8410aa64313a928f",
+      "catalogSecurityFingerprint": "677c31faad484bdd4afb9ea874d8a17556c44cadc9c08dba9e210112dec495cb",
+      "euWriterSecurityFingerprint": "00b44563b67e28912d8b71db5c0b0e09b7e396b5e8754ca99b870a31168db3da"
+    },
+    "upChecksum": "68562ede29f9c6063105c132331d7defb7b776d6ad5e928b3b1e843925af3f62",
+    "schemaFingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591",
+    "authoritySecurityFingerprint": "ef5207fd05f4223c7ad824984e897542c3ea99f44a59211c8410aa64313a928f",
+    "catalogSecurityFingerprint": "677c31faad484bdd4afb9ea874d8a17556c44cadc9c08dba9e210112dec495cb",
+    "euWriterSecurityFingerprint": "00b44563b67e28912d8b71db5c0b0e09b7e396b5e8754ca99b870a31168db3da"
+  },
+  "protocol": {
+    "id": "eu-writer-performance-executors-2026-10-31-v2",
+    "parameters": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/test/integration/eu-writer-performance/protocol.json",
+      "sha256": "5efb4f3162b8fd891b7a40bde8a37ccf578c08f7b59ceea7502ffb86ffdb9658",
+      "bytes": 2054
+    },
+    "parentParameters": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/context/references/performance/eu-writer-v2-protocol.json",
+      "sha256": "dd3c1fa9791a7473eb6e941f8f6c139bcf5ae1eae3aa0423429fa07cb70fac14",
+      "bytes": 5405
+    },
+    "contract": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/context/features/eu-writer-performance-executors.md",
+      "sha256": "f90edae69b651661ded486355aad986ec9c71de6dd61d05c057ab0a1e65bf9e6",
+      "bytes": 4979
+    },
+    "commands": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/test/integration/eu-writer-performance/README.md",
+      "sha256": "99ceacc220599b2722acca196e0178fe44cb6f003836e6635c3ed94ef73c6302",
+      "bytes": 5966
+    },
+    "runner": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/sources/test/integration/eu-writer-performance/run.cjs"
+  },
+  "functionalProof": {
+    "status": "PASS",
+    "mode": "readiness",
+    "evidence": {
+      "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/612a14e5e11c41c1a8d2fc38cda17c7c/report.json",
+      "sha256": "163c726bc2433b71638e00a9a3c56a2674c1c437973d546869357b5f80ed7b17",
+      "bytes": 1218161
+    },
+    "startedAt": "2026-10-31T16:39:42.279Z",
+    "finishedAt": "2026-10-31T16:42:25.967Z",
+    "sourceSetDigest": "0ecb31dc7c70585959a97b38046e79c5aa0dec06b87763a557720ad3e8ce1d6c",
+    "trialManifestSha256": "767625d37bece93c7877a577c527324ce514cec3081ed57451d1677b04be7afc",
+    "seed": {
+      "digest": "3809b44e0f34f7a5f6868b9052fb66af021051292b0b49648b9d0e8876edf3f6",
+      "specification": {
+        "schemaVersion": 1,
+        "id": "eu-writer-performance-seed-v1",
+        "instant": "2026-10-31T00:00:00.000Z",
+        "deadline": "2027-12-31",
+        "applicationsPerTenant": 1000,
+        "peoplePerTenant": 250,
+        "tenants": 2
+      },
+      "operationalIdentityBindings": "Separate per-stage digests; ephemeral OIDC subjects, sessions, database generations and installation timestamps are outside the business seed"
+    },
+    "images": {
+      "postgres": {
+        "id": "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+        "repositoryDigests": [
+          "postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873"
+        ],
+        "sourceTag": "postgres:18-alpine"
+      },
+      "keycloak": {
+        "id": "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc",
+        "repositoryDigests": [
+          "quay.io/keycloak/keycloak@sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+        ],
+        "sourceTag": "quay.io/keycloak/keycloak:26.8.0"
+      }
+    },
+    "environment": {
+      "platform": "win32",
+      "architecture": "x64",
+      "node": "v24.13.1",
+      "timezone": "UTC",
+      "cpuCount": 24,
+      "totalMemory": 68095725568,
+      "freeMemoryBefore": 40200724480
+    },
+    "stages": [
+      {
+        "revision": "043",
+        "status": "PASS",
+        "evidence": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/612a14e5e11c41c1a8d2fc38cda17c7c/stage-0-043.json",
+          "sha256": "abec0dfee2bc0a9ff06c53775b23ee018bd236b55cc01f0620d88261a0fc0d86",
+          "bytes": 956165
+        },
+        "schemas": {
+          "central": "043_opportunity_eu_writer_v2",
+          "centralFingerprint": "ec582c27bdd4472cff543f2dd3edd77f55bfc552881d1acd560e481dd1df9591",
+          "tenants": [
+            "034_application_snapshot_v2",
+            "034_application_snapshot_v2"
+          ]
+        },
+        "metadata": {
+          "status": "PASS",
+          "mode": "functional",
+          "checkpoints": 8,
+          "checks": {
+            "exactJsonBytes": true,
+            "exactFingerprint": true,
+            "freshReadsPerCall": true,
+            "securityReadsPreserved": true
+          },
+          "driftAndPostLock": "PASS"
+        },
+        "http": {
+          "status": "PASS",
+          "sequentialRequests": 17,
+          "successfulResponses": 8,
+          "expectedRefusals": 9,
+          "checks": [
+            "real OIDC/PKCE login and secure session",
+            "report, private catalog and dashboard for two organizations",
+            "signed second page and tampered cursor refusal",
+            "cross-organization and anonymous refusal",
+            "scoped runtime roles and physical RLS",
+            "complete observations and drain"
+          ]
+        },
+        "writerState": {
+          "state": "QUIESCED",
+          "pending": 0,
+          "runtimeEnabled": false
+        },
+        "operationalIdentityDigest": "c6f86e6252824d871502d368f1a1b011f5dc5d1931fe6e27909fd2ad4e9947be",
+        "sourceIntegrityAfter": "PASS",
+        "cleanup": {
+          "status": "PASS",
+          "ownedContainersRemoved": 2,
+          "childExitVerified": true
+        }
+      },
+      {
+        "revision": "042",
+        "status": "PASS",
+        "evidence": {
+          "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/612a14e5e11c41c1a8d2fc38cda17c7c/stage-1-042.json",
+          "sha256": "bc7bc482d0cac0fec2d498819d86c5f5a841464ab355d50f7da42a1078766903",
+          "bytes": 31436
+        },
+        "schemas": {
+          "central": "042_opportunity_eu_source_control_v2",
+          "centralFingerprint": "0cb6ef8f6e00cc8e9209864addab966c9772a9bb5d886b0165d49a67e1d21e82",
+          "tenants": [
+            "034_application_snapshot_v2",
+            "034_application_snapshot_v2"
+          ]
+        },
+        "metadata": {
+          "status": "PASS",
+          "mode": "functional",
+          "checkpoints": 8,
+          "checks": {
+            "exactJsonBytes": true,
+            "exactFingerprint": true,
+            "freshReadsPerCall": true,
+            "securityReadsPreserved": true
+          },
+          "driftAndPostLock": "PASS"
+        },
+        "writerState": {
+          "state": "QUIESCED",
+          "pending": 0,
+          "runtimeEnabled": false
+        },
+        "operationalIdentityDigest": "0ffca6fcec9df3ef9cac155dc483bc25f78cc0cb6e3a80a8c3f81d8588732163",
+        "sourceIntegrityAfter": "PASS",
+        "cleanup": {
+          "status": "PASS",
+          "ownedContainersRemoved": 2,
+          "childExitVerified": true
+        }
+      }
+    ],
+    "cleanup": {
+      "status": "PASS",
+      "ownedContainersRemoved": 4,
+      "childProcessesExited": 2
+    },
+    "sourceIntegrityAfter": "PASS",
+    "habitualEnvironmentAccess": false,
+    "performanceMeasurement": false
+  },
+  "localValidation": {
+    "focused": {
+      "status": "PASS",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "durationMs": 559.9869,
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/focused.log",
+        "sha256": "b8b0fcd75bc1a2bff0dc6458097c4fe95cdf8bf0ba3d8351a646a8b222446eb2",
+        "bytes": 14348
+      }
+    },
+    "backend": {
+      "status": "PASS",
+      "total": 2224,
+      "passed": 2217,
+      "failed": 0,
+      "skipped": 7,
+      "cancelled": 0,
+      "durationMs": 55998.9939,
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/backend.log",
+        "sha256": "ec167de635f0f8b31201672b43a84b41d8616a4245c288377581d6e10f5571cb",
+        "bytes": 419950
+      }
+    },
+    "frontend": {
+      "status": "PASS",
+      "passed": 494,
+      "filesPassed": 63,
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/frontend.log",
+        "sha256": "0f728c124a1d93199920b8c8750a8acd241d4a3c785eec0512a3deae94ff3232",
+        "bytes": 19188
+      }
+    },
+    "build": {
+      "status": "PASS",
+      "durationSeconds": 11.21,
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/build.log",
+        "sha256": "38e5ddb200bd93c53adeb5b3dd4ab8acfe473fc54dabe22fcd4efb2a4857ec44",
+        "bytes": 13204
+      }
+    },
+    "syntax": {
+      "status": "PASS",
+      "filesPassed": 21,
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/syntax.json",
+        "sha256": "f3657f4ffed3f8fbe47415660e3884fc464488de00fdc09299561d8ef4740598",
+        "bytes": 2339
+      }
+    },
+    "integrity": {
+      "status": "PASS",
+      "evidence": {
+        "path": "output/eu-writer-trial-6c172f4fcfaa4965a4d5a357ed12da8e/evidence/local-validation/verification-final.json",
+        "sha256": "4d4a3e4abdd933b2c62768cfaeccb111c970d55dda129af3e19d03939d9a101c",
+        "bytes": 1090
+      },
+      "sourceCount": 1844,
+      "archiveEntriesContentAndCrcVerified": true,
+      "dependencies": {
+        "status": "PASS",
+        "checkedVersions": 38,
+        "treeBytesPinned": false
+      }
+    },
+    "partialConcurrentLocalValidation": true
+  },
+  "measurement": {
+    "status": "PREPARED_NOT_EXECUTED",
+    "metadata": "FUNCTIONAL_VALIDATED_LOAD_NOT_EXECUTED",
+    "http": "FUNCTIONAL_VALIDATED_LOAD_NOT_EXECUTED",
+    "requiresMatchingSourceManifestImagesAndSeed": true,
+    "loadRequiresSubsequentInstruction": true,
+    "writerInterference": "DISABLED_OPTIONAL",
+    "c6": "DISABLED_NO_OPTIMIZATION_CANDIDATE",
+    "performanceSloEstablished": false
+  },
+  "historicalWriterProof": {
+    "path": "output/opportunity-v2-writer-2da50ff68436466da34be54c00c2c4bf/verification.json",
+    "sha256": "99f3630da150b03f6d15a7caeb36ee94dba9a938e3827bca1b70fb7f1f5d806f",
+    "status": "HISTORICAL_PASS_NOT_EXACT_DERIVED_SOURCE_PROOF",
+    "checks": 23,
+    "changedGateSources": [
+      {
+        "path": "backend/src/applications/composition.js",
+        "before": "cec6036997941ebf27a1f4cdef370e7699eda7eed401b6f7cb083bbaa66bf0ca",
+        "after": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a"
+      },
+      {
+        "path": "backend/src/opportunities/httpComposition.js",
+        "before": "2f4168b371fa603fee8ceba84c56d4c89ecc76dd59dc4aecf0c9f7af32ecc854",
+        "after": "1389118396991de48b1a1d3fb04524aedf8fc20e2051760b3df49c6b7472eff4"
+      },
+      {
+        "path": "backend/test/opportunityV2ConsumerAdmission.test.js",
+        "before": "4de7b4006bf271337202848e04aa68e77dd86b12dd188a6edd5da9d5f1f8cac7",
+        "after": "7e95752d7b58168c5367c75b74881e67cb131fe653f6bea0c20486cf70e9125a"
+      }
+    ],
+    "reuseLimit": "Prior writer evidence retains historical value; it does not automatically certify this derived source set or its new HTTP runtime."
+  },
+  "preservedAttempts": [
+    {
+      "evidence": {
+        "path": "output/eu-writer-trial-61bf8fb839f343caa5d9e23214cbff17/review-status.json",
+        "sha256": "b867235002be4a13f805ca78253f6665014be1a1c28b8335898252c3b18114a2",
+        "bytes": 884
+      },
+      "status": "REJECTED_BEFORE_RUNTIME_EXECUTION",
+      "reason": "Concurrent report authority-read optimization excluded from the later minimal overlay"
+    },
+    {
+      "evidence": {
+        "path": "output/eu-writer-trial-21ebf00bf185454bbcbf24a29253d99d/evidence/caf3fa05fc824b5c828b1f0b91072eac/report.json",
+        "sha256": "fe0cf2c1dcc4d2631261fcaad3e2a8f1390feee1ec921129023a9436151971c8",
+        "bytes": 7423
+      },
+      "status": "FAIL",
+      "reason": "Fixture source-control transition rejected; preserved with successful cleanup",
+      "cleanup": true
+    },
+    {
+      "evidence": {
+        "path": "output/eu-writer-trial-4be8ed5cb7f346a59b504132794c5af9/evidence/fd51f766a1564b5f9e9f8e2fae355f67/report.json",
+        "sha256": "4dac9034fe606844e5a261d47caaf2b8d835a55dc5b9fb413888df225c5b2d4c",
+        "bytes": 440424
+      },
+      "status": "FAIL",
+      "reason": "Dashboard functional assertion failed; preserved with successful cleanup",
+      "cleanup": true
+    },
+    {
+      "evidence": {
+        "path": "output/eu-writer-trial-01eb5e7aed8945518100432d9ac2e756/evidence/f634ab90045142bc9038e69653ca0f7e/report.json",
+        "sha256": "41f0d4da12af162deffa0055d27a009bd142cdb222721e3cac62e0540d3919ba",
+        "bytes": 1392629
+      },
+      "status": "PASS",
+      "reason": "Earlier functional PASS retained; superseded after the HTTP scenario deadline guard was strengthened",
+      "cleanup": true
+    }
+  ],
+  "limitations": [
+    "This descriptor certifies the exact archived trial and its finite isolated functional proof, not the evolving workspace or the habitual environment.",
+    "No metadata or HTTP load matrix was executed. Functional observations do not establish latency, capacity, throughput or an SLO.",
+    "The writer was quiesced with no pending execution. Writer-interference W and optimization gate C6 remain disabled; the historical 23-check writer gate does not automatically certify the three derived overlays.",
+    "Sixteen auxiliary test inputs retain their separately documented post-baseline provenance. Only the pinned public environment template is included; actual configuration, TLS private material and credentials are excluded.",
+    "Thirty-eight installed dependency versions match the captured runtime and archived lockfiles. Installed dependency-tree bytes, the external Chrome binary and TLS materials are not archived or individually pinned.",
+    "Seven opt-in backend tests remain skipped. Their omitted coverage is not implied by the isolated HTTP/metadata proof.",
+    "Business seed IDs and dates are deterministic; actual OIDC subjects, credentials, session epochs, database generations and installation/audit timestamps remain ephemeral, with identity binding recorded separately by digest.",
+    "The scoped responsible-directory overlay uses the separately pinned minimal template and excludes the concurrent report authority-read optimization; other parallel workspace changes are preserved outside this trial.",
+    "Local suites and build ran partly in parallel with functional readiness. This does not provide an isolated performance benchmark; no performance conclusion is drawn from the observed durations."
+  ]
+}

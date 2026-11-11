@@ -1,0 +1,229 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "syntheticObjectIsolation": "PASS",
+      "auditSourceEvents": 4,
+      "backupObjects": 2
+    },
+    {
+      "target": "cia_restore_central",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.global_user",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization_membership",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "c4g_system.tenant_identity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "c4g_system.schema_migration",
+      "count": 33,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.opportunity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.application",
+      "count": 12,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "opportunity_catalog.application_change",
+      "count": 12,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "organizational_scope.person",
+      "count": 3,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "organizational_scope.person_profile",
+      "count": 3,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "document_storage.document",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "document_storage.document_version",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "audit.event",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "audit.event_identity",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenanta",
+      "table": "audit.chain_head",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "databaseLocale": "EQUIVALENT"
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "c4g_system.tenant_identity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "c4g_system.schema_migration",
+      "count": 33,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.opportunity",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.application",
+      "count": 7,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "opportunity_catalog.application_change",
+      "count": 7,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "organizational_scope.person",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "organizational_scope.person_profile",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "document_storage.document",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "document_storage.document_version",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "audit.event",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "audit.event_identity",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_tenantb",
+      "table": "audit.chain_head",
+      "count": 1,
+      "equivalent": true
+    },
+    {
+      "restoredTenantRls": "PASS",
+      "foreignOrganization": "DENIED"
+    },
+    {
+      "restoredTenantRls": "PASS",
+      "foreignOrganization": "DENIED"
+    },
+    {
+      "tenantMarkers": "PRESERVED_DISTINCT",
+      "note": "Markers are restored copies; no restored database is admitted to the live directory."
+    },
+    {
+      "tenant": "A",
+      "restoredObject": "HASH_AND_BYTES_MATCH",
+      "wrongHash": "DENIED",
+      "restoredAuditEvents": 2,
+      "auditChainContinues": 3
+    },
+    {
+      "tenant": "B",
+      "restoredObject": "HASH_AND_BYTES_MATCH",
+      "wrongHash": "DENIED",
+      "restoredAuditEvents": 2,
+      "auditChainContinues": 3
+    }
+  ],
+  "limits": [
+    "Synthetic data, disposable PostgreSQL and MinIO only; no real R2, production backups, WAL or disaster recovery.",
+    "MinIO cannot establish Cloudflare R2 provider compatibility.",
+    "CLEAN status is synthetic; no live antivirus proof."
+  ],
+  "sourceHashes": {
+    "test/integration/cia-recovery/run.ps1": "39c1328ba87a31f23624cc137c84c063893a86be7c8b8868a1343e43a16ff742",
+    "test/integration/cia-recovery/restore.cjs": "a0011730a0bd98b548bf0709822a02f51f79f911a8b27b395c9caa878ad14796",
+    "test/integration/cia-recovery/proof.cjs": "2ffb336b75c0e906981fbac3a0f0f20d2f684c470b46cf85d3f2e814f0286ad5",
+    "backend/src/documents/r2Storage.js": "ca6d206baaa0145fe8944ed710c5ea68d261b91306de1db52c5ab46d6b502ec6",
+    "backend/src/documents/r2Adapter.js": "71ccde5fa3d598b8f3f487c19828b50f08a29f167d36c373b802c68228434b53",
+    "backend/src/audit/appendService.js": "f3def7c615ddafcda131415ee2f0a078c791023e6d9ff2c9b69d879d522cc579",
+    "backend/src/audit/postgresAppendRepository.js": "a0cba2984dc01b3601ee628b0a4b6263af025a8297e2202fae34c6c99c59fd9a",
+    "backend/src/audit/verifier.js": "e6784e44f2737f0b4cec8be471b69f422b966df992dd9a1f9295924e4a10bab3",
+    "backend/src/audit/integrity.js": "9233cdb82752179a66215db45e974a871c7fbf54acca0b2ea9c9f78ead759e81"
+  },
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution",
+  "sourceIntegrity": "UNCHANGED"
+}

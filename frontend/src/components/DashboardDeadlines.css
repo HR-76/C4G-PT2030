@@ -1,0 +1,24 @@
+.deadline-priorities { min-width: 0; }
+.deadline-priorities .deadline-scope { margin: 0 0 16px; color: #53635f; font-size: 13px; }
+.deadline-limit { padding: 12px; background: #f2f6f5; border-radius: 8px; font-size: 13px; }
+.deadline-group { border-top: 1px solid #e3e9e7; padding-top: 16px; margin-top: 16px; }
+.deadline-group h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 15px; color: var(--ui-action); }
+.deadline-group h3 span { padding: 2px 8px; border-radius: 6px; background: #eef5f3; font-size: 12px; }
+.deadline-group[data-tone=overdue] h3 { color: #a33328; }
+.deadline-group[data-tone=overdue] h3 span { background: #fff0ed; }
+.deadline-group[data-tone=today] h3 { color: #805312; }
+.deadline-group[data-tone=today] h3 span { background: #fff5de; }
+.deadline-group ul { padding: 0; margin: 0; list-style: none; }
+.deadline-group li { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 0; }
+.deadline-group li + li { border-top: 1px solid #edf1ef; }
+.deadline-group a { color: var(--ui-action); font-weight: 600; overflow-wrap: anywhere; line-height: 1.5; }
+.deadline-group a:focus-visible { outline: 3px solid #48752a; outline-offset: 4px; border-radius: 2px; }
+.deadline-meta { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; text-align: right; font-size: 13px; }
+.deadline-meta time { color: #263b35; font-weight: 600; }
+.deadline-meta span, .deadline-empty { color: #53635f; font-size: 13px; }
+.deadline-empty { margin: 8px 0 0; }
+@media (max-width: 600px) {
+  .deadline-group li { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .deadline-meta { flex-direction: row; flex-wrap: wrap; gap: 8px 16px; text-align: left; }
+  .deadline-priorities .section-hd { flex-wrap: wrap; }
+}

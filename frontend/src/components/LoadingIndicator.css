@@ -1,0 +1,13 @@
+.loading-indicator { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; min-height:152px; padding:24px; color:var(--text-secondary,var(--color-text-secondary)); text-align:center; }
+.loading-indicator > span { max-width:100%; overflow-wrap:anywhere; }
+.loading-indicator-icon { flex-shrink:0; color:var(--primary,var(--ui-action)); }
+.loading-orbit-track { fill:none; stroke:var(--color-border); stroke-width:1; }
+.loading-orbit-track-inner { stroke-dasharray:2 4; }
+.loading-orbit { transform-origin:32px 32px; animation:c4g-loading 3.2s linear infinite; }
+.loading-orbit-inner { animation-duration:2.4s; animation-direction:reverse; }
+.loading-orbit-arc { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+.loading-orbit-inner .loading-orbit-arc { opacity:.55; stroke-width:1.5; }
+.loading-orbit-dot, .loading-orbit-core { fill:currentColor; }
+.loading-orbit-center { fill:var(--color-success); }
+@keyframes c4g-loading { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .loading-orbit { animation:none; } }

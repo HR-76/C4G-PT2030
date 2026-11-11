@@ -1,0 +1,4 @@
+.manual-call-information .dl-list { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.manual-call-information .dl-row { display: block; min-width: 0; }
+.manual-call-information .dl-row dt { width: auto; margin-bottom: 6px; }
+.manual-call-information .dl-row dd { margin: 0; overflow-wrap: anywhere; }

@@ -1,0 +1,626 @@
+{
+  "status": "COMPLETE",
+  "startedAt": "2026-10-26T23:31:38.337Z",
+  "finishedAt": "2026-10-26T23:35:44.577Z",
+  "sampleCount": 1872,
+  "sampleQueryMeanMs": 4,
+  "sampleQueryMaxMs": 153.88,
+  "policies": [
+    {
+      "globalLimit": 20,
+      "perTenantLimit": 5,
+      "operationalReserve": 2,
+      "globalQueueLimit": 40,
+      "perTenantQueueLimit": 10,
+      "operationalQueueReserve": 2,
+      "acquireTimeoutMs": 5000,
+      "leaseTimeoutMs": 15000,
+      "idleTimeoutMs": 30000,
+      "drainTimeoutMs": 10000,
+      "circuitFailureThreshold": 3,
+      "circuitResetMs": 10000,
+      "backoffBaseMs": 25,
+      "maxBackoffMs": 250
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "report-c1",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 5606.95,
+      "p95Ms": 6353.36,
+      "successThroughputPerSecond": 0.17,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1159,
+        1159,
+        1159,
+        1159
+      ],
+      "meanMetadataMs": 4574.14,
+      "meanApplicationSelectionMs": 18.4,
+      "meanAuditPrepareMs": 6.63,
+      "meanCentralLockCallMs": 47.67,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 84,
+          "maxWaitMs": 0.34,
+          "maxHeldMs": 402.83,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 2
+        },
+        "tenant": {
+          "count": 4,
+          "maxWaitMs": 0.12,
+          "maxHeldMs": 4547.77,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 1
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 221,
+      "maxActive": 1,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 0,
+      "centralBlockedFrames": 1,
+      "auditWaitEvents": [],
+      "blockerExamples": [],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "report-c2",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 5337.68,
+      "p95Ms": 7455.41,
+      "successThroughputPerSecond": 0.31,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1159,
+        1159,
+        1159,
+        1159
+      ],
+      "meanMetadataMs": 4136.31,
+      "meanApplicationSelectionMs": 18.22,
+      "meanAuditPrepareMs": 517.44,
+      "meanCentralLockCallMs": 79.83,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 84,
+          "maxWaitMs": 47.61,
+          "maxHeldMs": 370.51,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 3
+        },
+        "tenant": {
+          "count": 4,
+          "maxWaitMs": 56.41,
+          "maxHeldMs": 6009.96,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 2
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 124,
+      "maxActive": 2,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 20,
+      "centralBlockedFrames": 1,
+      "auditWaitEvents": [
+        "transactionid"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 7
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 7
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 8
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 7
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "report-c4",
+      "samples": 8,
+      "successes": 7,
+      "errors": 1,
+      "p50Ms": 9083.59,
+      "p95Ms": 10893.36,
+      "successThroughputPerSecond": 0.31,
+      "drainMs": 0,
+      "authorityTransactions": [
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21
+      ],
+      "queryCount": [
+        1159,
+        1159,
+        1159,
+        1159,
+        1159,
+        1159,
+        1159,
+        1159
+      ],
+      "meanMetadataMs": 4649.92,
+      "meanApplicationSelectionMs": 19.88,
+      "meanAuditPrepareMs": 3234.54,
+      "meanCentralLockCallMs": 188.3,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 168,
+          "maxWaitMs": 97.36,
+          "maxHeldMs": 1156.74,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 4
+        },
+        "tenant": {
+          "count": 8,
+          "maxWaitMs": 16.61,
+          "maxHeldMs": 10668.32,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 213,
+      "maxActive": 4,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 151,
+      "centralBlockedFrames": 13,
+      "auditWaitEvents": [
+        "transactionid",
+        "tuple"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 12
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 14
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 12
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 14
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 13
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 14
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": [
+        {
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "ms": 12825.71,
+          "failures": [
+            {
+              "code": "LEASE_TIMEOUT"
+            }
+          ],
+          "sqlErrors": [],
+          "auditPrepareMs": 6376.9,
+          "applicationSelectionMs": 17.19,
+          "tenantCheckouts": [
+            {
+              "waitMs": 16.61,
+              "holdMs": 10668.32,
+              "max": 5,
+              "total": 3,
+              "idle": 0,
+              "waiting": 0,
+              "role": "tenant-1",
+              "discard": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dashboard-c1",
+      "samples": 4,
+      "successes": 4,
+      "errors": 0,
+      "p50Ms": 8403.06,
+      "p95Ms": 9127.96,
+      "successThroughputPerSecond": 0.12,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2703,
+        2703,
+        2703,
+        2703
+      ],
+      "meanMetadataMs": 8843.26,
+      "meanApplicationSelectionMs": 16.36,
+      "meanAuditPrepareMs": 11.44,
+      "meanCentralLockCallMs": 149.43,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 168,
+          "maxWaitMs": 24.27,
+          "maxHeldMs": 344.57,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 3
+        },
+        "tenant": {
+          "count": 12,
+          "maxWaitMs": 0.04,
+          "maxHeldMs": 4043.19,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 4
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 329,
+      "maxActive": 2,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 0,
+      "centralBlockedFrames": 6,
+      "auditWaitEvents": [],
+      "blockerExamples": [],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "dashboard-c4",
+      "samples": 8,
+      "successes": 8,
+      "errors": 0,
+      "p50Ms": 15177.18,
+      "p95Ms": 15640.93,
+      "successThroughputPerSecond": 0.26,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703
+      ],
+      "meanMetadataMs": 9638.81,
+      "meanApplicationSelectionMs": 18.08,
+      "meanAuditPrepareMs": 4234.7,
+      "meanCentralLockCallMs": 1621.92,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 336,
+          "maxWaitMs": 53.66,
+          "maxHeldMs": 759.23,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 8
+        },
+        "tenant": {
+          "count": 24,
+          "maxWaitMs": 41.72,
+          "maxHeldMs": 10130.89,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 300,
+      "maxActive": 5,
+      "maxQueued": 3,
+      "framesQueued": 89,
+      "auditBlockedFrames": 207,
+      "centralBlockedFrames": 69,
+      "auditWaitEvents": [
+        "transactionid",
+        "tuple"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 28
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 26
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 28
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 26
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 27
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 26
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    },
+    {
+      "name": "dashboard-two-tenants-c4",
+      "samples": 8,
+      "successes": 8,
+      "errors": 0,
+      "p50Ms": 13480.07,
+      "p95Ms": 16956.62,
+      "successThroughputPerSecond": 0.27,
+      "drainMs": 0,
+      "authorityTransactions": [
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42,
+        42
+      ],
+      "queryCount": [
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703,
+        2703
+      ],
+      "meanMetadataMs": 13566.91,
+      "meanApplicationSelectionMs": 28.16,
+      "meanAuditPrepareMs": 870.24,
+      "meanCentralLockCallMs": 2013.92,
+      "physicalCheckouts": {
+        "authority": {
+          "count": 336,
+          "maxWaitMs": 76.1,
+          "maxHeldMs": 612.37,
+          "maxWaitingAtEntry": 1,
+          "maxPoolTotalAtEntry": 8
+        },
+        "tenant": {
+          "count": 24,
+          "maxWaitMs": 26.98,
+          "maxHeldMs": 9341.05,
+          "maxWaitingAtEntry": 0,
+          "maxPoolTotalAtEntry": 5
+        }
+      },
+      "logicalAdmissions": {
+        "count": 0,
+        "maxWaitMs": null,
+        "errors": []
+      },
+      "sampledFrames": 274,
+      "maxActive": 8,
+      "maxQueued": 0,
+      "framesQueued": 0,
+      "auditBlockedFrames": 28,
+      "centralBlockedFrames": 75,
+      "auditWaitEvents": [
+        "transactionid"
+      ],
+      "blockerExamples": [
+        {
+          "waiter": {
+            "role": "tenant-2",
+            "wait": "transactionid",
+            "request": 38
+          },
+          "blockers": [
+            {
+              "role": "tenant-2",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 36
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-1",
+            "wait": "transactionid",
+            "request": 37
+          },
+          "blockers": [
+            {
+              "role": "tenant-1",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 35
+            }
+          ]
+        },
+        {
+          "waiter": {
+            "role": "tenant-2",
+            "wait": "transactionid",
+            "request": 38
+          },
+          "blockers": [
+            {
+              "role": "tenant-2",
+              "state": "idle in transaction",
+              "wait": "ClientRead",
+              "query": "audit-append",
+              "request": 36
+            }
+          ]
+        }
+      ],
+      "afterResponseQueryCompletions": 0,
+      "failedRequests": []
+    }
+  ]
+}

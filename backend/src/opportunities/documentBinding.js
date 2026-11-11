@@ -1,0 +1,8 @@
+'use strict';
+const {assertObjectStoragePort}=require('../documents/objectStoragePort');
+const {OpportunityError}=require('./errors');
+function createOpportunityDocumentBinding({repository,authorization,documents,storage,audit}){
+ if(!repository||repository.authority!=='ORGANIZATION'||!authorization||!documents||typeof documents.bind!=='function'||!audit)throw new TypeError('Private opportunity document binding dependencies are invalid.');assertObjectStoragePort(storage);
+ return Object.freeze({async bind({opportunityId,documentId,context}){const opportunity=await repository.get(opportunityId);if(!opportunity)throw new OpportunityError('OPPORTUNITY_NOT_FOUND');for(const [operationCode,resourceId] of [['OPPORTUNITY_READ',opportunityId],['DOCUMENT_READ',documentId]]){const decision=await authorization.authorize({operationCode,actor:context.actor,resourceId,assuranceEvidence:context.assuranceEvidence,correlationId:context.correlationId});if(!decision.allowed)throw new OpportunityError('OPPORTUNITY_NOT_FOUND');}const document=await documents.load(documentId);if(!document||document.organizationId!==context.actor.organizationId||!['AVAILABLE','CLEAN'].includes(document.state))throw new OpportunityError('OPPORTUNITY_NOT_FOUND');const result=await documents.bind({resourceType:'OPPORTUNITY',resourceId:opportunityId,documentId,idempotencyKey:`${opportunityId}:${documentId}`});await audit.accept('OPPORTUNITY_PROVENANCE_LINKED',{correlationId:context.correlationId,causationId:context.causationId||context.correlationId,catalogVersion:'f12-events-v1'});return Object.freeze({...result});}});
+}
+module.exports={createOpportunityDocumentBinding};

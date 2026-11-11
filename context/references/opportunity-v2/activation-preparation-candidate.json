@@ -1,0 +1,161 @@
+{
+  "version": "opportunity-activation-preparation-v1",
+  "status": "PREPARATION_VALIDATED_ACTIVATION_PENDING",
+  "executable": false,
+  "registered": false,
+  "approved": false,
+  "activated": false,
+  "measuredAt": "2026-10-31T00:41:36.258Z",
+  "postgres": "18.6",
+  "evidence": "output/opportunity-v2-s6-873a1be1490345168fbc95ed48f14c47/verification.json",
+  "realPreview": "output/opportunity-v2-activation/real-preview.json",
+  "realPreviewSha256": "44df3603707909f41e1606de963202f169a3d53d750e57cfb2cafe4b1400e689",
+  "baseline": {
+    "central": "035_funding_source_resolution",
+    "tenant": "033_organizational_opportunity_interests",
+    "centralFingerprint": "8b772f6cd36d2abb4bf9a69ddc553230f827d97400ef1ac0c7e8f98f69bd649e",
+    "tenantFingerprint": "d3526c7287fade9a1009ce223be8d36769c38b9345f89e9c72180cb940c793bc",
+    "postgres": 180003
+  },
+  "centralSequence": [
+    {
+      "sequence": 1,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/funding_canonical_v2.up.sql",
+      "sha256": "c729f6d1048a6ccf5592cf903e6e717a16bccca108aa3c307ab1837f4a742a75",
+      "fingerprints": {
+        "schema": "4e7fb2b1fcef69b3dec9b050010c1df49aa74833521d5ae63f82a2b10e98b130",
+        "authority": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    },
+    {
+      "sequence": 2,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/manual_opportunity_v2.up.sql",
+      "sha256": "07302055a705a30b4b6e5fb3ab537e1b9e6b1c8031988d5bcdfec155538ec990",
+      "fingerprints": {
+        "schema": "dd02376be9e6fb329afb87f7b3371218600ab2f9fe1620776b8b427699412b0d",
+        "authority": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    },
+    {
+      "sequence": 3,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/pt2030_plan_v2.up.sql",
+      "sha256": "fb9d9e46ea2382dd9086343c5b6f685a946519942065c459975d872d922c45d5",
+      "fingerprints": {
+        "schema": "bcf9730df2dcc1ef4b94c87067be5c2dd248958aeb47b6deaeb6c9991c300b61",
+        "authority": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    },
+    {
+      "sequence": 4,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/opportunity_persistence_v2.up.sql",
+      "sha256": "fb2b973a11b8be7909452287416050ed2199f6b1bfd0b2d2b419a09f8f1d9f2c",
+      "fingerprints": {
+        "schema": "aff5929a7773753bc63c32ec7d3e0cf72e59711804b10ddb3c18a6a12a47e049",
+        "authority": "78509ec8a5d7ca7682c29c5fd0a8b15c42423bda969ca6fa6024be1061216b2b",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    },
+    {
+      "sequence": 5,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/opportunity_activation_authority_v2.up.sql",
+      "sha256": "06cfde591666f079bfd97db3e2ba0c3504770541ab7bd1c82139c8567c0108d5",
+      "fingerprints": {
+        "schema": "8ff6a715a925b13d78fe181973032f0620acd6de8202f4fc4bfcbd24e360b956",
+        "authority": "acb6daf8d58e240e14b5ce57e2228eb857ac37229b4700b735385576c0521286",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    },
+    {
+      "sequence": 6,
+      "ordinal": null,
+      "file": "backend/database/central/candidates/opportunity_activation_approval_v2.up.sql",
+      "sha256": "b75daef91a24886fe42baf2a79823f0cb121fa22ca6a1785dba404dd36d0e879",
+      "fingerprints": {
+        "schema": "a90a0f06dddf1f33d71bc5076771e97b91c0e9d8313d3f0823a694971059af15",
+        "authority": "acb6daf8d58e240e14b5ce57e2228eb857ac37229b4700b735385576c0521286",
+        "catalog": "b0676b4c7a82eea86f8cf7d8f9b56cbfbac18b2dce8efd80860f193acaaacbc5"
+      },
+      "registered": false
+    }
+  ],
+  "centralResult": "a90a0f06dddf1f33d71bc5076771e97b91c0e9d8313d3f0823a694971059af15",
+  "tenantCandidate": {
+    "baseline": "033_organizational_opportunity_interests",
+    "ordinal": null,
+    "sql": "backend/database/tenant/candidates/application_snapshot_v2.up.sql",
+    "schemaFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3",
+    "sqlSha256": "5be4eba00f11eb28b4756ec5d8a29fc08191a8e74133f25056a5315b244c77d7",
+    "notAppliedInThisGate": true,
+    "evidence": "output/opportunity-v2-s6-3d409b9e962a4351a1ae989635678301/verification.json"
+  },
+  "sources": [
+    {
+      "source": "EU_FUNDING_TENDERS",
+      "scope": [
+        "CASCADE:11145"
+      ],
+      "decision": "FIRST_SOURCE_AFTER_PREREQUISITES",
+      "prerequisites": [
+        "ARCHIVE_SCHEMA",
+        "VERIFIED_CURRENT_ARCHIVE",
+        "AUTHENTICATED_ADMIN_COMPOSITION",
+        "LEGACY_WRITER_QUIESCENCE",
+        "DURABLE_APPROVAL",
+        "MIGRATION_AND_BACKUP_WINDOW"
+      ]
+    },
+    {
+      "source": "INTERREG_EUROPE",
+      "scope": "Normative calls 1-3",
+      "decision": "SEPARATE_BATCH_AFTER_EU"
+    },
+    {
+      "source": "POCTEP",
+      "scope": "Normative calls 1-9 only",
+      "decision": "SEPARATE_BATCH_AFTER_EU",
+      "excluded": [
+        "POCTEP:2021-2027:CALL:10"
+      ]
+    },
+    {
+      "source": "C4G_MANUAL",
+      "scope": "New authorized editorial declarations only",
+      "decision": "NO_REAL_CANDIDATE_PREPARED"
+    },
+    {
+      "source": "PORTUGAL2030_PLAN",
+      "scope": "177 normative workbook rows",
+      "decision": "BLOCKED_DOCUMENT_PIPELINE",
+      "prerequisites": [
+        "CENTRAL_DOCUMENT_ARCHIVE",
+        "ANTIVIRUS",
+        "AUTHENTICATED_CENTRAL_WORKER"
+      ]
+    },
+    {
+      "source": "PORTUGAL2030_API",
+      "decision": "BLOCKED_UNCERTIFIED_SOURCE_SEMANTICS"
+    }
+  ],
+  "limitations": [
+    "Plan fence is not a worker lease or a global source switch.",
+    "SERVICE acceptance remains denied.",
+    "No current HTTP/OIDC activation endpoint or worker was enabled.",
+    "No backup or recovery execution was performed in the habitual environment.",
+    "SQL ordinals and active fingerprints remain unregistered.",
+    "Gate sessions and authority mutations are isolated fixtures; no identity-provider login is certified."
+  ]
+}

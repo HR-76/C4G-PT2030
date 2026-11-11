@@ -1,0 +1,24 @@
+'use strict';
+
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const os=require('node:os');
+const path=require('node:path');
+const test=require('node:test');
+const {inspectGateSource,inspectPowerShellContract,inspectReachable,loadGateManifest,violations}=require('../../test/integration/f12/source-guard');
+
+function temp(t){const root=fs.mkdtempSync(path.join(os.tmpdir(),'c4g-f12-manifest-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return root;}
+function write(root,name,source){const target=path.join(root,name);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,source);return target;}
+function program(pathname='entry.js'){return{id:'fixture',order:1,phase:'fixture',path:pathname,category:'probe',nodeArgs:[],args:[],failure:'fixture failed',sourceGuard:{operations:[]}};}
+function manifest(root,programs){return write(root,'gate-programs.json',JSON.stringify({schemaVersion:1,programs}));}
+function powershell(root,extra=''){return write(root,'migration-gate.ps1',`$manifestPath='gate-programs.json'\n$gateManifest=Get-Content -Raw $manifestPath | ConvertFrom-Json\nfunction Invoke-GatePhase([string]$phase){}\nInvoke-GatePhase 'fixture'\n${extra}& node @command\n`);}
+
+test('canonical manifest exactly matches every PowerShell program and every source-guard root',()=>{const inspected=inspectGateSource();assert.equal(inspected.manifest.programs.length,24);assert.equal(inspected.roots.length,22);assert.deepEqual(inspected.findings,[]);assert.deepEqual(inspected.executedButNotAnalyzed,[]);assert.deepEqual(inspected.analyzedButNotDeclared,[]);assert.equal(inspected.powershell.nodeCalls.length,1);for(const name of ['central-manifest-gate.js','tenant-manifest-gate.js','physical-connect.js','credential-lifecycle.js','legacy-lineage-upgrade.js','benchmark.js'])assert.ok(inspected.roots.some(root=>root.endsWith(name)),name);});
+
+test('PowerShell contract rejects every parallel Node invocation form',()=>{const real=loadGateManifest(),base=`$manifestPath='gate-programs.json'\n$gateManifest=Get-Content -Raw $manifestPath | ConvertFrom-Json\nfunction Invoke-GatePhase([string]$phase){}\n${[...new Set(real.programs.map(value=>value.phase))].map(phase=>`Invoke-GatePhase '${phase}'`).join('\n')}\n& node @command\n`;for(const bypass of ["& node './hidden.js'\n","node.exe './hidden.js'\n","Start-Process node -ArgumentList './hidden.js'\n","$target='./hidden.js'; & node $target\n"])assert.notDeepEqual(inspectPowerShellContract(base+bypass,real).findings,[],bypass);});
+
+test('a new manifest program automatically becomes a guarded root and missing programs fail closed',t=>{const root=temp(t),entry=write(root,'entry.js',"client.query('CREATE TABLE forbidden(id int)')"),manifestPath=manifest(root,[program('entry.js')]),powershellPath=powershell(root);let inspected=inspectGateSource({manifestPath,powershellPath,workspace:root});assert.deepEqual(inspected.roots,[entry]);assert.ok(inspected.findings.some(value=>value.includes('functional DDL')));write(root,'entry.js',"client.query('SELECT value FROM safe WHERE id=$1',[id])");inspected=inspectGateSource({manifestPath,powershellPath,workspace:root});assert.deepEqual(inspected.findings,[]);const missing=manifest(root,[program('missing.js')]);assert.throws(()=>loadGateManifest(missing,{workspace:root}),/PROGRAM_MISSING/);});
+
+test('indirect graph fixtures detect renamed SQL loader, ledger mutation, fabricated fingerprint and repair fallback',t=>{const root=temp(t);write(root,'entry.js',"const load=require('./sub/renamed');const run=require('./execute');run(load());require('./ledger');require('./fingerprint');require('./repair');");write(root,'sub/renamed.js',"const fs=require('node:fs');module.exports=()=>({sql:fs.promises.readFile('./005.sql','utf8')});");write(root,'execute.js',"module.exports=artifact=>client.query(artifact.sql);");write(root,'ledger.js',"client.query('UPDATE c4g_system.schema_migration SET ordinal=2');");write(root,'fingerprint.js',"module.exports={fingerprint:process.argv[2]};");write(root,'repair.js',"try{work()}catch(error){if(error.message==='table does not exist')client.query('SELECT repair()')}");const inspected=inspectReachable(root,['entry.js']);for(const category of ['unapproved file read','direct ledger mutation','fabricated schema evidence','schema repair fallback'])assert.ok(inspected.findings.some(value=>value.includes(category)),category);});
+
+test('operation allowlist authorizes only its exact operation',()=>{const file=path.resolve('partially-allowlisted.js'),rules=new Map([[file.replace(/\\/g,'/'),new Map([['administrative-ddl','fixture database setup']])]]),findings=violations(file,"client.query('CREATE TABLE allowed(id int)');client.query('DELETE FROM c4g_system.schema_migration')",rules);assert.equal(findings.some(value=>value.includes('functional DDL')),false);assert.equal(findings.some(value=>value.includes('direct ledger mutation')),true);});

@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "reviewScope": "INDEPENDENT_METHODOLOGY_POPULATION_NUMERICAL_AND_INTERPRETATION_REVIEW",
+  "startedAt": "2026-10-31T19:41:17.422Z",
+  "finishedAt": "2026-10-31T19:41:18.030Z",
+  "blockingFindings": 0,
+  "findings": [],
+  "resolvedClarifications": [
+    {
+      "topic": "Historical SQL proofs",
+      "resolution": "Main review now explicitly says previous parity and post-lock evidence hashes were rechecked; SQL proofs were not rerun in this increment."
+    }
+  ],
+  "inputs": [
+    {
+      "path": "context/features/central-snapshot-lease-timeout-repeat.md",
+      "sha256": "6801fc1982b52baa08da3a8156a4dba2846bead1ab9be058953eedd9f4c5be7f",
+      "bytes": 3701
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat.md",
+      "sha256": "56c55e0526e1071373fa70f7708259fd29c0d27ac52ba40dd17133c59f0dccfb",
+      "bytes": 10508
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/preflight-inputs.json",
+      "sha256": "db7448369484c1669f73a2267156da129c3a53ea6525e2309a4003cbb946f613",
+      "bytes": 8673
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/final-verification.json",
+      "sha256": "2ee03d70d7f3fbafce78b0e26f09b9a47cb9eb3b70303384ca1d44de69080544",
+      "bytes": 21617
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/lease-timeout.test.cjs",
+      "sha256": "17344dcb11440dafb4f1af960db9604d8f22a651e430013fcc017f7c2e49eeb3",
+      "bytes": 12696
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/deterministic-result.json",
+      "sha256": "df6395d4195b46cbc89b59568bf6700cb79e2405d7bcffdfda880c6fca196fb3",
+      "bytes": 20640
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/timeline.json",
+      "sha256": "f5423a74891b09a22c118b2f9324bcb810d3999608d37130506d6eafeca9fcca",
+      "bytes": 13072
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/timeline-corrected.json",
+      "sha256": "8861db3576be14d81c05f65f55ab391ece2c3a6537a5ffd6b770cf7a7236dda9",
+      "bytes": 14647
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/parallel-work-evidence.json",
+      "sha256": "d1885ddd71c0329ba2e953239371b71840379104ed4c505ebc1b9b6ddb91abdc",
+      "bytes": 8147
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/parallel-work-evidence.md",
+      "sha256": "e093c6286d266035ed5f43d437c2314a70996a3e85fea65a07c9b355e369eda8",
+      "bytes": 5622
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/derived-costs-repeat.json",
+      "sha256": "a67715f96be2053ba1bc8dd94dec71f9a2517e9e86bd1e4007c287c554546c08",
+      "bytes": 31867
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/analysis-c6708a3d5649467fb9acebdcd0d67f9f/analyze.cjs",
+      "sha256": "5cc3973d8be7fc800e93b1038233d19a03b7c37b81771a7b2dd0c9a1f0fbf137",
+      "bytes": 73386
+    },
+    {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/analysis-c6708a3d5649467fb9acebdcd0d67f9f/summary.json",
+      "sha256": "546f20bef1348797c7659cafeb8ea24e48f93346f1a1492e0061c1e1235e0443",
+      "bytes": 5034981
+    }
+  ],
+  "rawReport": {
+    "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/d985b1ab15814078b80f3a67d72b113a/report.json",
+    "sha256": "94d82ea4c78835400aa85916ddb9e1f81ab6fe95fbdcac09efa65b0c95dce9b6",
+    "bytes": 322283112,
+    "runId": "d985b1ab15814078b80f3a67d72b113a",
+    "startedAt": "2026-10-31T19:02:50.920Z",
+    "finishedAt": "2026-10-31T19:36:49.321Z",
+    "recordedStatus": "PASS",
+    "mode": "measure-http",
+    "hashIndependentlyRechecked": true
+  },
+  "method": {
+    "readOnlyReview": true,
+    "runtimeEdits": false,
+    "infrastructureExecuted": false,
+    "testsOrSuitesExecuted": false,
+    "fullSourceDependencyAndDockerVerificationDelegatedTo": {
+      "path": "context/reviews/central-snapshot-lease-timeout-repeat/final-verification.json",
+      "sha256": "2ee03d70d7f3fbafce78b0e26f09b9a47cb9eb3b70303384ca1d44de69080544",
+      "bytes": 21617
+    },
+    "independentChecks": [
+      "Raw parent identity, all8 stage outcomes and every measured/warmup status.",
+      "All4 complete A/B pairs in all6 scenarios; no filtering or exclusions.",
+      "Independent nearest-rank p50/p95 and maxima from raw attempts; counts,24 paired effects and every formatted latency-table value match summary/review.",
+      "Frozen analyzer hash matches preflight;4-argument mode has no continuation exclusion.",
+      "Deterministic result binds current external test; corrected timeline changes only4 documented source-line references.",
+      "Referenced final source/resource verification reviewed without repeating its source/dependency/Docker sweep."
+    ]
+  },
+  "population": {
+    "measured": 288,
+    "warmups": 56,
+    "measured200": 288,
+    "warmups200": 56,
+    "readinessControls": 136,
+    "stageOrder": [
+      "A",
+      "B",
+      "B",
+      "A",
+      "A",
+      "B",
+      "B",
+      "A"
+    ],
+    "scenarioCount": 6,
+    "pairsPerScenario": 4,
+    "matchedMeasured": 288,
+    "unpairedMeasured": 0,
+    "excludedPairs": [],
+    "analysisIssues": 0
+  },
+  "comparisons": [
+    {
+      "scenario": "report-c1",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 16,
+          "p50": 3917.711599999995,
+          "p95": 4016.934599999993,
+          "maximum": 4016.934599999993
+        },
+        "B": {
+          "n": 16,
+          "p50": 3468.0334000000003,
+          "p95": 3557.5244000000093,
+          "maximum": 3557.5244000000093
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -11.478083276982288
+    },
+    {
+      "scenario": "report-c2",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 16,
+          "p50": 4203.895799999998,
+          "p95": 4744.409499999994,
+          "maximum": 4744.409499999994
+        },
+        "B": {
+          "n": 16,
+          "p50": 3629.9973000000027,
+          "p95": 4188.318700000003,
+          "maximum": 4188.318700000003
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -13.651587177779145
+    },
+    {
+      "scenario": "report-c4",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 32,
+          "p50": 4904.921799999996,
+          "p95": 6683.683900000004,
+          "maximum": 6754.9533999999985
+        },
+        "B": {
+          "n": 32,
+          "p50": 4079.6493000000046,
+          "p95": 5820.535600000003,
+          "maximum": 6140.821100000001
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -16.82539566685839
+    },
+    {
+      "scenario": "dashboard-c1",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 16,
+          "p50": 9564.488899999997,
+          "p95": 9706.255600000004,
+          "maximum": 9706.255600000004
+        },
+        "B": {
+          "n": 16,
+          "p50": 8153.1222000000125,
+          "p95": 8335.4283,
+          "maximum": 8335.4283
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -14.756321166309105
+    },
+    {
+      "scenario": "dashboard-c4",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 32,
+          "p50": 10718.929800000013,
+          "p95": 12642.4614,
+          "maximum": 12975.620200000005
+        },
+        "B": {
+          "n": 32,
+          "p50": 9619.318,
+          "p95": 11429.350600000005,
+          "maximum": 11575.165600000008
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -10.258596898358373
+    },
+    {
+      "scenario": "dashboard-c4-two-tenants",
+      "pairs": 4,
+      "arms": {
+        "A": {
+          "n": 32,
+          "p50": 10881.28899999999,
+          "p95": 11974.74980000002,
+          "maximum": 12012.665700000012
+        },
+        "B": {
+          "n": 32,
+          "p50": 9579.369600000005,
+          "p95": 10333.555000000022,
+          "maximum": 10346.666200000007
+        }
+      },
+      "p50PairsBFaster": 4,
+      "p95PairsBFaster": 4,
+      "pooledP50ChangePercent": -11.964753440515963
+    }
+  ],
+  "diagnosis": {
+    "conclusion": "HIGH_CONFIDENCE_RECONSTRUCTION_OF_OPERATION_TIMEOUT_DURING_POST_COMMIT_AUTHORITY_COMPLETION",
+    "literalTimerObservationInOriginalTrace": false,
+    "deterministicProofUsesActualFrozenExecutor": true,
+    "authorityAndSqlDependenciesControlledDoubles": true,
+    "postCommitRollbackOrCancellationClaimed": false,
+    "lateAuthorityCompletionPreserved": true,
+    "hostCauseProven": false
+  },
+  "history": {
+    "previousHttpStatus": "FAIL",
+    "previousContinuationStatus": "FAIL",
+    "historicalRawHashesUnchanged": true,
+    "metadataReusedWithoutReclassification": true,
+    "metadataParallel044OverlapExplicit": true,
+    "newSuccessDoesNotEraseHistoricalFailure": true
+  },
+  "authority": {
+    "checkpointCombinationsVerified": 12,
+    "reducedChecksClaimed": false,
+    "originalReadinessAndPostLockProofsRetained": true,
+    "originalSqlProofsRerun": false,
+    "noRuntimeOrLimitChanges": true
+  },
+  "closure": {
+    "sourceVerificationRef": "context/reviews/central-snapshot-lease-timeout-repeat/final-verification.json",
+    "ownedContainersAbsent": 16,
+    "childExitsVerified": 8,
+    "forcedTerminations": 0,
+    "newDescriptorIntentionallyCreatedAfterThisReview": true
+  },
+  "limitations": [
+    "Review verifies interpretation and observed populations, not production capacity, C6, host exclusivity or an infrequent-failure rate.",
+    "Driver and inclusive authority/SQL spans overlap and include waits/transport; PostgreSQL CPU attribution is not established.",
+    "Nearest-rank p95 with4/8 attempts per scenario-arm-pair equals the maximum; pooled16/32 populations are labelled separately.",
+    "Original timer firing was not instrumented; localization remains a reconstruction with documented clock assumptions.",
+    "Deterministic doubles establish executor control flow, not real SQL authority, transaction durability, cancellation or performance.",
+    "Original M overlapped parallel044 work; new H PASS does not remove this historical limitation.",
+    "A successful registered repeat does not establish permanent resolution of the historical distributed slowdown."
+  ]
+}

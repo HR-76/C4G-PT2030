@@ -1,0 +1,62 @@
+﻿{
+    "at":  "2026-10-27T22:16:15.266Z",
+    "status":  "PASS",
+    "baselineFiles":  2889,
+    "unchanged":  2882,
+    "changed":  [
+                    "context/features/http-flows-performance.md",
+                    "test/integration/c6-dedicated/README.md",
+                    "test/integration/c6-dedicated/run.ps1",
+                    "test/integration/c6-dedicated/slo.js",
+                    "test/integration/c6-dedicated/slo.test.js",
+                    "test/integration/http-contention/README.md",
+                    "context/current-work.md"
+                ],
+    "missing":  [
+
+                ],
+    "protectedPrefixes":  {
+                              "backend/src/":  {
+                                                   "files":  466,
+                                                   "changed":  [
+
+                                                               ]
+                                               },
+                              "backend/database/":  {
+                                                        "files":  136,
+                                                        "changed":  [
+
+                                                                    ]
+                                                    },
+                              "frontend/":  {
+                                                "files":  179,
+                                                "changed":  [
+
+                                                            ]
+                                            },
+                              "context/reviews/c6-dedicated-slo/":  {
+                                                                        "files":  16,
+                                                                        "changed":  [
+
+                                                                                    ]
+                                                                    },
+                              "context/reviews/c6-dedicated-slo-repeat/":  {
+                                                                               "files":  11,
+                                                                               "changed":  [
+
+                                                                                           ]
+                                                                           }
+                          },
+    "sourceHashes":  {
+                         "test/integration/c6-dedicated/gate.js":  "e2e19a458e06964beabe2e7c6a5cf9affe6a7de37f3fcf638ae4b68d8400b0af",
+                         "test/integration/c6-dedicated/gate.test.js":  "8bf276bba8c20f87e00942cd73cc38788adae36dd0830d05a19795762ce9121f",
+                         "test/integration/c6-dedicated/policy.json":  "a6188d931d406e54258bc01c0b06b208dc407708c1081e43a2ee1ae96e4e40ec",
+                         "test/integration/c6-dedicated/slo.js":  "04eff98eed8fe83ccfd556bb47047d8adee54c08239b2edf667870ba738eaa7b",
+                         "test/integration/c6-dedicated/slo.test.js":  "f3c25e1cd6a8e561868467111d082ec2b14a30dec5a15209096d3a1a8b01a0b4",
+                         "test/integration/c6-dedicated/run.ps1":  "31a6d92cfad9d0e4ed27f42a01f9f44caf54d6dedc594d6565d0ea56ad0609be"
+                     },
+    "limits":  "Recorded-file hash comparison, not atomic filesystem or Dev data snapshot. No Docker, SQL or runtime operations in this increment.",
+    "head":  "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "branch":  "feat/f13-organizational-profile",
+    "gitIdentityPreserved":  true
+}

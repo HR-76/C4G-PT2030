@@ -1,0 +1,11 @@
+.eu-legacy-review .directory-heading p { margin: .5rem 0 0; color: var(--text-secondary, var(--color-text-secondary)); }
+.eu-legacy-package { display: flex; align-items: end; flex-wrap: wrap; gap: .75rem; margin: 1.25rem 0; }
+.eu-legacy-package label { width: 100%; font-weight: 600; }
+.eu-legacy-package input { min-width: min(28rem, 100%); padding: .65rem .75rem; border: 1px solid var(--color-text-muted); border-radius: .4rem; font: inherit; }
+.eu-legacy-summary { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.25rem 0; }
+.eu-legacy-summary div { min-width: 10rem; padding: 1rem; border: 1px solid var(--color-border); border-radius: .6rem; background: var(--color-background); }
+.eu-legacy-summary strong { display: block; font-size: 1.5rem; }
+.eu-legacy-summary span { color: var(--color-text-secondary); }
+.eu-legacy-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.25rem 0; }
+.eu-legacy-table { min-width: 58rem; }
+.eu-legacy-table td { vertical-align: top; }

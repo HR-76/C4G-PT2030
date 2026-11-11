@@ -1,0 +1,13 @@
+.import-page .upload-zone > svg { display: block; margin: 0 auto 12px; }
+.import-page .upload-zone input { max-width: 100%; }
+.import-page .data-table { table-layout: auto; }
+.import-page .data-table td { white-space: normal; overflow: visible; text-overflow: clip; }
+.import-page .data-table td small { overflow-wrap: anywhere; }
+.import-page .data-table td:last-child .btn { margin: 3px 0; }
+.import-page .import-preview h4 { margin-top: 16px; }
+.import-page .import-preview > p { margin: 12px 0; }
+.import-page .form-group { max-width: 600px; }
+@media (max-width: 768px) {
+  .import-page .data-table { min-width: 780px; }
+  .import-page .upload-zone { padding: 24px 16px; }
+}

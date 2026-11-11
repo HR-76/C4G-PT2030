@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "status": "REVIEW_ISOLATED_EXECUTOR_READY",
+  "preparedAt": "2026-10-31T01:48:01.430Z",
+  "source": "EU_FUNDING_TENDERS",
+  "externalIdentifier": "CASCADE:11145",
+  "packageId": "opportunity-v2-activation-11145",
+  "packageDigest": "4f83267f1c2d3f41c604453f3489136397f661fbc06a99de8b79ed2980674e7a",
+  "centralTarget": "042_opportunity_eu_source_control_v2",
+  "tenantTarget": "034_application_snapshot_v2",
+  "centralFingerprint": "0cb6ef8f6e00cc8e9209864addab966c9772a9bb5d886b0165d49a67e1d21e82",
+  "tenantFingerprint": "731d37b0fbe3a2af7484710d8bbc4a1f3bd0f4687f42b1b8e0c14602346a63e3",
+  "defaults": {
+    "OPPORTUNITY_ACTIVATION_RUNTIME": "disabled",
+    "OPPORTUNITY_11145_EXECUTOR": "disabled"
+  },
+  "selection": {
+    "OPPORTUNITY_ACTIVATION_RUNTIME": "authenticated-v2",
+    "OPPORTUNITY_11145_EXECUTOR": "bounded-v2"
+  },
+  "proof": {
+    "path": "output/opportunity-v2-executor-b361612540164c0d99a01443ca5e43d9/verification.json",
+    "sha256": "805c62dafe5540b86b022143725449c1b9ef6279920265af58f9b22169188cba",
+    "inputHashes": 710
+  },
+  "registeredProof": {
+    "path": "output/opportunity-v2-registered-d9112c867d53462989c3ed4584e5313d/verification.json",
+    "sha256": "16dcbeddb3b44d651f0a1810345544ac090bf8e8a6770521e0b51f202ae07268",
+    "inputHashes": 397
+  },
+  "publicObservation": {
+    "endpoint": "https://api.tech.ec.europa.eu/search-api/prod/rest/search",
+    "externalIdentifier": "CASCADE:11145",
+    "capturedAt": "2026-10-31T01:46:01.052Z",
+    "status": 200,
+    "bytes": 20580,
+    "sha256": "8ccc4d934e74af49d5fc5cee416fedac1d81be0e36d803582df34378d234cd75",
+    "file": "eu-11145-response-01.json",
+    "contentType": "application/json",
+    "etag": null,
+    "lastModified": null,
+    "queryDigest": "3aceb3c15c904df7002b176840ce7efe6de0927cf361434ce81da003f6c8aa85"
+  },
+  "contentDigest": "355df5dc59a25556d9103fa276921d7e43d66a1087630481b0c4867460a96ce6",
+  "summary": "output/opportunity-v2-executor-11145/validation-summary.json",
+  "report": "context/reviews/opportunity-data-standardization/executor-11145.md",
+  "runbook": "context/references/opportunity-v2/executor-11145-runbook.md",
+  "habitual": {
+    "accessedByThisIncrement": false,
+    "activated": false,
+    "approved": false,
+    "previousWindowHistorical": true,
+    "refreshPreviewAndBackupRequired": true
+  },
+  "limitations": [
+    "Synthetic identities, signed sessions and legacy v1 history; public EU11145 collection is live.",
+    "No OIDC provider login, real-person approval or habitual activation is certified.",
+    "No backup/restore or production migration is executed by this gate."
+  ]
+}

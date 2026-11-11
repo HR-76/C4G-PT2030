@@ -1,0 +1,1536 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILURE_DIAGNOSED_NOT_BENCHMARK_PASS",
+  "createdAt": "2026-10-31T18:19:12.244Z",
+  "inputs": [
+    {
+      "index": 0,
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/bfd7495e00394b85821c568571e26908/stage-0-043-A.json",
+      "sha256": "ae8a96e744f3936a0277f196cf5d0cce063a2c03aeef0b60bfeff308b7fe45a9",
+      "status": "PASS",
+      "arm": "A",
+      "sourceSetDigest": "58f2f8910abee80fff671cb40fc509b8ace7979736b150adb89158ae86bd9c18"
+    },
+    {
+      "index": 3,
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/bfd7495e00394b85821c568571e26908/stage-3-043-A.json",
+      "sha256": "7aba87ee2abe5a5d37f55ace92140101f3186acb60b7020b0f4f02c681731fa2",
+      "status": "PASS",
+      "arm": "A",
+      "sourceSetDigest": "58f2f8910abee80fff671cb40fc509b8ace7979736b150adb89158ae86bd9c18"
+    },
+    {
+      "index": 4,
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/bfd7495e00394b85821c568571e26908/stage-4-043-A.json",
+      "sha256": "cab6e68827bcad1fe3752741f326e90e65a277953d6312b5072e9d60e3cd7864",
+      "status": "FAIL",
+      "arm": "A",
+      "sourceSetDigest": "58f2f8910abee80fff671cb40fc509b8ace7979736b150adb89158ae86bd9c18"
+    }
+  ],
+  "sourceSetDigest": "58f2f8910abee80fff671cb40fc509b8ace7979736b150adb89158ae86bd9c18",
+  "manifestSha256": "252c80d48081fe9768d02e9d393060b89d1e32864b62943903aae9bcb9691278",
+  "stage": 4,
+  "arm": "A",
+  "failureContext": {
+    "reportStatus": "FAIL",
+    "httpStatus": "FAIL",
+    "kind": "WARMUP",
+    "scenario": "dashboard-c4-two-tenants",
+    "tenant": 0,
+    "status": 503,
+    "internalCode": "LEASE_TIMEOUT",
+    "publicCode": "SERVICE_UNAVAILABLE",
+    "phaseConcurrency": "ONE_SEQUENTIAL_WARMUP_REQUEST; the concurrency4 measured scenario had not started",
+    "priorMeasuredAttemptsInStage": 28,
+    "priorMeasuredSuccessesInStage": 28,
+    "failedScenarioMeasuredAttempts": 0,
+    "completedMeasuredAttemptsBeforeStage": 144,
+    "totalMeasuredAttemptsBeforeFailure": 172,
+    "cleanup": true,
+    "sourceIntegrityAfter": "PASS",
+    "previousScenario": {
+      "id": "dashboard-c4",
+      "replica": 4,
+      "status": "PASS",
+      "attempts": 8,
+      "controlBudgetMs": 180000,
+      "controlElapsedMs": 23802.522599999997,
+      "successes": 8,
+      "errors": 0,
+      "timeouts": 0,
+      "http503": 0,
+      "p50Ms": 10914.786900000006,
+      "p95Ms": 13035.718099999998,
+      "maximumMs": 13035.718099999998,
+      "allAttemptP50Ms": 10914.786900000006,
+      "allAttemptP95Ms": 13035.718099999998,
+      "drainMs": 0.1982000000134576
+    }
+  },
+  "failedRequest": {
+    "scenario": "dashboard-c4-two-tenants",
+    "tenant": 0,
+    "status": 503,
+    "code": "SERVICE_UNAVAILABLE",
+    "httpMs": 20479.233600000007,
+    "serverResponseMs": 20474.4559,
+    "queryCount": 2005,
+    "transactionCount": 82,
+    "sql": {
+      "unionMs": 19726.50539999982,
+      "betweenUnionGapsMs": {
+        "n": 1929,
+        "p50": 0.014699999999720603,
+        "p95": 1.2748999999894295,
+        "maximum": 58.24199999999837
+      }
+    },
+    "metadataUnionMs": 16702.182399999932,
+    "sqlUnionFraction": 0.9632443178928245,
+    "metadataUnionFraction": 0.8155667700377189,
+    "centralQueryMs": {
+      "n": 39,
+      "p50": 57.48020000001998,
+      "p95": 672.1509000000078,
+      "maximum": 1442.5809000000008
+    },
+    "authoritySecurityQueryMs": {
+      "n": 78,
+      "p50": 21.281400000007125,
+      "p95": 101.47879999998258,
+      "maximum": 404.43799999999464
+    },
+    "tenantCheckouts": [
+      {
+        "startMs": 725.3689000000013,
+        "waitMs": 0.02549999998882413,
+        "holdMs": 4463.183100000024
+      },
+      {
+        "startMs": 7506.295799999993,
+        "waitMs": 0.03169999999227002,
+        "holdMs": 12703.563999999984
+      }
+    ],
+    "admissionMs": [
+      0.46000000002095476,
+      0.5581999999994878
+    ],
+    "activeMaximum": 1,
+    "queuedMaximum": 0,
+    "pendingQueries": 0,
+    "afterResponseQueries": 0,
+    "failures": [
+      {
+        "code": "LEASE_TIMEOUT"
+      }
+    ],
+    "sqlErrors": []
+  },
+  "topQueryIntervals": [
+    {
+      "startMs": 16969.162499999977,
+      "endMs": 18411.743399999978,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1743,
+      "durationMs": 1442.5809000000008
+    },
+    {
+      "startMs": 15915.247999999992,
+      "endMs": 16587.3989,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1710,
+      "durationMs": 672.1509000000078
+    },
+    {
+      "startMs": 12839.931799999991,
+      "endMs": 13424.463099999994,
+      "role": "tenant",
+      "category": "metadata",
+      "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+      "afterResponse": false,
+      "index": 1545,
+      "durationMs": 584.5313000000024
+    },
+    {
+      "startMs": 9429.597799999989,
+      "endMs": 9900.974699999992,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "ad488789c5b185d7d7648601d0f2a65c57d6a3adf0b85e52c33c9c4b7b3abfd7",
+      "afterResponse": false,
+      "index": 1422,
+      "durationMs": 471.37690000000293
+    },
+    {
+      "startMs": 18411.9056,
+      "endMs": 18816.343599999993,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+      "afterResponse": false,
+      "index": 1744,
+      "durationMs": 404.43799999999464
+    },
+    {
+      "startMs": 12028.306699999986,
+      "endMs": 12321.804799999984,
+      "role": "tenant",
+      "category": "metadata",
+      "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+      "afterResponse": false,
+      "index": 1511,
+      "durationMs": 293.49809999999707
+    },
+    {
+      "startMs": 8075.099199999997,
+      "endMs": 8314.247199999983,
+      "role": "tenant",
+      "category": "metadata",
+      "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+      "afterResponse": false,
+      "index": 1347,
+      "durationMs": 239.1479999999865
+    },
+    {
+      "startMs": 7646.497799999983,
+      "endMs": 7879.188899999979,
+      "role": "tenant",
+      "category": "metadata",
+      "hash": "abe918a6442bb2359a29f0681a725176118fa6ec88984852d3f30f11a9dafda7",
+      "afterResponse": false,
+      "index": 1313,
+      "durationMs": 232.69109999999637
+    },
+    {
+      "startMs": 10272.712899999984,
+      "endMs": 10484.408199999976,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1443,
+      "durationMs": 211.69529999999213
+    },
+    {
+      "startMs": 4750.724699999992,
+      "endMs": 4951.220899999986,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1132,
+      "durationMs": 200.49619999999413
+    },
+    {
+      "startMs": 14862.001799999998,
+      "endMs": 15041.4038,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1657,
+      "durationMs": 179.40200000000186
+    },
+    {
+      "startMs": 8940.343999999983,
+      "endMs": 9115.141899999988,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "737dff03533086ed8a87c0a83c9557bcec6b6d92ade7a1a0b82e5c426d51bd1a",
+      "afterResponse": false,
+      "index": 1410,
+      "durationMs": 174.79790000000503
+    }
+  ],
+  "topInclusiveSpans": [
+    {
+      "name": "assertAuthorityAdmission",
+      "startMs": 16913.769899999985,
+      "endMs": 19001.15299999999,
+      "index": 107,
+      "durationMs": 2087.3831000000064
+    },
+    {
+      "name": "assertCentralSchema",
+      "startMs": 16969.146899999992,
+      "endMs": 18990.8131,
+      "index": 108,
+      "durationMs": 2021.666200000007
+    },
+    {
+      "name": "observeTenantRuntimeMetadata",
+      "startMs": 12028.294199999975,
+      "endMs": 13897.224199999997,
+      "index": 97,
+      "durationMs": 1868.9300000000221
+    },
+    {
+      "name": "observeTenantRuntimeMetadata",
+      "startMs": 7646.4836999999825,
+      "endMs": 8863.846299999976,
+      "index": 87,
+      "durationMs": 1217.362599999993
+    },
+    {
+      "name": "assertAuthorityAdmission",
+      "startMs": 8870.460099999997,
+      "endMs": 10002.794699999999,
+      "index": 88,
+      "durationMs": 1132.334600000002
+    },
+    {
+      "name": "assertCentralSchema",
+      "startMs": 8940.325899999996,
+      "endMs": 10000.25529999999,
+      "index": 89,
+      "durationMs": 1059.9293999999936
+    },
+    {
+      "name": "assertAuthorityAdmission",
+      "startMs": 10209.036999999982,
+      "endMs": 11202.499899999995,
+      "index": 91,
+      "durationMs": 993.4629000000132
+    },
+    {
+      "name": "assertAuthorityAdmission",
+      "startMs": 15864.209799999982,
+      "endMs": 16811.171399999992,
+      "index": 104,
+      "durationMs": 946.9616000000096
+    },
+    {
+      "name": "assertCentralSchema",
+      "startMs": 10272.698199999984,
+      "endMs": 11183.376099999994,
+      "index": 92,
+      "durationMs": 910.6779000000097
+    },
+    {
+      "name": "assertCentralSchema",
+      "startMs": 15915.232699999993,
+      "endMs": 16796.50389999998,
+      "index": 105,
+      "durationMs": 881.2711999999883
+    }
+  ],
+  "lastQueryIntervals": [
+    {
+      "startMs": 20430.439599999983,
+      "endMs": 20457.284199999995,
+      "role": "authority",
+      "category": "metadata",
+      "hash": "d865a98c5b469f9ca6588b7cd6491f64edb76c9942fa3fa61d6b0af8d044cd61",
+      "afterResponse": false,
+      "index": 2000,
+      "durationMs": 26.84460000001127
+    },
+    {
+      "startMs": 20457.949399999983,
+      "endMs": 20464.017299999978,
+      "role": "authority",
+      "category": "other",
+      "hash": "6ffec628935eba85643404d06e1fed77cd1bd335a7ad0fb995d927366fba4bdd",
+      "afterResponse": false,
+      "index": 2001,
+      "durationMs": 6.067899999994552
+    },
+    {
+      "startMs": 20464.097999999998,
+      "endMs": 20468.872899999988,
+      "role": "authority",
+      "category": "other",
+      "hash": "6ffec628935eba85643404d06e1fed77cd1bd335a7ad0fb995d927366fba4bdd",
+      "afterResponse": false,
+      "index": 2002,
+      "durationMs": 4.7748999999894295
+    },
+    {
+      "startMs": 20469.015199999994,
+      "endMs": 20472.066299999977,
+      "role": "authority",
+      "category": "other",
+      "hash": "6ffec628935eba85643404d06e1fed77cd1bd335a7ad0fb995d927366fba4bdd",
+      "afterResponse": false,
+      "index": 2003,
+      "durationMs": 3.051099999982398
+    },
+    {
+      "startMs": 20472.08839999998,
+      "endMs": 20473.712099999975,
+      "role": "authority",
+      "category": "transaction",
+      "hash": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "afterResponse": false,
+      "index": 2004,
+      "durationMs": 1.623699999996461
+    }
+  ],
+  "comparisons": [
+    {
+      "index": 0,
+      "status": "PASS",
+      "dashboardWarmups": [
+        {
+          "scenario": "dashboard-c1",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9944.647199999978,
+          "serverResponseMs": 9940.111899999989,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 9042.253699999826,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.00969999999506399,
+              "p95": 1.1355000000039581,
+              "maximum": 27.818499999993946
+            }
+          },
+          "metadataUnionMs": 8098.281399999629,
+          "sqlUnionFraction": 0.909258369668443,
+          "metadataUnionFraction": 0.8143357162031497,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 46.85659999999916,
+            "p95": 57.59309999999823,
+            "maximum": 66.20309999998426
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.95930000001681,
+            "p95": 28.299599999998463,
+            "maximum": 31.751499999983935
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 750.838699999993,
+              "waitMs": 0.04290000000037253,
+              "holdMs": 3354.517200000002
+            },
+            {
+              "startMs": 4612.268199999991,
+              "waitMs": 0.037699999986216426,
+              "holdMs": 2165.2272999999986
+            },
+            {
+              "startMs": 7274.29879999999,
+              "waitMs": 0.02950000000419095,
+              "holdMs": 2528.7624999999825
+            }
+          ],
+          "admissionMs": [
+            0.5957999999809545,
+            0.4831000000122003,
+            0.3855000000039581
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9682.934399999998,
+          "serverResponseMs": 9676.814000000013,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8683.513400000142,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.008999999990919605,
+              "p95": 1.53870000000461,
+              "maximum": 41.88269999998738
+            }
+          },
+          "metadataUnionMs": 7794.44299999997,
+          "sqlUnionFraction": 0.8967853174756759,
+          "metadataUnionFraction": 0.8049670356126725,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 46.516499999997905,
+            "p95": 53.90790000002016,
+            "maximum": 62.71359999998822
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.690999999991618,
+            "p95": 26.997100000007777,
+            "maximum": 29.88080000001355
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 766.472299999994,
+              "waitMs": 0.055500000016763806,
+              "holdMs": 3320.0028000000166
+            },
+            {
+              "startMs": 4617.95259999999,
+              "waitMs": 0.037899999995715916,
+              "holdMs": 2229.7958999999973
+            },
+            {
+              "startMs": 7271.164799999999,
+              "waitMs": 0.028599999990547076,
+              "holdMs": 2275.3509000000195
+            }
+          ],
+          "admissionMs": [
+            1.1167999999888707,
+            0.5001999999803957,
+            0.4790999999968335
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4-two-tenants",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9076.705400000006,
+          "serverResponseMs": 9072.795899999997,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8063.459000000672,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.007699999987380579,
+              "p95": 1.6152999999758322,
+              "maximum": 54.25400000001537
+            }
+          },
+          "metadataUnionMs": 7211.781700000458,
+          "sqlUnionFraction": 0.8883684822469469,
+          "metadataUnionFraction": 0.7945373769650442,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 45.47349999999278,
+            "p95": 50.616399999998976,
+            "maximum": 66.86900000000605
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 19.002999999996973,
+            "p95": 21.425800000026356,
+            "maximum": 24.037100000015926
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 730.0626000000047,
+              "waitMs": 0.0333999999857042,
+              "holdMs": 2995.8661999999895
+            },
+            {
+              "startMs": 4224.154899999994,
+              "waitMs": 0.01820000002044253,
+              "holdMs": 2144.2415000000037
+            },
+            {
+              "startMs": 6764.023699999991,
+              "waitMs": 0.016500000027008355,
+              "holdMs": 2181.0768999999855
+            }
+          ],
+          "admissionMs": [
+            0.1879999999946449,
+            0.11569999999483116,
+            0.10279999999329448
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4-two-tenants",
+          "tenant": 1,
+          "status": 200,
+          "code": null,
+          "httpMs": 9070.664099999995,
+          "serverResponseMs": 9055.265500000009,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8094.279099999432,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.007599999982630834,
+              "p95": 1.1992999999783933,
+              "maximum": 42.75250000000233
+            }
+          },
+          "metadataUnionMs": 7242.615399999486,
+          "sqlUnionFraction": 0.8923579366145239,
+          "metadataUnionFraction": 0.7984658366965094,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 44.70889999999781,
+            "p95": 49.2048000000068,
+            "maximum": 65.60779999999795
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 18.847600000008242,
+            "p95": 21.11610000001383,
+            "maximum": 26.644799999980023
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 724.4373000000196,
+              "waitMs": 6.370599999994738,
+              "holdMs": 3127.8254000000015
+            },
+            {
+              "startMs": 4344.609300000011,
+              "waitMs": 0.05819999999948777,
+              "holdMs": 2026.252600000007
+            },
+            {
+              "startMs": 6745.745500000019,
+              "waitMs": 0.01799999998183921,
+              "holdMs": 2191.513099999982
+            }
+          ],
+          "admissionMs": [
+            6.85999999998603,
+            0.15129999999771826,
+            0.10339999999268912
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        }
+      ],
+      "mixedWarmupSampler": {
+        "phase": "dashboard-c4-two-tenants-warmup",
+        "samples": 173,
+        "firstAt": "2026-10-31T17:56:07.060Z",
+        "lastAt": "2026-10-31T17:56:25.080Z",
+        "elapsedMs": 18020,
+        "cpuMicroseconds": 3953000,
+        "nodeCpuFractionOneCore": 0.21936736958934516,
+        "observerMs": {
+          "n": 173,
+          "p50": 1.4326000000000931,
+          "p95": 2.590199999976903,
+          "maximum": 8.375599999999395
+        },
+        "sampleGapsMs": {
+          "n": 172,
+          "p50": 103,
+          "p95": 114,
+          "maximum": 132
+        },
+        "largestGaps": [
+          {
+            "at": "2026-10-31T17:56:12.017Z",
+            "gapMs": 132,
+            "observerMs": 2.423799999989569,
+            "cpuUserDeltaUs": 63000,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T17:56:12.867Z",
+            "gapMs": 125,
+            "observerMs": 2.672900000005029,
+            "cpuUserDeltaUs": 47000,
+            "cpuSystemDeltaUs": 16000
+          },
+          {
+            "at": "2026-10-31T17:56:14.534Z",
+            "gapMs": 123,
+            "observerMs": 1.8171999999904074,
+            "cpuUserDeltaUs": 15000,
+            "cpuSystemDeltaUs": 47000
+          },
+          {
+            "at": "2026-10-31T17:56:21.165Z",
+            "gapMs": 122,
+            "observerMs": 3.301800000015646,
+            "cpuUserDeltaUs": 31000,
+            "cpuSystemDeltaUs": 31000
+          },
+          {
+            "at": "2026-10-31T17:56:19.680Z",
+            "gapMs": 117,
+            "observerMs": 3.371499999979278,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T17:56:09.480Z",
+            "gapMs": 115,
+            "observerMs": 1.6441999999806285,
+            "cpuUserDeltaUs": 31000,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T17:56:15.597Z",
+            "gapMs": 115,
+            "observerMs": 1.753499999991618,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 16000
+          },
+          {
+            "at": "2026-10-31T17:56:20.097Z",
+            "gapMs": 115,
+            "observerMs": 1.6018000000040047,
+            "cpuUserDeltaUs": 16000,
+            "cpuSystemDeltaUs": 15000
+          }
+        ],
+        "activeMaximum": 1,
+        "queuedMaximum": 0,
+        "samplesWithBlockers": 1,
+        "rssPeakBytes": 573231104,
+        "heapPeakBytes": 347554952,
+        "stateWaitObservations": [
+          {
+            "stateWaitAndBlockerCount": [
+              "idle",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 1241
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "idle in transaction",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 126
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              null,
+              null,
+              0
+            ],
+            "observations": 106
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              "Lock",
+              "advisory",
+              1
+            ],
+            "observations": 1
+          }
+        ],
+        "samplerErrors": []
+      }
+    },
+    {
+      "index": 3,
+      "status": "PASS",
+      "dashboardWarmups": [
+        {
+          "scenario": "dashboard-c1",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9544.263699999981,
+          "serverResponseMs": 9539.2028,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8577.979200000089,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.008400000020628795,
+              "p95": 1.5996999999915715,
+              "maximum": 37.89639999999781
+            }
+          },
+          "metadataUnionMs": 7707.561499999923,
+          "sqlUnionFraction": 0.8987575647139868,
+          "metadataUnionFraction": 0.8075595710960856,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 44.24660000001313,
+            "p95": 48.205099999991944,
+            "maximum": 51.80019999999786
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 23.37550000002375,
+            "p95": 25.15119999999297,
+            "maximum": 25.792799999995623
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 764.2851999999839,
+              "waitMs": 0.07339999999385327,
+              "holdMs": 3140.145199999999
+            },
+            {
+              "startMs": 4436.026399999973,
+              "waitMs": 0.0794000000169035,
+              "holdMs": 2175.5775999999896
+            },
+            {
+              "startMs": 7080.715599999996,
+              "waitMs": 0.0420999999914784,
+              "holdMs": 2335.1559000000125
+            }
+          ],
+          "admissionMs": [
+            1.0640999999886844,
+            1.0009999999892898,
+            0.5016000000177883
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9608.70239999998,
+          "serverResponseMs": 9602.498599999992,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8555.625100000529,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.008600000001024455,
+              "p95": 1.9109999999927823,
+              "maximum": 39.176900000020396
+            }
+          },
+          "metadataUnionMs": 7670.034900000668,
+          "sqlUnionFraction": 0.8904037968748565,
+          "metadataUnionFraction": 0.7982383656715899,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 44.91599999999744,
+            "p95": 48.12260000000242,
+            "maximum": 54.42720000000554
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.605200000019977,
+            "p95": 24.397100000001956,
+            "maximum": 31.36460000000079
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 790.4801999999909,
+              "waitMs": 0.03990000000339933,
+              "holdMs": 3263.6918000000005
+            },
+            {
+              "startMs": 4582.214299999992,
+              "waitMs": 0.04490000000805594,
+              "holdMs": 2204.528500000015
+            },
+            {
+              "startMs": 7196.234899999981,
+              "waitMs": 0.027000000001862645,
+              "holdMs": 2276.397399999987
+            }
+          ],
+          "admissionMs": [
+            0.5054999999993015,
+            0.49699999997392297,
+            0.46059999999124557
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4-two-tenants",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9731.848099999974,
+          "serverResponseMs": 9727.117299999984,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8854.335499999608,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.0087000000057742,
+              "p95": 1.1834999999846332,
+              "maximum": 32.58389999999781
+            }
+          },
+          "metadataUnionMs": 7962.566299999686,
+          "sqlUnionFraction": 0.9098308367554188,
+          "metadataUnionFraction": 0.8181967307935794,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 46.68090000000666,
+            "p95": 61.73970000000554,
+            "maximum": 68.65150000000722
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.81789999999455,
+            "p95": 26.343499999988126,
+            "maximum": 34.544900000008056
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 767.2600000000093,
+              "waitMs": 0.024799999984679744,
+              "holdMs": 3219.407099999982
+            },
+            {
+              "startMs": 4597.95180000001,
+              "waitMs": 0.02609999998821877,
+              "holdMs": 2175.4665000000095
+            },
+            {
+              "startMs": 7192.816599999991,
+              "waitMs": 0.024800000013783574,
+              "holdMs": 2402.917699999991
+            }
+          ],
+          "admissionMs": [
+            0.15949999997974373,
+            0.21009999999660067,
+            0.15900000001420267
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4-two-tenants",
+          "tenant": 1,
+          "status": 200,
+          "code": null,
+          "httpMs": 9771.357199999999,
+          "serverResponseMs": 9757.863299999997,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8744.806200000516,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.008800000010523945,
+              "p95": 1.5051000000094064,
+              "maximum": 37.87980000002426
+            }
+          },
+          "metadataUnionMs": 7845.641400000284,
+          "sqlUnionFraction": 0.8949428437638649,
+          "metadataUnionFraction": 0.8029223821640954,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 46.0905999999959,
+            "p95": 48.56999999997788,
+            "maximum": 51.779200000019046
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.882800000021234,
+            "p95": 24.44200000001001,
+            "maximum": 29.347500000003492
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 787.0124000000069,
+              "waitMs": 9.235699999990175,
+              "holdMs": 3289.333499999979
+            },
+            {
+              "startMs": 4626.015400000004,
+              "waitMs": 0.06580000001122244,
+              "holdMs": 2246.872100000008
+            },
+            {
+              "startMs": 7291.241399999999,
+              "waitMs": 0.028800000000046566,
+              "holdMs": 2340.9597000000067
+            }
+          ],
+          "admissionMs": [
+            9.57949999999255,
+            0.19200000001001172,
+            0.1700999999884516
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        }
+      ],
+      "mixedWarmupSampler": {
+        "phase": "dashboard-c4-two-tenants-warmup",
+        "samples": 187,
+        "firstAt": "2026-10-31T18:08:42.104Z",
+        "lastAt": "2026-10-31T18:09:01.594Z",
+        "elapsedMs": 19490,
+        "cpuMicroseconds": 9062000,
+        "nodeCpuFractionOneCore": 0.4649563878912263,
+        "observerMs": {
+          "n": 187,
+          "p50": 1.5660999999963678,
+          "p95": 2.833600000012666,
+          "maximum": 4.199499999987893
+        },
+        "sampleGapsMs": {
+          "n": 186,
+          "p50": 104,
+          "p95": 115,
+          "maximum": 122
+        },
+        "largestGaps": [
+          {
+            "at": "2026-10-31T18:08:57.322Z",
+            "gapMs": 122,
+            "observerMs": 1.9596000000019558,
+            "cpuUserDeltaUs": 187000,
+            "cpuSystemDeltaUs": 16000
+          },
+          {
+            "at": "2026-10-31T18:08:46.869Z",
+            "gapMs": 121,
+            "observerMs": 2.0538999999989755,
+            "cpuUserDeltaUs": 32000,
+            "cpuSystemDeltaUs": 15000
+          },
+          {
+            "at": "2026-10-31T18:08:47.091Z",
+            "gapMs": 118,
+            "observerMs": 2.650099999998929,
+            "cpuUserDeltaUs": 62000,
+            "cpuSystemDeltaUs": 16000
+          },
+          {
+            "at": "2026-10-31T18:08:42.651Z",
+            "gapMs": 116,
+            "observerMs": 2.1475999999966007,
+            "cpuUserDeltaUs": 15000,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:08:45.282Z",
+            "gapMs": 116,
+            "observerMs": 2.294800000003306,
+            "cpuUserDeltaUs": 93000,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:08:46.748Z",
+            "gapMs": 116,
+            "observerMs": 1.7036000000080094,
+            "cpuUserDeltaUs": 78000,
+            "cpuSystemDeltaUs": 16000
+          },
+          {
+            "at": "2026-10-31T18:08:42.219Z",
+            "gapMs": 115,
+            "observerMs": 1.7302999999956228,
+            "cpuUserDeltaUs": 16000,
+            "cpuSystemDeltaUs": 15000
+          },
+          {
+            "at": "2026-10-31T18:08:43.282Z",
+            "gapMs": 115,
+            "observerMs": 3.6071999999985565,
+            "cpuUserDeltaUs": 125000,
+            "cpuSystemDeltaUs": 32000
+          }
+        ],
+        "activeMaximum": 1,
+        "queuedMaximum": 0,
+        "samplesWithBlockers": 1,
+        "rssPeakBytes": 415563776,
+        "heapPeakBytes": 176590328,
+        "stateWaitObservations": [
+          {
+            "stateWaitAndBlockerCount": [
+              "idle",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 1320
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              null,
+              null,
+              0
+            ],
+            "observations": 121
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "idle in transaction",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 126
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              "Lock",
+              "advisory",
+              1
+            ],
+            "observations": 1
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 1
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "idle in transaction",
+              null,
+              null,
+              0
+            ],
+            "observations": 2
+          }
+        ],
+        "samplerErrors": []
+      }
+    },
+    {
+      "index": 4,
+      "status": "FAIL",
+      "dashboardWarmups": [
+        {
+          "scenario": "dashboard-c1",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9660.786099999998,
+          "serverResponseMs": 9655.432499999995,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8669.28189999942,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.00890000001527369,
+              "p95": 1.8268000000098255,
+              "maximum": 31.882800000021234
+            }
+          },
+          "metadataUnionMs": 7772.794399999897,
+          "sqlUnionFraction": 0.8973681655159949,
+          "metadataUnionFraction": 0.8045716279754811,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 45.904000000009546,
+            "p95": 48.4892000000109,
+            "maximum": 50.03470000001835
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.69460000001709,
+            "p95": 24.540500000002794,
+            "maximum": 31.676199999987148
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 774.0701999999874,
+              "waitMs": 0.06640000001061708,
+              "holdMs": 3195.10070000001
+            },
+            {
+              "startMs": 4495.576099999977,
+              "waitMs": 0.07130000001052395,
+              "holdMs": 2232.5049999999756
+            },
+            {
+              "startMs": 7230.342600000004,
+              "waitMs": 0.04069999998318963,
+              "holdMs": 2291.2539999999863
+            }
+          ],
+          "admissionMs": [
+            1.0402000000176486,
+            1.092899999988731,
+            0.48260000001755543
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4",
+          "tenant": 0,
+          "status": 200,
+          "code": null,
+          "httpMs": 9558.574300000007,
+          "serverResponseMs": 9551.766999999993,
+          "queryCount": 2841,
+          "transactionCount": 113,
+          "sql": {
+            "unionMs": 8576.52280000021,
+            "betweenUnionGapsMs": {
+              "n": 2778,
+              "p50": 0.00829999998677522,
+              "p95": 1.5144999999902211,
+              "maximum": 35.34750000000349
+            }
+          },
+          "metadataUnionMs": 7703.679699999746,
+          "sqlUnionFraction": 0.8972596258419211,
+          "metadataUnionFraction": 0.8059444283442709,
+          "centralQueryMs": {
+            "n": 53,
+            "p50": 45.92320000001928,
+            "p95": 51.5567999999912,
+            "maximum": 59.803799999994226
+          },
+          "authoritySecurityQueryMs": {
+            "n": 106,
+            "p50": 22.3918999999878,
+            "p95": 25.374700000014855,
+            "maximum": 32.63310000000638
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 763.9413000000059,
+              "waitMs": 0.0326000000059139,
+              "holdMs": 3228.5185999999812
+            },
+            {
+              "startMs": 4527.352500000008,
+              "waitMs": 0.03459999998449348,
+              "holdMs": 2132.1760000000068
+            },
+            {
+              "startMs": 7088.275300000008,
+              "waitMs": 0.034099999989848584,
+              "holdMs": 2325.5626999999804
+            }
+          ],
+          "admissionMs": [
+            0.4539000000222586,
+            0.5455999999830965,
+            0.6915000000153668
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [],
+          "sqlErrors": []
+        },
+        {
+          "scenario": "dashboard-c4-two-tenants",
+          "tenant": 0,
+          "status": 503,
+          "code": "SERVICE_UNAVAILABLE",
+          "httpMs": 20479.233600000007,
+          "serverResponseMs": 20474.4559,
+          "queryCount": 2005,
+          "transactionCount": 82,
+          "sql": {
+            "unionMs": 19726.50539999982,
+            "betweenUnionGapsMs": {
+              "n": 1929,
+              "p50": 0.014699999999720603,
+              "p95": 1.2748999999894295,
+              "maximum": 58.24199999999837
+            }
+          },
+          "metadataUnionMs": 16702.182399999932,
+          "sqlUnionFraction": 0.9632443178928245,
+          "metadataUnionFraction": 0.8155667700377189,
+          "centralQueryMs": {
+            "n": 39,
+            "p50": 57.48020000001998,
+            "p95": 672.1509000000078,
+            "maximum": 1442.5809000000008
+          },
+          "authoritySecurityQueryMs": {
+            "n": 78,
+            "p50": 21.281400000007125,
+            "p95": 101.47879999998258,
+            "maximum": 404.43799999999464
+          },
+          "tenantCheckouts": [
+            {
+              "startMs": 725.3689000000013,
+              "waitMs": 0.02549999998882413,
+              "holdMs": 4463.183100000024
+            },
+            {
+              "startMs": 7506.295799999993,
+              "waitMs": 0.03169999999227002,
+              "holdMs": 12703.563999999984
+            }
+          ],
+          "admissionMs": [
+            0.46000000002095476,
+            0.5581999999994878
+          ],
+          "activeMaximum": 1,
+          "queuedMaximum": 0,
+          "pendingQueries": 0,
+          "afterResponseQueries": 0,
+          "failures": [
+            {
+              "code": "LEASE_TIMEOUT"
+            }
+          ],
+          "sqlErrors": []
+        }
+      ],
+      "mixedWarmupSampler": {
+        "phase": "dashboard-c4-two-tenants-warmup",
+        "samples": 174,
+        "firstAt": "2026-10-31T18:13:15.812Z",
+        "lastAt": "2026-10-31T18:13:36.473Z",
+        "elapsedMs": 20661,
+        "cpuMicroseconds": 3860000,
+        "nodeCpuFractionOneCore": 0.18682541987319104,
+        "observerMs": {
+          "n": 174,
+          "p50": 5.550300000002608,
+          "p95": 52.05869999999413,
+          "maximum": 515.1459999999788
+        },
+        "sampleGapsMs": {
+          "n": 173,
+          "p50": 105,
+          "p95": 161,
+          "maximum": 544
+        },
+        "largestGaps": [
+          {
+            "at": "2026-10-31T18:13:33.878Z",
+            "gapMs": 544,
+            "observerMs": 515.1459999999788,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:32.351Z",
+            "gapMs": 533,
+            "observerMs": 450.40380000000005,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:25.669Z",
+            "gapMs": 532,
+            "observerMs": 470.25400000001537,
+            "cpuUserDeltaUs": 16000,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:33.334Z",
+            "gapMs": 456,
+            "observerMs": 404.5222000000067,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:29.160Z",
+            "gapMs": 387,
+            "observerMs": 286.0879000000132,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:34.582Z",
+            "gapMs": 303,
+            "observerMs": 244.1689999999944,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:34.118Z",
+            "gapMs": 240,
+            "observerMs": 212.7494000000006,
+            "cpuUserDeltaUs": 0,
+            "cpuSystemDeltaUs": 0
+          },
+          {
+            "at": "2026-10-31T18:13:19.603Z",
+            "gapMs": 163,
+            "observerMs": 11.597000000008848,
+            "cpuUserDeltaUs": 32000,
+            "cpuSystemDeltaUs": 0
+          }
+        ],
+        "activeMaximum": 1,
+        "queuedMaximum": 0,
+        "samplesWithBlockers": 0,
+        "rssPeakBytes": 342880256,
+        "heapPeakBytes": 141947480,
+        "stateWaitObservations": [
+          {
+            "stateWaitAndBlockerCount": [
+              "idle",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 1101
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              null,
+              null,
+              0
+            ],
+            "observations": 98
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "active",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 3
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "idle in transaction",
+              "Client",
+              "ClientRead",
+              0
+            ],
+            "observations": 122
+          },
+          {
+            "stateWaitAndBlockerCount": [
+              "idle in transaction",
+              null,
+              null,
+              0
+            ],
+            "observations": 4
+          }
+        ],
+        "samplerErrors": []
+      }
+    }
+  ],
+  "codeRefs": [
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/config/opportunityRuntime.js",
+      "line": 52,
+      "meaning": "leaseTimeoutMs15000",
+      "sha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantPoolManager.js",
+      "line": 474,
+      "meaning": "allocation deadline is acquisition time plus leaseTimeoutMs",
+      "sha256": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantLeaseExecutor.js",
+      "line": 322,
+      "meaning": "operation uses min(allocation deadline, operation timeout); both expiry paths use LEASE_TIMEOUT",
+      "sha256": "d28e52aa9067c707cf9a8c93163178ee04fefeb4c75551743a8599aa4e2143b2"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/security/tenantResolver.js",
+      "line": 65,
+      "meaning": "preparation is bounded by allocation deadline",
+      "sha256": "b794d4eadaf4b586d791dab08a8973281f7f0a9e526eb26e377c25d9e3a3b845"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/applications/composition.js",
+      "line": 99,
+      "meaning": "application operation timeout10000",
+      "sha256": "2796dd3fe64ef4482c265f39886331cdd37a5d86c5d3038111aa6da6e8270f4a"
+    },
+    {
+      "path": "output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/A/sources/backend/src/opportunities/httpComposition.js",
+      "line": 170,
+      "meaning": "opportunity operation timeout10000",
+      "sha256": "1389118396991de48b1a1d3fb04524aedf8fc20e2051760b3df49c6b7472eff4"
+    }
+  ],
+  "observations": [
+    "The failure is real in baseline A: HTTP503 with LEASE_TIMEOUT; all172 preceding measured requests were HTTP200, but the final scenario of stage4 has no measured population.",
+    "Failed request SQL intervals cover approximately96.3% of HTTP wall time; metadata intervals cover approximately81.6%. Queries continued throughout the request; the largest uncovered inter-query interval is58.242ms.",
+    "Many driver-observed metadata intervals expanded. The longest Central snapshot is1442.581ms; the immediately preceding successful dashboard warmup in the same stage had a Central-query maximum59.804ms.",
+    "The observer SQL also slowed: failed warmup observer maximum515.146ms versus4.199ms in preceding complete A stage3; no blocking sessions or tenant queue were observed during the failed phase.",
+    "Two tenant physical holds were4463.183ms and12703.564ms, each below the configured15000ms allocation limit measured monotonically. The generic LEASE_TIMEOUT code also covers the tighter10000ms operation deadline. No operation deadline marker or failure timestamp is recorded, so the exact expiry branch cannot be proven from this report."
+  ],
+  "inferences": [
+    "Distributed inflation of query/observer intervals is consistent with slower database/transport scheduling; the evidence does not isolate PostgreSQL execution from network/host scheduling.",
+    "The operation deadline is a plausible narrower boundary; neither a15s allocation timeout nor a particular operation can be asserted solely from LEASE_TIMEOUT."
+  ],
+  "limits": [
+    "Driver intervals include SQL execution, waits, transport and application scheduling; this report has no PostgreSQL CPU or execution plan for the failed request.",
+    "The100ms sampler skips while its previous SQL query is pending. Sample gaps are not an event-loop-lag metric.",
+    "Node CPU for the failed labelled phase is approximately18.68% of one core; this does not measure PostgreSQL/host CPU or prove an external-load cause.",
+    "Phase labels may include draining/cleanup; warmup phase comparisons cover two successful tenants in prior stages but only the failed first tenant in stage4.",
+    "No runtime/timeouts were changed and no request was retried by this analysis. Original FAIL evidence is preserved.",
+    "Continuation of unstarted stages cannot turn this failed/incomplete H matrix into a complete PASS or supply the missing8 stage4 measured attempts."
+  ],
+  "method": {
+    "quantiles": "NEAREST_RANK",
+    "roundBeforeComputation": false,
+    "intervals": "Unions are computed per request from sorted startMs/endMs; nested spans remain inclusive and are not added.",
+    "source": "Read-only JSON/source inspection; only this derived artifact was written."
+  }
+}

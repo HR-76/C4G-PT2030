@@ -1,0 +1,33 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.global_user",
+      "count": 2,
+      "equivalent": true
+    },
+    {
+      "target": "cia_restore_central",
+      "table": "public.organization_membership",
+      "count": 2,
+      "equivalent": true
+    }
+  ],
+  "limits": [
+    "Synthetic data and same disposable cluster only; no provider objects, production backups, WAL or disaster recovery."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution",
+  "error": {
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION",
+    "message": "The expression evaluated to a falsy value:\n\n  assert(/^[a-z_]+\\.[a-z_]+$/.test(table))\n"
+  }
+}

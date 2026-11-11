@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "checks": [
+    "active organization query returns matching row and no missing row",
+    "directory query includes active and suspended, excludes foreign organization",
+    "alerts query excludes foreign, suspended, future and actor",
+    "notices query filters foreign, suspended and future memberships",
+    "read-only role refuses write and unrelated identity table",
+    "directory query propagates a database privilege failure",
+    "directory and notices SQL bound results to 1001 under excess synthetic members"
+  ],
+  "limitations": [
+    "SQL contract proof with synthetic identities and two organizations; not an HTTP authorization or production privilege proof.",
+    "Table grants allow direct cross-organization reads; query filters are not SQL-enforced isolation."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

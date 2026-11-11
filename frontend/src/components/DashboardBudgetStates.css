@@ -1,0 +1,15 @@
+.dashboard-budget-states { margin-top: 24px; border-color: var(--color-text-muted); }
+.dashboard-budget-states .section-hd { margin-bottom: 8px; }
+.dashboard-budget-caption { margin: 0 0 16px; color: var(--color-action); font-size: 13px; }
+.dashboard-budget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 205px), 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.dashboard-budget-card { padding: 12px 14px; border-top: 3px solid var(--application-state-accent); border-radius: 6px; background: var(--application-state-surface); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.dashboard-budget-card h3 { margin: 0; font-size: 15px; }
+.dashboard-budget-card a { color: var(--application-state-accent); text-underline-offset: 3px; }
+.dashboard-budget-card a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.dashboard-budget-card p { margin: 4px 0 8px; font-size: 13px; }
+.dashboard-budget-card strong { font-size: 22px; }
+.dashboard-budget-card dl { margin: 0; }
+.dashboard-budget-card dt, .dashboard-budget-card small { font-size: 12px; }
+.dashboard-budget-card dd { margin: 0; font-size: 14px; font-weight: 600; }
+.dashboard-budget-card dd + dt { margin-top: 6px; }
+.dashboard-budget-card small { display: block; font-weight: normal; }

@@ -1,0 +1,37 @@
+﻿{
+    "checks":  [
+                   {
+                       "path":  "analyze.js",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "hostCheck.js",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "preload.js",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "slo.js",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "slo.test.js",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "background.ps1",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "observer.test.ps1",
+                       "passed":  true
+                   },
+                   {
+                       "path":  "run.ps1",
+                       "passed":  true
+                   }
+               ],
+    "status":  "PASS"
+}

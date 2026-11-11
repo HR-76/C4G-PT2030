@@ -1,0 +1,7 @@
+'use strict';
+const {createJobRegistry}=require('../async/jobRegistry');
+const JOBS=Object.freeze(['opportunity.duplicate.scan','opportunity.catalog.reconcile']);
+const SERVICE_ACTORS=Object.freeze({'opportunity.duplicate.scan':Object.freeze({code:'F12_DUPLICATE_SCANNER',operation:'OPPORTUNITY_DUPLICATE_SCAN_JOB'}),'opportunity.catalog.reconcile':Object.freeze({code:'F12_CATALOG_RECONCILER',operation:'OPPORTUNITY_CATALOG_RECONCILE_JOB'})});
+function closedPayload(type,payload){if(!payload||Object.getPrototypeOf(payload)!==Object.prototype)return false;const keys=type===JOBS[0]?['opportunityId','revisionId','ruleVersion']:['opportunityId','revisionId','reasonCode'];return Reflect.ownKeys(payload).length===keys.length&&keys.every(k=>Object.hasOwn(payload,k)&&typeof payload[k]==='string');}
+function createOpportunityJobRegistry(handlers){if(!handlers||Object.getPrototypeOf(handlers)!==Object.prototype||Reflect.ownKeys(handlers).some(k=>!JOBS.includes(k))||JOBS.some(k=>typeof handlers[k]!=='function'))throw new TypeError('F12 job handlers are incomplete or open.');return createJobRegistry(JOBS.map(type=>({type,version:1,payloadVersion:1,handler:async execution=>{if(!execution||execution.envelopeVersion!==2||!closedPayload(type,execution.payload))throw new TypeError('F12 job payload is invalid.');return handlers[type](execution);}})));}
+module.exports={JOBS,SERVICE_ACTORS,createOpportunityJobRegistry};

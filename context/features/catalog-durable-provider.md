@@ -1,0 +1,9 @@
+# Fornecedor durável do leitor e credenciais dedicadas
+Estado: Complete neste incremento isolado — 02/11/2026.
+Âmbito: fornecedor compatível com a ligação funcional, três logins separados, política PostgreSQL do laboratório persistente OFF. Sem operador, enable/resume, instalação por arranque ou alteração habitual.
+Critérios satisfeitos:045/048 sem e com par de logins dedicados; esquema e permissões validados novamente; isolamento de dados; recusa de grants excessivos, contas privilegiadas/expiradas e par incompleto; política ausente/inacessível bloqueia; persistência confirmada por segundo processo e recriação;close idempotente;rota503;ligação disabled não cria pools.
+Credenciais:3 segredos diferentes gerados em memória, autenticação SCRAM-SHA-256 no cluster próprio. Não guardados como texto em ficheiros ou entregáveis. O PostgreSQL de teste guarda apenas verificadores;cluster encerrado. Não são credenciais do GCNI habitual.
+Provas:46 controlos PostgreSQL18.3 PASS;2522 testes backend PASS,7 SKIP herdados;585 frontend PASS;build e sintaxe PASS.
+Autorrevisão: cleanup de todos os pools em erro, validação de rolconfig/validade, rejeição de poder de escrita/transição da conta de política; erros sem segredos. Mantido o contexto original das consultas de fingerprint para não alterar artificialmente as assinaturas. Verificação da política usa SET LOCAL ROLE de leitura, sem grants adicionais. Sem findings materiais abertos neste âmbito.
+Limites:adapter e esquema gcni_catalog_control_rehearsal continuam exclusivos do laboratório. O fornecedor desta preparação é inerte, não publica dados. Não foram executados browser/OIDC institucional ou carga neste incremento. Credenciais definitivas, armazenamento seguro no destino e ativação continuam fora deste ensaio.
+Próximo passo: ensaio final ponta a ponta na cópia isolada, com ativação controlada apenas para o administrador da entidade, antes de qualquer promoção habitual.

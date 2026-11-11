@@ -1,0 +1,85 @@
+{
+  "method": "isolated browser A/B/B/A, synthetic ports and accelerated availability polling",
+  "sourceHashes": {
+    "frontend\\src\\pages\\Applications\\ApplicationWork.jsx": "aeeba8d24099cbcd667d4e18dbc353730c5df8205a7b2137f37f3a90d10bb81b",
+    "frontend\\src\\pages\\Opportunities\\CatalogExposureGate.jsx": "8f2cdbbdc929b88a9556b1ddf30379ad382491039e4782d19742f42c21fe8ebf"
+  },
+  "runs": [
+    {
+      "variant": "before",
+      "gate": {
+        "polls": 5,
+        "commits": 6
+      },
+      "workUpdates": 6,
+      "workDurations": [
+        13.100000023841858,
+        12.200000047683716,
+        10.299999982118607,
+        10.399999976158142,
+        11.599999994039536,
+        10.200000047683716
+      ],
+      "participants": 500,
+      "openTotal": 333,
+      "editButtons": 0
+    },
+    {
+      "variant": "after",
+      "gate": {
+        "polls": 5,
+        "commits": 3
+      },
+      "workUpdates": 6,
+      "workDurations": [
+        11.599999904632568,
+        11.5,
+        8.899999976158142,
+        8.900000005960464,
+        10,
+        8.400000035762787
+      ],
+      "participants": 500,
+      "openTotal": 333,
+      "editButtons": 0
+    },
+    {
+      "variant": "after",
+      "gate": {
+        "polls": 5,
+        "commits": 3
+      },
+      "workUpdates": 6,
+      "workDurations": [
+        11.699999988079071,
+        10.90000006556511,
+        8.999999940395355,
+        9.39999994635582,
+        10.299999982118607,
+        8.499999970197678
+      ],
+      "participants": 500,
+      "openTotal": 333,
+      "editButtons": 0
+    },
+    {
+      "variant": "before",
+      "gate": {
+        "polls": 5,
+        "commits": 6
+      },
+      "workUpdates": 6,
+      "workDurations": [
+        16.400000035762787,
+        12.199999958276749,
+        10.599999874830246,
+        10.499999970197678,
+        13,
+        10.399999976158142
+      ],
+      "participants": 500,
+      "openTotal": 333,
+      "editButtons": 0
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+ "source": "EU Funding & Tenders public search API",
+ "observedAt": "2026-11-11",
+ "externalIdentifier": "EuropeAid/187757/DD/ACT/KH",
+ "totalResults": 1,
+ "results": [
+  {
+   "url": "https://webgate.ec.europa.eu/prospect/external/publishedcalls.htm?callId=187757",
+   "contentType": "text/plain",
+   "language": "en",
+   "summary": "Support to Civil Society Organisations (CSOs) and Support to Human Rights and Democracy (HR&D)",
+   "content": "Support to Civil Society Organisations (CSOs) and Support to Human Rights and Democracy (HR&D)",
+   "accessRestriction": false,
+   "metadata": {
+    "updateDate": [
+     "2026-10-21T10:53:51.000+0000"
+    ],
+    "es_SortDate": [
+     "2026-10-22T04:00:57.000+0000"
+    ],
+    "beneficiaryAdministration": [],
+    "sortStatus": [
+     "1"
+    ],
+    "contractType": [
+     "42893160"
+    ],
+    "language": [
+     "en"
+    ],
+    "title": [
+     "Support to Civil Society Organisations (CSOs) and Support to Human Rights and Democracy (HR&D)"
+    ],
+    "type": [
+     "2"
+    ],
+    "esST_checksum": [
+     "BE9F3C30FDE486F4DF815A7CDE3C391558FEC33CAABB17C1684BC185BB8379BA"
+    ],
+    "esST_FileName": [
+     "file.txt"
+    ],
+    "callIdentifier": [
+     "187757"
+    ],
+    "DATASOURCE": [
+     "SEDIA"
+    ],
+    "REFERENCE": [
+     "187757PROSPECTSEN"
+    ],
+    "currency": [
+     "EUR"
+    ],
+    "frameworkProgramme": [
+     "111111"
+    ],
+    "budget": [
+     "5993000"
+    ],
+    "identifier": [
+     "EuropeAid/187757/DD/ACT/KH"
+    ],
+    "es_ContentType": [
+     "text/plain"
+    ],
+    "geographicalZones": [
+     "20000928"
+    ],
+    "publicationDocuments": [
+     "[{\"nameDoc\":\"Guidelines (restricted call)\",\"typeDoc\":\"rtf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:55.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2233682&lang=EN\"},{\"nameDoc\":\"Application form full application\",\"typeDoc\":\"rtf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:17.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2232521&lang=EN\"},{\"nameDoc\":\"Application form concept note\",\"typeDoc\":\"rtf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:38.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2232520&lang=EN\"},{\"nameDoc\":\"Annex B - Budget\",\"typeDoc\":\"xlsx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:42.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219065&lang=EN\"},{\"nameDoc\":\"Annex C - Logical framework\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:13.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219068&lang=EN\"},{\"nameDoc\":\"Annex D - Identification Form (public law bodies)\",\"typeDoc\":\"pdf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:36.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219072&lang=EN\"},{\"nameDoc\":\"Annex D - Identification Form (private or public with legal form)\",\"typeDoc\":\"pdf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:49.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219069&lang=EN\"},{\"nameDoc\":\"Annex D - Identification Form (natural person)\",\"typeDoc\":\"pdf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:54.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219067&lang=EN\"},{\"nameDoc\":\"Annex F - PADOR offline registration form\",\"typeDoc\":\"pdf\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:26.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219066&lang=EN\"},{\"nameDoc\":\"Annex G - Standard grant contract\",\"typeDoc\":\"zip\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:24.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219070&lang=EN\"},{\"nameDoc\":\"Annex H - Declaration of honour on exclusion and selection criteria\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:34.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219063&lang=EN\"},{\"nameDoc\":\"Annex K - Clarifications on financing not linked to costs\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:24.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219062&lang=EN\"},{\"nameDoc\":\"Annex J - Information on the tax regime applicable to grant contracts\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:05.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219071&lang=EN\"},{\"nameDoc\":\"Annex L - Self-evaluation questionnaire on SEA-H\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:29.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219061&lang=EN\"},{\"nameDoc\":\"e-Calls PADOR privacy statement\",\"typeDoc\":\"docx\",\"languageDoc\":\"EN\",\"finalPublicDocDate\":\"2026-10-22 06:00:51.0\",\"docUrl\":\"https://webgate.ec.europa.eu/prospect/internal/noauth/externalDocumentDownload.htm?id=2219073&lang=EN\"}]"
+    ],
+    "esDA_FirstIngestDate": [
+     "2026-10-22T06:01:00.441+0200"
+    ],
+    "programmePeriod": [
+     "2014 - 2020",
+     "2021 - 2027"
+    ],
+    "deadlineDate": [
+     "2026-12-11T10:00:42.000+0000"
+    ],
+    "esDA_IngestDate": [
+     "2026-10-22T06:01:00.441+0200"
+    ],
+    "url": [
+     "https://webgate.ec.europa.eu/prospect/external/publishedcalls.htm?callId=187757"
+    ],
+    "es_Combine": [
+     "1"
+    ],
+    "esST_URL": [
+     "https://webgate.ec.europa.eu/prospect/external/publishedcalls.htm?callId=187757"
+    ],
+    "esDA_QueueDate": [
+     "2026-10-22T06:01:00.435+0200"
+    ],
+    "programmeDivisionProspect": [
+     "43072409"
+    ],
+    "geographicalZone": [
+     "20000928"
+    ],
+    "startDate": [
+     "2026-10-22T04:00:57.000+0000"
+    ],
+    "status": [
+     "31094502"
+    ]
+   },
+   "children": []
+  }
+ ]
+}

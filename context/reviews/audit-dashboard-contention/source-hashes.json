@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-27T00:17:36.641Z",
+  "sha256": {
+    "backend/src/security/tenantLeaseExecutor.js": "5ee021f475831d89c79108ede3e520d165911f7abac99fc3491733ac68eb3ee9",
+    "backend/src/authorization/audit.js": "58015b4faadbcd7bcff96a3911ba4f608da5e53b16ca30c47f6506e38be43332",
+    "backend/src/organizationalProfile/editorialUiAudit.js": "1bcacb7d8f1053f642510fc253752cbbd75f661573f13aa1e026ca8988349a97",
+    "backend/src/applications/composition.js": "298d64c9f3565f3c61c32a9669f2a0411b1686ea6bf5bcd17b9f30edb85aadeb",
+    "backend/src/opportunities/httpComposition.js": "854357ac43bdc021297eddf5bdbe1b9ed3cfea71aaac678af5943180a7fea426",
+    "backend/src/routes/organizationDashboardRoutes.js": "3fe5df98137d7ba76fe62a4726d35c2855056165824a87228f24207803d30d02",
+    "backend/src/audit/readAuditBuffer.js": "04064ca500d864efb588ab56a409db15c820245e58fcbb243673dfb2fd913deb",
+    "backend/test/preparedReadAudit.test.js": "91564cdcfa04d397c3f8cb640f8d66626158b111de45bb73c1eee55d782e5943",
+    "backend/test/readAuditOutcomes.test.js": "8b10844481b5ae2af2a10001f1ba323c02529b7ecfe7e5287896b054086ded2f",
+    "backend/test/httpDashboardScheduling.test.js": "bf5afae5d30daaa73888554cee8f7e32e53930bc1ee9cab8694e050ea3d46439",
+    "test/integration/audit-dashboard/proof.js": "9faf1196dbf0958bfd952a56ed93113a9d23bac07e75a8c26dcf81717fbd5b14",
+    "test/integration/audit-dashboard/proof.ps1": "602a503ceb6a06dcbb04556a2b94fe7520ddf5687a9bfa75a6cf9ddccfd9f815",
+    "test/integration/audit-dashboard/README.md": "744a13e1b2beff571a42ec7cbbcca31f0a31c9b0b397e67b0034cc25ff1de1e4"
+  }
+}

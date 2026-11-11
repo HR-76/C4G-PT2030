@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-27T22:43:29.945Z",
+  "analysisChecks": "PASS",
+  "validation": {
+    "series": 2,
+    "bursts": 24,
+    "requests": 144,
+    "admissions": 432,
+    "allSourceHashesMatch": true,
+    "countsAndAuthorityInvariant": true
+  },
+  "sourceFiles": 112,
+  "sourceHashesStillMatch": true,
+  "all24WorstAdmissionsAreFirstAtCapacity": true,
+  "allTenantWaitingAtEntryZero": true,
+  "latestGateUnchanged": {
+    "policy": "c6-admission-v1",
+    "verdict": "FAIL",
+    "reason": "INVALID_ENVIRONMENT"
+  },
+  "analysisCodeSha256": "3c066f5f8fec4f5063a8d8bb30cc31b9f11b5db201785be7a70dcd051a9df047",
+  "preservation": "PASS"
+}

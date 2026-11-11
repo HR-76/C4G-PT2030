@@ -1,0 +1,9 @@
+# Limites da fila de concorrência documental
+
+Estado: implementação em curso. A auditoria encontrou fila sem limite em `documents/concurrency.js`. A pesquisa atual encontrou apenas um teste como consumidor; não afirmar que limita o tráfego documental em produção.
+
+Contrato: preservar limites ativos globais e por organização e a oportunidade de progresso de outra organização. Limitar espera por defeito a 64 pedidos globais e 16 por organização; permitir configurar apenas valores positivos iguais ou inferiores a estes tetos. Aceitar opcionalmente `AbortSignal`; cancelamento antes do início remove o pedido, não executa trabalho e rejeita com código estável. Falha de capacidade rejeita com código estável; nenhuma libertação prematura da capacidade ativa. Os limites são por instância/processo, não uma quota distribuída. Não alterar integração de R2, permissões ou outras filas.
+
+Aceitação: regressão para saturação global e por organização, cancelamento em fila e após início, progresso de outra organização, falha e libertação de capacidade. Testes focados, suites completas e build; sem fornecedores externos ou bases habituais.
+
+Resultado 09/11: 31 testes focados PASS; backend 2754 PASS/7 SKIP, frontend PASS e build PASS. A primeira regressão ficou pendente porque a versão anterior não recusava a fila saturada; foi interrompida. Um teste posterior expôs que o slot era libertado após resolução da promise e a ordem foi corrigida antes da aprovação final. A fila é limitada e aceita cancelamento explícito enquanto aguarda, mas não tem deadline automático; trabalho já iniciado mantém o slot até terminar e depende do cancelamento do próprio trabalho. Nenhuma integração produtiva deste limitador foi encontrada; limites distribuídos e ligação aos percursos efetivos requerem trabalho e provas próprias. Sem bases habituais ou R2 real.

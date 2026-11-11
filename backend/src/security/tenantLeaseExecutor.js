@@ -1,0 +1,347 @@
+const { sameSnapshot, validateOperationValue, enforceResultLimits } = require('./tenantLeaseContracts');
+const { tenantFailure, aggregateCleanup, isTrustedRuntimeFailure } = require('./tenantRuntimeErrors');
+const { transactionControlStatements } = require('./sqlTransactionControl');
+const preparedTransactions = new WeakMap();
+const { randomUUID } = require('node:crypto');
+const { snapshotDigest } = require('./tenantAuthorityRecovery');
+
+const READ_AUDIT_POLICIES = Object.freeze({
+  DIRECTORY_CONTEXT: ['ORGANIZATION_DIRECTORY', 'ORGANIZATION_DIRECTORY_READ', 'ACCESS'],
+  OPPORTUNITY_INTEREST_BROWSE: ['ORGANIZATIONAL_OPPORTUNITY_INTERESTS', 'OPPORTUNITY_INTEREST_READ', 'ACCESS'],
+  APPLICATION_BROWSE: ['APPLICATION_FIRST_SLICE', 'APPLICATION_READ', 'ACCESS'],
+  APPLICATION_DETAIL: ['APPLICATION_FIRST_SLICE', 'APPLICATION_READ', 'ACCESS'],
+  APPLICATION_WORK_DETAIL: ['APPLICATION_FIRST_SLICE', 'APPLICATION_WORK_READ', 'ACCESS'],
+  APPLICATION_CHAT: ['APPLICATION_FIRST_SLICE', 'APPLICATION_CHAT_READ', 'ACCESS'],
+  APPLICATION_DOCUMENT_DETAIL: ['APPLICATION_FIRST_SLICE', 'APPLICATION_DOCUMENT_READ', 'ACCESS'],
+  APPLICATION_REPORT: ['APPLICATION_FIRST_SLICE', 'APPLICATION_READ', 'ACCESS'],
+  APPLICATION_DASHBOARD: ['APPLICATION_FIRST_SLICE', 'APPLICATION_READ', 'ACCESS'],
+  OPPORTUNITY_DASHBOARD: ['F12_PRIVATE_HTTP_RUNTIME', 'OPPORTUNITY_READ', 'DATA']
+});
+function readAuditBinding(client) {
+  const binding = preparedTransactions.get(client);
+  if (!binding?.physicalVerified) throw tenantFailure('READ_AUDIT_BINDING_INVALID', 'TENANT_OPERATION_UNAVAILABLE');
+  binding.assertLeaseCurrent();
+  return binding;
+}
+function deferPreparedReadAudit(client, policy, candidate) {
+  const binding = readAuditBinding(client);
+  try {
+    const contract = Object.hasOwn(READ_AUDIT_POLICIES, policy) && READ_AUDIT_POLICIES[policy];
+    const operation = binding.record.operation;
+    if (!contract || operation.accessMode !== 'READ' || operation.ownerModule !== contract[0]
+      || operation.operationCode !== contract[1] || operation.queryModule.requiresAuditWrite !== true
+      || binding.readAuditFinalized || (binding.readAuditPolicy && binding.readAuditPolicy !== policy))
+      throw tenantFailure('READ_AUDIT_POLICY_INVALID', 'TENANT_OPERATION_UNAVAILABLE');
+    // Critical and deny evidence is always appended immediately by its producer.
+    if (candidate?.event?.eventCode !== 'AUTHORIZATION_ALLOWED'
+      || candidate.event.auditClass !== 'OBSERVATIONAL_RECONCILABLE') return false;
+    binding.readAuditPolicy = policy;
+    binding.readAudit ||= require('../audit/readAuditBuffer').createReadAuditBuffer({
+      organizationId: binding.record.snapshot.organizationId, tenantId: binding.record.snapshot.tenantId, streamType: contract[2] });
+    binding.readAudit.enqueue(candidate);
+    return true;
+  } catch (error) { binding.readAuditFailure ||= error; throw error; }
+}
+async function flushReadAudit(client, final) {
+  const binding = readAuditBinding(client);
+  if (binding.readAuditFailure) throw binding.readAuditFailure;
+  if (final) binding.readAuditFinalized = true;
+  try { await binding.readAudit?.flush(client, final); }
+  catch (error) { binding.readAuditFailure ||= error; throw error; }
+}
+async function flushPreparedReadAudit(client) { return flushReadAudit(client, false); }
+
+function preparedAuthorityBinding(client) {
+  const binding=preparedTransactions.get(client);
+  if (!binding?.authorityBinding) throw tenantFailure('AUTHORITY_BINDING_INVALID','TENANT_OPERATION_UNAVAILABLE');
+  binding.assertLeaseCurrent();
+  return binding.authorityBinding;
+}
+
+// Validation only: the issuer is private to the F4 transaction owner.
+function isPreparedTenantTransaction(client, expected) {
+  const binding = preparedTransactions.get(client);
+  if (!binding || !binding.physicalVerified) return false;
+  try { binding.assertLeaseCurrent(); } catch { return false; }
+  const snapshot = binding.record.snapshot;
+  return snapshot.tenantId === expected.tenantId && snapshot.organizationId === expected.organizationId
+    && snapshot.workload === expected.workload
+    && (expected.databaseGenerationId === undefined || snapshot.databaseGenerationId === expected.databaseGenerationId)
+    && expected.requiredCapabilities.every(code => snapshot.schema.verifiedCapabilities?.[code] === true);
+}
+
+function milliseconds(clock) {
+  const value = clock.now();
+  const result = value instanceof Date ? value.getTime() : Number(value);
+  if (!Number.isFinite(result)) throw new TypeError('Tenant runtime clock returned an invalid instant.');
+  return result;
+}
+
+function transactionClient(client, record, assertLeaseCurrent, physicalVerified) {
+  const prepared = Object.freeze({
+    async query(statement, values) {
+      if (!preparedTransactions.has(prepared)) throw tenantFailure('LEASE_NOT_ACTIVE', 'TENANT_OPERATION_UNAVAILABLE');
+      assertLeaseCurrent();
+      const sql = typeof statement === 'string' ? statement : statement?.text;
+      if (typeof sql !== 'string' || transactionControlStatements(sql).length > 0) {
+        throw tenantFailure('TRANSACTION_BOUNDARY_VIOLATION', 'TENANT_OPERATION_UNAVAILABLE');
+      }
+      return client.query(statement, values);
+    }
+  });
+  preparedTransactions.set(prepared, { record, assertLeaseCurrent, physicalVerified });
+  return prepared;
+}
+
+async function executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remainingMs, bindingVerifier) {
+  const client = record.allocation.client;
+  let connectionError=null;
+  const onConnectionError=error=>{connectionError=error;};
+  client.on?.('error',onConnectionError);
+  let began = false;
+  let commitAttempted = false;
+  let preparedClient;
+  // Closed audited-read contract: no general adapter can turn a READ into a write.
+  const auditedEvidenceRead=((record.operation.ownerModule==='F13_PQ1_EFFECTIVE' && ['F13_PROFILE_READ','F14_PREQUALIFICATION_READ'].includes(record.operation.operationCode))||(record.operation.ownerModule==='OPPORTUNITY_CRITERIA' && record.operation.operationCode==='OPPORTUNITY_CRITERIA_READ')||(record.operation.ownerModule==='F13_COMPETENCIES_AND_EXPERIENCE'
+    && record.operation.operationCode==='F13_EVIDENCE_LINK_READ')||(record.operation.ownerModule==='F13_FINANCIAL_CAPACITY'
+    && record.operation.operationCode==='F13_FINANCIAL_READ')||(record.operation.ownerModule==='F12_PRIVATE_HTTP_RUNTIME'
+    && record.operation.operationCode==='OPPORTUNITY_READ')||(record.operation.ownerModule==='F13_OPERATIONAL_CAPACITY'
+    && record.operation.operationCode==='F13_OPERATIONAL_READ')||(record.operation.ownerModule==='F13_TERRITORIES_AND_POPULATIONS' && record.operation.operationCode==='F13_POPULATION_READ')
+    ||(record.operation.ownerModule==='F13_EDITORIAL_BASELINE' && record.operation.operationCode==='F13_PROFILE_READ')
+    ||(record.operation.ownerModule==='APPLICATION_FIRST_SLICE' && ['APPLICATION_READ','APPLICATION_WORK_READ','APPLICATION_CHAT_READ','APPLICATION_DOCUMENT_READ','APPLICATION_ALERT_READ','NOTIFICATION_READ','ORGANIZATION_NOTICE_READ'].includes(record.operation.operationCode))
+    ||(record.operation.ownerModule==='ORGANIZATION_DIRECTORY' && ['ORGANIZATION_DIRECTORY_READ','PERSONAL_PROFILE_READ'].includes(record.operation.operationCode))
+    ||(record.operation.ownerModule==='ORGANIZATIONAL_OPPORTUNITY_INTERESTS' && record.operation.operationCode==='OPPORTUNITY_INTEREST_READ'))&&record.operation.queryModule.requiresAuditWrite===true;
+  const readOnly = record.operation.accessMode === 'READ'&&!auditedEvidenceRead;
+  try {
+    await client.query(readOnly ? 'BEGIN TRANSACTION READ ONLY' : 'BEGIN TRANSACTION READ WRITE');
+    began = true;
+    await client.query(`SET LOCAL statement_timeout TO '${Math.max(1, Math.trunc(remainingMs))}ms'`);
+    const verifyPhysical = () => bindingVerifier?.verify({ client, snapshot: record.snapshot,
+      requiredCapabilities: record.operation.requiredCapabilities, correlationId: record.correlationId });
+    await verifyPhysical();
+    preparedClient = transactionClient(client, record, assertLeaseCurrent, Boolean(bindingVerifier));
+    if (['F13_PQ1_EFFECTIVE','OPPORTUNITY_CRITERIA','F12_PRIVATE_HTTP_RUNTIME','F13_TAXONOMY','F13_PROFILE_AUTHORING','F13_COMPETENCIES_AND_EXPERIENCE','F13_FINANCIAL_CAPACITY','F13_OPERATIONAL_CAPACITY','F13_TERRITORIES_AND_POPULATIONS','F13_EDITORIAL_BASELINE','APPLICATION_FIRST_SLICE','ORGANIZATION_DIRECTORY','ORGANIZATIONAL_OPPORTUNITY_INTERESTS'].includes(record.operation.ownerModule)) {
+      if (!record.operation.queryModule.authorityGuard) throw tenantFailure('AUTHORITY_GUARD_REQUIRED','TENANT_OPERATION_UNAVAILABLE');
+      const transactionId=randomUUID();
+      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))',[transactionId]);
+      const backend=(await client.query('SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()')).rows[0];
+      if (!backend) throw tenantFailure('AUTHORITY_BINDING_INVALID','TENANT_OPERATION_UNAVAILABLE');
+      preparedTransactions.get(preparedClient).authorityBinding=Object.freeze({transactionId,deadline:record.allocation.deadline,
+        correlationId:record.correlationId,
+        operationCode:record.operation.operationCode,
+        organizationId:record.snapshot.organizationId,tenantId:record.snapshot.tenantId,
+        sourceBinding:Object.freeze({snapshotDigest:snapshotDigest(record.snapshot),backendPid:backend.pid,backendStart:backend.backend_start})});
+    }
+    const result = await record.operation.queryModule.execute(Object.freeze({ client: preparedClient, input }));
+    validateOperationValue(record.operation.resultSchema, result, 'RESULT_CONTRACT_MISMATCH', record.correlationId);
+    enforceResultLimits(record.operation, result, record.correlationId);
+    assertLeaseCurrent();
+    await revalidateAuthority();
+    // Only the transaction owner may change constraint timing. The editorial
+    // writer submits an existing authoring revision whose deferred seal uses
+    // SECURITY INVOKER: evaluate it while the functional role/context are still
+    // active, before the adapter restores the grantless NOINHERIT login for F4.
+    if (['F13_PQ1_EFFECTIVE','F13_EDITORIAL_BASELINE','OPPORTUNITY_CRITERIA','ORGANIZATION_DIRECTORY'].includes(record.operation.ownerModule)) {
+      await client.query('SET CONSTRAINTS ALL IMMEDIATE');
+    }
+    // Append staged read decisions while the functional role is still active.
+    // Keep every existing physical/authority/fence check AFTER this potentially
+    // blocking work; staging is not acceptance and never escapes this transaction.
+    const auditBinding = preparedTransactions.get(preparedClient);
+    if (auditBinding.readAuditFailure) throw auditBinding.readAuditFailure;
+    auditBinding.readAuditFinalized = true;
+    if (auditBinding.readAudit) await flushReadAudit(preparedClient, true);
+    if (record.operation.queryModule.beforeCommit) {
+      await record.operation.queryModule.beforeCommit(Object.freeze({ client: preparedClient, input }));
+    }
+    await verifyPhysical();
+    await revalidateAuthority();
+    assertLeaseCurrent();
+    if (record.operation.queryModule.authorityGuard) {
+      await record.operation.queryModule.authorityGuard.assert({client:preparedClient,input});
+      assertLeaseCurrent();
+    }
+    if (auditBinding.readAuditFailure) throw auditBinding.readAuditFailure;
+    auditBinding.readAudit?.assertComplete();
+    if(connectionError)throw connectionError;
+    commitAttempted = true;
+    await client.query('COMMIT');
+    began = false;
+    if (record.operation.queryModule.authorityGuard) await record.operation.queryModule.authorityGuard.complete({input,outcome:readOnly?'READ_TERMINAL':'COMMITTED'});
+    return result;
+  } catch (cause) {
+    if (commitAttempted) {
+      if (record.operation.queryModule.authorityGuard) await record.operation.queryModule.authorityGuard.complete({input,outcome:'UNKNOWN'}).catch(()=>{});
+      throw tenantFailure('COMMIT_UNCERTAIN', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+    }
+    if (began) {
+      try { await client.query('ROLLBACK'); }
+      catch {
+        const primary = isTrustedRuntimeFailure(cause) ? cause
+          : tenantFailure('TENANT_QUERY_FAILED', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+        throw aggregateCleanup(primary, tenantFailure(
+          'TRANSACTION_ROLLBACK_FAILED', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId }
+        ));
+      }
+      if (record.operation.queryModule.authorityGuard) await record.operation.queryModule.authorityGuard.complete({input,outcome:'ROLLED_BACK'}).catch(()=>{});
+    }
+    throw isTrustedRuntimeFailure(cause) ? cause
+      : tenantFailure('TENANT_QUERY_FAILED', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+  } finally {
+    client.removeListener?.('error',onConnectionError);
+    if (preparedClient) {
+      preparedTransactions.get(preparedClient)?.readAudit?.dispose();
+      preparedTransactions.delete(preparedClient);
+    }
+  }
+}
+
+function createTenantLeaseExecutor({ membershipRepository, directoryRepository, poolManager, clock, scheduler, bindingVerifier }) {
+  if (!membershipRepository || typeof membershipRepository.revalidateContext !== 'function'
+      || !directoryRepository || typeof directoryRepository.resolveSnapshotByOrganization !== 'function'
+      || !poolManager || !clock || !scheduler || typeof scheduler.setTimeout !== 'function'
+      || typeof scheduler.clearTimeout !== 'function') throw new TypeError('Tenant lease executor dependencies are incomplete.');
+
+  return Object.freeze({
+    issue(record) {
+      let state = 'ACTIVE';
+      let firstQuery = true;
+      async function release(discard = false, cause = null, fromExecution = false) {
+        if (state === 'RELEASED') return;
+        if (state === 'EXECUTING' && !fromExecution) {
+          throw tenantFailure('LEASE_IN_USE', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+        }
+        state = 'RELEASED';
+        const cleanup = Promise.resolve().then(() => record.allocation.release({ discard, cause }));
+        cleanup.catch(() => {});
+        const remaining = record.allocation.deadline - milliseconds(clock);
+        if (remaining <= 0) {
+          throw tenantFailure('LEASE_CLEANUP_TIMEOUT', 'TENANT_OPERATION_UNAVAILABLE', {
+            correlationId: record.correlationId
+          });
+        }
+        let timeout;
+        const deadline = new Promise((resolve, reject) => {
+          timeout = scheduler.setTimeout(() => reject(tenantFailure(
+            'LEASE_CLEANUP_TIMEOUT', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId }
+          )), remaining);
+        });
+        try { await Promise.race([cleanup, deadline]); }
+        catch (cleanup) {
+          throw isTrustedRuntimeFailure(cleanup) ? cleanup
+            : tenantFailure('LEASE_CLEANUP_FAILED', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+        }
+        finally { scheduler.clearTimeout(timeout); }
+      }
+      const handle = {
+        async execute(input) {
+          if (state !== 'ACTIVE') throw tenantFailure('LEASE_NOT_ACTIVE', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+          state = 'EXECUTING';
+          let primary = null;
+          let expired = false;
+          function assertLeaseCurrent() {
+            if (expired || milliseconds(clock) >= record.allocation.deadline) {
+              throw tenantFailure('LEASE_TIMEOUT', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+            }
+            if (state !== 'EXECUTING' || poolManager.getFence(record.snapshot.tenantId,record.snapshot.workload) !== record.allocation.fence) {
+              throw tenantFailure('TRANSITION_CONFLICT', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
+            }
+          }
+          async function revalidateAuthority() {
+            let eligible;
+            try { eligible = await membershipRepository.revalidateContext(record.organizationContext, milliseconds(clock)); }
+            catch {
+              throw tenantFailure('ORGANIZATION_CONTEXT_UNAVAILABLE', 'TENANT_NOT_AVAILABLE', {
+                correlationId: record.correlationId
+              });
+            }
+            assertLeaseCurrent();
+            if (!eligible) throw tenantFailure('ORGANIZATION_MISMATCH', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
+            let current;
+            try { current = await directoryRepository.resolveSnapshotByOrganization(record.snapshot.organizationId,record.snapshot.workload); }
+            catch {
+              throw tenantFailure('DIRECTORY_UNAVAILABLE', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
+            }
+            assertLeaseCurrent();
+            if (!sameSnapshot(record.snapshot, current)) {
+              throw tenantFailure('TRANSITION_CONFLICT', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
+            }
+          }
+          try {
+            validateOperationValue(record.operation.inputSchema, input, 'INPUT_CONTRACT_MISMATCH', record.correlationId);
+            let inputBytes;
+            try { inputBytes = Buffer.byteLength(JSON.stringify(input), 'utf8'); }
+            catch { inputBytes = Number.POSITIVE_INFINITY; }
+            if (record.operation.limits && input && Number.isSafeInteger(input.pageSize)
+                && input.pageSize > record.operation.limits.maxPageSize) {
+              throw tenantFailure('INPUT_LIMIT_EXCEEDED', 'TENANT_OPERATION_UNAVAILABLE', {
+                correlationId: record.correlationId
+              });
+            }
+            if (record.operation.limits && inputBytes > record.operation.limits.maxBytes) {
+              throw tenantFailure('INPUT_LIMIT_EXCEEDED', 'TENANT_OPERATION_UNAVAILABLE', {
+                correlationId: record.correlationId
+              });
+            }
+            assertLeaseCurrent();
+            const operationDeadline = record.operation.timeoutMs
+              ? milliseconds(clock) + record.operation.timeoutMs : record.allocation.deadline;
+            const remaining = Math.min(record.allocation.deadline, operationDeadline) - milliseconds(clock);
+            if (remaining <= 0) throw tenantFailure('LEASE_TIMEOUT', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+            let timeout;
+            const timed = new Promise((resolve, reject) => {
+              timeout = scheduler.setTimeout(() => {
+                expired = true;
+                reject(tenantFailure('LEASE_TIMEOUT', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId }));
+              }, remaining);
+            });
+            const execution = (async () => {
+              if (firstQuery) {
+                await revalidateAuthority();
+                firstQuery = false;
+              }
+              assertLeaseCurrent();
+              try {
+                if (record.snapshot.schema.compatibilityState === 'READ_ONLY') {
+                  if (record.operation.readOnlyEligible !== true || record.operation.accessMode !== 'READ') {
+                    throw tenantFailure('READ_CATALOG_INCOMPATIBLE', 'TENANT_READ_ONLY', {
+                      correlationId: record.correlationId
+                    });
+                  }
+                  return await executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier);
+                }
+                if (['READ', 'WRITE'].includes(record.operation.accessMode)) {
+                  return await executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier);
+                }
+                return await record.operation.queryModule.execute(Object.freeze({ client: record.allocation.client, input }));
+              } catch (cause) {
+                throw isTrustedRuntimeFailure(cause) ? cause
+                  : tenantFailure('TENANT_QUERY_FAILED', 'TENANT_OPERATION_UNAVAILABLE', { correlationId: record.correlationId });
+              }
+            })();
+            try { return await Promise.race([execution, timed]); }
+            finally { scheduler.clearTimeout(timeout); }
+          } catch (error) {
+            primary = error;
+            throw error;
+          } finally {
+            if (primary?.internalCode === 'LEASE_TIMEOUT') {
+              release(true, primary, true).catch(() => {});
+            } else {
+              try { await release(Boolean(primary), primary, true); }
+              catch (cleanup) {
+                if (primary) throw aggregateCleanup(primary, cleanup);
+                throw cleanup;
+              }
+            }
+          }
+        },
+        async release() { await release(false, null); }
+      };
+      return Object.freeze(handle);
+    }
+  });
+}
+
+module.exports = { createTenantLeaseExecutor, isPreparedTenantTransaction, preparedAuthorityBinding, sameSnapshot,
+  deferPreparedReadAudit, flushPreparedReadAudit };

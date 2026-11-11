@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-28",
+  "status": "NOT_RUN",
+  "reason": "LOCAL_DOCKER_PIPE_NOT_FOUND",
+  "immutableAttemptHashes": {
+    "attempt.json": "7ce2baf9862f5a8719e3354a0611ebefb02582a4a8497c3895585c9888c82223",
+    "sources.json": "4aa729c1e1528df52433cb53ca7b181d7ef92b26e429cb47549dc9da1b703bb5"
+  },
+  "previousFourExecutionHashes": {
+    "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/evidence.json": "207ea2a86182c7b32c4dd467f7291cef261ba87df772ef11c1289b5821e06e5f",
+    "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/README.md": "57e8f49352ebaff36ec9c1f1dd7154cd0663c98b10bf62ef8fdbe112694bb697",
+    "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/sources.json": "540b0eeeb91fca4e0daf55428e593d6d164e0ddd00e0865132c625dd7d7a46ee",
+    "context/reviews/partner-portal-pg-942a2b58f6d8b84fbb3510ea7d00714f/verification.json": "5dd66108431dd3ea1d5f567b7fae2979ea3783557dc24dd8814fd2f9754b3adb",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/evidence.json": "d296011b36f3229bb7e432fb25c30605ba478d9d56a5770f86812eb6010ba96e",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/README.md": "f66a9c7fd0d394aeb6d1d4aabd471f4e433a2c856b0bd5e83017a74d09d11aff",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/sources.json": "0a17d2587fd5e2bc1b4b80adf9e6e13c7541f40a557a819d87252f5607abe5c3",
+    "context/reviews/partner-portal-pg-972f46fb06d1bc8d9fde2d3ac2290943/verification.json": "b44fd6a3ac1bfb08455fd900c4c1f0a2b6a07b3bf2eeaa95360490c9f268fc3f",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/evidence.json": "46137f216ac34af192d6520d8a630c46d435b7dfc96582db0a483962e956a1a3",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/README.md": "8dcbb193833235c2c0191b78bbb30f6f2d3bf464ff024180ccde653ec0ef3898",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/sources.json": "b6d68cb4529e319e0e0f01cd10fcd37bc52c0fa78caed4e66c4965eab58d6c43",
+    "context/reviews/partner-portal-pg-a7dc74a8441914bb00646b077a009ce9/verification.json": "a3984b5682481f479c33f088ca565f09dcda3710534a4f4a1e2bc6fc7c3330e2",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/evidence.json": "5afa8b743d17dc65c9d811beb6784eb0ed139340260c5b9e92d604afa3e9f83e",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/README.md": "3f43e61395136a4921a34bf48dee4eb70cfdbd6b796d4208f0a2ba6eea047c44",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/sources.json": "014b04f9250084eeacd481839c18e95b721f16ab7b6c46cf0c062ea6a8f77985",
+    "context/reviews/partner-portal-pg-f8ca4c45e35a826640ac25d2f8fa97ef/verification.json": "1a7921cb3563a72af62d715825518b2f3d036aadc5d0d6f965a22be1e6b3c818"
+  },
+  "review": {
+    "readOnly": true,
+    "codeBlockerFound": false
+  },
+  "preservation": {
+    "status": "PASS",
+    "baselineFiles": 30999,
+    "baselineWorktreeEntries": 2625,
+    "added": [
+      "context/reviews/partner-portal-precondition-20261028-01/README.md",
+      "context/reviews/partner-portal-precondition-20261028-01/attempt.json",
+      "context/reviews/partner-portal-precondition-20261028-01/sources.json",
+      "context/reviews/partner-portal-precondition-20261028-01/verification.json"
+    ],
+    "changed": [
+      "context/current-work.md",
+      "context/features/partner-postgres-gate.md"
+    ],
+    "removed": [],
+    "unexpected": [],
+    "branchAndHeadUnchanged": true,
+    "currentFiles": 31003,
+    "currentWorktreeEntries": 2629,
+    "previousFourExecutionsUnchanged": true,
+    "runtimePrototypeMigrationPermissionSourcesAndDevUnchanged": true
+  }
+}

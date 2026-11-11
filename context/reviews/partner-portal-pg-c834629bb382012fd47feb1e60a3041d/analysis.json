@@ -1,0 +1,765 @@
+{
+  "schemaVersion": 1,
+  "source": "evidence.json",
+  "snapshot": "atSettlement",
+  "notes": [
+    "Times inclusive and overlapping; do not add categories",
+    "Observed duration is completed totalMs plus pendingMs at this checkpoint",
+    "Miss duration includes completed authorizations only; unfinished authorization has no HIT/MISS classification",
+    "SQL_CENTRAL includes phases outside the reader and excludes acquisition and fixture pre-processing",
+    "Comparison with fourth execution is uncontrolled for host and PostgreSQL observer overhead",
+    "Pending work after tenant cleanup prevents causal or capacity approval"
+  ],
+  "counts": {
+    "repository": 14,
+    "authority": 9,
+    "samples": 52,
+    "warmups": 26,
+    "failedSamples": 12,
+    "failedWarmups": 6,
+    "temporalSamples": 12,
+    "temporalWarmups": 6,
+    "incompleteMeasured": 10,
+    "incompleteWarmups": 5
+  },
+  "groups": [
+    {
+      "scenarioId": "volume-10000",
+      "variant": "before",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 10895.780700000018,
+          "meanObservedMs": 10895.780700000018,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 705.5553000000073,
+          "meanObservedMs": 705.5553000000073,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10000.352150000006,
+          "meanObservedMs": 10000.352150000006,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 286.5304000000033,
+          "meanObservedMs": 286.5304000000033,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 9354.06905000002,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 8449.099800000506,
+          "meanObservedMs": 8610.44240000051,
+          "meanCompletedCount": 6200
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 4151.356550000011,
+          "meanObservedMs": 4151.356550000011,
+          "meanCompletedCount": 34
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 4236.192049999998,
+          "meanObservedMs": 4285.253499999977,
+          "meanCompletedCount": 33
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.21739999987767078,
+          "meanObservedMs": 0.21739999987767078,
+          "meanCompletedCount": 33
+        },
+        "AUDIT": {
+          "meanCompletedMs": 149.11679999981425,
+          "meanObservedMs": 149.11679999981425,
+          "meanCompletedCount": 33
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 26.078500000643544,
+          "meanObservedMs": 26.078500000643544,
+          "meanCompletedCount": 6168
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 8423.021299999862,
+          "meanObservedMs": 8423.021299999862,
+          "meanCompletedCount": 32
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8370.609800000297,
+          "meanObservedMs": 8371.730700000277,
+          "meanCompletedCount": 2484.5
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 1212.1512999999104,
+          "meanObservedMs": 1212.1512999999104,
+          "meanCompletedCount": 320
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 1,
+      "meanMissShareReaderLowerBoundPercent": 90.04306479846636,
+      "meanRowsRead": 3200
+    },
+    {
+      "scenarioId": "volume-10000",
+      "variant": "after",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 10739.22834999999,
+          "meanObservedMs": 10739.22834999999,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 538.8822499999951,
+          "meanObservedMs": 538.8822499999951,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10010.722999999998,
+          "meanObservedMs": 10010.722999999998,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 403.0972499999916,
+          "meanObservedMs": 403.0972499999916,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 9339.575450000004,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 8628.274600001634,
+          "meanObservedMs": 8794.623250001634,
+          "meanCompletedCount": 6500
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 4343.044850000093,
+          "meanObservedMs": 4343.044850000093,
+          "meanCompletedCount": 35.5
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 4178.350699999864,
+          "meanObservedMs": 4233.741699999868,
+          "meanCompletedCount": 34.5
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.22490000003017485,
+          "meanObservedMs": 0.22490000003017485,
+          "meanCompletedCount": 34.5
+        },
+        "AUDIT": {
+          "meanCompletedMs": 189.17485000003944,
+          "meanObservedMs": 189.17485000003944,
+          "meanCompletedCount": 34.5
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 31.27165000178502,
+          "meanObservedMs": 31.27165000178502,
+          "meanCompletedCount": 6466.5
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 8597.002949999849,
+          "meanObservedMs": 8597.002949999849,
+          "meanCompletedCount": 33.5
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8293.099599998997,
+          "meanObservedMs": 8310.518799999001,
+          "meanCompletedCount": 2583
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 905.6533500001533,
+          "meanObservedMs": 905.6533500001533,
+          "meanCompletedCount": 325.5
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 2,
+      "meanMissShareReaderLowerBoundPercent": 92.0448183079188,
+      "meanRowsRead": 3350
+    },
+    {
+      "scenarioId": "volume-10001",
+      "variant": "before",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 11347.269299999985,
+          "meanObservedMs": 11347.269299999985,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 983.9601500000281,
+          "meanObservedMs": 983.9601500000281,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10008.644899999985,
+          "meanObservedMs": 10008.644899999985,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 531.8282500000205,
+          "meanObservedMs": 531.8282500000205,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 8517.595850000012,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 7763.784549999866,
+          "meanObservedMs": 7859.7075499998755,
+          "meanCompletedCount": 3400
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 3862.1805999999633,
+          "meanObservedMs": 3958.0661499999405,
+          "meanCompletedCount": 19
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 3719.7643999999564,
+          "meanObservedMs": 3719.7643999999564,
+          "meanCompletedCount": 19
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.15455000000656582,
+          "meanObservedMs": 0.15455000000656582,
+          "meanCompletedCount": 19
+        },
+        "AUDIT": {
+          "meanCompletedMs": 174.62054999999236,
+          "meanObservedMs": 174.62054999999236,
+          "meanCompletedCount": 19
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 18.322249999793712,
+          "meanObservedMs": 18.322249999793712,
+          "meanCompletedCount": 3382
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 7745.462300000072,
+          "meanObservedMs": 7745.462300000072,
+          "meanCompletedCount": 18
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8522.468550001242,
+          "meanObservedMs": 8542.819150001247,
+          "meanCompletedCount": 1504
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 1706.784450000123,
+          "meanObservedMs": 1706.784450000123,
+          "meanCompletedCount": 278
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 2,
+      "meanMissShareReaderLowerBoundPercent": 90.92364766240834,
+      "meanRowsRead": 1800
+    },
+    {
+      "scenarioId": "volume-10001",
+      "variant": "after",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 11071.196699999971,
+          "meanObservedMs": 11071.196699999971,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 781.0583499999775,
+          "meanObservedMs": 781.0583499999775,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10001.82249999998,
+          "meanObservedMs": 10001.82249999998,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 546.3208999999915,
+          "meanObservedMs": 546.3208999999915,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 9045.381900000008,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 8176.338550000946,
+          "meanObservedMs": 8358.026450000936,
+          "meanCompletedCount": 4500
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 4083.405950000044,
+          "meanObservedMs": 4153.880150000041,
+          "meanCompletedCount": 25
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 3996.655950000102,
+          "meanObservedMs": 4002.911000000109,
+          "meanCompletedCount": 24.5
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.20264999999199063,
+          "meanObservedMs": 0.20264999999199063,
+          "meanCompletedCount": 24.5
+        },
+        "AUDIT": {
+          "meanCompletedMs": 180.04924999983632,
+          "meanObservedMs": 180.04924999983632,
+          "meanCompletedCount": 24.5
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 26.396000000822823,
+          "meanObservedMs": 26.396000000822823,
+          "meanCompletedCount": 4476.5
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 8149.942550000123,
+          "meanObservedMs": 8149.942550000123,
+          "meanCompletedCount": 23.5
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8584.545750000223,
+          "meanObservedMs": 8585.423000000243,
+          "meanCompletedCount": 1882.5
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 1146.712549999822,
+          "meanObservedMs": 1146.712549999822,
+          "meanCompletedCount": 295.5
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 2,
+      "meanMissShareReaderLowerBoundPercent": 90.13727642580542,
+      "meanRowsRead": 2350
+    },
+    {
+      "scenarioId": "profile-distinct-origins",
+      "variant": "before",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 10839.490049999993,
+          "meanObservedMs": 10839.490049999993,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 604.3742999999959,
+          "meanObservedMs": 604.3742999999959,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10003.63644999999,
+          "meanObservedMs": 10003.63644999999,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 228.77419999998529,
+          "meanObservedMs": 228.77419999998529,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 9467.264649999997,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 9171.856200000097,
+          "meanObservedMs": 9229.632250000082,
+          "meanCompletedCount": 42
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 4578.646249999962,
+          "meanObservedMs": 4586.964949999965,
+          "meanCompletedCount": 43.5
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 4466.5489499999385,
+          "meanObservedMs": 4473.562299999961,
+          "meanCompletedCount": 43
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.27940000011585653,
+          "meanObservedMs": 0.27940000011585653,
+          "meanCompletedCount": 43
+        },
+        "AUDIT": {
+          "meanCompletedMs": 168.51304999986314,
+          "meanObservedMs": 168.51304999986314,
+          "meanCompletedCount": 43
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 9171.856200000097,
+          "meanObservedMs": 9171.856200000097,
+          "meanCompletedCount": 42
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8903.30945000131,
+          "meanObservedMs": 8904.073400001274,
+          "meanCompletedCount": 3138
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 821.8450500002364,
+          "meanObservedMs": 821.8450500002364,
+          "meanCompletedCount": 309
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 2,
+      "meanMissShareReaderLowerBoundPercent": 96.88771599858009,
+      "meanRowsRead": 100
+    },
+    {
+      "scenarioId": "profile-distinct-origins",
+      "variant": "after",
+      "measuredSamples": 2,
+      "metrics": {
+        "OPERATION": {
+          "meanCompletedMs": 10664.702350000007,
+          "meanObservedMs": 10664.702350000007,
+          "meanCompletedCount": 1
+        },
+        "RESOLVE": {
+          "meanCompletedMs": 491.2521499999857,
+          "meanObservedMs": 491.2521499999857,
+          "meanCompletedCount": 1
+        },
+        "LEASE": {
+          "meanCompletedMs": 10005.040000000008,
+          "meanObservedMs": 10005.040000000008,
+          "meanCompletedCount": 1
+        },
+        "PROTECT": {
+          "meanCompletedMs": 369.214650000009,
+          "meanObservedMs": 369.214650000009,
+          "meanCompletedCount": 1
+        },
+        "READER": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 9474.156349999976,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION": {
+          "meanCompletedMs": 8981.521800000017,
+          "meanObservedMs": 9089.695750000014,
+          "meanCompletedCount": 34.5
+        },
+        "AUTHORIZATION_MEMBERSHIP": {
+          "meanCompletedMs": 4473.795699999959,
+          "meanObservedMs": 4478.981349999958,
+          "meanCompletedCount": 36
+        },
+        "AUTHORIZATION_DATA": {
+          "meanCompletedMs": 4401.270649999991,
+          "meanObservedMs": 4447.860549999983,
+          "meanCompletedCount": 35.5
+        },
+        "RESOURCE_POLICY": {
+          "meanCompletedMs": 0.30755000008502975,
+          "meanObservedMs": 0.30755000008502975,
+          "meanCompletedCount": 35.5
+        },
+        "AUDIT": {
+          "meanCompletedMs": 167.3880000000645,
+          "meanObservedMs": 167.3880000000645,
+          "meanCompletedCount": 35.5
+        },
+        "AUTHORIZATION_HIT": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "AUTHORIZATION_MISS": {
+          "meanCompletedMs": 8981.521800000017,
+          "meanObservedMs": 8981.521800000017,
+          "meanCompletedCount": 34.5
+        },
+        "AUTHORIZATION_UNRESOLVED": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        },
+        "SQL_CENTRAL": {
+          "meanCompletedMs": 8323.762450000824,
+          "meanObservedMs": 8331.477900000813,
+          "meanCompletedCount": 2639.5
+        },
+        "SQL_TENANT": {
+          "meanCompletedMs": 629.6826999996556,
+          "meanObservedMs": 629.6826999996556,
+          "meanCompletedCount": 295
+        },
+        "CLEANUP": {
+          "meanCompletedMs": 0,
+          "meanObservedMs": 0,
+          "meanCompletedCount": 0
+        }
+      },
+      "incompleteAfterCleanup": 1,
+      "meanMissShareReaderLowerBoundPercent": 94.798812214355,
+      "meanRowsRead": 100
+    }
+  ],
+  "comparison": [
+    {
+      "scenarioId": "volume-0",
+      "beforeOperationMeanMs": 2107.8326499999966,
+      "afterOperationMeanMs": 1877.1287999999913,
+      "beforeQueriesMean": 333,
+      "afterQueriesMean": 335,
+      "beforeRowsMean": 0,
+      "afterRowsMean": 0,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1215.3129499999923,
+      "fourthAfterOperationMeanMs": 1217.668150000005
+    },
+    {
+      "scenarioId": "volume-25",
+      "beforeOperationMeanMs": 3363.830350000004,
+      "afterOperationMeanMs": 3028.2727500000037,
+      "beforeQueriesMean": 337,
+      "afterQueriesMean": 339,
+      "beforeRowsMean": 25,
+      "afterRowsMean": 25,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1810.6263000000035,
+      "fourthAfterOperationMeanMs": 1599.7000499999995
+    },
+    {
+      "scenarioId": "volume-26",
+      "beforeOperationMeanMs": 2969.1705000000075,
+      "afterOperationMeanMs": 2230.3924000000115,
+      "beforeQueriesMean": 337,
+      "afterQueriesMean": 339,
+      "beforeRowsMean": 26,
+      "afterRowsMean": 26,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1658.1859499999991,
+      "fourthAfterOperationMeanMs": 1650.830099999992
+    },
+    {
+      "scenarioId": "volume-100",
+      "beforeOperationMeanMs": 2318.5506999999925,
+      "afterOperationMeanMs": 2960.061200000011,
+      "beforeQueriesMean": 338,
+      "afterQueriesMean": 340,
+      "beforeRowsMean": 100,
+      "afterRowsMean": 100,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1668.9955000000045,
+      "fourthAfterOperationMeanMs": 1540.9876499999955
+    },
+    {
+      "scenarioId": "volume-101",
+      "beforeOperationMeanMs": 2572.566049999994,
+      "afterOperationMeanMs": 3045.29310000001,
+      "beforeQueriesMean": 340,
+      "afterQueriesMean": 342,
+      "beforeRowsMean": 101,
+      "afterRowsMean": 101,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1963.7153500000059,
+      "fourthAfterOperationMeanMs": 2068.5199999999895
+    },
+    {
+      "scenarioId": "volume-10000",
+      "beforeOperationMeanMs": 9821.454650000014,
+      "afterOperationMeanMs": 9863.378399999987,
+      "beforeQueriesMean": 321.5,
+      "afterQueriesMean": 326.5,
+      "beforeRowsMean": 3200,
+      "afterRowsMean": 3350,
+      "completedSuccessfully": false,
+      "fourthBeforeOperationMeanMs": 9888.87950000001,
+      "fourthAfterOperationMeanMs": 9930.56809999999
+    },
+    {
+      "scenarioId": "volume-10001",
+      "beforeOperationMeanMs": 9742.875350000017,
+      "afterOperationMeanMs": 9796.212949999986,
+      "beforeQueriesMean": 279,
+      "afterQueriesMean": 296.5,
+      "beforeRowsMean": 1800,
+      "afterRowsMean": 2350,
+      "completedSuccessfully": false,
+      "fourthBeforeOperationMeanMs": 9904.817700000014,
+      "fourthAfterOperationMeanMs": 9926.605349999998
+    },
+    {
+      "scenarioId": "profile-denied",
+      "beforeOperationMeanMs": 2634.1938500000106,
+      "afterOperationMeanMs": 2906.9387999999744,
+      "beforeQueriesMean": 340,
+      "afterQueriesMean": 342,
+      "beforeRowsMean": 101,
+      "afterRowsMean": 101,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1338.6465000000026,
+      "fourthAfterOperationMeanMs": 1387.6767500000133
+    },
+    {
+      "scenarioId": "profile-shared-origin",
+      "beforeOperationMeanMs": 2936.0615000000107,
+      "afterOperationMeanMs": 3098.8311500000127,
+      "beforeQueriesMean": 340,
+      "afterQueriesMean": 342,
+      "beforeRowsMean": 101,
+      "afterRowsMean": 101,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1513.053500000009,
+      "fourthAfterOperationMeanMs": 1427.8469499999774
+    },
+    {
+      "scenarioId": "profile-distinct-origins",
+      "beforeOperationMeanMs": 9871.114900000015,
+      "afterOperationMeanMs": 9881.565650000004,
+      "beforeQueriesMean": 310,
+      "afterQueriesMean": 296,
+      "beforeRowsMean": 100,
+      "afterRowsMean": 100,
+      "completedSuccessfully": false,
+      "fourthBeforeOperationMeanMs": 9894.524849999987,
+      "fourthAfterOperationMeanMs": 9903.118450000009
+    },
+    {
+      "scenarioId": "profile-selective",
+      "beforeOperationMeanMs": 2191.8985499999835,
+      "afterOperationMeanMs": 2175.171100000007,
+      "beforeQueriesMean": 340,
+      "afterQueriesMean": 342,
+      "beforeRowsMean": 101,
+      "afterRowsMean": 101,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1440.0804500000377,
+      "fourthAfterOperationMeanMs": 1327.519649999973
+    },
+    {
+      "scenarioId": "profile-historical-people",
+      "beforeOperationMeanMs": 2171.686550000013,
+      "afterOperationMeanMs": 2003.3880499999796,
+      "beforeQueriesMean": 340,
+      "afterQueriesMean": 342,
+      "beforeRowsMean": 101,
+      "afterRowsMean": 101,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1586.0999500000325,
+      "fourthAfterOperationMeanMs": 1592.4745500000136
+    },
+    {
+      "scenarioId": "profile-large-payload",
+      "beforeOperationMeanMs": 1485.7073499999533,
+      "afterOperationMeanMs": 1504.1570499999798,
+      "beforeQueriesMean": 337,
+      "afterQueriesMean": 339,
+      "beforeRowsMean": 26,
+      "afterRowsMean": 26,
+      "completedSuccessfully": true,
+      "fourthBeforeOperationMeanMs": 1509.2090000000026,
+      "fourthAfterOperationMeanMs": 1397.1919000000053
+    }
+  ],
+  "measuredMissShareReaderLowerBoundPercent": {
+    "min": 88.73674126608617,
+    "max": 97.46147826302123
+  },
+  "measuredAuthorizationObservedShareReaderPercent": {
+    "min": 90.47412108356835,
+    "max": 97.63995428011148
+  },
+  "allOperationRanges": {
+    "operationMs": {
+      "min": 1303.762699999992,
+      "max": 9932.670500000007
+    },
+    "admissionMs": {
+      "min": 0.08809999999357387,
+      "max": 42.78849999999511
+    },
+    "cleanupMs": {
+      "min": 13.751700000022538,
+      "max": 88.66330000001471
+    },
+    "responseBytes": {
+      "min": 0,
+      "max": 775423
+    },
+    "nodeRssPeakBytes": {
+      "min": 272326656,
+      "max": 323239936
+    },
+    "nodeHeapPeakBytes": {
+      "min": 72340968,
+      "max": 123451384
+    },
+    "postgresTempBytes": {
+      "min": 0,
+      "max": 0
+    }
+  },
+  "allTimedCentralPendingAtSettlement": true,
+  "afterSuccessQueries": 0
+}

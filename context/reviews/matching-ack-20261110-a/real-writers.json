@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "checks": [
+    "real directory personEdit succeeds through F4/F5 and writes an idempotency receipt",
+    "two participating real writers are refused after the guard connection is destroyed",
+    "negative control: direct real writer bypasses external guard and commits while it is active",
+    "synthetic recovery waits for nonce termination before releasing a participating writer; second tenant remains unchanged",
+    "real directory recovery port verifies completed transaction nonce and matching receipt",
+    "real directory reconciles an observed committed write after injected acknowledgement loss using its nonce and receipt",
+    "experimental tenant trigger rejects direct SQL with an active or missing guard; schema fingerprint changes and the unchanged runtime rejects the modified tenant"
+  ],
+  "limits": [
+    "Real directory writer, F4, F5 and Central session/authority with synthetic identities; no HTTP/OIDC browser.",
+    "Experimental external guard has no enforcement in production writers: the negative bypass is intentional and demonstrates the candidate is not safe to integrate.",
+    "No simulated real network partition, exhaustive writer coverage, snapshot publication or matching pagination."
+  ],
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

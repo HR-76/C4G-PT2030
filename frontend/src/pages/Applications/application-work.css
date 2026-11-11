@@ -1,0 +1,38 @@
+.application-work .work-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin:20px 0; }
+.application-work dt { color:var(--text-muted); font-size:12px; margin-bottom:4px; }
+.application-work dd { margin:0; overflow-wrap:anywhere; }
+.application-work .work-summary > div { padding:12px; border:1px solid var(--border); border-radius:8px; }
+.application-work .work-participants,.application-work .work-tasks { list-style:none; padding:0; display:grid; gap:12px; }
+.application-work-participant-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+.application-work-participant-heading h3 { margin:0; }
+.application-work .work-participants { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
+.application-work .work-participants:empty { display:none; }
+.application-work .work-participants li { display:flex; align-items:flex-start; flex-wrap:wrap; gap:10px; padding:14px; border:1px solid var(--border-control); border-radius:10px; background:var(--surface-default); overflow-wrap:anywhere; }
+.work-participant-avatar { display:grid; place-items:center; flex:0 0 40px; height:40px; border-radius:50%; background:var(--surface-hover); color:var(--text-primary); font-weight:700; }
+.work-participant-info { display:flex; flex:1 1 120px; min-width:0; align-items:flex-start; flex-direction:column; gap:4px; }
+.application-work .work-tasks { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.application-work .work-task { border:1px solid var(--border); border-radius:8px; padding:16px; min-width:0; overflow-wrap:anywhere; }
+.application-work .work-task-heading { display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px; }
+.application-work .work-task-order { color:var(--color-text-secondary); font-size:13px; margin:4px 0 12px; }
+.application-work .work-task dl { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; margin:16px 0; }
+.application-work .work-task button { margin:4px 8px 0 0; }
+.application-work .work-deadline-note { border-left:3px solid var(--border-control); padding-left:10px; }
+.application-work .work-task-form { max-width:760px; padding:20px; border:1px solid var(--border); border-radius:8px; margin:20px 0; }
+.application-work label { display:flex; flex-direction:column; gap:6px; margin:12px 0; }
+.application-work input,.application-work select { width:100%; max-width:760px; min-width:0; }
+.application-work-editor { margin-top:16px; }
+.application-work-editor label { display:flex; flex-direction:column; gap:6px; margin:16px 0; }
+.application-work-editor input,.application-work-editor select { width:100%; min-width:0; }
+.application-work-editor textarea { width:100%; resize:vertical; }
+.task-description { white-space:pre-wrap; overflow-wrap:anywhere; }
+.application-work .work-history { margin-top:24px; border-top:1px solid var(--border); padding-top:16px; }
+.application-work .work-history summary { cursor:pointer; font-weight:600; }
+@media(max-width:900px){.application-work .work-summary {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:640px){.application-work .work-summary,.application-work .work-tasks,.application-work .work-task dl {grid-template-columns:minmax(0,1fr);}.application-work .work-task-form {padding:12px;}}
+
+.application-work .work-task-filters { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.application-work .work-task-filters button { min-height:44px; }
+.application-work .work-task-filters button[aria-pressed=true] { background:var(--action-primary-soft); border-color:var(--action-primary-border); color:var(--action-primary-hover); font-weight:600; }
+.application-work .work-task-filters button:focus-visible { outline:3px solid #48752a; outline-offset:3px; }
+.application-work .work-task-filter-status { font-size:13px; color:var(--color-text-secondary); line-height:1.6; }
+.application-work .work-task-empty { padding:16px; background:var(--color-bg-secondary,#f5f8f7); border-radius:8px; margin-bottom:16px; }

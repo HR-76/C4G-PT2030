@@ -1,0 +1,629 @@
+{
+  "schemaVersion": 2,
+  "contractVersion": "opportunity-v2.0",
+  "identity": {
+    "kind": "CASCADE_CALL",
+    "references": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "kind": "SOURCE_CALL_ID",
+          "value": "11145"
+        },
+        {
+          "kind": "TOPIC_REFERENCE",
+          "value": "DIGITAL-2023-SKILLS-05-SPECIALEDU"
+        }
+      ],
+      "evidenceRefs": [
+        "call-id",
+        "topic-id"
+      ],
+      "reason": null
+    }
+  },
+  "sourceRecords": [
+    {
+      "key": "EU_FUNDING_TENDERS:CASCADE:11145",
+      "namespace": "EU_FUNDING_TENDERS",
+      "externalId": "CASCADE:11145",
+      "transport": "API",
+      "role": "CALL",
+      "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/11145"
+    }
+  ],
+  "description": {
+    "title": {
+      "state": "PRESENT",
+      "value": "Gnomon Internships Offer",
+      "evidenceRefs": [
+        "call-title"
+      ],
+      "reason": null
+    },
+    "summary": {
+      "state": "PRESENT",
+      "value": "Gnomon Internships Offer",
+      "evidenceRefs": [
+        "summary"
+      ],
+      "reason": null
+    },
+    "language": {
+      "state": "PRESENT",
+      "value": "en",
+      "evidenceRefs": [
+        "language"
+      ],
+      "reason": null
+    }
+  },
+  "programmes": {
+    "state": "PRESENT",
+    "value": [
+      {
+        "key": "EU_FRAMEWORK_PROGRAMME:62ef862087520b30",
+        "sourceId": "43152860",
+        "code": "DIGITAL",
+        "label": "Digital Europe Programme (DIGITAL)",
+        "scheme": "EU_FRAMEWORK_PROGRAMME",
+        "schemeVersion": "eu-framework-2026-10-29",
+        "mapping": "VERIFIED"
+      }
+    ],
+    "evidenceRefs": [
+      "programme"
+    ],
+    "reason": null
+  },
+  "funds": {
+    "state": "NOT_FOUND",
+    "value": null,
+    "evidenceRefs": [
+      "record"
+    ],
+    "reason": "FUNDS_NOT_DECLARED"
+  },
+  "parties": {
+    "state": "PRESENT",
+    "value": [
+      {
+        "role": "DIRECT_AWARDER",
+        "name": "Gnomon Informatics SA",
+        "externalId": null
+      }
+    ],
+    "evidenceRefs": [
+      "direct-awarder"
+    ],
+    "reason": null
+  },
+  "classification": {
+    "callNature": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "instruments": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "specificObjectives": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "themes": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    }
+  },
+  "publication": {
+    "state": "PRESENT",
+    "value": "PUBLISHED",
+    "evidenceRefs": [
+      "source-type"
+    ],
+    "reason": null
+  },
+  "schedule": {
+    "plannedOpening": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "plannedClosing": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "planningPeriod": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "opening": {
+      "state": "PRESENT",
+      "value": {
+        "precision": "INSTANT",
+        "value": "2025-06-30T00:00:00.000Z",
+        "originalTimezone": "+00:00"
+      },
+      "evidenceRefs": [
+        "opening"
+      ],
+      "reason": null
+    },
+    "deadlines": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2025-09-02T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2026-01-03T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2026-09-02T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2027-01-03T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2027-09-02T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2028-01-03T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        },
+        {
+          "at": {
+            "precision": "INSTANT",
+            "value": "2028-09-02T04:59:00.000Z",
+            "originalTimezone": "+00:00"
+          },
+          "phase": null
+        }
+      ],
+      "evidenceRefs": [
+        "deadlines"
+      ],
+      "reason": null
+    },
+    "deadlineModel": {
+      "state": "PRESENT",
+      "value": "MULTIPLE_CUTOFF",
+      "evidenceRefs": [
+        "deadline-model"
+      ],
+      "reason": null
+    }
+  },
+  "status": {
+    "published": {
+      "state": "PRESENT",
+      "value": "OPEN",
+      "evidenceRefs": [
+        "status"
+      ],
+      "reason": null
+    },
+    "publishedCode": {
+      "state": "PRESENT",
+      "value": "31094502",
+      "evidenceRefs": [
+        "status"
+      ],
+      "reason": null
+    }
+  },
+  "financing": {
+    "allocations": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "key": "allocation-1",
+          "money": {
+            "amount": "120000",
+            "currency": {
+              "state": "NOT_FOUND",
+              "value": null,
+              "evidenceRefs": [
+                "currency-absence"
+              ],
+              "reason": "CURRENCY_NOT_DECLARED"
+            },
+            "interpretation": "PUBLISHED_AMOUNT"
+          },
+          "scope": "CALL_TOTAL",
+          "basis": "CONFIRMED",
+          "programmeRefs": [
+            "EU_FRAMEWORK_PROGRAMME:62ef862087520b30"
+          ],
+          "fundRefs": [],
+          "period": null,
+          "sharedGroup": null,
+          "aggregation": "STANDALONE",
+          "qualifiers": []
+        }
+      ],
+      "evidenceRefs": [
+        "budget"
+      ],
+      "reason": null
+    },
+    "support": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "minimum": null,
+          "maximum": "1500",
+          "currency": {
+            "state": "PRESENT",
+            "value": "EUR",
+            "evidenceRefs": [
+              "support-currency"
+            ],
+            "reason": null
+          },
+          "unit": "PER_PERSON_MONTH",
+          "conditions": "Maximum per month of internship at GNOMON; estimated structure: 20 internships of 4 months each."
+        }
+      ],
+      "evidenceRefs": [
+        "monthly-support"
+      ],
+      "reason": null
+    },
+    "rates": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "eligibleCosts": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    }
+  },
+  "eligibility": {
+    "beneficiaryTypes": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "territories": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "conditions": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    }
+  },
+  "applicationModes": {
+    "state": "NOT_COLLECTED",
+    "value": null,
+    "evidenceRefs": [],
+    "reason": "NOT_REQUESTED_IN_MAPPING"
+  },
+  "relatedProject": {
+    "acronym": {
+      "state": "PRESENT",
+      "value": "SUSA",
+      "evidenceRefs": [
+        "projectAcronym"
+      ],
+      "reason": null
+    },
+    "name": {
+      "state": "PRESENT",
+      "value": "Sustainable Healthcare with Digital Health Data Competence",
+      "evidenceRefs": [
+        "projectName"
+      ],
+      "reason": null
+    },
+    "grantAgreementNumber": {
+      "state": "PRESENT",
+      "value": "101190010",
+      "evidenceRefs": [
+        "projectId"
+      ],
+      "reason": null
+    },
+    "url": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "record"
+      ],
+      "reason": "PROJECT_URL_NOT_DECLARED"
+    }
+  },
+  "links": {
+    "official": {
+      "state": "PRESENT",
+      "value": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/11145",
+      "evidenceRefs": [
+        "official-url"
+      ],
+      "reason": null
+    },
+    "submission": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    },
+    "documents": {
+      "state": "NOT_COLLECTED",
+      "value": null,
+      "evidenceRefs": [],
+      "reason": "NOT_REQUESTED_IN_MAPPING"
+    }
+  },
+  "quality": {
+    "ruleVersion": "opportunity-quality-v2.0",
+    "issues": [
+      {
+        "code": "CURRENCY_NOT_DECLARED",
+        "field": "/financing/allocations/value/0/money/currency",
+        "evidenceRefs": [
+          "currency-absence"
+        ]
+      },
+      {
+        "code": "SOURCE_URL_RECONSTRUCTED_FROM_CALL_ID",
+        "field": "/links/official",
+        "evidenceRefs": [
+          "official-url"
+        ]
+      },
+      {
+        "code": "SOURCE_CLOSINGDATE_NOT_A_DEADLINE",
+        "field": "/schedule/deadlines",
+        "evidenceRefs": [
+          "unused-closing"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "mappingVersion": "eu-funding-type8-v2.0",
+    "observations": [
+      {
+        "id": "obs-eu-11145",
+        "sourceRecordKey": "EU_FUNDING_TENDERS:CASCADE:11145",
+        "observedAt": "2026-10-30T22:45:39.461Z",
+        "sourceModifiedAt": null,
+        "artifactSha256": "21e07eb79a478de23ca126fd8377733f82c6731ac24fe91313a79b2ed186f2a6",
+        "document": null,
+        "coverage": "FULL_RECORD"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "call-id",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/callccm2Id/0",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      },
+      {
+        "id": "topic-id",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/identifier/0",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      },
+      {
+        "id": "call-title",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/content",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "language",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/language",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      },
+      {
+        "id": "summary",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/summary",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "programme",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/frameworkProgramme/0",
+        "excerpt": null,
+        "transform": "EU_PROGRAMME_TAXONOMY_20261029"
+      },
+      {
+        "id": "record",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      },
+      {
+        "id": "budget",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/budget/0",
+        "excerpt": null,
+        "transform": "DECIMAL_CANONICAL"
+      },
+      {
+        "id": "currency-absence",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata",
+        "excerpt": null,
+        "transform": "ABSENT_CURRENCY_KEY"
+      },
+      {
+        "id": "direct-awarder",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/description/0",
+        "excerpt": null,
+        "transform": "EXPLICIT_NAMED_ROLE"
+      },
+      {
+        "id": "source-type",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/type/0",
+        "excerpt": null,
+        "transform": "EU_TYPE8_PUBLIC_CALL"
+      },
+      {
+        "id": "opening",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/startDate/0",
+        "excerpt": null,
+        "transform": "OFFSET_TO_UTC"
+      },
+      {
+        "id": "deadlines",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/deadlineDate",
+        "excerpt": null,
+        "transform": "OFFSET_TO_UTC_SORT_UNIQUE"
+      },
+      {
+        "id": "deadline-model",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/deadlineModel/0",
+        "excerpt": null,
+        "transform": "EU_DEADLINE_MODEL"
+      },
+      {
+        "id": "status",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/status/0",
+        "excerpt": null,
+        "transform": "EU_STATUS_CODE"
+      },
+      {
+        "id": "projectAcronym",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/projectAcronym/0",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "projectName",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/projectName/0",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "projectId",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/projectId/0",
+        "excerpt": null,
+        "transform": "IDENTIFIER_AS_TEXT"
+      },
+      {
+        "id": "official-url",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/callccm2Id/0",
+        "excerpt": null,
+        "transform": "EU_CASCADE_CANONICAL_URL"
+      },
+      {
+        "id": "unused-closing",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/closingDate/0",
+        "excerpt": null,
+        "transform": "EXCLUDE_NON_CALENDAR_METADATA"
+      },
+      {
+        "id": "monthly-support",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/description/0",
+        "excerpt": "maximum amount of financial support",
+        "transform": "EXPLICIT_MONTHLY_INTERNSHIP_CAP"
+      },
+      {
+        "id": "support-currency",
+        "observationId": "obs-eu-11145",
+        "locatorType": "JSON_POINTER",
+        "locator": "/results/0/metadata/description/0",
+        "excerpt": "€1,500 per month of internship",
+        "transform": "EXPLICIT_EURO_SYMBOL"
+      }
+    ]
+  }
+}

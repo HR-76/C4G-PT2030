@@ -1,0 +1,76 @@
+'use strict';
+// Schema experiment only; requires the explicitly created disposable cluster.
+const assert=require('node:assert/strict');
+const {readFileSync}=require('node:fs');
+const path=require('node:path');
+const {randomUUID}=require('node:crypto');
+const {Pool}=require('pg');
+if(process.env.C4G_CAPACITY_PROOF_ISOLATED!=='yes'||process.env.C4G_CAPACITY_PROOF_PORT!=='56439')throw Error('ISOLATED_PROOF_REQUIRED');
+const options={host:'127.0.0.1',port:56439,user:'capacity_proof'};
+const admin=new Pool({...options,database:'postgres'});let db;
+async function main(){try{
+ const data=(await admin.query('SHOW data_directory')).rows[0].data_directory;
+ if(path.resolve(data).toLowerCase()!==path.resolve(__dirname,'../../.tmp/capacity-proof-pg-20261110').toLowerCase())throw Error('ISOLATED_CLUSTER_MISMATCH');
+ const name=`capacity_schema_${randomUUID().replaceAll('-','').slice(0,12)}`;
+ await admin.query(`CREATE DATABASE ${name}`);db=new Pool({...options,database:name});
+ await db.query("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='c4g_central_owner') THEN CREATE ROLE c4g_central_owner NOLOGIN NOINHERIT; END IF; IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='capacity_proof_untrusted') THEN CREATE ROLE capacity_proof_untrusted NOLOGIN NOINHERIT; END IF; END $$; CREATE TABLE public.c4g_database_identity(product_code text,database_role text); INSERT INTO public.c4g_database_identity VALUES('C4G','CENTRAL')");
+ const sql=readFileSync(path.resolve(__dirname,'../database/central/candidates/capacity_authority_v1.up.sql'),'utf8');await db.query(sql);
+ const [organization,tenant,databaseGeneration,root,execution,proof]=Array.from({length:6},()=>randomUUID()),digest='a'.repeat(64),binding='b'.repeat(64);
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root,execution,digest,binding]);
+ await assert.rejects(db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,2,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root,execution,digest,binding]),e=>e.code==='23505');
+ await assert.rejects(db.query("UPDATE capacity_authority.reservation SET state='RELEASED' WHERE root_execution_id=$1",[root]),e=>e.code==='23514');
+ const insertProof="INSERT INTO capacity_authority.terminal_evidence(proof_id,organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,outcome) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'SUCCESS')";
+ const evidence=(values={})=>[proof,organization,tenant,values.databaseGeneration||databaseGeneration,root,values.generation||1,values.execution||execution,values.jobType||'document.scan',values.digest||digest,values.binding||binding,values.epoch||1];
+ for(const values of [{generation:2},{digest:'c'.repeat(64)},{databaseGeneration:randomUUID()},{jobType:'document.reconcile'},{binding:'d'.repeat(64)},{epoch:2},{execution:randomUUID()}])
+  await assert.rejects(db.query(insertProof,evidence(values)),e=>e.code==='23503');
+ await db.query(insertProof,evidence());
+ await assert.rejects(db.query("UPDATE capacity_authority.terminal_evidence SET outcome='CANCELLED' WHERE proof_id=$1",[proof]),e=>e.code==='P0001');
+ await assert.rejects(db.query("DELETE FROM capacity_authority.terminal_evidence WHERE proof_id=$1",[proof]),e=>e.code==='P0001');
+ await assert.rejects(db.query("UPDATE capacity_authority.reservation SET priority='NORMAL' WHERE root_execution_id=$1",[root]),e=>e.code==='P0001');
+ await db.query("UPDATE capacity_authority.reservation SET state='RELEASED',terminal_proof_id=$2 WHERE root_execution_id=$1",[root,proof]);
+ await assert.rejects(db.query("UPDATE capacity_authority.reservation SET state='RESERVED',terminal_proof_id=NULL WHERE root_execution_id=$1",[root]),e=>e.code==='P0001');
+ const root2=randomUUID(),oldExecution=randomUUID(),nextExecution=randomUUID();
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root2,oldExecution,digest,binding]);
+ const transfer='SELECT capacity_authority.transfer_reservation($1,$2,$3,$4,$5,$6) AS created';
+ const args=[organization,tenant,root2,1,oldExecution,nextExecution];
+ assert.equal((await db.query(transfer,args)).rows[0].created,true);
+ assert.equal((await db.query(transfer,args)).rows[0].created,false);
+ await assert.rejects(db.query(transfer,[organization,tenant,root2,1,oldExecution,randomUUID()]),e=>e.code==='P0001');
+ const states=(await db.query('SELECT generation,state,execution_id FROM capacity_authority.reservation WHERE root_execution_id=$1 ORDER BY generation',[root2])).rows;
+ assert.deepEqual(states.map(row=>[Number(row.generation),row.state,row.execution_id]),[[1,'SUPERSEDED',oldExecution],[2,'RESERVED',nextExecution]]);
+ const root3=randomUUID(),old3=randomUUID();
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root3,old3,digest,binding]);
+ const racing=await Promise.allSettled([randomUUID(),randomUUID()].map(next=>db.query(transfer,[organization,tenant,root3,1,old3,next])));
+ assert.equal(racing.filter(result=>result.status==='fulfilled').length,1);
+ assert.equal(racing.filter(result=>result.status==='rejected'&&result.reason.code==='P0001').length,1);
+ assert.equal(Number((await db.query("SELECT count(*) n FROM capacity_authority.reservation WHERE root_execution_id=$1 AND state='RESERVED'",[root3])).rows[0].n),1);
+ const root4=randomUUID(),old4=randomUUID(),next4=randomUUID();
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root4,old4,digest,binding]);
+ const rollbackClient=await db.connect();try{await rollbackClient.query('BEGIN');await rollbackClient.query(transfer,[organization,tenant,root4,1,old4,next4]);await rollbackClient.query('ROLLBACK');}finally{rollbackClient.release();}
+ const rollbackRows=(await db.query('SELECT state,execution_id FROM capacity_authority.reservation WHERE root_execution_id=$1',[root4])).rows;
+ assert.deepEqual(rollbackRows,[{state:'RESERVED',execution_id:old4}]);
+ await assert.rejects(db.query(transfer,[randomUUID(),tenant,root4,1,old4,next4]),e=>e.code==='P0001');
+ const root5=randomUUID(),old5=randomUUID(),next5=randomUUID(),proof5=randomUUID();
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root5,old5,digest,binding]);
+ await db.query(insertProof,[proof5,organization,tenant,databaseGeneration,root5,1,old5,'document.scan',digest,binding,1]);
+ const release='SELECT capacity_authority.release_reservation($1,$2,$3,$4,$5,$6) AS released';
+ const race=await Promise.allSettled([db.query(release,[organization,tenant,root5,1,old5,proof5]),db.query(transfer,[organization,tenant,root5,1,old5,next5])]);
+ assert.equal(race.filter(result=>result.status==='fulfilled').length,1);
+ assert.equal(race.filter(result=>result.status==='rejected'&&result.reason.code==='P0001').length,1);
+ const final5=(await db.query('SELECT generation,state FROM capacity_authority.reservation WHERE root_execution_id=$1 ORDER BY generation',[root5])).rows;
+ assert.ok(JSON.stringify(final5)===JSON.stringify([{generation:'1',state:'RELEASED'}])||JSON.stringify(final5)===JSON.stringify([{generation:'1',state:'SUPERSEDED'},{generation:'2',state:'RESERVED'}]));
+ const root6=randomUUID(),old6=randomUUID(),proof6=randomUUID();
+ await db.query("INSERT INTO capacity_authority.reservation(organization_id,tenant_id,database_generation_id,root_execution_id,generation,execution_id,job_type,content_digest,binding_digest,authority_epoch,priority,state) VALUES($1,$2,$3,$4,1,$5,'document.scan',$6,$7,1,'CRITICAL','RESERVED')",[organization,tenant,databaseGeneration,root6,old6,digest,binding]);
+ const releaseArgs=[organization,tenant,root6,1,old6,proof6];
+ await assert.rejects(db.query(release,releaseArgs),e=>e.code==='P0001');
+ await db.query(insertProof,[proof6,organization,tenant,databaseGeneration,root6,1,old6,'document.scan',digest,binding,1]);
+ assert.equal((await db.query(release,releaseArgs)).rows[0].released,true);
+ assert.equal((await db.query(release,releaseArgs)).rows[0].released,false);
+ await assert.rejects(db.query(release,[organization,tenant,root6,1,old6,randomUUID()]),e=>e.code==='P0001');
+ await assert.rejects(db.query(transfer,[organization,tenant,root6,1,old6,randomUUID()]),e=>e.code==='P0001');
+ assert.equal((await db.query("SELECT has_function_privilege('capacity_proof_untrusted','capacity_authority.release_reservation(uuid,uuid,uuid,bigint,uuid,uuid)','EXECUTE') AS allowed")).rows[0].allowed,false);
+ const permission=(await db.query("SELECT has_schema_privilege('capacity_proof_untrusted','capacity_authority','USAGE') AS schema_access,has_table_privilege('capacity_proof_untrusted','capacity_authority.terminal_evidence','INSERT') AS proof_insert,has_function_privilege('capacity_proof_untrusted','capacity_authority.transfer_reservation(uuid,uuid,uuid,bigint,uuid,uuid)','EXECUTE') AS transfer_execute")).rows[0];assert.deepEqual(permission,{schema_access:false,proof_insert:false,transfer_execute:false});
+ const limited=await db.connect();try{await limited.query('BEGIN');await limited.query('SET LOCAL ROLE capacity_proof_untrusted');await assert.rejects(limited.query("INSERT INTO capacity_authority.terminal_evidence DEFAULT VALUES"),e=>e.code==='42501');await limited.query('ROLLBACK');}finally{limited.release();}
+ console.log(JSON.stringify({status:'PASS',releaseWithoutProofDenied:true,duplicateActiveDenied:true,wrongGenerationDenied:true,wrongDatabaseGenerationDenied:true,wrongExecutionDenied:true,wrongDigestDenied:true,wrongJobTypeDenied:true,wrongBindingDenied:true,wrongAuthorityEpochDenied:true,terminalEvidenceImmutable:true,reservationIdentityImmutable:true,releasedGenerationImmutable:true,transferAtomic:true,transferIdempotent:true,transferRace:true,transferRollback:true,wrongOrganizationDenied:true,untrustedWriteDenied:true}));
+ }finally{await Promise.all([db?.end(),admin.end()]);}}
+main().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,0 +1,13 @@
+{
+  "name": "gcni-catalog-read-g2-isolated",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Schemas and synthetic tests only; no production entrypoint, network or database.",
+  "scripts": {
+    "test": "python run-tests.py"
+  },
+  "engines": {
+    "node": ">=24.5.0"
+  }
+}

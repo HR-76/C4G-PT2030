@@ -1,0 +1,331 @@
+{
+  "runs": [
+    {
+      "name": "a1",
+      "directory": "transversal-a1-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T22:25:03.258Z",
+      "finishedAt": "2026-11-06T22:28:44.891Z"
+    },
+    {
+      "name": "b1",
+      "directory": "transversal-b1-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T22:28:50.028Z",
+      "finishedAt": "2026-11-06T22:30:28.195Z"
+    },
+    {
+      "name": "b2",
+      "directory": "transversal-b2-20261106",
+      "variant": "B",
+      "startedAt": "2026-11-06T22:30:33.340Z",
+      "finishedAt": "2026-11-06T22:32:08.452Z"
+    },
+    {
+      "name": "a2",
+      "directory": "transversal-a2-20261106",
+      "variant": "A",
+      "startedAt": "2026-11-06T22:32:13.546Z",
+      "finishedAt": "2026-11-06T22:35:04.820Z"
+    }
+  ],
+  "images": [
+    "sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+    "sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"
+  ],
+  "totalPageMeasurements": 48,
+  "rows": [
+    {
+      "mode": "load",
+      "route": "/dashboard",
+      "before": {
+        "n": 4,
+        "medianMs": 5080.459599999998,
+        "minMs": 4788.94219999999,
+        "maxMs": 5346.2526,
+        "valuesMs": [
+          5346.2526,
+          4788.94219999999,
+          4991.868999999999,
+          5169.050199999998
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4309.12645,
+        "minMs": 4242.3799,
+        "maxMs": 4400.5192000000025,
+        "valuesMs": [
+          4329.100200000001,
+          4242.3799,
+          4400.5192000000025,
+          4289.152699999999
+        ]
+      },
+      "reductionPercent": 15.18234984094744,
+      "settledMedianMs": {
+        "before": 11329.4958,
+        "after": 4741.461200000002
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 4,
+        "medianMs": 4697.5399,
+        "minMs": 4635.724600000001,
+        "maxMs": 4862.292700000005,
+        "valuesMs": [
+          4699.6993,
+          4862.292700000005,
+          4695.380499999999,
+          4635.724600000001
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4834.753400000001,
+        "minMs": 4552.445300000007,
+        "maxMs": 4960.078600000001,
+        "valuesMs": [
+          4870.876600000003,
+          4798.6302,
+          4960.078600000001,
+          4552.445300000007
+        ]
+      },
+      "reductionPercent": -2.9209650779124186,
+      "settledMedianMs": {
+        "before": 12866.035699999997,
+        "after": 5990.175050000005
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/candidaturas",
+      "before": {
+        "n": 4,
+        "medianMs": 5535.4835500000045,
+        "minMs": 5151.722099999999,
+        "maxMs": 5792.413699999997,
+        "valuesMs": [
+          5792.413699999997,
+          5508.800800000012,
+          5151.722099999999,
+          5562.166299999997
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 4126.910649999998,
+        "minMs": 3999.260699999999,
+        "maxMs": 4293.365699999995,
+        "valuesMs": [
+          4293.365699999995,
+          3999.260699999999,
+          4118.280999999995,
+          4135.540300000001
+        ]
+      },
+      "reductionPercent": 25.446248503439328,
+      "settledMedianMs": {
+        "before": 11919.40885,
+        "after": 4554.511999999999
+      }
+    },
+    {
+      "mode": "load",
+      "route": "/notificacoes",
+      "before": {
+        "n": 4,
+        "medianMs": 16041.540549999998,
+        "minMs": 15590.630399999995,
+        "maxMs": 16231.38930000001,
+        "valuesMs": [
+          16052.567800000004,
+          15590.630399999995,
+          16231.38930000001,
+          16030.513299999991
+        ]
+      },
+      "after": {
+        "n": 4,
+        "medianMs": 5460.02665,
+        "minMs": 5208.631800000003,
+        "maxMs": 5580.744900000005,
+        "valuesMs": [
+          5580.744900000005,
+          5428.357600000003,
+          5491.695699999997,
+          5208.631800000003
+        ]
+      },
+      "reductionPercent": 65.96320264265391,
+      "settledMedianMs": {
+        "before": 16497.120049999998,
+        "after": 5919.943650000001
+      }
+    },
+    {
+      "mode": "navigation",
+      "route": "/dashboard",
+      "before": {
+        "n": 2,
+        "medianMs": 3109.8879999999917,
+        "minMs": 3077.475000000006,
+        "maxMs": 3142.3009999999776,
+        "valuesMs": [
+          3077.475000000006,
+          3142.3009999999776
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 2986.1528499999986,
+        "minMs": 2978.420299999998,
+        "maxMs": 2993.885399999999,
+        "valuesMs": [
+          2993.885399999999,
+          2978.420299999998
+        ]
+      },
+      "reductionPercent": 3.9787654732258315
+    },
+    {
+      "mode": "navigation",
+      "route": "/perfil-organizacao",
+      "before": {
+        "n": 2,
+        "medianMs": 3994.1202000000194,
+        "minMs": 3927.676700000011,
+        "maxMs": 4060.563700000028,
+        "valuesMs": [
+          3927.676700000011,
+          4060.563700000028
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3829.091750000007,
+        "minMs": 3745.744000000006,
+        "maxMs": 3912.4395000000077,
+        "valuesMs": [
+          3912.4395000000077,
+          3745.744000000006
+        ]
+      },
+      "reductionPercent": 4.131784767018576
+    },
+    {
+      "mode": "navigation",
+      "route": "/candidaturas",
+      "before": {
+        "n": 2,
+        "medianMs": 3247.214799999987,
+        "minMs": 3187.4139999999898,
+        "maxMs": 3307.0155999999843,
+        "valuesMs": [
+          3187.4139999999898,
+          3307.0155999999843
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 2876.2409000000043,
+        "minMs": 2832.2275999999983,
+        "maxMs": 2920.2542000000103,
+        "valuesMs": [
+          2920.2542000000103,
+          2832.2275999999983
+        ]
+      },
+      "reductionPercent": 11.424372049547948
+    },
+    {
+      "mode": "navigation",
+      "route": "/notificacoes",
+      "before": {
+        "n": 2,
+        "medianMs": 10422.254350000003,
+        "minMs": 9914.509099999996,
+        "maxMs": 10929.99960000001,
+        "valuesMs": [
+          10929.99960000001,
+          9914.509099999996
+        ]
+      },
+      "after": {
+        "n": 2,
+        "medianMs": 3196.4767000000065,
+        "minMs": 2680.1907000000065,
+        "maxMs": 3712.7627000000066,
+        "valuesMs": [
+          3712.7627000000066,
+          2680.1907000000065
+        ]
+      },
+      "reductionPercent": 69.33027546003035
+    }
+  ],
+  "securityChecks": [
+    "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+    "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+    "authority runtime cannot read central tables outside closed protocol",
+    "real composition readiness",
+    "OIDC PKCE login and organization selection",
+    "combined browse matches existing list and units, preserves filters and rejects tampered cursors",
+    "combined refresh creates due alerts once, matches stored inbox, excludes other recipients and requires CSRF",
+    "both combined operations refuse crossed organization headers",
+    "browse refuses missing application.read",
+    "alerts refuses missing notification.read",
+    "notification visibility freshly excludes inaccessible application.read",
+    "notification visibility freshly excludes inaccessible opportunity.read",
+    "browse withholds data on synchronous audit failure",
+    "alerts withholds data on synchronous audit failure",
+    "creation audit failure rolls back newly inserted deadline alerts",
+    "four concurrent browse operations return complete authorized results",
+    "four concurrent alerts operations return complete authorized results",
+    "concurrent first generation creates exactly two events and two audit entries; stale deadlines remain hidden",
+    "browse preserves protected commit ordering and refuses reads after revocation",
+    "alerts preserves protected commit ordering and refuses reads after revocation"
+  ],
+  "concurrent": {
+    "browse": [
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      },
+      {
+        "status": 200,
+        "total": 1000
+      }
+    ],
+    "alerts": [
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      },
+      {
+        "status": 200,
+        "total": 8
+      }
+    ]
+  }
+}

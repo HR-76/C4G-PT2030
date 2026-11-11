@@ -1,0 +1,103 @@
+{
+  "at": "2026-10-26T23:44:38.208Z",
+  "syntax": [
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "test/integration/http-contention/instrumentation.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "test/integration/http-contention/profile.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "test/integration/http-contention/summarize.js"
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "file": "test/integration/http-contention/profile.ps1"
+    }
+  ],
+  "experiments": [
+    {
+      "file": "context/reviews/authority-contention/results.json",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-26T23:31:38.337Z",
+      "finishedAt": "2026-10-26T23:35:44.577Z",
+      "successes": 35,
+      "requests": 36,
+      "errors": [
+        {
+          "name": "report-c1",
+          "errors": 0
+        },
+        {
+          "name": "report-c2",
+          "errors": 0
+        },
+        {
+          "name": "report-c4",
+          "errors": 1
+        },
+        {
+          "name": "dashboard-c1",
+          "errors": 0
+        },
+        {
+          "name": "dashboard-c4",
+          "errors": 0
+        },
+        {
+          "name": "dashboard-two-tenants-c4",
+          "errors": 0
+        }
+      ],
+      "checks": [
+        "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+        "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+        "authority runtime cannot read central tables outside closed protocol",
+        "real composition readiness",
+        "OIDC PKCE login and organization selection"
+      ],
+      "cleanupErrors": []
+    },
+    {
+      "file": "context/reviews/authority-contention-capacity/results.json",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-26T23:37:29.234Z",
+      "finishedAt": "2026-10-26T23:38:46.872Z",
+      "successes": 2,
+      "requests": 6,
+      "errors": [
+        {
+          "name": "dashboard-c6",
+          "errors": 4
+        }
+      ],
+      "checks": [
+        "real API logins cannot bypass RLS, change to owner/worker, connect across tenants or read without functional role",
+        "FORCE RLS hides foreign rows and rejects mismatched writes; transaction restores SQL role",
+        "authority runtime cannot read central tables outside closed protocol",
+        "real composition readiness",
+        "OIDC PKCE login and organization selection"
+      ],
+      "cleanupErrors": []
+    }
+  ],
+  "artifactSecretScan": {
+    "files": 13,
+    "matches": [],
+    "encodings": [
+      "UTF8",
+      "UTF16LE"
+    ]
+  },
+  "isolatedContainersRemaining": 0,
+  "containerCheck": "docker ps -a --filter label=c4g.http-proof returned no rows",
+  "globalSuitesAndBuild": "Not repeated: application sources unchanged in this investigation.",
+  "performanceGate": "OPEN: HTTP errors reproduced; COMPLETE means diagnostic execution completed."
+}

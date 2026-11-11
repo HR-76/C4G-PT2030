@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T17:35:47.075Z",
+  "checks": {
+    "people": 1,
+    "units": 3,
+    "profileRevision": 1,
+    "catalog": 9,
+    "currentDetails": 4,
+    "managerAdminStatus": 403,
+    "foreignOrganizationStatus": 409,
+    "privateApplicationsStatus": 200,
+    "adminPrivateStatus": 409
+  },
+  "writes": [],
+  "pageErrors": [],
+  "externalCollections": 0
+}

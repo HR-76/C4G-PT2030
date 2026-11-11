@@ -1,0 +1,218 @@
+[
+  {
+    "scenario": "1000, deadline, A",
+    "median": 54.93,
+    "min": 53.223,
+    "max": 56.356
+  },
+  {
+    "scenario": "1000, deadline, B",
+    "median": 54.2505,
+    "min": 51.768,
+    "max": 54.988
+  },
+  {
+    "scenario": "1000, deep, A",
+    "median": 61.759,
+    "min": 58.635,
+    "max": 64.922
+  },
+  {
+    "scenario": "1000, deep, B",
+    "median": 56.0805,
+    "min": 50.921,
+    "max": 75.022
+  },
+  {
+    "scenario": "1000, first, A",
+    "median": 56.65,
+    "min": 53.928,
+    "max": 58.854
+  },
+  {
+    "scenario": "1000, first, B",
+    "median": 52.7285,
+    "min": 51.334,
+    "max": 63.275
+  },
+  {
+    "scenario": "1000, resource, A",
+    "median": 0.289,
+    "min": 0.285,
+    "max": 0.292
+  },
+  {
+    "scenario": "1000, resource, B",
+    "median": 0.27,
+    "min": 0.262,
+    "max": 0.338
+  },
+  {
+    "scenario": "1000, search, A",
+    "median": 26.514499999999998,
+    "min": 25.214,
+    "max": 29.975
+  },
+  {
+    "scenario": "1000, search, B",
+    "median": 24.621,
+    "min": 23.433,
+    "max": 25.655
+  },
+  {
+    "scenario": "1000, status, A",
+    "median": 57.4015,
+    "min": 56.529,
+    "max": 63.093
+  },
+  {
+    "scenario": "1000, status, B",
+    "median": 54.8725,
+    "min": 53.367,
+    "max": 57.227
+  },
+  {
+    "scenario": "1000, team, A",
+    "median": 2.0105,
+    "min": 1.939,
+    "max": 2.041
+  },
+  {
+    "scenario": "1000, team, B",
+    "median": 2.0839999999999996,
+    "min": 2.001,
+    "max": 2.188
+  },
+  {
+    "scenario": "1000, team-empty, A",
+    "median": 0.40800000000000003,
+    "min": 0.369,
+    "max": 0.483
+  },
+  {
+    "scenario": "1000, team-empty, B",
+    "median": 0.3675,
+    "min": 0.312,
+    "max": 0.405
+  },
+  {
+    "scenario": "1000, unit-none, A",
+    "median": 55.085499999999996,
+    "min": 52.763,
+    "max": 57.974
+  },
+  {
+    "scenario": "1000, unit-none, B",
+    "median": 55.885999999999996,
+    "min": 53.852,
+    "max": 57.173
+  },
+  {
+    "scenario": "10000, deadline, A",
+    "median": 1211.4385,
+    "min": 1174.87,
+    "max": 1263.196
+  },
+  {
+    "scenario": "10000, deadline, B",
+    "median": 514.1475,
+    "min": 497.923,
+    "max": 520.015
+  },
+  {
+    "scenario": "10000, deep, A",
+    "median": 1293.3429999999998,
+    "min": 1256.262,
+    "max": 1305.093
+  },
+  {
+    "scenario": "10000, deep, B",
+    "median": 535.5035,
+    "min": 513.202,
+    "max": 559.496
+  },
+  {
+    "scenario": "10000, first, A",
+    "median": 1339.2835,
+    "min": 1293.585,
+    "max": 1469.277
+  },
+  {
+    "scenario": "10000, first, B",
+    "median": 573.185,
+    "min": 532.106,
+    "max": 594.739
+  },
+  {
+    "scenario": "10000, resource, A",
+    "median": 0.256,
+    "min": 0.24,
+    "max": 0.271
+  },
+  {
+    "scenario": "10000, resource, B",
+    "median": 0.2395,
+    "min": 0.227,
+    "max": 0.274
+  },
+  {
+    "scenario": "10000, search, A",
+    "median": 957.338,
+    "min": 916.565,
+    "max": 971.742
+  },
+  {
+    "scenario": "10000, search, B",
+    "median": 191.571,
+    "min": 175.296,
+    "max": 204.979
+  },
+  {
+    "scenario": "10000, status, A",
+    "median": 1248.517,
+    "min": 1197.692,
+    "max": 1312.861
+  },
+  {
+    "scenario": "10000, status, B",
+    "median": 511.80499999999995,
+    "min": 487.887,
+    "max": 518.957
+  },
+  {
+    "scenario": "10000, team, A",
+    "median": 752.701,
+    "min": 723.487,
+    "max": 788.233
+  },
+  {
+    "scenario": "10000, team, B",
+    "median": 2.88,
+    "min": 2.748,
+    "max": 3.175
+  },
+  {
+    "scenario": "10000, team-empty, A",
+    "median": 744.162,
+    "min": 735.279,
+    "max": 781.686
+  },
+  {
+    "scenario": "10000, team-empty, B",
+    "median": 0.866,
+    "min": 0.852,
+    "max": 0.888
+  },
+  {
+    "scenario": "10000, unit-none, A",
+    "median": 1255.6025,
+    "min": 1222.581,
+    "max": 1299.057
+  },
+  {
+    "scenario": "10000, unit-none, B",
+    "median": 519.857,
+    "min": 513.338,
+    "max": 526.651
+  }
+]

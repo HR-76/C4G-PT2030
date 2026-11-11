@@ -1,0 +1,11 @@
+.form-modal-overlay { position:fixed; inset:0; z-index:2000; display:grid; place-items:center; padding:24px; background:color-mix(in srgb, var(--color-action-hover) 55%, transparent); }
+.form-modal-overlay[hidden] { display:none; }
+.form-modal { width:min(100%,600px); max-height:calc(100dvh - 48px); overflow-y:auto; overscroll-behavior:contain; background:var(--surface-default); color:var(--text-primary); border:1px solid var(--border-control); border-radius:16px; padding:24px; box-shadow:0 24px 80px color-mix(in srgb, var(--color-action-hover) 24%, transparent); animation:confirm-in var(--motion-normal) var(--motion-ease); }
+.form-modal-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.form-modal-heading h2 { margin:0; font-size:1.25rem; }
+.form-modal-close { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border:1px solid var(--border-control); border-radius:8px; background:transparent; color:inherit; cursor:pointer; transition:var(--control-transition); }
+.form-modal-close:hover:not(:disabled) { background:var(--surface-hover); border-color:var(--navigation-surface); }
+.form-modal-close:disabled { opacity:.45; cursor:wait; }
+.form-modal :focus-visible { outline:2px solid var(--focus-ring); outline-offset:3px; }
+.form-modal .entity-user-form { margin:0; padding:0; border:0; background:transparent; }
+@media(max-width:640px) { .form-modal-overlay { padding:12px; }.form-modal { max-height:calc(100dvh - 24px); padding:20px; border-radius:12px; } }

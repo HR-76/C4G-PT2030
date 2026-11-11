@@ -1,0 +1,12 @@
+.central-manual-form { max-width: 1040px; padding: 24px; }
+.central-manual-group { min-width: 0; margin: 0 0 24px; padding: 0 0 24px; border: 0; border-bottom: 1px solid var(--border); }
+.central-manual-group legend { padding: 0 0 16px; font-size: 16px; font-weight: 600; }
+.central-manual-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+.central-manual-fields label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.central-manual-fields label:has([name="title"]), .central-manual-fields label:has(textarea), .central-manual-fields label:has([name="officialUrl"]) { grid-column: 1 / -1; }
+.central-manual-fields input, .central-manual-fields select, .central-manual-fields textarea { width: 100%; min-width: 0; }
+.central-manual-fields textarea { resize: vertical; }
+.central-manual-form [role="alert"] { grid-column: 1 / -1; }
+@media (max-width: 640px) { .central-manual-form { padding: 16px; } .central-manual-fields { grid-template-columns: minmax(0, 1fr); } }
+
+.central-manual-fields input[type="url"] { border: 1px solid var(--border-control); border-radius: var(--radius); padding: 7px 10px; font: 13.5px var(--font); color: var(--text); background: var(--bg-white); transition: var(--control-transition); }

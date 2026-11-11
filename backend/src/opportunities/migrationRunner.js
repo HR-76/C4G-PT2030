@@ -1,0 +1,6 @@
+'use strict';
+const {load}=require('./migrationManifest');const {opportunityPreflight}=require('./preflight');
+function assertTarget(connectionString){const url=new URL(connectionString);if(!['127.0.0.1','localhost'].includes(url.hostname)||['5432','5433'].includes(url.port)||!/^\/f12_synthetic_/.test(url.pathname))throw new Error('F12 migration target refused.');}
+async function applyOpportunityMigration(pool,scope){const exists=(await pool.query("SELECT to_regnamespace('opportunity_catalog') IS NOT NULL AS present")).rows[0].present;if(exists){await opportunityPreflight(pool,scope);return Object.freeze({applied:false,version:load(scope).entry.version});}await pool.query('BEGIN');try{await pool.query(load(scope,'up').sql);await pool.query('COMMIT');return Object.freeze({applied:true,version:load(scope).entry.version});}catch(error){await pool.query('ROLLBACK');throw error;}}
+async function rollbackOpportunityMigration(pool,scope){await pool.query('BEGIN');try{await pool.query(load(scope,'down').sql);await pool.query('COMMIT');return Object.freeze({rolledBack:true,version:load(scope).entry.version});}catch(error){await pool.query('ROLLBACK');throw error;}}
+module.exports={applyOpportunityMigration,assertTarget,rollbackOpportunityMigration};

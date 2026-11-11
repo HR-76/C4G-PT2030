@@ -1,0 +1,108 @@
+{
+  "result": "PASS",
+  "synthetic": true,
+  "realPostgres": true,
+  "identityProvider": "session fixture",
+  "organizationEdit": true,
+  "unitHierarchy": true,
+  "personCreateEdit": true,
+  "reloadAndIdempotency": true,
+  "reader": true,
+  "tenantIsolation": true,
+  "mobile390": true,
+  "pageErrors": [],
+  "responses": [
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 201
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 503
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 201
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people/5f47056c-5d93-486d-9050-ff6c6f5b26d3",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/units",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    },
+    {
+      "path": "/api/organization-directory/people",
+      "status": 200
+    }
+  ]
+}

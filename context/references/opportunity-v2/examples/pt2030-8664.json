@@ -1,0 +1,610 @@
+{
+  "schemaVersion": 2,
+  "contractVersion": "opportunity-v2.0",
+  "identity": {
+    "kind": "CALL",
+    "references": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "kind": "PLAN_ID",
+          "value": "8664"
+        }
+      ],
+      "evidenceRefs": [
+        "cell-A"
+      ],
+      "reason": null
+    }
+  },
+  "sourceRecords": [
+    {
+      "key": "PT2030_PLAN:8664",
+      "namespace": "PORTUGAL2030_PLAN",
+      "externalId": "8664",
+      "transport": "XLSX",
+      "role": "PLAN",
+      "url": null
+    }
+  ],
+  "description": {
+    "title": {
+      "state": "PRESENT",
+      "value": "SICE - Inovação Produtiva - Regime Contratual de Investimento",
+      "evidenceRefs": [
+        "cell-D"
+      ],
+      "reason": null
+    },
+    "summary": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "language": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "LANGUAGE_NOT_DECLARED"
+    }
+  },
+  "programmes": {
+    "state": "PRESENT",
+    "value": [
+      {
+        "key": "PT2030_PROGRAMME_LABEL:2e7057ba4d4d0412",
+        "sourceId": null,
+        "code": null,
+        "label": "ALGARVE2030",
+        "scheme": "PT2030_PROGRAMME_LABEL",
+        "schemeVersion": null,
+        "mapping": "UNMAPPED"
+      }
+    ],
+    "evidenceRefs": [
+      "cell-E"
+    ],
+    "reason": null
+  },
+  "funds": {
+    "state": "PRESENT",
+    "value": [
+      {
+        "key": "PT2030_FUND_LABEL:7e44979edc847983",
+        "sourceId": null,
+        "code": null,
+        "label": "FEDER",
+        "scheme": "PT2030_FUND_LABEL",
+        "schemeVersion": null,
+        "mapping": "UNMAPPED"
+      }
+    ],
+    "evidenceRefs": [
+      "cell-G"
+    ],
+    "reason": null
+  },
+  "parties": {
+    "state": "NOT_FOUND",
+    "value": null,
+    "evidenceRefs": [
+      "headers"
+    ],
+    "reason": "PARTIES_NOT_DECLARED"
+  },
+  "classification": {
+    "callNature": {
+      "state": "PRESENT",
+      "value": {
+        "key": "PT2030_CALL_NATURE_LABEL:1997f55225451859",
+        "sourceId": null,
+        "code": null,
+        "label": "Concurso",
+        "scheme": "PT2030_CALL_NATURE_LABEL",
+        "schemeVersion": null,
+        "mapping": "UNMAPPED"
+      },
+      "evidenceRefs": [
+        "cell-C"
+      ],
+      "reason": null
+    },
+    "instruments": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "specificObjectives": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "key": "PT2030_SPECIFIC_OBJECTIVE:a72f67ffd201db73",
+          "sourceId": null,
+          "code": "RSO1.3",
+          "label": "Crescimento e competitividade das PMEs",
+          "scheme": "PT2030_SPECIFIC_OBJECTIVE",
+          "schemeVersion": null,
+          "mapping": "UNMAPPED"
+        }
+      ],
+      "evidenceRefs": [
+        "cell-F"
+      ],
+      "reason": null
+    },
+    "themes": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    }
+  },
+  "publication": {
+    "state": "PRESENT",
+    "value": "PLANNED",
+    "evidenceRefs": [
+      "document-title"
+    ],
+    "reason": null
+  },
+  "schedule": {
+    "plannedOpening": {
+      "state": "PRESENT",
+      "value": {
+        "precision": "DATE",
+        "value": "2026-10-30"
+      },
+      "evidenceRefs": [
+        "cell-I"
+      ],
+      "reason": null
+    },
+    "plannedClosing": {
+      "state": "PRESENT",
+      "value": {
+        "precision": "DATE",
+        "value": "2027-11-30"
+      },
+      "evidenceRefs": [
+        "cell-J"
+      ],
+      "reason": null
+    },
+    "planningPeriod": {
+      "state": "PRESENT",
+      "value": {
+        "label": "Q1",
+        "scheme": "PT2030_PLAN_FOUR_MONTH",
+        "start": null,
+        "end": null
+      },
+      "evidenceRefs": [
+        "cell-K"
+      ],
+      "reason": null
+    },
+    "opening": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "CONFIRMED_CALENDAR_NOT_DECLARED"
+    },
+    "deadlines": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "CONFIRMED_CALENDAR_NOT_DECLARED"
+    },
+    "deadlineModel": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "CONFIRMED_CALENDAR_NOT_DECLARED"
+    }
+  },
+  "status": {
+    "published": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "PUBLICATION_STATUS_NOT_DECLARED"
+    },
+    "publishedCode": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "PUBLICATION_STATUS_NOT_DECLARED"
+    }
+  },
+  "financing": {
+    "allocations": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "key": "allocation-1",
+          "money": {
+            "amount": "0",
+            "currency": {
+              "state": "NOT_FOUND",
+              "value": null,
+              "evidenceRefs": [
+                "headers"
+              ],
+              "reason": "CURRENCY_NOT_DECLARED"
+            },
+            "interpretation": "ZERO_UNEXPLAINED"
+          },
+          "scope": "FUND_ALLOCATION",
+          "basis": "PLANNED",
+          "programmeRefs": [
+            "PT2030_PROGRAMME_LABEL:2e7057ba4d4d0412"
+          ],
+          "fundRefs": [
+            "PT2030_FUND_LABEL:7e44979edc847983"
+          ],
+          "period": null,
+          "sharedGroup": null,
+          "aggregation": "UNKNOWN",
+          "qualifiers": []
+        }
+      ],
+      "evidenceRefs": [
+        "cell-H",
+        "cell-G",
+        "cell-E"
+      ],
+      "reason": null
+    },
+    "support": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "rates": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "eligibleCosts": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    }
+  },
+  "eligibility": {
+    "beneficiaryTypes": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "key": "PT2030_BENEFICIARY_LABEL:3f8caf90abb58a2d",
+          "sourceId": null,
+          "code": null,
+          "label": "Privada",
+          "scheme": "PT2030_BENEFICIARY_LABEL",
+          "schemeVersion": null,
+          "mapping": "UNMAPPED"
+        }
+      ],
+      "evidenceRefs": [
+        "cell-B"
+      ],
+      "reason": null
+    },
+    "territories": {
+      "state": "PRESENT",
+      "value": [
+        {
+          "concept": {
+            "key": "PT2030_NUTS_II_LABEL:41a016a3d2fbde33",
+            "sourceId": null,
+            "code": null,
+            "label": "Algarve",
+            "scheme": "PT2030_NUTS_II_LABEL",
+            "schemeVersion": null,
+            "mapping": "UNMAPPED"
+          },
+          "scope": "UNSPECIFIED"
+        }
+      ],
+      "evidenceRefs": [
+        "cell-L"
+      ],
+      "reason": null
+    },
+    "conditions": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    }
+  },
+  "applicationModes": {
+    "state": "PRESENT",
+    "value": [
+      {
+        "key": "PT2030_APPLICATION_MODE_LABEL:010dd7b94f5f3d31",
+        "sourceId": null,
+        "code": null,
+        "label": "Individual",
+        "scheme": "PT2030_APPLICATION_MODE_LABEL",
+        "schemeVersion": null,
+        "mapping": "UNMAPPED"
+      }
+    ],
+    "evidenceRefs": [
+      "cell-M"
+    ],
+    "reason": null
+  },
+  "relatedProject": {
+    "acronym": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "name": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "grantAgreementNumber": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "url": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    }
+  },
+  "links": {
+    "official": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "submission": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    },
+    "documents": {
+      "state": "NOT_FOUND",
+      "value": null,
+      "evidenceRefs": [
+        "headers"
+      ],
+      "reason": "NO_COLUMN_IN_SOURCE"
+    }
+  },
+  "quality": {
+    "ruleVersion": "opportunity-quality-v2.0",
+    "issues": [
+      {
+        "code": "CURRENCY_NOT_DECLARED",
+        "field": "/financing/allocations/value/0/money/currency",
+        "evidenceRefs": [
+          "headers"
+        ]
+      },
+      {
+        "code": "PLANNING_PERIOD_BOUNDS_NOT_DECLARED",
+        "field": "/schedule/planningPeriod",
+        "evidenceRefs": [
+          "cell-K"
+        ]
+      },
+      {
+        "code": "TAXONOMY_MAPPING_PENDING",
+        "field": "/programmes",
+        "evidenceRefs": [
+          "cell-E"
+        ]
+      },
+      {
+        "code": "TERRITORY_TAXONOMY_VERSION_UNKNOWN",
+        "field": "/eligibility/territories",
+        "evidenceRefs": [
+          "cell-L"
+        ]
+      },
+      {
+        "code": "ZERO_MEANING_UNCONFIRMED",
+        "field": "/financing/allocations/value/0/money/interpretation",
+        "evidenceRefs": [
+          "cell-H"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "mappingVersion": "pt2030-plan-xlsx-v2.0",
+    "observations": [
+      {
+        "id": "obs-plan-8664",
+        "sourceRecordKey": "PT2030_PLAN:8664",
+        "observedAt": "2026-10-30T22:47:58.470Z",
+        "sourceModifiedAt": "2026-09-14T15:54:48.000Z",
+        "artifactSha256": "f5d81e3a2fcf31fac5b4545a4e7625c9f0c22333f28cc301ad4b61a7845f5869",
+        "document": {
+          "name": "PlanoAnualAvisos_download_140926-1.xlsx",
+          "sha256": "f5d81e3a2fcf31fac5b4545a4e7625c9f0c22333f28cc301ad4b61a7845f5869",
+          "sheet": "Sheet1"
+        },
+        "coverage": "SOURCE_FILE"
+      }
+    ],
+    "evidence": [
+      {
+        "id": "cell-A",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!A23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-B",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!B23",
+        "excerpt": null,
+        "transform": "PIPE_LIST"
+      },
+      {
+        "id": "cell-C",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!C23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-D",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!D23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-E",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!E23",
+        "excerpt": null,
+        "transform": "PIPE_LIST"
+      },
+      {
+        "id": "cell-F",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!F23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-G",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!G23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-H",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!H23",
+        "excerpt": null,
+        "transform": "DECIMAL_CANONICAL"
+      },
+      {
+        "id": "cell-I",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!I23",
+        "excerpt": null,
+        "transform": "EXCEL_1900_DATE"
+      },
+      {
+        "id": "cell-J",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!J23",
+        "excerpt": null,
+        "transform": "EXCEL_1900_DATE"
+      },
+      {
+        "id": "cell-K",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!K23",
+        "excerpt": null,
+        "transform": "TEXT_NFC_TRIM"
+      },
+      {
+        "id": "cell-L",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!L23",
+        "excerpt": null,
+        "transform": "PIPE_LIST"
+      },
+      {
+        "id": "cell-M",
+        "observationId": "obs-plan-8664",
+        "locatorType": "CELL",
+        "locator": "Sheet1!M23",
+        "excerpt": null,
+        "transform": "PIPE_LIST"
+      },
+      {
+        "id": "headers",
+        "observationId": "obs-plan-8664",
+        "locatorType": "HEADER",
+        "locator": "Sheet1!A2:M2",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      },
+      {
+        "id": "document-title",
+        "observationId": "obs-plan-8664",
+        "locatorType": "DOCUMENT",
+        "locator": "Sheet1!A1",
+        "excerpt": null,
+        "transform": "IDENTITY"
+      }
+    ]
+  }
+}

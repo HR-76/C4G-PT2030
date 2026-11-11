@@ -1,0 +1,3 @@
+'use strict';
+const TRACEPARENT=/^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$/;function parseTraceContext(headers={}){if(headers.baggage)throw new TypeError('W3C baggage is prohibited.');const value=String(headers.traceparent||'').toLowerCase();if(!value)return null;if(value.length>55||!TRACEPARENT.test(value)||/^00-0{32}-/.test(value)||/-0{16}-/.test(value))return null;const state=headers.tracestate==null?null:String(headers.tracestate);if(state&&state.length>512)return null;const [,traceId,spanId,flags]=value.split('-');return Object.freeze({traceId,spanId,sampled:flags==='01',tracestate:state});}
+module.exports={parseTraceContext};

@@ -1,0 +1,4 @@
+'use strict';
+async function bounded(promise,ms){let timer;try{return await Promise.race([Promise.resolve(promise),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Object.assign(new Error('TIMEOUT'),{code:'TIMEOUT'})),ms);})]);}finally{clearTimeout(timer);}}
+function createLifecycle({flush=()=>Promise.resolve(),shutdown=()=>Promise.resolve(),clock=()=>Date.now()}={}){let state='NEW';return Object.freeze({get state(){return state;},start(){if(state!=='NEW')throw new Error('LIFECYCLE_INVALID');state='READY';},async stop(){if(state==='STOPPED')return;state='STOPPING';const started=clock();let error=null;try{await bounded(flush(),5000);}catch(e){error=e;}try{await bounded(shutdown(),Math.max(1,30000-(clock()-started)));}catch(e){error=error||e;}state='STOPPED';return {errorCode:error?'SHUTDOWN_FAILURE':null};}});}
+module.exports={bounded,createLifecycle};

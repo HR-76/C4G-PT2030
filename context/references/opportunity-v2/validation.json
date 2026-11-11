@@ -1,0 +1,193 @@
+{
+  "contractVersion": "opportunity-v2.0",
+  "validatedAt": "2026-10-30T22:53:00.875Z",
+  "scope": "OFFLINE_CONTRACT_CORPUS_ONLY",
+  "schemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "engine": "Python jsonschema Draft202012Validator with FormatChecker; Python standard library ZIP/XML, Decimal and SHA-256",
+  "passed": true,
+  "completeSnapshots": 6,
+  "workbookRows": 177,
+  "workbookCells": 2301,
+  "positiveChecks": [
+    "eu-11145.json:schema",
+    "eu-11145.json:bytes",
+    "eu-11145.json:unique-evidence",
+    "eu-11145.json:unique-observations",
+    "eu-11145.json:unique-sources",
+    "eu-11145.json:observation-links",
+    "eu-11145.json:fact-and-issue-links",
+    "eu-11145.json:issue-field-paths",
+    "eu-11145.json:allocation-links-and-zero",
+    "eu-11145.json:support-bounds",
+    "pt2030-8485.json:schema",
+    "pt2030-8485.json:bytes",
+    "pt2030-8485.json:unique-evidence",
+    "pt2030-8485.json:unique-observations",
+    "pt2030-8485.json:unique-sources",
+    "pt2030-8485.json:observation-links",
+    "pt2030-8485.json:fact-and-issue-links",
+    "pt2030-8485.json:issue-field-paths",
+    "pt2030-8485.json:allocation-links-and-zero",
+    "pt2030-8485.json:support-bounds",
+    "pt2030-8514.json:schema",
+    "pt2030-8514.json:bytes",
+    "pt2030-8514.json:unique-evidence",
+    "pt2030-8514.json:unique-observations",
+    "pt2030-8514.json:unique-sources",
+    "pt2030-8514.json:observation-links",
+    "pt2030-8514.json:fact-and-issue-links",
+    "pt2030-8514.json:issue-field-paths",
+    "pt2030-8514.json:allocation-links-and-zero",
+    "pt2030-8514.json:support-bounds",
+    "pt2030-8583.json:schema",
+    "pt2030-8583.json:bytes",
+    "pt2030-8583.json:unique-evidence",
+    "pt2030-8583.json:unique-observations",
+    "pt2030-8583.json:unique-sources",
+    "pt2030-8583.json:observation-links",
+    "pt2030-8583.json:fact-and-issue-links",
+    "pt2030-8583.json:issue-field-paths",
+    "pt2030-8583.json:allocation-links-and-zero",
+    "pt2030-8583.json:support-bounds",
+    "pt2030-8614.json:schema",
+    "pt2030-8614.json:bytes",
+    "pt2030-8614.json:unique-evidence",
+    "pt2030-8614.json:unique-observations",
+    "pt2030-8614.json:unique-sources",
+    "pt2030-8614.json:observation-links",
+    "pt2030-8614.json:fact-and-issue-links",
+    "pt2030-8614.json:issue-field-paths",
+    "pt2030-8614.json:allocation-links-and-zero",
+    "pt2030-8614.json:support-bounds",
+    "pt2030-8664.json:schema",
+    "pt2030-8664.json:bytes",
+    "pt2030-8664.json:unique-evidence",
+    "pt2030-8664.json:unique-observations",
+    "pt2030-8664.json:unique-sources",
+    "pt2030-8664.json:observation-links",
+    "pt2030-8664.json:fact-and-issue-links",
+    "pt2030-8664.json:issue-field-paths",
+    "pt2030-8664.json:allocation-links-and-zero",
+    "pt2030-8664.json:support-bounds",
+    "source-xlsx-hash",
+    "source-no-formulas",
+    "source-no-external-links",
+    "pt-177-rows",
+    "pt-177-distinct-ids",
+    "pt-2301-cells-equal-original",
+    "pt-177-all-column-digests",
+    "pt-177-all-13-column-projections",
+    "pt-177-civil-dates",
+    "pt-nine-fractional-amounts",
+    "pt2030-8485.json:all-13-columns-and-provenance",
+    "pt2030-8514.json:all-13-columns-and-provenance",
+    "pt2030-8583.json:all-13-columns-and-provenance",
+    "pt2030-8614.json:all-13-columns-and-provenance",
+    "pt2030-8664.json:all-13-columns-and-provenance",
+    "eu-evidence-hash",
+    "eu-source-identity",
+    "eu-title",
+    "eu-topic-reference",
+    "eu-budget-exact",
+    "eu-budget-currency-unknown",
+    "eu-projectAcronym",
+    "eu-projectName",
+    "eu-projectId",
+    "eu-opening-utc",
+    "eu-seven-deadlines-utc",
+    "eu-closingDate-excluded",
+    "eu-published-status",
+    "eu-evidence-json-pointers-and-excerpts",
+    "eu-monthly-support-separate",
+    "original-xlsx-unchanged"
+  ],
+  "positiveCheckCount": 91,
+  "negativeSchemaCases": [
+    "amount-json-number",
+    "amount-localized",
+    "amount-exponent",
+    "amount-negative",
+    "amount-too-many-decimals",
+    "amount-too-many-integer-digits",
+    "amount-leading-zero",
+    "amount-trailing-zero",
+    "unknown-root-property",
+    "missing-required-block",
+    "present-null",
+    "present-empty-array",
+    "absent-nonnull",
+    "missing-currency-fact",
+    "missing-absence-reason",
+    "missing-present-evidence",
+    "numeric-agreement",
+    "invalid-calendar-date",
+    "non-utc-instant",
+    "fabricated-date-hour-field",
+    "unknown-source-namespace"
+  ],
+  "negativeSchemaCaseCount": 21,
+  "originalWorkbookSha256": "f5d81e3a2fcf31fac5b4545a4e7625c9f0c22333f28cc301ad4b61a7845f5869",
+  "limitations": [
+    "No application parser, database, HTTP endpoint, UI, worker or migration executed.",
+    "Temporal projection outcomes are normative acceptance expectations, not executed APP tests.",
+    "Negative cases check structural constraints; remaining semantic invariants must become S1 regression tests.",
+    "EU total-budget currency is not independently established by the API observation."
+  ],
+  "validatedArtifacts": [
+    {
+      "path": "evidence/eu-11145.json",
+      "sha256": "21e07eb79a478de23ca126fd8377733f82c6731ac24fe91313a79b2ed186f2a6"
+    },
+    {
+      "path": "evidence/eu-11145.metadata.json",
+      "sha256": "0449058b636bd2699bf4045de48ec4d35a63446abf10fe1e7e7c83d8decc5276"
+    },
+    {
+      "path": "evidence/eu-programme-taxonomy.json",
+      "sha256": "8bfb8ed421ba23e747439be0160e2b460f99f2fb258c00b98a4270757b9d28aa"
+    },
+    {
+      "path": "evidence/pt2030-plan-177.json",
+      "sha256": "33916c726c41c869d3d38b8637812102c6d23538af280d1cdd0790098b2b009f"
+    },
+    {
+      "path": "examples/eu-11145.json",
+      "sha256": "1e7f21d03dcf0ac6fd4da20709664028b052c188810df0f14522093224887718"
+    },
+    {
+      "path": "examples/pt2030-8485.json",
+      "sha256": "c0d8e949e3464e94b42afe5aaeb8f6c506afe3d924de5b66dc4c936f83aeb8dd"
+    },
+    {
+      "path": "examples/pt2030-8514.json",
+      "sha256": "ff79af6ed7f038ab998f50079d680de704b925498abfe2ee8093be92da329e41"
+    },
+    {
+      "path": "examples/pt2030-8583.json",
+      "sha256": "5ea81bc0e082b85496cd58e82fbfdb4f9d0ec693ea364ba131d914a3805e4609"
+    },
+    {
+      "path": "examples/pt2030-8614.json",
+      "sha256": "cbb595ce4a0c958348f74ca707e152df73b3ba150ff0ec7d7ceca63548e52525"
+    },
+    {
+      "path": "examples/pt2030-8664.json",
+      "sha256": "64d9ec42284502263086a61373920e97f66d6d273ff5aa1791723e0f297b45c9"
+    },
+    {
+      "path": "opportunity-v2.schema.json",
+      "sha256": "2996f35eaab2717860e4276b041899620d497e737f0a29900dbbbc02693d1675"
+    },
+    {
+      "path": "pt2030-expected-177.json",
+      "sha256": "23bc72b4862f09630372af4217b7566ede77d34340f484b832da2aa4d1a44f83"
+    }
+  ],
+  "independentReview": {
+    "result": "NO_BLOCKERS_AFTER_TEMPORAL_OPEN_RULE_CLARIFICATION",
+    "schemaDestinationPathsChecked": 50,
+    "sourceJsonPathsResolved": 23,
+    "completeSnapshotsSchemaChecked": 6,
+    "applicationExecuted": false
+  }
+}

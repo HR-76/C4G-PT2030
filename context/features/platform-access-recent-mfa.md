@@ -1,0 +1,3 @@
+# MFA recente para alterações administrativas de acesso
+
+Alterações de perfil ou estado de membership pela administração da plataforma exigem sessão e atribuição C4G_ADMIN válidas e prova de MFA recente da política reconhecida. A validação ocorre dentro da operação coordenada antes de alterar dados ou aceitar uma repetição. Ausência, expiração, divergência de política ou inexistência de política MFA válida recusam a operação. Leituras não mudam. A alteração autorizada mantém auditoria crítica na mesma transação; falha de auditoria impede confirmação da escrita. A API devolve MFA_REQUIRED para permitir recuperação explícita.

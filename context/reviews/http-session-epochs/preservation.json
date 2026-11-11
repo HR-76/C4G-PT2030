@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-26T23:24:57.129Z",
+  "baselineFiles": 2573,
+  "unchanged": 2562,
+  "intendedChanges": [
+    "backend/src/applications/composition.js",
+    "backend/src/security/catalogReaderSchema.js",
+    "backend/test/applicationResponsiblesAuthority.test.js",
+    "context/features/http-flows-performance.md",
+    "test/integration/http-oidc/README.md",
+    "test/integration/http-oidc/gate.js",
+    "test/integration/http-oidc/gate.ps1",
+    "backend/src/security/authenticatedAuthority.js",
+    "backend/src/security/authorityCoordinator.js",
+    "backend/src/security/sessionSecurity.js",
+    "context/current-work.md"
+  ],
+  "unexpectedChanges": [],
+  "missing": [],
+  "protectedFiles": 195,
+  "protectedChanges": [],
+  "newSourceFiles": [
+    "backend/src/security/coordinatedSessionStore.js",
+    "backend/test/coordinatedSessionStore.test.js",
+    "test/integration/http-oidc/sessionEpochProof.js"
+  ]
+}

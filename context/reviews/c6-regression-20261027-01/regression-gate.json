@@ -1,0 +1,5 @@
+﻿{
+  "policy": "c6-admission-v1",
+  "verdict": "FAIL",
+  "reason": "INVALID_ENVIRONMENT"
+}

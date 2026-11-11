@@ -1,0 +1,823 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "suite": "FROZEN_EXECUTOR_DETERMINISTIC_CONTROL_FLOW",
+  "generatedAt": "2026-10-31T19:01:38.667Z",
+  "manifestSha256": "252c80d48081fe9768d02e9d393060b89d1e32864b62943903aae9bcb9691278",
+  "testSha256": "17344dcb11440dafb4f1af960db9604d8f22a651e430013fcc017f7c2e49eeb3",
+  "sources": [
+    {
+      "path": "backend/src/security/tenantLeaseExecutor.js",
+      "sha256": "d28e52aa9067c707cf9a8c93163178ee04fefeb4c75551743a8599aa4e2143b2",
+      "bytes": 22821,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/tenantPoolManager.js",
+      "sha256": "3973e406a71a50325b8527026ee56c246ddb04166240d177e2b773114d335ba9",
+      "bytes": 37017,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/tenantResolver.js",
+      "sha256": "b794d4eadaf4b586d791dab08a8973281f7f0a9e526eb26e377c25d9e3a3b845",
+      "bytes": 9509,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/security/authorityCoordinator.js",
+      "sha256": "cff9d773d72c0f93a7252c460e1bda03ebed7484451568dc2d20539607557b4c",
+      "bytes": 32168,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/config/opportunityRuntime.js",
+      "sha256": "b5bf3c4e8a01488671a4a79ba5fd06f8e58eacc9caf277933cb7a414eec6089f",
+      "bytes": 10842,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/opportunities/httpComposition.js",
+      "sha256": "1389118396991de48b1a1d3fb04524aedf8fc20e2051760b3df49c6b7472eff4",
+      "bytes": 17815,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/src/routes/organizationDashboardRoutes.js",
+      "sha256": "71389b67f93f222b21ceb0719199515d9bdf7bde99a4ab3f4a920c20b7ee76e7",
+      "bytes": 4111,
+      "identicalAB": true
+    },
+    {
+      "path": "backend/test/support/tenantRuntimeDoubles.js",
+      "sha256": "1b223e2533024406b83a137162c9c2372372f9db929cc55542cc922ab7224018",
+      "bytes": 4084,
+      "identicalAB": true
+    }
+  ],
+  "sourceIntegrityAfter": "PASS",
+  "measuredPerformance": false,
+  "infrastructureCreated": false,
+  "clock": "MANUAL_MILLISECONDS",
+  "realWallClockDelaysUsed": false,
+  "limitations": [
+    "Real frozen executor; membership/directory/physical verification/authority guard and SQL client are controlled doubles.",
+    "No PostgreSQL guard, grants, trigger, transaction durability, HTTP response or performance assertion is established.",
+    "6000ms preparation models consumed allocation time; this scenario does not execute the resolver.",
+    "Post-COMMIT late completion is observed, not cancelled by Promise.race. Caller failure remains final."
+  ],
+  "results": [
+    {
+      "name": "operation 10000ms wins over a fresh 15000ms allocation",
+      "status": "PASS",
+      "allocationBudgetMs": 15000,
+      "allocationDeadlineMs": 15000,
+      "operationBudgetMs": 10000,
+      "preparationElapsedMs": 0,
+      "executeStartMs": 0,
+      "settlement": "FAIL",
+      "failureCode": "LEASE_TIMEOUT",
+      "memberships": 1,
+      "directories": 1,
+      "physicalVerifications": 1,
+      "guarded": 0,
+      "releases": [
+        {
+          "atMs": 10000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        }
+      ],
+      "events": [
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 0,
+          "id": 1,
+          "delay": 10000,
+          "dueMs": 10000
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 0
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "BEGIN TRANSACTION READ WRITE"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SET LOCAL statement_timeout TO '10000ms'"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()"
+        },
+        {
+          "kind": "QUERY_MODULE",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT 1"
+        },
+        {
+          "kind": "QUERY_BARRIER",
+          "atMs": 0
+        },
+        {
+          "kind": "TIMER_FIRED",
+          "atMs": 10000,
+          "id": 1,
+          "delay": 10000
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 10000,
+          "id": 1
+        },
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 10000,
+          "id": 2,
+          "delay": 5000,
+          "dueMs": 15000
+        },
+        {
+          "kind": "RELEASE",
+          "atMs": 10000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "CALLER_FAILURE",
+          "atMs": 10000,
+          "code": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 10000,
+          "id": 2
+        },
+        {
+          "kind": "SQL",
+          "atMs": 10000,
+          "statement": "ROLLBACK"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_ENTER",
+          "atMs": 10000,
+          "outcome": "ROLLED_BACK"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_RETURN",
+          "atMs": 10000,
+          "outcome": "ROLLED_BACK"
+        }
+      ]
+    },
+    {
+      "name": "6000ms preparation leaves 9000ms of allocation despite operation 10000ms",
+      "status": "PASS",
+      "allocationBudgetMs": 15000,
+      "allocationDeadlineMs": 15000,
+      "operationBudgetMs": 10000,
+      "preparationElapsedMs": 6000,
+      "executeStartMs": 6000,
+      "settlement": "FAIL",
+      "failureCode": "LEASE_TIMEOUT",
+      "memberships": 1,
+      "directories": 1,
+      "physicalVerifications": 1,
+      "guarded": 0,
+      "releases": [
+        {
+          "atMs": 15000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        }
+      ],
+      "events": [
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 6000,
+          "id": 1,
+          "delay": 9000,
+          "dueMs": 15000
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 6000
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 6000
+        },
+        {
+          "kind": "SQL",
+          "atMs": 6000,
+          "statement": "BEGIN TRANSACTION READ WRITE"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 6000,
+          "statement": "SET LOCAL statement_timeout TO '9000ms'"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 6000
+        },
+        {
+          "kind": "SQL",
+          "atMs": 6000,
+          "statement": "SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 6000,
+          "statement": "SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()"
+        },
+        {
+          "kind": "QUERY_MODULE",
+          "atMs": 6000
+        },
+        {
+          "kind": "SQL",
+          "atMs": 6000,
+          "statement": "SELECT 1"
+        },
+        {
+          "kind": "QUERY_BARRIER",
+          "atMs": 6000
+        },
+        {
+          "kind": "TIMER_FIRED",
+          "atMs": 15000,
+          "id": 1,
+          "delay": 9000
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 15000,
+          "id": 1
+        },
+        {
+          "kind": "RELEASE",
+          "atMs": 15000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "CALLER_FAILURE",
+          "atMs": 15000,
+          "code": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 15000,
+          "statement": "ROLLBACK"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_ENTER",
+          "atMs": 15000,
+          "outcome": "ROLLED_BACK"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_RETURN",
+          "atMs": 15000,
+          "outcome": "ROLLED_BACK"
+        }
+      ]
+    },
+    {
+      "name": "operation expires during authority completion after COMMIT without late success",
+      "status": "PASS",
+      "allocationBudgetMs": 15000,
+      "allocationDeadlineMs": 15000,
+      "operationBudgetMs": 10000,
+      "preparationElapsedMs": 0,
+      "executeStartMs": 0,
+      "settlement": "FAIL",
+      "failureCode": "LEASE_TIMEOUT",
+      "memberships": 3,
+      "directories": 3,
+      "physicalVerifications": 2,
+      "guarded": 1,
+      "releases": [
+        {
+          "atMs": 10000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        }
+      ],
+      "events": [
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 0,
+          "id": 1,
+          "delay": 10000,
+          "dueMs": 10000
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 0
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "BEGIN TRANSACTION READ WRITE"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SET LOCAL statement_timeout TO '10000ms'"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()"
+        },
+        {
+          "kind": "QUERY_MODULE",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT 1"
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 9000
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 9000
+        },
+        {
+          "kind": "BEFORE_COMMIT",
+          "atMs": 9000
+        },
+        {
+          "kind": "SQL",
+          "atMs": 9000,
+          "statement": "RESET ROLE"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 9000
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 9000
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 9000
+        },
+        {
+          "kind": "AUTHORITY_ASSERT",
+          "atMs": 9000
+        },
+        {
+          "kind": "SQL",
+          "atMs": 9000,
+          "statement": "COMMIT"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_ENTER",
+          "atMs": 9000,
+          "outcome": "COMMITTED"
+        },
+        {
+          "kind": "TIMER_FIRED",
+          "atMs": 10000,
+          "id": 1,
+          "delay": 10000
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 10000,
+          "id": 1
+        },
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 10000,
+          "id": 2,
+          "delay": 5000,
+          "dueMs": 15000
+        },
+        {
+          "kind": "RELEASE",
+          "atMs": 10000,
+          "discard": true,
+          "cause": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "CALLER_FAILURE",
+          "atMs": 10000,
+          "code": "LEASE_TIMEOUT"
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 10000,
+          "id": 2
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_RETURN",
+          "atMs": 10000,
+          "outcome": "COMMITTED"
+        }
+      ]
+    },
+    {
+      "name": "successful control preserves fresh revalidations and completes authority before release",
+      "status": "PASS",
+      "allocationBudgetMs": 15000,
+      "allocationDeadlineMs": 15000,
+      "operationBudgetMs": 10000,
+      "preparationElapsedMs": 0,
+      "executeStartMs": 0,
+      "settlement": "SUCCESS",
+      "failureCode": null,
+      "memberships": 3,
+      "directories": 3,
+      "physicalVerifications": 2,
+      "guarded": 1,
+      "releases": [
+        {
+          "atMs": 100,
+          "discard": false,
+          "cause": null
+        }
+      ],
+      "events": [
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 0,
+          "id": 1,
+          "delay": 10000,
+          "dueMs": 10000
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 0
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "BEGIN TRANSACTION READ WRITE"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SET LOCAL statement_timeout TO '10000ms'"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))"
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()"
+        },
+        {
+          "kind": "QUERY_MODULE",
+          "atMs": 0
+        },
+        {
+          "kind": "SQL",
+          "atMs": 0,
+          "statement": "SELECT 1"
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 100
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 100
+        },
+        {
+          "kind": "BEFORE_COMMIT",
+          "atMs": 100
+        },
+        {
+          "kind": "SQL",
+          "atMs": 100,
+          "statement": "RESET ROLE"
+        },
+        {
+          "kind": "PHYSICAL_VERIFICATION",
+          "atMs": 100
+        },
+        {
+          "kind": "MEMBERSHIP",
+          "atMs": 100
+        },
+        {
+          "kind": "DIRECTORY",
+          "atMs": 100
+        },
+        {
+          "kind": "AUTHORITY_ASSERT",
+          "atMs": 100
+        },
+        {
+          "kind": "SQL",
+          "atMs": 100,
+          "statement": "COMMIT"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_ENTER",
+          "atMs": 100,
+          "outcome": "COMMITTED"
+        },
+        {
+          "kind": "AUTHORITY_COMPLETE_RETURN",
+          "atMs": 100,
+          "outcome": "COMMITTED"
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 100,
+          "id": 1
+        },
+        {
+          "kind": "TIMER_ARMED",
+          "atMs": 100,
+          "id": 2,
+          "delay": 14900,
+          "dueMs": 15000
+        },
+        {
+          "kind": "RELEASE",
+          "atMs": 100,
+          "discard": false,
+          "cause": null
+        },
+        {
+          "kind": "TIMER_CLEARED",
+          "atMs": 100,
+          "id": 2
+        },
+        {
+          "kind": "CALLER_SUCCESS",
+          "atMs": 100
+        }
+      ]
+    },
+    {
+      "name": "membership refusal and authority refusal cannot commit or succeed",
+      "status": "PASS",
+      "observations": [
+        {
+          "allocationBudgetMs": 15000,
+          "allocationDeadlineMs": 15000,
+          "operationBudgetMs": 10000,
+          "preparationElapsedMs": 0,
+          "executeStartMs": 0,
+          "settlement": "FAIL",
+          "failureCode": "ORGANIZATION_MISMATCH",
+          "memberships": 1,
+          "directories": 0,
+          "physicalVerifications": 0,
+          "guarded": 0,
+          "releases": [
+            {
+              "atMs": 0,
+              "discard": true,
+              "cause": "ORGANIZATION_MISMATCH"
+            }
+          ],
+          "events": [
+            {
+              "kind": "TIMER_ARMED",
+              "atMs": 0,
+              "id": 1,
+              "delay": 10000,
+              "dueMs": 10000
+            },
+            {
+              "kind": "MEMBERSHIP",
+              "atMs": 0
+            },
+            {
+              "kind": "TIMER_CLEARED",
+              "atMs": 0,
+              "id": 1
+            },
+            {
+              "kind": "TIMER_ARMED",
+              "atMs": 0,
+              "id": 2,
+              "delay": 15000,
+              "dueMs": 15000
+            },
+            {
+              "kind": "RELEASE",
+              "atMs": 0,
+              "discard": true,
+              "cause": "ORGANIZATION_MISMATCH"
+            },
+            {
+              "kind": "TIMER_CLEARED",
+              "atMs": 0,
+              "id": 2
+            },
+            {
+              "kind": "CALLER_FAILURE",
+              "atMs": 0,
+              "code": "ORGANIZATION_MISMATCH"
+            }
+          ]
+        },
+        {
+          "allocationBudgetMs": 15000,
+          "allocationDeadlineMs": 15000,
+          "operationBudgetMs": 10000,
+          "preparationElapsedMs": 0,
+          "executeStartMs": 0,
+          "settlement": "FAIL",
+          "failureCode": "AUTHORITY_GUARD_STALE",
+          "memberships": 3,
+          "directories": 3,
+          "physicalVerifications": 2,
+          "guarded": 1,
+          "releases": [
+            {
+              "atMs": 0,
+              "discard": true,
+              "cause": "AUTHORITY_GUARD_STALE"
+            }
+          ],
+          "events": [
+            {
+              "kind": "TIMER_ARMED",
+              "atMs": 0,
+              "id": 1,
+              "delay": 10000,
+              "dueMs": 10000
+            },
+            {
+              "kind": "MEMBERSHIP",
+              "atMs": 0
+            },
+            {
+              "kind": "DIRECTORY",
+              "atMs": 0
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "BEGIN TRANSACTION READ WRITE"
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "SET LOCAL statement_timeout TO '10000ms'"
+            },
+            {
+              "kind": "PHYSICAL_VERIFICATION",
+              "atMs": 0
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "SELECT pg_advisory_xact_lock(hashtextextended($1,43001305))"
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "SELECT pid,backend_start::text AS backend_start FROM pg_stat_activity WHERE pid=pg_backend_pid()"
+            },
+            {
+              "kind": "QUERY_MODULE",
+              "atMs": 0
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "SELECT 1"
+            },
+            {
+              "kind": "MEMBERSHIP",
+              "atMs": 0
+            },
+            {
+              "kind": "DIRECTORY",
+              "atMs": 0
+            },
+            {
+              "kind": "BEFORE_COMMIT",
+              "atMs": 0
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "RESET ROLE"
+            },
+            {
+              "kind": "PHYSICAL_VERIFICATION",
+              "atMs": 0
+            },
+            {
+              "kind": "MEMBERSHIP",
+              "atMs": 0
+            },
+            {
+              "kind": "DIRECTORY",
+              "atMs": 0
+            },
+            {
+              "kind": "AUTHORITY_ASSERT",
+              "atMs": 0
+            },
+            {
+              "kind": "SQL",
+              "atMs": 0,
+              "statement": "ROLLBACK"
+            },
+            {
+              "kind": "AUTHORITY_COMPLETE_ENTER",
+              "atMs": 0,
+              "outcome": "ROLLED_BACK"
+            },
+            {
+              "kind": "AUTHORITY_COMPLETE_RETURN",
+              "atMs": 0,
+              "outcome": "ROLLED_BACK"
+            },
+            {
+              "kind": "TIMER_CLEARED",
+              "atMs": 0,
+              "id": 1
+            },
+            {
+              "kind": "TIMER_ARMED",
+              "atMs": 0,
+              "id": 2,
+              "delay": 15000,
+              "dueMs": 15000
+            },
+            {
+              "kind": "RELEASE",
+              "atMs": 0,
+              "discard": true,
+              "cause": "AUTHORITY_GUARD_STALE"
+            },
+            {
+              "kind": "TIMER_CLEARED",
+              "atMs": 0,
+              "id": 2
+            },
+            {
+              "kind": "CALLER_FAILURE",
+              "atMs": 0,
+              "code": "AUTHORITY_GUARD_STALE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

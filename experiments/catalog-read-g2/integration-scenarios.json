@@ -1,0 +1,202 @@
+[
+  {
+    "id": "IT-AC01",
+    "acceptance": "AC01",
+    "title": "Mapping de fontes",
+    "given": "Aviso previsto, aviso publicado e tópico EU sintéticos com IDs distintos.",
+    "when": "Normalizar e projetar cada um.",
+    "then": "Preservar granularidade, fonte, URL e relações sem fusão por título.",
+    "requires": "adapter",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC02",
+    "acceptance": "AC02",
+    "title": "Filtros antes da paginação",
+    "given": "60 oportunidades; a correspondência está no item 51.",
+    "when": "Pesquisar e combinar filtros antes de paginar.",
+    "then": "Devolver o item 51; não duplicar oportunidades com várias fontes.",
+    "requires": "reader",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC03",
+    "acceptance": "AC03",
+    "title": "Filtro inválido e contexto",
+    "given": "Lista aberta com q/programme; cursor emitido.",
+    "when": "Alterar filtro, voltar da ficha e limpar.",
+    "then": "Novo snapshot/cursor quando filtros mudam; URL preservada; limpar não reintroduz data.",
+    "requires": "http-ui",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC04",
+    "acceptance": "AC04",
+    "title": "Revisão concorrente",
+    "given": "Geração A fixa oportunidade R1; geração B aceita R2 após página 1.",
+    "when": "Ler página 2, ficha, histórico e evidência com snapshot A.",
+    "then": "Todas as leituras mantêm R1 e corte A; novo snapshot vê B.",
+    "requires": "postgres-http",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC05",
+    "acceptance": "AC05",
+    "title": "Expiração e token alterado",
+    "given": "Relógio fixo; snapshot emitido em T, TTL 900s.",
+    "when": "Pedir em T+899s/T+900s; alterar assinatura, filtro, rota e oportunidade do cursor.",
+    "then": "Válido antes do limite; expirado no limite (convenção G2); assinatura inválida 400; contexto incompatível 409; UI atualiza sem misturar páginas.",
+    "requires": "http-clock",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC06",
+    "acceptance": "AC06",
+    "title": "Precisão e rondas",
+    "given": "Data civil, hora sem fuso, período e duas rondas com fases distintas.",
+    "when": "Derivar estado e filtrar intervalo.",
+    "then": "Preservar precisão; sem UTC inventado; datas ambíguas não passam filtro como certas.",
+    "requires": "domain",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC07",
+    "acceptance": "AC07",
+    "title": "Prorrogação e conflito",
+    "given": "Prazo anterior R1, condição de verba e duas fontes divergentes.",
+    "when": "Aceitar alteração condicional ou observar conflito material.",
+    "then": "Conservar R1/evidência; condição visível; observação não seleciona alternativa nem publica conflito.",
+    "requires": "postgres-domain",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC08",
+    "acceptance": "AC08",
+    "title": "Verba partilhada",
+    "given": "Uma call com 3 tópicos e mesma allocationGroup; moeda desconhecida, zero e oito decimais.",
+    "when": "Filtrar funding_min e produzir totais/leitura.",
+    "then": "Sem dupla contagem ou substituição por apoio individual; valor exato e âmbito preservados.",
+    "requires": "domain-reader",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC09",
+    "acceptance": "AC09",
+    "title": "Versões documentais",
+    "given": "URL estável devolve bytes A depois B; alteração apenas de prazo.",
+    "when": "Recolher e versionar B.",
+    "then": "Hashes/versões distintos; A recuperável se arquivado; substituição parcial não revoga condições restantes.",
+    "requires": "document-store",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC10",
+    "acceptance": "AC10",
+    "title": "Plano e aviso",
+    "given": "Dois avisos com títulos semelhantes e relação provável.",
+    "when": "Resolver identidades e mostrar relação.",
+    "then": "Sem fusão automática; confirmado/provável distinguíveis; alvo autorizado.",
+    "requires": "domain",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC11",
+    "acceptance": "AC11",
+    "title": "Qualidade",
+    "given": "Campos NOT_FOUND/NOT_COLLECTED/CONFLICT e freshness unknown/stale.",
+    "when": "Projetar lista/ficha.",
+    "then": "Estados conservados; parcial não vira inexistente; stale segundo política da fonte.",
+    "requires": "reader-ui",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC12",
+    "acceptance": "AC12",
+    "title": "Replay e falha de ingestão",
+    "given": "Mesma observação recebida duas vezes; falha antes do commit.",
+    "when": "Repetir ingestão e recuperar execução.",
+    "then": "Uma identidade/revisão lógica e evidência preservada; rollback não deixa projeção parcial.",
+    "requires": "postgres-ingestion",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC13",
+    "acceptance": "AC13",
+    "title": "Revogação e isolamento",
+    "given": "Sujeitos A/B, duas organizações, um administrador sem membership e snapshot de A.",
+    "when": "Revogar A, trocar âmbito, usar token A em B.",
+    "then": "401/403 conforme sessão; sem dados privados cruzados; revalidação atual prevalece.",
+    "requires": "oidc-postgres-http",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC14",
+    "acceptance": "AC14",
+    "title": "Interesses/candidaturas",
+    "given": "Interesse privado A e candidatura com técnico fora da equipa.",
+    "when": "Consultar catálogo, abrir ações, mudar filtros temáticos.",
+    "then": "Sem duplicar interesse ou expor candidatura; perfil e scoring inalterados.",
+    "requires": "tenant-ui",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC15",
+    "acceptance": "AC15",
+    "title": "Conteúdo e exportação",
+    "given": "HTML hostil, URL com credenciais/token e célula CSV iniciada por fórmula.",
+    "when": "Renderizar, navegar e exportar sob utilizadores distintos.",
+    "then": "Texto inerte; URL rejeitada; CSV seguro; mesmas permissões.",
+    "requires": "ui-security",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC16",
+    "acceptance": "AC16",
+    "title": "Acessibilidade e estados",
+    "given": "Desktop/mobile com carregamento, vazio, falha de secção e snapshot expirado.",
+    "when": "Navegar apenas com teclado e voltar à lista.",
+    "then": "Foco, labels, leitura e ações funcionam; sem perda silenciosa de filtros.",
+    "requires": "browser",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC17",
+    "acceptance": "AC17",
+    "title": "Descrição oficial",
+    "given": "EU metadata.description útil e raw.summary igual ao título.",
+    "when": "Aplicar mapping versionado e gerar excerto.",
+    "then": "Descrição útil preservada; excerto determinístico e fonte; ausência sem texto inventado.",
+    "requires": "adapter",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC18",
+    "acceptance": "AC18",
+    "title": "Áreas pendentes",
+    "given": "Mapping temático aprovado em incremento próprio; conceito não mapeado.",
+    "when": "Aplicar filtros temáticos no servidor.",
+    "then": "Pesquisa completa, sem mudar perfil; conceito inválido tratado explicitamente.",
+    "requires": "thematic-contract-pending",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC19",
+    "acceptance": "AC19",
+    "title": "Volume e orçamento",
+    "given": "10 000 oportunidades sintéticas, 10 consultas concorrentes, aquecimento e 5 execuções.",
+    "when": "Medir lista/ficha de 25 itens no mesmo equipamento.",
+    "then": "p95 <=500ms como alvo G1; investigar regressão >10%; orçamento bytes e não escrita em GET verificados.",
+    "requires": "performance",
+    "status": "not_executed"
+  },
+  {
+    "id": "IT-AC20",
+    "acceptance": "AC20",
+    "title": "Migração e admissão",
+    "given": "Base isolada no schema atual, leitor restrito, cópia/restauro controlados.",
+    "when": "Aplicar migração aditiva própria e validar leitura/roles/recuperação.",
+    "then": "Sem perda histórica ou escrita pelo leitor; admissão válida; nenhuma base habitual usada.",
+    "requires": "postgres-gate",
+    "status": "not_executed"
+  }
+]

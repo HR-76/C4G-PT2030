@@ -1,0 +1,166 @@
+{
+  "status": "PASS",
+  "isolated": true,
+  "gateId": "90ca8b31499e4d9b88b0b4402826db65",
+  "clusterStopped": true,
+  "checks": [
+    {
+      "name": "OWNED_POSTGRES18_CLUSTER",
+      "status": "PASS"
+    },
+    {
+      "name": "REAL_CENTRAL_BASELINE_AND_V2_CANDIDATE",
+      "status": "PASS"
+    },
+    {
+      "name": "ISOLATED_SOURCE_CONTROL_QUIESCED",
+      "status": "PASS"
+    },
+    {
+      "name": "SEED_EXISTING_V2_REVISION",
+      "status": "PASS"
+    },
+    {
+      "name": "PACKAGE_FAILURE_ROLLS_BACK_SQL_AND_LEDGER",
+      "status": "PASS"
+    },
+    {
+      "name": "UPGRADE_FROM_PREVIOUS_ISOLATED_PACKAGE",
+      "status": "PASS"
+    },
+    {
+      "name": "ADDITIVE_CANDIDATE_NO_HISTORY_CHANGE",
+      "status": "PASS"
+    },
+    {
+      "name": "REGISTERED_ISOLATED_PACKAGE_REPLAY",
+      "status": "PASS"
+    },
+    {
+      "name": "PACKAGE_REJECTS_LEDGER_AND_PERMISSION_DRIFT",
+      "status": "PASS"
+    },
+    {
+      "name": "PERSIST_VALID_EXTENSION_AND_PROJECTION",
+      "status": "PASS"
+    },
+    {
+      "name": "REPLAY_AND_CHANGED_REPLAY",
+      "status": "PASS"
+    },
+    {
+      "name": "BUILDING_GENERATION_IS_INVISIBLE",
+      "status": "PASS"
+    },
+    {
+      "name": "ATOMIC_PUBLICATION_AND_SEALED_GENERATION",
+      "status": "PASS"
+    },
+    {
+      "name": "INCOMPLETE_PUBLICATION_ROLLS_BACK",
+      "status": "PASS"
+    },
+    {
+      "name": "READER_HAS_NO_WRITE_OR_PRIVATE_BASE_TABLE_ACCESS",
+      "status": "PASS"
+    },
+    {
+      "name": "IMMUTABLE_CONTENT_AND_CROSS_REVISION_REJECTION",
+      "status": "PASS"
+    },
+    {
+      "name": "SECOND_GENERATION_PRESERVES_FIRST",
+      "status": "PASS"
+    },
+    {
+      "name": "CONCURRENT_READER_NEVER_SEES_UNCOMMITTED_PUBLICATION",
+      "status": "PASS"
+    },
+    {
+      "name": "WRITER_CANNOT_APPROVE_OR_MUTATE_APPROVAL_HISTORY",
+      "status": "PASS"
+    },
+    {
+      "name": "EXPIRED_REVOKED_AND_WRONG_ACCEPTANCE_REJECTED",
+      "status": "PASS"
+    },
+    {
+      "name": "MATERIAL_CONFLICT_CANNOT_BE_PUBLISHED",
+      "status": "PASS"
+    },
+    {
+      "name": "REVOCATION_SERIALIZES_WITH_PUBLICATION",
+      "status": "PASS"
+    },
+    {
+      "name": "REAL_LIMITED_LOGINS_AND_MEMBERSHIP_REVOCATION",
+      "status": "PASS"
+    },
+    {
+      "name": "REVOKED_APPROVAL_BLOCKS_REACTIVATION_PRESERVING_HISTORY",
+      "status": "PASS"
+    },
+    {
+      "name": "FINANCIAL_RANGES_PERSIST_EXACTLY",
+      "status": "PASS"
+    },
+    {
+      "name": "READ_FIXTURE_27_APPROVED_OPPORTUNITIES",
+      "status": "PASS"
+    },
+    {
+      "name": "READ_SCHEMA_DEDICATED_LOGIN_ADMISSION",
+      "status": "PASS"
+    },
+    {
+      "name": "MEMBERSHIP_READER_HAS_NO_WRITE_OR_PROFILE_ACCESS",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_SIGNED_SESSION_MEMBERSHIP_AND_PAGE_CONTRACT",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_DETAIL_COLLECTIONS_OPTIONS_AND_CROSS_SCOPE_DENIAL",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_GETS_DO_NOT_MUTATE_CATALOG_OR_SESSION",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_SNAPSHOT_RETAINS_OLD_GENERATION_AFTER_PUBLICATION",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_ABSOLUTE_EXPIRY_AND_CURRENT_AUTHORITY_REVOCATION",
+      "status": "PASS"
+    },
+    {
+      "name": "HTTP_SCHEMA_DRIFT_FAILS_CLOSED",
+      "status": "PASS"
+    },
+    {
+      "name": "FINAL_ADMISSION_AND_SOURCE_SUSPENSION",
+      "status": "PASS"
+    },
+    {
+      "name": "FINAL_CORE_HISTORY_UNCHANGED",
+      "status": "PASS"
+    }
+  ],
+  "sourceConnections": false,
+  "applicationDatabaseAccess": false,
+  "postgres": "18.3",
+  "baseline": "045_opportunity_eu_legacy_prearchive",
+  "baselineMode": "full",
+  "upgrade": {
+    "applied": [
+      "048_catalog_read_service_v1"
+    ]
+  },
+  "package": {
+    "applied": []
+  },
+  "catalogFingerprint": "007fcfaa1a206d287d8aa776596153f95f2135aa7bfce16d04c7c5ed8b64e6dc"
+}

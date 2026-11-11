@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-26T23:59:08.081Z",
+  "head": "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+  "branch": "feat/f13-organizational-profile",
+  "sameHead": true,
+  "sameBranch": true,
+  "baselineFiles": 2608,
+  "baselineStatusEntries": 2158,
+  "currentStatusEntries": 2174,
+  "changed": [
+    "context/features/http-flows-performance.md",
+    "backend/src/security/authoritySecurityManifest.js",
+    "backend/src/security/centralSchemaManifest.js",
+    "context/current-work.md",
+    "backend/src/security/catalogReaderSchema.js"
+  ],
+  "missing": [],
+  "unexpectedChanges": [],
+  "protectedFilesCompared": 118,
+  "protectedFilesChanged": [],
+  "frontendFilesChanged": []
+}

@@ -1,0 +1,55 @@
+﻿{
+    "at":  "2026-10-27T22:43:29.936Z",
+    "status":  "PASS",
+    "baselineFiles":  2975,
+    "unchanged":  2973,
+    "changed":  [
+                    "context/features/http-flows-performance.md",
+                    "context/current-work.md"
+                ],
+    "missing":  [
+
+                ],
+    "protectedPrefixes":  {
+                              "backend/src/":  {
+                                                   "files":  466,
+                                                   "changed":  [
+
+                                                               ]
+                                               },
+                              "backend/database/":  {
+                                                        "files":  136,
+                                                        "changed":  [
+
+                                                                    ]
+                                                    },
+                              "frontend/":  {
+                                                "files":  179,
+                                                "changed":  [
+
+                                                            ]
+                                            },
+                              "test/integration/":  {
+                                                        "files":  418,
+                                                        "changed":  [
+
+                                                                    ]
+                                                    },
+                              "context/reviews/c6-dedicated-slo-repeat/":  {
+                                                                               "files":  11,
+                                                                               "changed":  [
+
+                                                                                           ]
+                                                                           },
+                              "context/reviews/c6-regression-20261027-01/":  {
+                                                                                 "files":  28,
+                                                                                 "changed":  [
+
+                                                                                             ]
+                                                                             }
+                          },
+    "limits":  "Hash comparison of recorded files, not atomic filesystem or Dev data snapshot. No service, Docker, SQL or load operations in this investigation.",
+    "head":  "0cf519ea22de929d2e52d0b3edb4d72364aa6220",
+    "branch":  "feat/f13-organizational-profile",
+    "gitIdentityPreserved":  true
+}

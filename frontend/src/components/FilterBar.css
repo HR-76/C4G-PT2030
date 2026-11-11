@@ -1,0 +1,51 @@
+.filter-bar.filter-bar {
+  display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--space-12);
+  margin:20px 0 var(--space-16); padding:20px; background:var(--color-surface);
+  border:1px solid var(--color-border); border-radius:10px; min-width:0;
+}
+.filter-bar.filter-bar-integrated { padding:0 0 20px; margin-top:0; border:0; border-bottom:1px solid var(--color-border); border-radius:0; }
+.filter-bar.filter-bar-compact { padding:0; border:0; background:transparent; border-radius:0; }
+.filter-bar.filter-bar label { display:flex; flex-direction:column; gap:6px; min-width:0; flex:1 1 150px; font-size:12px; font-weight:600; color:var(--color-text-secondary); }
+.filter-bar.filter-bar .filter-search { flex:2 1 260px; }
+.filter-bar.filter-bar :is(input:not([type=checkbox]):not([type=search]),select) {
+  width:100%; max-width:none; min-width:0; height:34px; min-height:34px;
+  border:1px solid var(--ui-control); border-radius:6px; padding:6px 11px;
+  background:var(--color-surface); color:var(--color-text-primary); font:400 14px/1.4 var(--font);
+}
+.filter-bar.filter-bar :is(input:not([type=search]),select,button,a,summary):focus-visible { outline:2px solid var(--ui-action); outline-offset:3px; }
+.filter-bar.filter-bar .btn { min-height:34px; justify-content:center; }
+.filter-bar.filter-bar .filter-actions { display:flex; flex-wrap:wrap; gap:var(--space-8); align-items:center; justify-content:flex-end; margin:0; }
+.filter-bar.filter-bar .filter-wide { flex-basis:100%; width:100%; }
+.filter-bar.filter-bar .filter-note { flex-basis:100%; margin:0; color:var(--color-text-secondary); font-size:12px; font-weight:400; }
+.filter-bar.filter-bar .filter-options { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-8); width:100%; }
+.filter-bar.filter-bar .filter-options + .filter-actions { padding-top:var(--space-12); border-top:1px solid var(--color-border); }
+.filter-bar.filter-bar .pipeline-bar { flex-basis:100%; margin:0 0 var(--space-4); padding:0 0 var(--space-12); border:0; border-bottom:1px solid var(--color-border); border-radius:0; }
+.filter-bar .application-mobile-sort { margin:0; }
+.filter-bar.filter-bar label.checkbox-label { flex:0 1 auto; flex-direction:row; align-items:center; gap:var(--space-8); min-height:34px; }
+.filter-bar .checkbox-label input { width:18px; height:18px; accent-color:var(--color-action); }
+.filter-bar .catalog-date-filters { flex-basis:100%; order:0; width:100%; }
+.filter-bar .catalog-date-filters summary { display:inline-flex; align-items:center; min-height:34px; color:var(--color-action); font-weight:600; }
+.filter-bar .catalog-date-filters > div { display:flex; flex-wrap:wrap; gap:var(--space-12); padding-top:var(--space-12); max-width:560px; }
+.filter-bar .catalog-date-filters[open] { order:0; }
+.filter-bar .billing-filter-title { flex-basis:100%; }
+.filter-bar.filter-bar .billing-search { flex:2 1 260px; }
+.filter-bar.filter-bar.billing-filters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.filter-bar.billing-filters .billing-search { grid-column:span 2; }
+.filter-bar.billing-filters :is(.billing-filter-title,.filter-actions) { grid-column:1/-1; }
+.filter-bar.filter-bar .filter-options .btn[aria-pressed=true] { background:var(--action-primary-soft); border-color:var(--action-primary-border); color:var(--action-primary-hover); font-weight:600; }
+@media(max-width:700px) {
+ .filter-bar.filter-bar .pipeline-bar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); overflow:visible; white-space:normal; }
+ .filter-bar .pipeline-pill { min-height:44px; white-space:normal; text-align:left; }
+ .filter-bar.filter-bar.billing-filters { grid-template-columns:1fr; }
+ .filter-bar.billing-filters .billing-search { grid-column:auto; }
+ .filter-bar.filter-bar { padding:var(--space-16); gap:14px 10px; }
+ .filter-bar.filter-bar-integrated { padding:0 0 var(--space-16); }
+ .filter-bar.filter-bar-compact { padding:0; }
+ .filter-bar.filter-bar label,.filter-bar.filter-bar .filter-search { flex-basis:100%; width:100%; min-width:0; }
+ .filter-bar.filter-bar :is(input:not([type=checkbox]):not([type=search]),select) { height:44px; min-height:44px; }
+ .filter-bar.filter-bar :is(button.btn,a.btn) { min-height:44px; }
+ .filter-bar.filter-bar .filter-actions { width:100%; }
+ .filter-bar .filter-actions > .btn { flex:1; }
+ .filter-bar.filter-bar > .btn { flex:1; }
+ .filter-bar.filter-bar label.checkbox-label { flex-basis:100%; }
+}

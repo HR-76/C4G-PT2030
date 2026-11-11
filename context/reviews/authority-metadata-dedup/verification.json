@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-26T23:59:08.144Z",
+  "syntax": [
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "backend/src/security/authoritySecurityManifest.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "backend/src/security/centralSchemaManifest.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "backend/src/security/catalogReaderSchema.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "backend/test/authorityMetadataDedup.test.js"
+    },
+    {
+      "output": "",
+      "status": "PASS",
+      "file": "test/integration/authority-metadata/proof.js"
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "file": "test/integration/authority-metadata/proof.ps1"
+    }
+  ],
+  "focused": {
+    "tests": 49,
+    "pass": 49,
+    "fail": 0,
+    "skipped": 0
+  },
+  "backend": {
+    "tests": 1269,
+    "pass": 1259,
+    "fail": 3,
+    "skipped": 7
+  },
+  "knownBackendFailures": [
+    "ClamAV lifecycle cancellation",
+    "F12 F11 ObjectStoragePort binding fixture",
+    "Closed protocol query catalog historical pin"
+  ],
+  "postgresProof": {
+    "status": "PASS",
+    "checks": 19,
+    "cleanupErrors": []
+  },
+  "httpRevocation": {
+    "status": "PASS",
+    "checks": 9,
+    "boundary": "tenant-admission",
+    "cleanupError": null
+  },
+  "experiments": [
+    {
+      "file": "context/reviews/authority-metadata-contention/results.json",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-26T23:51:44.838Z",
+      "finishedAt": "2026-10-26T23:55:21.123Z",
+      "successes": 36,
+      "requests": 36,
+      "errors": 0,
+      "cleanupError": null
+    },
+    {
+      "file": "context/reviews/authority-metadata-capacity/results.json",
+      "status": "COMPLETE",
+      "startedAt": "2026-10-26T23:56:13.585Z",
+      "finishedAt": "2026-10-26T23:57:25.062Z",
+      "successes": 4,
+      "requests": 6,
+      "errors": 2,
+      "cleanupError": null
+    }
+  ],
+  "artifactSecretScan": {
+    "files": 25,
+    "matches": [],
+    "encodings": [
+      "UTF8",
+      "UTF16LE"
+    ]
+  },
+  "isolatedContainersRemaining": 0,
+  "containerCheck": "docker ps -a with c4g.http-proof and c4g.authority-metadata-proof returned no rows",
+  "frontendBuild": "Not repeated: no frontend or HTTP contract changes.",
+  "globalPerformanceAcceptance": "FAIL: two 503 responses remain in the six-request burst.",
+  "historicalFullHttpMatrix": "The earlier 108-request matrix was not rerun; the specified standard/capacity contention profiles were rerun."
+}

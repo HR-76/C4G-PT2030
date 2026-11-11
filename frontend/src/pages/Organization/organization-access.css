@@ -1,0 +1,56 @@
+.access-table td { overflow-wrap: anywhere; white-space: normal; }
+.access-table select { width: 100%; min-width: 0; }
+.access-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.access-table .btn { max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: start; }
+@media (min-width: 769px) {
+ .access-table { min-width: 660px; }
+ .access-table th:nth-child(1) { width: 16%; }
+ .access-table th:nth-child(2) { width: 22%; }
+ .access-table th:nth-child(3) { width: 16%; }
+ .access-table th:nth-child(4) { width: 10%; }
+ .access-table th:nth-child(5) { width: 16%; }
+ .access-table th:nth-child(6) { width: 20%; }
+}
+
+.mt-demo1 .entity-users { margin-top:0; }
+.entity-users .entity-users-heading { border-bottom:1px solid #d8e1e9; padding-bottom:14px; }
+.entity-users-heading .member-org-name { margin:0 0 4px; color:#536579; font-size:.85rem; }
+.entity-users-heading h1 { color:#203448; font-size:clamp(24px,2.4vw,32px); margin:0; }
+.member-access-heading { display:flex; align-items:baseline; gap:12px; margin:16px 0 10px; }
+.member-access-heading h2 { margin:0; color:#203448; font-size:1.12rem; }
+.member-access-heading span,.access-actions small { color:#536579; font-size:.85rem; }
+.member-access .table-wrap { background:white; border:1px solid #d8e1e9; border-radius:10px; }
+.member-access th { color:#43576a; text-transform:none; }
+.member-access .member-profile { font-weight:600; color:#24384a; }
+.member-state { display:inline-flex; border-radius:20px; padding:3px 9px; color:#44566b; background:#edf1f5; font-size:.82rem; }
+.member-state[data-state=ACTIVE] { background:#e9f4ed; color:#225940; }
+.member-state[data-state=SUSPENDED] { background:#fff1df; color:#764811; }
+.access-actions label { display:grid; gap:4px; width:100%; color:#536579; font-size:.8rem; }
+.access-actions select { min-height:36px; }
+.access-review { padding-top:12px; }
+.member-access :is(button,select):focus-visible { outline:2px solid #305d83; outline-offset:2px; }
+
+/* Hierarquia e espaço de leitura nas tabelas de utilizadores. */
+.entity-users .member-access-heading { margin:24px 0 12px; }
+.entity-users .member-access .data-table :is(th,td) { padding:14px 16px; vertical-align:top; }
+.entity-users .member-access .data-table th { font-weight:600; }
+.entity-users .member-access .data-table td:first-child > span { font-weight:600; }
+.entity-users .member-access .data-table td:first-child small { font-weight:400; color:var(--color-text-secondary); }
+.entity-users .member-access .data-table td[data-label="Faturação"] > span { display:block; margin-bottom:8px; }
+.entity-users .member-access .data-table td[data-label="Faturação"] > span:last-child { margin-bottom:0; }
+.entity-users .access-actions { align-items:flex-start; gap:8px; }
+.entity-users .access-actions label { font-size:.82rem; font-weight:600; }
+.entity-users .access-actions select { border:1px solid var(--ui-control); border-radius:6px; padding:7px 10px; background:var(--color-surface); color:var(--color-text-primary); font:inherit; font-weight:400; }
+.entity-users .access-actions .btn { min-height:36px; }
+.entity-users .entity-activation-list .data-table td { vertical-align:middle; }
+.entity-users .entity-activation-list td[data-label="Pessoa"] > span { font-weight:600; }
+.entity-users .entity-activation-list td[data-label="Pessoa"] small { margin-top:4px; color:var(--color-text-secondary); font-weight:400; }
+.entity-users .entity-activation-list .table-wrap { border:0; border-radius:0; }
+@media(max-width:768px) {
+ .member-access tbody { display:grid; gap:8px; padding:8px; }
+ .member-access tbody tr { border:1px solid #d8e1e9; border-radius:8px; }
+ .member-access td[data-label="Nome"] { display:block; font-weight:650; color:#203448; }
+ .member-access td[data-label="Nome"]::before { content:none; }
+ .entity-users .member-access .data-table td { padding:10px 14px; }
+ .entity-users .access-actions .btn { min-height:44px; }
+}

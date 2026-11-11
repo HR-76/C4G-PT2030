@@ -1,0 +1,12 @@
+{
+  "result": "PASS",
+  "schema": "025_organization_directory",
+  "tenants": 2,
+  "publicOpportunitiesPreserved": 9,
+  "privateApplicationsPreserved": [
+    1,
+    0
+  ],
+  "businessRecordsCreated": 0,
+  "managerGrants": "explicit, existing memberships only"
+}

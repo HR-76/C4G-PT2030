@@ -1,0 +1,22 @@
+.editorial { width: 100%; min-width: 0; max-width: 64rem; margin: 0 auto; overflow-wrap: anywhere; }
+.editorial section, .editorial fieldset { min-width: 0; max-width: 100%; margin: 1rem 0; padding: 1rem; border: 1px solid var(--color-border-strong); border-radius: .5rem; }
+.editorial button, .editorial select { font: inherit; min-height: 2.75rem; padding: .5rem .75rem; margin: .25rem; max-width: 100%; }
+.editorial button { cursor: pointer; }
+.editorial button:disabled { cursor: default; opacity: .6; }
+.editorial label { display: block; margin: .5rem 0; }
+.editorial select { display: block; width: min(100%, 36rem); }
+.editorial li { margin: .75rem 0; }
+.editorial-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.editorial-confirm { background: var(--color-info-soft); }
+.editorial :focus-visible { outline: 3px solid var(--color-info); outline-offset: 3px; }
+.editorial [role=alert] { padding: 1rem; border-left: 4px solid var(--color-danger); }
+@media (max-width: 480px) { .editorial section, .editorial fieldset { padding: .5rem; } .editorial-actions { flex-direction: column; } }
+
+@media (max-width: 640px) {
+  .editorial-header { flex-wrap: wrap; }
+  .editorial-header .header-left, .editorial-header .header-actions { width: 100%; min-width: 0; }
+  .editorial-header .header-actions > div { width: 100%; min-width: 0; }
+  .editorial-header select { max-width: 100%; width: 100%; }
+}
+
+.editorial ul { padding-inline-start: 1.25rem; }

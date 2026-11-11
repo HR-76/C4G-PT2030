@@ -1,0 +1,66 @@
+.detail-page.interests-page { max-width: 1200px; }
+.interests-page:not(.detail-page) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  --color-text-secondary: #555;
+}
+.interests-page .data-table td:first-child a { color: var(--color-action); }
+@media (min-width: 1024px) {
+  .interests-page .data-table th:first-child { width: 30%; }
+  .interests-page .data-table td:first-child { white-space: normal; overflow-wrap: anywhere; }
+}
+.interest-units { border: 1px solid var(--border, var(--color-border-strong)); padding: 1rem; margin: 1rem 0; border-radius: 6px; }
+.interest-units legend { font-weight: 600; padding: 0 .3rem; }
+.interest-units label { display: flex; align-items: center; gap: .6rem; padding: .35rem 0; overflow-wrap: anywhere; }
+.interest-units input[type=checkbox] { width: auto; flex: 0 0 auto; }
+.interest-unit-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.interest-unit-list span { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; border: 1px solid var(--border, var(--color-border-strong)); padding: .2rem .45rem; border-radius: 4px; }
+.interest-row-actions { display: grid; gap: .5rem; min-width: 0; }
+.interest-row-actions .btn { width: 100%; min-height: 36px; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.interest-row-actions .btn:focus-visible { outline: 2px solid var(--color-success); outline-offset: 2px; }
+.interest-analysis textarea { width: 100%; }
+.interest-history { padding-left: 1.25rem; }
+.interest-history li { padding: .4rem 0; overflow-wrap: anywhere; }
+.interest-source { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1rem; }
+.interest-source dd { margin: 0; overflow-wrap: anywhere; }
+.catalog-interest-action { display: grid; gap: .35rem; justify-items: start; }
+.catalog-interest-status { display: inline-flex; align-items: center; gap: .35rem; max-width: 100%; padding: .25rem .45rem; border-radius: 4px; font-size: 12px; font-weight: 500; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
+.catalog-interest-status svg { flex-shrink: 0; }
+.catalog-interest-status-success { color: var(--status-success-text); background: var(--status-success-surface); }
+.catalog-interest-status-neutral { color: var(--status-neutral-text); background: var(--status-neutral-surface); }
+@media(max-width:600px) { .interest-source { grid-template-columns: 1fr; gap: .25rem; } .interest-source dd { margin-bottom: .6rem; } }
+.catalog-interest-heart { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 6px; background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+.catalog-interest-heart.is-active { color: var(--status-success-text); }
+.catalog-interest-heart:focus-visible { outline: 2px solid currentColor; }
+.catalog-interest-heart:disabled { cursor: wait; }
+.catalog-interest-pending { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; color: var(--color-text-muted, #526476); }
+.catalog-interest-pending svg { flex-shrink: 0; }
+.interest-transversal { display:flex; gap:8px; align-items:center; margin:12px 0; }
+.interest-initial-notes { display:grid; gap:6px; }
+.interest-initial-notes textarea { width:100%; font:inherit; }
+.highlighted-interest td:first-child { box-shadow:inset 3px 0 #305d83; }
+
+/* Lista de interesses: colunas legíveis e ações agrupadas. */
+.interests-page .interest-table-wrap { overflow-x:auto; }
+.interests-page .interest-table-wrap:focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; }
+.interests-page .interest-table :is(th,td) { padding:14px 16px; white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; vertical-align:middle; }
+.interests-page .interest-table th { line-height:1.35; font-weight:600; }
+.interests-page .interest-table td:first-child a { font-weight:600; text-underline-offset:3px; }
+.interests-page .interest-table td:first-child a:hover { text-decoration:underline; }
+.interests-page .interest-row-actions { min-width:145px; }
+@media (min-width:769px) {
+ .interests-page .interest-table { min-width:1250px; table-layout:fixed; }
+ .interests-page .interest-table th:first-child { width:23%; }
+ .interests-page .interest-table th:nth-child(2) { width:13%; }
+ .interests-page .interest-table th:nth-child(3) { width:9%; }
+ .interests-page .interest-table th:nth-child(4) { width:16%; }
+ .interests-page .interest-table th:nth-child(5) { width:15%; }
+ .interests-page .interest-table th:nth-child(6) { width:8%; }
+ .interests-page .interest-table th:nth-child(7) { width:16%; }
+}
+@media (max-width:768px) {
+ .interests-page .interest-row-actions { min-width:0; }
+ .interests-page .interest-table td { padding:12px 14px; }
+ .c4g-shell #main-content .interest-row-actions .btn { min-height:var(--control-h-touch); }
+}

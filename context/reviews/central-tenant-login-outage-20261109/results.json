@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "checks": [
+    "tenant A rejects new login; tenant B remains reachable",
+    "tenant A login recovers after restoration",
+    "central reader rejects new login without corrupting tenant B connection",
+    "central reader login recovers after restoration"
+  ],
+  "limits": [
+    "Simulated login denial on a disposable PostgreSQL cluster, not network outage, existing connections, HTTP behavior, production database or Neon.",
+    "Central and tenants share one synthetic cluster; no independent physical failure domain or production privilege parity."
+  ],
+  "postgres": "PostgreSQL 18.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "centralMigration": "035_funding_source_resolution"
+}

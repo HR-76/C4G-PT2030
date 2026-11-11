@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "status": "TEMPORAL_OVERLAP_CONFIRMED_CAUSE_UNRESOLVED",
+  "observedAt": "2026-10-31T19:00:45Z",
+  "scope": "READ_ONLY_HISTORICAL_TIMING_AND_LOAD_METADATA",
+  "runtimeChanged": false,
+  "infrastructureExecuted": false,
+  "sources": [
+    {"id":"contract","path":"context/features/central-snapshot-lease-timeout-repeat.md","sha256":"6801fc1982b52baa08da3a8156a4dba2846bead1ab9be058953eedd9f4c5be7f"},
+    {"id":"diagnostic","path":"context/reviews/central-security-snapshot-ab-analysis/failure-analysis.json","sha256":"2008a1104fdf10c4dfe61e61523f36231d5733d7bb45af8fbe83381b9c78d437"},
+    {"id":"H-A4","path":"output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/bfd7495e00394b85821c568571e26908/stage-4-043-A.json","sha256":"cab6e68827bcad1fe3752741f326e90e65a277953d6312b5072e9d60e3cd7864"},
+    {"id":"M","path":"output/central-snapshot-ab-5b9e4e70caa94f49a881fc11b39a47bb/evidence/62b84bafdcc249d8879692256bba757e/report.json","sha256":"80014a4ad9aefe30b99a33758b18b45079ab847aae9ee4216645af0877362411"},
+    {"id":"checks044","path":"output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/checks-post-lock.json","sha256":"3728b81d6204a884ce310298588a451ae95248a33c0b74fce976dc749bc73399"},
+    {"id":"inputs044","path":"output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/tested-inputs-post-lock.json","sha256":"17ec3c0ad303fa95f7282d67fd28936b4ccaad1214a075cebe4b8ad125243591"},
+    {"id":"frontend044","path":"output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/frontend-post-lock.log","sha256":"0aa2c45764ea6eefff80b3e2ca1ae46c51c43f1ac1fdc9616224fafdba061e61"},
+    {"id":"backend044","path":"output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/backend-post-lock.log","sha256":"105c247f4d080f093c8a627015aefd64b0f34fae0b3052d583d7b9bb30af7ddf"},
+    {"id":"build044","path":"output/opportunity-eu-reconciliation-validation-42188168-9e32-4928-bf44-6d38e94388b7/build-post-lock.log","sha256":"b3e7ffac4522f69b506f49f7052d0fa7b8ecda508a7652caac5fc60d5ca3efe8"},
+    {"id":"gate044-H","path":"output/opportunity-v2-reconciliation-f4f33a48b9f54478b741c45e30ae1732/verification.json","sha256":"b55526ce6a555020f1b06b6e153193e28dd9a9360ab3a0b8eaab9516b823b5ca"},
+    {"id":"gate044-M","path":"output/opportunity-v2-reconciliation-7d0456bfa52f4dccba25dda0768bf123/verification.json","sha256":"c1ae925206d1abc53742d866b023ff5065e650a6bb57691271ca8eb185075dc3"},
+    {"id":"restore044-1","path":"output/opportunity-v2-window/e20d478b-c6b4-4b3a-87cb-25e29bf789ba/backup-restore-65770b8e-3902-4bee-be0d-1c669306826f.json","sha256":"a40b297a6a205ed56f5f7b65320ccbc6ac6a0c56ff2598f89d58f4b216ec6481"},
+    {"id":"restore044-2","path":"output/opportunity-v2-window/fb103a50-07fc-4e9b-a7a2-20c1a6c856a8/backup-restore-852911f3-a763-4c72-8a04-234c35a4e529.json","sha256":"1775400ad1c7c1788efe0a0adbb9488262f3264c8f50abd013f42b2ab02cafbf"}
+  ],
+  "verification": {
+    "sourceHashes": "SHA256_RAW_BYTES",
+    "logEncoding": "UTF16LE_BOM",
+    "logsMatchChecks044": ["frontend044", "backend044", "build044"],
+    "filesystemTimes": "Observed separately; not contained in or authenticated by the content hashes."
+  },
+  "timeline": [
+    {"source":"gate044-M","basis":"EXPLICIT_ISO_UTC","start":"2026-10-31T17:47:12.389Z","end":"2026-10-31T17:53:31.699Z","status":"FAIL"},
+    {"source":"M","basis":"EXPLICIT_ISO_UTC","start":"2026-10-31T17:47:31.692Z","end":"2026-10-31T17:51:59.538Z","status":"PASS"},
+    {"source":"inputs044","basis":"EXPLICIT_ISO_UTC","at":"2026-10-31T18:13:13.917Z","meaning":"Inputs captured for the post-lock validation."},
+    {"source":"diagnostic","support":"H-A4","basis":"EXPLICIT_SAMPLER_PHASE_UTC","start":"2026-10-31T18:13:15.812Z","end":"2026-10-31T18:13:36.473Z","meaning":"First and last samples labelled dashboard-c4-two-tenants-warmup; not exact HTTP start/end."},
+    {"source":"frontend044","basis":"EXPLICIT_LOCAL_CLOCK_PLUS_INFERRED_UTC_ALIGNMENT","startClock":"18:13:24","durationMs":11450,"observedMtimeUtc":"2026-10-31T18:13:35.759Z","inferredStartUtc":"2026-10-31T18:13:24.000Z","inferredEndUtc":"2026-10-31T18:13:35.450Z","assumptions":"Log has no date or UTC offset; same-date UTC alignment is corroborated by the adjacent ISO artifacts and filesystem timestamp, not certified by the log alone."},
+    {"source":"backend044","basis":"DURATION_AND_FILESYSTEM_INFERENCE","durationMs":54568.5769,"tests":2337,"passed":2330,"skipped":7,"failed":0,"observedMtimeUtc":"2026-10-31T18:14:13.562Z","approximateStartUtc":"2026-10-31T18:13:18.993Z","assumptions":"mtime minus reported duration, rounded to milliseconds; assumes direct final log write. Buffering, delayed write or copying can invalidate this estimate."},
+    {"source":"gate044-H","basis":"EXPLICIT_ISO_UTC","start":"2026-10-31T18:13:30.564Z","end":"2026-10-31T18:16:38.478Z","status":"FAIL","firstPostgresSetupCheckMs":5808},
+    {"source":"build044","basis":"DURATION_AND_FILESYSTEM_ONLY","durationMs":2580,"observedMtimeUtc":"2026-10-31T18:13:39.336Z","meaning":"Near the end of the failed phase; an exact overlapping build interval is not established."},
+    {"source":"checks044","basis":"EXPLICIT_ISO_UTC","at":"2026-10-31T18:14:48.012Z","meaning":"Post-lock validation summary created."},
+    {"source":"restore044-1","basis":"EXPLICIT_ISO_UTC","start":"2026-10-31T18:32:43.561Z","end":"2026-10-31T18:33:20.013Z","status":"PASS"},
+    {"source":"restore044-2","basis":"EXPLICIT_ISO_UTC","start":"2026-10-31T18:35:35.040Z","end":"2026-10-31T18:36:08.760Z","status":"PASS"}
+  ],
+  "overlaps": [
+    {"sources":["M","gate044-M"],"basis":"EXPLICIT_REPORTED_EXECUTION_INTERVALS","overlapMs":267846,"MEntireReportedIntervalWithinGate":true,"continuousCpuLoadEstablished":false},
+    {"sources":["diagnostic","gate044-H"],"basis":"EXPLICIT_SAMPLER_PHASE_AND_GATE_INTERVALS","start":"2026-10-31T18:13:30.564Z","end":"2026-10-31T18:13:36.473Z","overlapMs":5909,"exactRequestOverlapMs":null},
+    {"sources":["diagnostic","frontend044"],"basis":"LOCAL_CLOCK_ALIGNMENT_CORROBORATED_BY_METADATA","overlapSupported":true,"causalContributionMeasured":false},
+    {"sources":["diagnostic","restore044-1","restore044-2"],"basis":"EXPLICIT_REPORTED_INTERVALS","overlapMs":0}
+  ],
+  "failureObservations": {
+    "source":"diagnostic",
+    "httpStatus":503,
+    "internalCode":"LEASE_TIMEOUT",
+    "httpMs":20479.233600000007,
+    "measuredRequestsBeforeFailure":172,
+    "failedScenarioMeasuredRequests":0,
+    "sqlIntervalUnionFraction":0.9632443178928245,
+    "metadataIntervalUnionFraction":0.8155667700377189,
+    "observerSlowBeforeGate":{"at":"2026-10-31T18:13:25.669Z","observerMs":470.25400000001537},
+    "observerMaximumMs":515.1459999999788,
+    "sampledNodeCpuFractionOneCore":0.18682541987319104,
+    "sampledTenantQueuedMaximum":0,
+    "samplesWithBlockers":0,
+    "sqlErrors":0,
+    "admissionErrors":0
+  },
+  "interpretation": {
+    "established":"Other validation work overlapped the historical performance execution. The failed phase contains distributed SQL/observer latency inflation.",
+    "hypothesis":"Concurrent tests and PostgreSQL setup may have contributed to host, database or transport scheduling contention.",
+    "notEstablished":["Exclusive or quantified cause of the timeout","Continuous high load throughout the overlapping gate","PostgreSQL or whole-host CPU saturation","Exact timeout branch from LEASE_TIMEOUT alone"],
+    "limits":["Sampler phase bounds can include drain or cleanup and are not exact HTTP wall-clock bounds.","Node CPU is not host or PostgreSQL CPU; query driver intervals include execution, waiting, transport and scheduling.","No sampled queue or blocker does not exclude short waits between samples.","Observer inflation at 18:13:25.669Z precedes the gate start; that gate cannot alone explain the entire slowdown.","The original M remains a population collected during a concurrent gate, even if a later H completes without overlap.","A successful repeat does not erase the original FAIL or prove that SQL B repairs its cause."]
+  }
+}

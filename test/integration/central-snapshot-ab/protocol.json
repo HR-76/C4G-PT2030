@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "central-security-snapshot-ab-v1",
+  "parentId": "eu-writer-trial-0ecb31dc7c705859",
+  "seedDigest": "3809b44e0f34f7a5f6868b9052fb66af021051292b0b49648b9d0e8876edf3f6",
+  "clock": "MONOTONIC",
+  "quantiles": "NEAREST_RANK",
+  "roundBeforeDecision": false,
+  "metadata": {
+    "collector": "AGGREGATE_A_VERSUS_AGGREGATE_B_WITH_ALL_SECURITY_READS",
+    "revisions": ["043", "042"],
+    "pairOrder": [["A","B"],["B","A"],["A","B"],["B","A"],["A","B"],["B","A"]],
+    "warmupsPerBlock": 10,
+    "measuredPerBlock": 100,
+    "measuredPerArmPerRevision": 600,
+    "connectionsPerBlock": 1,
+    "fixture": "ONE_PER_REVISION_SHARED_BY_BOTH_ARMS"
+  },
+  "http": {
+    "revision": "043",
+    "pairOrder": [["A","B"],["B","A"],["A","B"],["B","A"]],
+    "attemptsPerArm": 36,
+    "warmupsPerArm": 7,
+    "totalAttempts": 288,
+    "totalWarmups": 56,
+    "fixture": "NEW_PER_ARM_WITH_FUNCTIONAL_HTTP_OIDC_READINESS",
+    "matrix": "UNCHANGED_FROZEN_EU_WRITER_HTTP_REPLICA"
+  },
+  "budgets": {"setup":300000,"metadataBlock":300000,"httpScenario":180000,"drain":30000,"cleanup":120000},
+  "images": {
+    "postgres": {"id":"sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873","repositoryDigests":["postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873"],"sourceTag":"postgres:18-alpine"},
+    "keycloak": {"id":"sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc","repositoryDigests":["quay.io/keycloak/keycloak@sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc"],"sourceTag":"quay.io/keycloak/keycloak:26.8.0"}
+  },
+  "execution": {"sequential":true,"concurrentTestsOrBuilds":false,"habitualEnvironmentAccess":false,"writerActive":false,"c6":false,"profilingOutsideMeasurements":true},
+  "limitations": ["Unreserved local host; external activity and power management can affect timings.","HTTP p95 with 4 or 8 attempts per scenario/arm is the maximum; diagnostic sampling does not certify capacity.","Driver intervals include network, execution and waits; overlapping intervals are not additive SQL CPU.","No checkpoint, security read or post-lock verification may be removed or reused."]
+}
