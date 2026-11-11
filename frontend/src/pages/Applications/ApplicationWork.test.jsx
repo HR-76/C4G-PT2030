@@ -490,3 +490,14 @@ it('shows retry rather than a false empty result when server filtering fails',as
  expect(screen.queryByText('Sem tarefas com este filtro na candidatura.')).toBeNull();
  fireEvent.click(screen.getByRole('button',{name:'Tentar novamente',exact:true}));await screen.findByText('Minha aberta');
 })
+
+it('tells the team the history was deleted instead of showing an unexplained empty chat',async()=>{
+ api.work.mockResolvedValue({data:{canEdit:false,canChat:true,revision:1,participants:[],tasks:[]}})
+ api.chat.mockResolvedValue({data:{items:[],nextCursor:null,purgedAt:'2026-11-12T03:00:00.000Z'}})
+ render(<ApplicationWork {...props} canEdit={false} />)
+ fireEvent.click(await screen.findByRole('button',{name:'Chat da equipa'}))
+ const dialog=await screen.findByRole('dialog',{name:'Chat da equipa'})
+ expect((await within(dialog).findByRole('status')).textContent).toMatch(/A conversa foi eliminada em 12\/11\/2026/)
+ expect(within(dialog).queryByText('Ainda não há mensagens.')).toBeNull()
+ expect(within(dialog).getByRole('textbox',{name:'Mensagem'})).toBeTruthy()
+})

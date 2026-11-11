@@ -32,7 +32,11 @@ Motivo: o chat é uma conversa por candidatura, com mensagens imutáveis e sem r
 
 ## Validação em PostgreSQL 17 descartável (11/11/2026)
 
-`test/integration/chat-retention/proof.js`: contentor próprio em `127.0.0.1`, removido no fim; **19 verificações PASS**, sem bases habituais, R2 ou fornecedores. O runner oficial aplica a 040 (fingerprint e ledger conferem; repetir é no-op); fechada há 91 dias e há exatamente 90 dias são eliminadas; fechada há 30 dias, ativa e reaberta ficam intactas; recibos saem com as mensagens; outra organização intacta; registo sem texto e imutável; o runtime da aplicação não faz `DELETE` nem executa a função; outros papéis não executam; menos de 90 dias e lotes fora de limites recusados; repetir não tem efeito; `DELETE` direto fora da função continua recusado; uma candidatura fechada de novo recomeça os 90 dias.
+`test/integration/chat-retention/proof.js`: contentor próprio em `127.0.0.1`, removido no fim; **22 verificações PASS**, sem bases habituais, R2 ou fornecedores. O runner oficial aplica a 040 (fingerprint e ledger conferem; repetir é no-op); fechada há 91 dias e há exatamente 90 dias são eliminadas; fechada há 30 dias, ativa e reaberta ficam intactas; recibos saem com as mensagens; outra organização intacta; registo sem texto e imutável; o runtime da aplicação não faz `DELETE` nem executa a função; outros papéis não executam; menos de 90 dias e lotes fora de limites recusados; repetir não tem efeito; `DELETE` direto fora da função continua recusado; uma candidatura fechada de novo recomeça os 90 dias.
+
+## Aviso «conversa eliminada» (11/11/2026)
+
+Quando a primeira página do histórico vem vazia, `chatGet` devolve também `purgedAt`: verifica com `to_regclass` se a tabela `application_chat_purge` existe (esquemas anteriores à 040 continuam suportados, sem erro) e lê a data de eliminação da candidatura. Páginas com mensagens ou com cursor não fazem esta consulta. O painel mostra «A conversa foi eliminada em dd/mm/aaaa: as conversas de candidaturas fechadas são eliminadas 90 dias depois do fecho» em vez de «Ainda não há mensagens»; o envio de mensagens continua disponível. Prova em PostgreSQL 17 descartável (22 verificações no total): o runtime lê a data de uma candidatura eliminada e nada para outra, não vê registos de outra organização (RLS) nem consegue escrever o registo. Testes: `applicationChat.test.js` e `ApplicationWork.test.jsx`.
 
 ## Execução periódica (decidida a 11/11/2026)
 
@@ -44,5 +48,4 @@ Implementado: `chatRetentionRunner.js` (lotes, isolamento por organização, só
 
 - **Tarefa do Windows por registar** e **primeira execução por fazer**: dependem de autorização expressa. A primeira execução cria um registo permanente em `application_chat_purge` para cada candidatura final com mais de 90 dias.
 - **Produção (VPS):** falta o adaptador de organizações e credenciais, o login por tenant só com o papel de retenção e aplicar a 040 em cada tenant. Ver o runbook.
-- **Sem aviso «conversa eliminada em …» no painel:** o painel mostra «Ainda não há mensagens» depois da eliminação. Fica por fazer: `chatGet` ler `application_chat_purge` quando a 040 existir.
 - A estimativa de custo (≈2,5 KB por mensagem) é uma estimativa; a base local tinha 0 mensagens.

@@ -8,6 +8,9 @@ import './application-team-chat.css'
 const messageDate = new Intl.DateTimeFormat('pt-PT', {
   timeZone: 'Europe/Lisbon', dateStyle: 'short', timeStyle: 'short',
 })
+const purgeDate = new Intl.DateTimeFormat('pt-PT', {
+  timeZone: 'Europe/Lisbon', day: '2-digit', month: '2-digit', year: 'numeric',
+})
 const denied = error => [401, 403, 404].includes(error?.response?.status)
 
 function mergeLatest(previous, page) {
@@ -88,8 +91,8 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
         anchor.current = { height: panel.current.scrollHeight, top: panel.current.scrollTop }
       }
       setFeed(previous => cursor
-        ? { items: [...data.items, ...previous.items], nextCursor: data.nextCursor }
-        : mergeLatest(previous, data))
+        ? { items: [...data.items, ...previous.items], nextCursor: data.nextCursor, purgedAt: previous.purgedAt ?? null }
+        : { ...mergeLatest(previous, data), purgedAt: data.purgedAt ?? null })
       setLoadError('')
     } catch (error) {
       if (scope.controller.signal.aborted) return
@@ -179,7 +182,11 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
       {!feed && !loadError && <p role="status" className="application-chat-status">A carregar mensagens…</p>}
       {feed?.nextCursor && <button type="button" className="btn btn-outline btn-sm application-chat-older"
         disabled={loading} onClick={() => load(scopeRef.current, feed.nextCursor)}>Mensagens anteriores</button>}
-      {feed && feed.items.length === 0 && <p className="application-chat-status">Ainda não há mensagens.</p>}
+      {feed && feed.items.length === 0 && (feed.purgedAt
+        ? <p role="status" className="application-chat-status">
+          A conversa foi eliminada em {purgeDate.format(new Date(feed.purgedAt))}: as conversas de candidaturas fechadas são eliminadas 90 dias depois do fecho.
+        </p>
+        : <p className="application-chat-status">Ainda não há mensagens.</p>)}
       {feed?.items.length > 0 && <ol className="application-chat-messages" aria-label="Mensagens">
         {feed.items.map(message => <li key={message.messageId} className={message.own ? 'application-chat-own' : ''}>
           <div className="application-chat-message-heading">

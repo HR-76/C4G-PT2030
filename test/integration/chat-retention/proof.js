@@ -120,6 +120,19 @@ async function main() {
     } finally { await c2.query('RESET session_replication_role'); c2.release(); }
     assert.deepEqual(await purge(), []); assert.equal(await count('application_chat_message', reopened.id), 1); ok('an application closed again starts a new 90-day period');
 
+    // --- the chat panel notice: the exact lookups chatGet runs, as the application runtime --------------------------
+    await as('c4g_opportunity_tenant_runtime', async c => {
+      assert.equal((await c.query("SELECT to_regclass('opportunity_catalog.application_chat_purge') IS NOT NULL AS present")).rows[0].present, true);
+      assert.equal((await c.query("SELECT to_regclass('opportunity_catalog.table_that_does_not_exist') IS NOT NULL AS present")).rows[0].present, false);
+      const seen = await c.query('SELECT purged_at FROM opportunity_catalog.application_chat_purge WHERE organization_id=$1 AND application_id=$2', [org, archived91.id]);
+      assert.equal(seen.rowCount, 1); assert.ok(seen.rows[0].purged_at instanceof Date);
+      assert.equal((await c.query('SELECT 1 FROM opportunity_catalog.application_chat_purge WHERE organization_id=$1 AND application_id=$2', [org, cancelled30.id])).rowCount, 0);
+    }); ok('runtime reads the purge date of a purged application, and nothing for one that was not purged');
+    await as('c4g_opportunity_tenant_runtime', async c => {
+      assert.equal((await c.query('SELECT 1 FROM opportunity_catalog.application_chat_purge WHERE application_id=$1', [archived91.id])).rowCount, 0);
+    }, other); ok('another organization cannot see the purge record (RLS); a missing table reports absent without error');
+    await as('c4g_opportunity_tenant_runtime', async c => { await assert.rejects(c.query("INSERT INTO opportunity_catalog.application_chat_purge(organization_id,application_id,terminal_status,terminal_at,message_count,retention_days) VALUES($1,$2,'ARCHIVED',now(),0,90)", [org, active.id]), /permission denied/); }); ok('runtime cannot write the purge log');
+
     const result = checks.every(c => c.result === 'PASS') ? 'PASS' : 'FAIL';
     console.log(JSON.stringify({ result, checks }, null, 1));
     if (result !== 'PASS') process.exitCode = 1;

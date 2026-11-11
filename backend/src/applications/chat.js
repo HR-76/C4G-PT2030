@@ -40,6 +40,15 @@ function createChatRepository({organizationId,actor,protectApplication,responsib
   }));
  }
 
+ // The table only exists from migration 040; older tenant schemas are still supported.
+ async function purgedAt(client,id){
+  const {rows:[table]}=await client.query(`SELECT to_regclass('opportunity_catalog.application_chat_purge') IS NOT NULL AS present`);
+  if(table?.present!==true)return null;
+  const {rows:[purge]}=await client.query(`SELECT purged_at FROM opportunity_catalog.application_chat_purge
+   WHERE organization_id=$1 AND application_id=$2`,[organizationId,id]);
+  return purge?new Date(purge.purged_at).toISOString():null;
+ }
+
  return {
   async chatGet(client,id,input){
    await authorize(client,id,'APPLICATION_CHAT_READ');
@@ -52,6 +61,8 @@ function createChatRepository({organizationId,actor,protectApplication,responsib
     ORDER BY sequence_no DESC LIMIT $4`,[organizationId,id,before,PAGE_SIZE+1]);
    const page=rows.slice(0,PAGE_SIZE);
    const nextCursor=rows.length>PAGE_SIZE?cursor.cursor(page.at(-1).sequence_no,binding):null;
+   // An empty first page is ambiguous: no messages yet, or the retention purge deleted them.
+   if(before===null&&page.length===0)return {items:[],nextCursor:null,purgedAt:await purgedAt(client,id)};
    return {items:await project(page.reverse()),nextCursor};
   },
 

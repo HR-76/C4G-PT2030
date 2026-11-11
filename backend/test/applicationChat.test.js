@@ -57,3 +57,53 @@ test('chat history pages are chronological, scoped to the actor and limited to 2
  assert.equal(older.nextCursor,null);
  assert.deepEqual(older.items.map(item=>item.body),messages.slice(0,5).map(item=>item.body));
 });
+
+function purgeNoticeHarness({ present = true, purgedAt = null } = {}) {
+ const organizationId = randomUUID(), id = randomUUID(), membershipId = randomUUID(), seen = [];
+ const repo = createChatRepository({ organizationId, actor: { id: membershipId, membershipId }, protectApplication: async () => {},
+  responsibleNames: async () => new Map(), cursor: { cursor: position => String(position), openCursor: position => position } });
+ const client = { async query(sql, values) {
+  seen.push([String(sql), values]);
+  if (sql.includes('application_participant')) return { rows: [{}] };
+  if (sql.includes('to_regclass')) return { rows: [{ present }] };
+  if (sql.includes('application_chat_purge')) return { rows: purgedAt ? [{ purged_at: purgedAt }] : [] };
+  return { rows: [] };
+ } };
+ return { repo, client, id, organizationId, seen };
+}
+
+test('an empty first chat page reports when the history was purged', async () => {
+ const { repo, client, id, organizationId, seen } = purgeNoticeHarness({ purgedAt: new Date('2026-11-12T03:00:00Z') });
+ assert.deepEqual(await repo.chatGet(client, id, {}), { items: [], nextCursor: null, purgedAt: '2026-11-12T03:00:00.000Z' });
+ const lookup = seen.find(([sql]) => /FROM opportunity_catalog\.application_chat_purge/.test(sql));
+ assert.deepEqual(lookup[1], [organizationId, id]);
+});
+
+test('an empty first chat page without a purge record reports no purge', async () => {
+ const { repo, client, id } = purgeNoticeHarness({ purgedAt: null });
+ assert.deepEqual(await repo.chatGet(client, id, {}), { items: [], nextCursor: null, purgedAt: null });
+});
+
+test('a database without the retention table never queries it', async () => {
+ const { repo, client, id, seen } = purgeNoticeHarness({ present: false });
+ assert.deepEqual(await repo.chatGet(client, id, {}), { items: [], nextCursor: null, purgedAt: null });
+ assert.equal(seen.some(([sql]) => /FROM opportunity_catalog\.application_chat_purge/.test(sql)), false);
+});
+
+test('pages with messages or a cursor never look up the purge record', async () => {
+ const withMessages = purgeNoticeHarness({ purgedAt: new Date() });
+ const membershipId = randomUUID();
+ const row = { message_id: randomUUID(), author_membership_id: membershipId, body: 'Olá', created_at: new Date(), sequence_no: '1' };
+ const client = { async query(sql) {
+  withMessages.seen.push([String(sql)]);
+  if (sql.includes('application_participant')) return { rows: [{}] };
+  return { rows: [row] };
+ } };
+ const page = await withMessages.repo.chatGet(client, withMessages.id, {});
+ assert.equal(Object.hasOwn(page, 'purgedAt'), false);
+ assert.equal(withMessages.seen.some(([sql]) => /to_regclass|application_chat_purge/.test(sql)), false);
+ const older = purgeNoticeHarness({ purgedAt: new Date() });
+ const result = await older.repo.chatGet(older.client, older.id, { cursor: '5' });
+ assert.equal(Object.hasOwn(result, 'purgedAt'), false);
+ assert.equal(older.seen.some(([sql]) => /to_regclass|application_chat_purge/.test(sql)), false);
+});
