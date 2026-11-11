@@ -83,7 +83,7 @@ Executar `npm run test:oidc-pending` para testar os dois resultados do login. O 
 
 **Painel de utilizadores disponível desde 18/10/2026:** Administração C4G → Entidades e utilizadores → Consultar a entidade → Adicionar utilizador. Introduzir nome, email e perfil, rever, criar o acesso por ativar e emitir a ligação temporária. Entregar a ligação manualmente à pessoa, que define a password no Keycloak ou confirma a conta existente. É possível substituir/revogar a ligação, consultar a ativação e gerir perfil/suspensão no mesmo ecrã. O administrador da entidade usa Acessos; o gestor pode adicionar apenas técnicos. Email continua adiado.
 
-A configuração privada deste percurso está em `.tmp/local-platform/members/`. O módulo de ativação foi instalado no contentor Keycloak existente; não recriar o contentor nem apagar essa configuração. A Central usa a migração 021 e o binding da base da entidade passou a ser resolvido pelo diretório central. A prova com duas entidades e a conferência do ambiente habitual estão em [revisão de acessos](context/reviews/platform-member-access.md). A criação de uma nova entidade pelo formulário ainda é um incremento separado.
+A configuração privada deste percurso está em `.tmp/local-platform/members/`. O módulo de ativação foi instalado no contentor Keycloak existente; desde 11/11/2026 está montado a partir de `.tmp/f2-integration/keycloak-external/` (ver a secção final). Não apagar essa configuração nem recriar o contentor sem o override aí indicado. A Central usa a migração 021 e o binding da base da entidade passou a ser resolvido pelo diretório central. A prova com duas entidades e a conferência do ambiente habitual estão em [revisão de acessos](context/reviews/platform-member-access.md). A criação de uma nova entidade pelo formulário ainda é um incremento separado.
 
 Depois da instalação, consultar localmente `.tmp/local-platform/access.json`. Contém os nomes de utilizador e as passwords iniciais; não copiar para documentação ou mensagens. Alterar a password nas definições da conta não atualiza esse ficheiro nem faz o instalador repor a password anterior.
 
@@ -141,7 +141,20 @@ docker network connect c4g-native-email-edge c4g-f2-integration-proxy-1
 
 O segundo comando é obrigatório: a rede `c4g-native-email-edge` não faz parte do compose e sem ela o realm `c4g-native-local` deixa de responder em `https://localhost:8443`.
 
-O contentor `c4g-f2-integration-keycloak-1` **não foi recriado e não deve ser**: guarda dentro do próprio contentor a base H2 e o módulo `c4g-manual-activation.jar`, sem volume. Recriá-lo apaga ambos. A sua única montagem é `GCNI_C4G\test\integration\f2\realm.json`, só de leitura; não apagar nem mover esse ficheiro enquanto o contentor existir. Outros contentores antigos (`c4g-local-demo-*`, `c4g-assisted-app-*`, `c4g-recovery-*`, bases `c4g-f2-integration-*-db-1`) também montam caminhos de `GCNI_C4G`.
+O contentor `c4g-f2-integration-keycloak-1` guardava dentro de si, sem volume, a base H2 (realms `master`, `c4g-test`, `c4g-native-local` e `c4g-native-validation`), o módulo `c4g-manual-activation.jar`, a sua configuração `c4g-activation.properties` e uma cópia do tema. Em 11/11/2026 esse estado foi movido para fora e o contentor recriado:
+
+- Base H2: volume Docker externo `c4g-f2-keycloak-data`, montado em `/opt/keycloak/data`. **Não remover este volume** (`docker volume rm`, `docker compose down -v` ou limpeza de volumes no Docker Desktop apagam os realms).
+- Módulo, configuração e tema: `.tmp/f2-integration/keycloak-external/` (`providers`, `conf`, `themes/c4g`), montados só de leitura. O tema é a cópia que o contentor usava, mais antiga do que `dev/keycloak/themes/c4g`.
+- Override: `.tmp/f2-integration/keycloak-external.compose.yaml`.
+- Cópias de segurança anteriores à migração: imagem `c4g-f2-keycloak-before-migration:20261111` e `.tmp/f2-integration/keycloak-external/backup/keycloak-data-before-migration.tar`.
+
+A partir de agora o contentor pode ser recriado sem perda, desde que com o override (sem ele, o Keycloak arranca com uma base vazia):
+
+```powershell
+docker compose --project-name c4g-f2-integration --env-file .tmp/f2-integration/.env -f test/integration/f2/compose.yaml -f .tmp/f2-integration/demo-static.compose.yaml -f .tmp/f2-integration/keycloak-external.compose.yaml up -d --no-deps --force-recreate keycloak
+```
+
+O proxy e este Keycloak já não montam nada de `GCNI_C4G`. Outros contentores antigos (`c4g-local-demo-*`, `c4g-assisted-app-*`, `c4g-recovery-*`, bases `c4g-f2-integration-*-db-1`) continuam a montar caminhos de lá.
 
 **Sintoma:** dashboard, diretório da organização e notificações respondem 503, enquanto `/api/local-health` continua a devolver `ready: true`. Confirmar com:
 
