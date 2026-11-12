@@ -1,6 +1,6 @@
 # Emails: templates e configuração
 
-Estado: Draft — contrato proposto em 12/11/2026, por aprovar. Nada implementado. Há perguntas em aberto que bloqueiam as fases 2 e 3.
+Estado: Draft — contrato proposto em 12/11/2026, por aprovar. Nada implementado. Decisões de produto da fase 1 fechadas, com [plano técnico](email-templates-and-configuration-plan.md) por aprovar. Há perguntas em aberto que bloqueiam as fases 2 e 3.
 
 ## Pedido
 
@@ -47,12 +47,16 @@ Factos relevantes para o desenho:
 Ecrã no Administrador C4G, menu Email › Tipos.
 
 - Existe um template global do convite, que reproduz o texto atual. Cada organização pode ter um template próprio que o substitui; sem template próprio, usa o global.
-- Campos editáveis: assunto e corpo. Variáveis numa lista fechada: `{Organizacao}`, `{LigacaoAtivacao}`, `{Validade}`.
+- Campos editáveis: assunto e corpo. Variáveis numa lista fechada: `{Organizacao}`, `{LigacaoAtivacao}`, `{Validade}` e `{Logotipo}`. No assunto só `{Organizacao}` e `{Validade}`. `{Logotipo}` marca o sítio onde a imagem aparece; é opcional e não aparece na versão em texto.
 - O corpo é HTML com logótipo, editado num editor de texto rico (decisão de 12/11/2026). Formatação admitida numa lista fechada: parágrafos, títulos, negrito, itálico, listas, ligações `https` e o logótipo. Sem scripts, estilos externos, formulários, iframes ou imagens de endereços arbitrários.
 - O servidor sanitiza o HTML ao gravar e volta a validar ao enviar; não confia na sanitização do browser. O que for retirado é mostrado ao administrador antes de gravar.
 - Cada envio leva também uma versão em texto simples, gerada a partir do HTML, com a ligação de ativação por extenso.
-- O logótipo é referenciado por um endereço público HTTPS servido pela plataforma, não anexado nem embutido em base64. Qual logótipo, na pergunta 6.
-- Gravar é recusado se faltar `{LigacaoAtivacao}` ou `{Validade}`, se existir uma variável desconhecida, ou se o assunto contiver quebras de linha. Limites: assunto 200 caracteres, corpo 5000.
+- O logótipo é referenciado por um endereço público HTTPS servido pela plataforma, não anexado nem embutido em base64.
+- Logótipo (decisão de 12/11/2026): emails da aplicação levam o logótipo da C4G; emails de uma organização levam o logótipo dessa organização. Assim, o template global e os emails do Keycloak usam o da C4G, e o template de convite próprio de uma organização usa o dela. Uma organização sem logótipo carregado usa o da C4G.
+- Logótipo da organização: uma imagem por organização, PNG ou JPEG, até 512 KiB e 1200×600 px, validada pelo conteúdo e não pela extensão. SVG é recusado. Substituir o logótipo não altera a evidência de envios anteriores.
+- Quem carrega (decisão de 12/11/2026): o logótipo da C4G é carregado pelo Admin C4G, no Administrador C4G; o logótipo de uma entidade é carregado pela própria entidade, apenas pelo Admin da entidade. Gestor de financiamento, Colaborador e Técnico não carregam nem removem. O Admin C4G vê o logótipo da entidade no ecrã do template, sem o alterar.
+- Enquanto o Admin C4G não carregar um logótipo, usa-se o atual `logo-c4g.png`.
+- Gravar é recusado se faltar `{LigacaoAtivacao}` ou `{Validade}`, se existir uma variável desconhecida, ou se o assunto contiver quebras de linha. Limites: assunto 200 caracteres, corpo 20 000 caracteres de HTML.
 - Pré-visualização com valores de exemplo, sem ligação real.
 - Envio de teste para o endereço do próprio administrador autenticado, com ligação de exemplo não funcional e marca visível de teste.
 - Cada gravação cria uma versão com autor e data. É possível repor o template global. O envio regista a versão usada.
@@ -66,6 +70,9 @@ Critérios de aceitação:
 4. Valores das variáveis são inseridos com escaping; o nome de uma organização nunca é interpretado como marcação.
 4a. HTML com `<script>`, atributos de evento, `javascript:`, iframes ou imagens externas é gravado sem esses elementos, e o envio nunca os contém.
 4b. O email enviado tem partes HTML e texto; a parte de texto contém a ligação de ativação e a validade.
+4d. Um convite da organização A com logótipo próprio mostra o da A; um convite da B sem logótipo mostra o da C4G; nenhum convite mostra o logótipo de outra organização.
+4e. Um ficheiro que não seja PNG ou JPEG válido, ou que exceda os limites, é recusado sem ser guardado.
+4f. O Admin da entidade A carrega e remove o logótipo da A; não lê nem altera o da B. Outros perfis da A recebem recusa. O Admin C4G não altera o logótipo de uma entidade.
 4c. O template por defeito em HTML transmite a mesma informação que o texto atual.
 5. Só `C4G_ADMIN` lê e escreve templates; Admin da entidade e Gestor recebem recusa.
 6. Reenviar um convite depois de editar o template usa a versão nova; o registo do envio anterior conserva a versão antiga.
@@ -106,6 +113,7 @@ Depende das perguntas 4 e 5.
 - Domínios de envio próprios por cliente.
 - Anexos, imagens além do logótipo e carregamento livre de imagens pelo editor.
 - Qualquer alteração a quem pode convidar colaboradores.
+- Uso do logótipo da entidade fora dos emails (cabeçalho da aplicação, relatórios).
 
 ## Perguntas em aberto
 
@@ -114,8 +122,9 @@ Depende das perguntas 4 e 5.
 3. A reposição de palavra-passe é ligada no âmbito desta feature? Implica SMTP externo no Keycloak e revê a decisão de a manter desligada.
 4. O histórico deve incluir os emails do Keycloak? A aplicação não os vê hoje; exigiria ler eventos do Keycloak.
 5. Prazo de retenção dos endereços no histórico.
-6. Qual logótipo: sempre o da C4G, ou o de cada organização? Hoje a plataforma só tem o logótipo C4G (`frontend/public/logo-c4g.png`); não existe logótipo guardado por organização, e tê-lo exige carregamento, validação e armazenamento de imagens. Bloqueia a fase 1.
-7. Dependências novas: o repositório não tem editor de texto rico nem biblioteca de sanitização de HTML. A escolha e a instalação precisam de aprovação antes de implementar.
+6. Resolvida em 12/11/2026: C4G carrega o seu; cada entidade carrega o seu, apenas o Admin da entidade.
+6a. Armazenamento e endereço público do logótipo: proposta no [plano técnico](email-templates-and-configuration-plan.md) (guardado na Central, servido por rota pública dedicada). Confirmado pelo utilizador em 12/11/2026.
+7. Resolvida em 12/11/2026: aprovados Tiptap no frontend (editor, extensões limitadas à formatação admitida) e `sanitize-html` no backend (lista fechada de elementos e atributos). Versões e licenças a confirmar na instalação.
 
 ## Validação prevista
 

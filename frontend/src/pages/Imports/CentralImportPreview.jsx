@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import {platformImportsApi as api} from '../../api/api'
 import LoadingIndicator from '../../components/LoadingIndicator'
-import CentralImportCatalog from './CentralImportCatalog'
+import CentralImportCatalog, { RESUME_KEY } from './CentralImportCatalog'
 
 const columns=[['A','Referência'],['D','Aviso'],['E','Programa'],['I','Início previsto'],['J','Fim previsto'],['H','Dotação (valor do ficheiro)']]
 const additional=[['B','Beneficiários'],['C','Natureza do aviso'],['F','Objetivo específico'],['G','Fundo'],['K','Quadrimestre'],['L','NUTS II'],['M','Modalidade de candidatura']]
@@ -19,6 +19,7 @@ const message=error=>errors[error?.response?.data?.error?.code]||(error?.respons
 // catalog: the deployment can also save the candidates and accept the new ones into the Catálogo (mode STAGE_AND_ACCEPT).
 export default function CentralImportPreview({catalog=false}){
  const [file,setFile]=useState(null),[document,setDocument]=useState(null),[sheet,setSheet]=useState(''),[preview,setPreview]=useState(null),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('')
+ const [resume]=useState(()=>{try{const value=sessionStorage.getItem(RESUME_KEY);return /^[a-f0-9-]{36}$/i.test(value||'')?value:null}catch{return null}})
  const alive=useRef(true),lock=useRef(false),uploadIntent=useRef(null),previewIntent=useRef(null)
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
  function choose(event){
@@ -55,6 +56,7 @@ export default function CentralImportPreview({catalog=false}){
    <div className="table-wrap"><table className="data-table"><thead><tr><th>Linha</th>{columns.map(([key,label])=><th key={key}>{label}</th>)}<th>Restantes campos</th><th>Validação</th></tr></thead><tbody>{rows.slice(page*50,(page+1)*50).map(row=><tr key={row.line}><td>{row.line}</td>{columns.map(([key])=><td key={key}>{display(key,row.values[key])}</td>)}<td><details><summary>Ver campos da linha {row.line}</summary><dl>{additional.map(([key,label])=><div key={key}><dt>{label}</dt><dd>{row.values[key]??'—'}</dd></div>)}</dl></details></td><td>{row.errors.length?<><span>Rever dados</span><details><summary>Detalhes</summary>{row.errors.map(code=><p key={code}>{errors[code]||'Verifique os dados desta linha.'} <small>{code}</small></p>)}</details></>:'Válida'}</td></tr>)}</tbody></table></div>
    {pages>1&&<nav aria-label="Páginas da pré-visualização"><button className="btn btn-secondary" disabled={page===0} onClick={()=>setPage(v=>v-1)}>Anterior</button><span> Página {page+1} de {pages} </span><button className="btn btn-secondary" disabled={page+1>=pages} onClick={()=>setPage(v=>v+1)}>Seguinte</button></nav>}
   </section>}
+  {catalog&&resume&&!preview&&!document&&<CentralImportCatalog key="resume" resumeImportId={resume}/>}
   {catalog&&preview?.previewDigest&&preview.validRows>0&&<CentralImportCatalog key={preview.previewDigest} uploadId={document.requestId} sheetName={preview.sheetName} previewDigest={preview.previewDigest}/>}
  </section>
 }

@@ -8,5 +8,10 @@ COPY backend/database ./database
 COPY backend/scripts ./scripts
 # O código das oportunidades EU lê estes dois ficheiros da raiz do repositório.
 COPY scripts/eu-legacy-receipts-check.cjs scripts/eu-legacy-ledger-reconcile.cjs /app/scripts/
+# A listagem do Catálogo lê a evidência arquivada (EU 11145 e plano PT2030) de context/references/opportunity-v2/evidence,
+# relativa à raiz da aplicação. Sem esta pasta a listagem falha com ENOENT e a API responde 503. O RUN falha a construção
+# se a cópia não chegar à imagem (por exemplo por causa do .dockerignore).
+COPY context/references/opportunity-v2/evidence /app/context/references/opportunity-v2/evidence
+RUN test -f /app/context/references/opportunity-v2/evidence/eu-11145.json
 USER node
 CMD ["node", "src/server.js"]

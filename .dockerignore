@@ -4,7 +4,12 @@
 .tmp
 **/node_modules
 frontend
-context
+context/*
+!context/references
+context/references/*
+!context/references/opportunity-v2
+context/references/opportunity-v2/*
+!context/references/opportunity-v2/evidence
 dev
 experiments
 lint-harness

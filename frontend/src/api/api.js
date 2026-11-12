@@ -141,6 +141,23 @@ export const platformBillingApi = {
   paymentReverse: (paymentId, body) => api.post(`${billingRoot}/payments/${paymentId}/reversals`, body, { timeout: 20000 }),
 }
 
+const emailRoot = '/admin/email'
+// scope: null for the global template, or the organization id for its own one.
+const emailTemplatePath = (type, scope) => scope
+  ? `${emailRoot}/organizations/${scope}/templates/${type}`
+  : `${emailRoot}/templates/${type}`
+export const platformEmailApi = {
+  types: signal => api.get(emailRoot + '/templates', { signal, timeout: 15000 }),
+  template: (type, scope, signal) => api.get(emailTemplatePath(type, scope), { signal, timeout: 15000 }),
+  save: (type, scope, body) => api.put(emailTemplatePath(type, scope), body, { timeout: 20000 }),
+  reset: (type, scope, body) => api.post(emailTemplatePath(type, scope) + '/reset', body, { timeout: 20000 }),
+  preview: (type, scope, body, signal) => api.post(emailTemplatePath(type, scope) + '/preview', body, { signal, timeout: 15000 }),
+  test: (type, scope, body) => api.post(emailTemplatePath(type, scope) + '/test', body, { timeout: 30000 }),
+  logo: signal => api.get(emailRoot + '/logo', { signal, timeout: 15000 }),
+  logoWrite: (file, revision) => api.put(emailRoot + '/logo', file, { timeout: 30000, headers: { 'Content-Type': file.type, 'X-Logo-Revision': String(revision) } }),
+  logoRemove: revision => api.delete(emailRoot + '/logo', { timeout: 20000, headers: { 'X-Logo-Revision': String(revision) } }),
+}
+
 export function entityAccessApi(organizationId,platform=false){
  const root=platform?`/admin/directory/entities/${organizationId}`:'/organization-directory';
  const usersRoot=root+(platform?'/users':'/access/users');

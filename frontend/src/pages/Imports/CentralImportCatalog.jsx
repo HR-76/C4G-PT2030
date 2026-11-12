@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { platformImportsApi } from '../../api/api'
+import { platformImportsApi, authApi } from '../../api/api'
 import LoadingIndicator from '../../components/LoadingIndicator'
 
 // After a preview: save the candidates, review what would enter the Catálogo and accept the new ones. The administrator
@@ -18,13 +18,41 @@ const errors = {
   PT2030_DOCUMENT_CHANGED: 'O original guardado não corresponde ao ficheiro verificado. Carregue novamente o ficheiro.',
   C4G_ADMIN_REQUIRED: 'Já não tem autorização para esta operação.'
 }
+// The import to resume after the administrator renews the authentication: the page reloads on return and the staged
+// candidates are still saved, so the review comes back without uploading anything again.
+export const RESUME_KEY = 'c4g.pt2030.import'
+const RETURN_PATH = '/administracao/importar'
 const message = error => errors[error?.response?.data?.error?.code] || 'Não foi possível concluir a operação. Pode repetir o pedido: nada é duplicado.'
 
-export default function CentralImportCatalog({ uploadId, sheetName, previewDigest, api = platformImportsApi }) {
+export default function CentralImportCatalog({ uploadId, sheetName, previewDigest, resumeImportId = null, api = platformImportsApi, auth = authApi }) {
   const [review, setReview] = useState(null), [result, setResult] = useState(null), [page, setPage] = useState(0)
-  const [busy, setBusy] = useState(''), [error, setError] = useState('')
+  const [busy, setBusy] = useState(''), [error, setError] = useState(''), [needsAuth, setNeedsAuth] = useState(false)
   const alive = useRef(true), lock = useRef(false), stageIntent = useRef(null)
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
+  useEffect(() => {
+    if (!resumeImportId) return
+    try { sessionStorage.removeItem(RESUME_KEY) } catch { /* storage unavailable */ }
+    setBusy('review')
+    api.review(resumeImportId).then(({ data }) => { if (alive.current) setReview(data) }, e => { if (alive.current) fail(e) }).finally(() => { if (alive.current) setBusy('') })
+  }, [resumeImportId, api])
+  function fail(e) {
+    setNeedsAuth(e?.response?.data?.error?.code === 'PT2030_RECENT_AUTHENTICATION_REQUIRED'); setError(message(e))
+  }
+  async function renew() {
+    if (!review) return
+    try { sessionStorage.setItem(RESUME_KEY, review.importId) } catch { /* the review is then reloaded by hand */ }
+    try {
+      const { data } = await auth.stepUpPolicy()
+      if (typeof data?.mfaOptional !== 'boolean') throw Error('POLICY')
+      auth.stepUp(data.mfaOptional ? 'recent-auth' : 'recent-mfa', RETURN_PATH)
+    } catch { setError('Não foi possível iniciar a renovação da autenticação. Termine a sessão e entre de novo.') }
+  }
+  async function reload() {
+    if (lock.current || !review) return
+    lock.current = true; setBusy('review'); setError(''); setNeedsAuth(false)
+    try { const { data } = await api.review(review.importId); if (alive.current) setReview(data) }
+    catch (e) { if (alive.current) fail(e) } finally { lock.current = false; if (alive.current) setBusy('') }
+  }
 
   async function stage() {
     if (lock.current) return
@@ -34,31 +62,32 @@ export default function CentralImportCatalog({ uploadId, sheetName, previewDiges
       const { data: staged } = await api.stage(uploadId, { requestId: stageIntent.current, sheetName, previewDigest })
       const { data } = await api.review(staged.importId)
       if (alive.current) { setReview(data); setPage(0) }
-    } catch (e) { if (alive.current) setError(message(e)) } finally { lock.current = false; if (alive.current) setBusy('') }
+    } catch (e) { if (alive.current) fail(e) } finally { lock.current = false; if (alive.current) setBusy('') }
   }
   async function accept() {
     if (lock.current || !review) return
-    lock.current = true; setBusy('accept'); setError('')
+    lock.current = true; setBusy('accept'); setError(''); setNeedsAuth(false)
     try {
       const { data } = await api.accept(review.importId, { batchDigest: review.batchDigest })
       const again = await api.review(review.importId)
       if (alive.current) { setResult(data); setReview(again.data) }
-    } catch (e) { if (alive.current) setError(message(e)) } finally { lock.current = false; if (alive.current) setBusy('') }
+    } catch (e) { if (alive.current) fail(e) } finally { lock.current = false; if (alive.current) setBusy('') }
   }
   const rows = review?.rows || [], pages = Math.max(1, Math.ceil(rows.length / 50))
   const fresh = review?.totals?.ACCEPTABLE || 0
 
   return <section className="detail-section" aria-label="Gravar e aceitar no Catálogo">
     <h2>Levar para o Catálogo</h2>
-    {!review && <p>Grave as candidatas desta folha. Ainda nada chega ao Catálogo: antes verá o que entra.</p>}
+    {!review && uploadId && <p>Grave as candidatas desta folha. Ainda nada chega ao Catálogo: antes verá o que entra.</p>}
     {error && <p role="alert">{error}</p>}
-    {busy && <LoadingIndicator>{busy === 'stage' ? 'A gravar as candidatas…' : 'A aceitar no Catálogo…'}</LoadingIndicator>}
-    {!review && <div className="form-actions"><button className="btn btn-primary" disabled={!!busy} onClick={stage}>Gravar candidatas</button></div>}
+    {needsAuth && review && <div className="form-actions"><button className="btn btn-primary" onClick={renew}>Renovar autenticação e continuar</button></div>}
+    {busy && <LoadingIndicator>{busy === 'stage' ? 'A gravar as candidatas…' : busy === 'review' ? 'A carregar a revisão…' : 'A aceitar no Catálogo…'}</LoadingIndicator>}
+    {!review && uploadId && <div className="form-actions"><button className="btn btn-primary" disabled={!!busy} onClick={stage}>Gravar candidatas</button></div>}
     {review && <>
       <p>{review.totalRows} linhas · {review.totals.ACCEPTABLE} novas · {review.totals.ALREADY_ACCEPTED} já aceites · {review.totals.NEEDS_REVIEW} a rever · {review.totals.REJECTED} rejeitadas</p>
       <p>Só as novas são aceites. As já aceites e as alteradas não são tocadas: uma alteração fica a rever e não substitui o que já está no Catálogo.</p>
       <div className="form-actions"><button className="btn btn-primary" disabled={!!busy || fresh === 0} onClick={accept}>{fresh === 0 ? 'Não há oportunidades novas' : `Aceitar ${fresh} oportunidades novas no Catálogo`}</button>
-        <button className="btn btn-secondary" disabled={!!busy} onClick={stage}>Atualizar revisão</button></div>
+        <button className="btn btn-secondary" disabled={!!busy} onClick={reload}>Atualizar revisão</button></div>
       {result && <div role="status"><p>{result.created} oportunidades aceites{result.failed.length ? ` · ${result.failed.length} falharam` : ''}{result.skipped.alreadyAccepted ? ` · ${result.skipped.alreadyAccepted} já aceites` : ''}{result.skipped.needsReview ? ` · ${result.skipped.needsReview} a rever` : ''}.</p>
         {result.failed.length > 0 && <details><summary>Linhas que falharam</summary>{result.failed.map(item => <p key={item.externalIdentifier}>Linha {item.physicalRow} ({item.externalIdentifier}): <small>{item.code}</small></p>)}</details>}
         {result.created > 0 && <p><Link to="/catalogo">Consultar o Catálogo</Link></p>}</div>}
