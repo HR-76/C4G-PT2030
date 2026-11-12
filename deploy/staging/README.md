@@ -98,7 +98,7 @@ O worker só aceita a recolha de staging contra a base `c4g_central_staging` do 
 
 ## Armazenamento privado (Cloudflare R2) e antivírus (ClamAV)
 
-Liga duas funcionalidades que precisam de ficheiros privados verificados: os PDFs de faturação e o carregamento central do PT2030 (pré-visualização). Os documentos das candidaturas são outra peça (fila e worker próprios) e **não** ficam ligados por este passo. O ClamAV corre ao lado da API, na mesma rede (`network_mode`), porque a aplicação só aceita um antivírus em `127.0.0.1:3310`; só arranca com o perfil `storage`.
+Liga duas funcionalidades que precisam de ficheiros privados verificados: os PDFs de faturação e o carregamento central do PT2030 (pré-visualização). Os documentos das candidaturas são outra peça (fila e worker próprios) e **não** ficam ligados por este passo. O ClamAV corre na mesma rede que a API (ambos partilham a rede do contentor `pod`), porque a aplicação só aceita um antivírus em `127.0.0.1:3310`; só arranca com o perfil `storage`.
 
 **1. Na Cloudflare (tu).** R2 → criar dois buckets **privados** na jurisdição **UE** (por exemplo `c4g-staging-documents` e `c4g-staging-quarantine`; têm de ser diferentes) → «Manage API tokens» → token com permissão de leitura e escrita de objetos **só nesses dois buckets** → guardar o *Access Key ID*, o *Secret Access Key* e o endpoint `https://<conta>.eu.r2.cloudflarestorage.com`. Nunca colar estes valores no chat nem em Git.
 
@@ -125,10 +125,10 @@ docker compose -f deploy/staging/compose.yaml --profile storage up -d clamav
 until [ "$(docker inspect -f '{{.State.Health.Status}}' c4g-staging-api-clamav-1)" = healthy ]; do sleep 10; done; echo clamav pronto
 ```
 
-**4. Verificar R2 e antivírus** (só imprime booleanos; não escreve nem lê objetos). O contentor junta-se à rede da API, onde o antivírus escuta:
+**4. Verificar R2 e antivírus** (só imprime booleanos; não escreve nem lê objetos). O contentor junta-se à rede do «pod» (dono da rede da API e do antivírus), onde o antivírus escuta:
 
 ```bash
-docker run --rm --network container:c4g-staging-api-api-1 --env-file /srv/c4g-staging/r2.env c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js storage-check
+docker run --rm --network container:c4g-staging-api-pod-1 --env-file /srv/c4g-staging/r2.env c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js storage-check
 ```
 
 Esperado: `{"r2":true,"scanner":true}`. Se `r2` for `false`: token, endpoint, nomes dos buckets ou permissões. Se `scanner` for `false`: o passo 3 ainda não terminou. Só com os dois verdadeiros, faz a tua declaração:
@@ -143,17 +143,18 @@ echo 'C4G_R2_LAYER_C_VALIDATED=true' >> /srv/c4g-staging/r2.env
 docker run --rm --user 0:0 --env-file /srv/c4g-staging/postgres/.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/api-private.env:/carry.env:ro -v /srv/c4g-staging/r2.env:/r2.env:ro c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js env --carry /carry.env --storage /r2.env --out /state/api-private.env.generated
 ```
 
-**6. Ativar.** O ClamAV partilha a rede da API: recriar a API obriga a recriar o antivírus. A API pode reiniciar uma ou duas vezes até o antivírus responder, porque a prontidão (`/health/ready`) exige R2 e antivírus:
+**6. Ativar.** A API e o ClamAV partilham a rede do contentor `pod`, que nunca reinicia com a API (se a API fosse a dona, cada reinício criaria uma rede nova e o antivírus ficava para trás, deixando a API em ciclo de reinícios). Ao passar do compose antigo para este, o `pod` precisa da porta 8500 que a API antiga ocupa, por isso a API antiga é removida primeiro. A API pode reiniciar uma ou duas vezes até o antivírus responder, porque a prontidão (`/health/ready`) exige R2 e antivírus:
 
 ```bash
 cp /srv/c4g-staging/state/api-private.env.generated /srv/c4g-staging/api-private.env && chmod 600 /srv/c4g-staging/api-private.env
-docker compose -f deploy/staging/compose.yaml --profile storage up -d --force-recreate api clamav
+docker compose -f deploy/staging/compose.yaml --profile storage rm -sf api clamav
+docker compose -f deploy/staging/compose.yaml --profile storage up -d pod api clamav
 sleep 60; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
 ```
 
 **7. Ensaio funcional (tu, no navegador).** Administração C4G: carregar uma folha de teste PT2030 e ver a pré-visualização; e, num ciclo de faturação, confirmar um PDF pequeno. Se algum falhar, diz-me o que o ecrã mostra.
 
-**Voltar atrás:** gera o ambiente sem `--storage`, copia-o e recria a API (`up -d --force-recreate api`); as duas funcionalidades voltam a «indisponível». O ClamAV e os buckets não são apagados. Objetos já enviados ficam no R2.
+**Voltar atrás:** gera o ambiente sem `--storage`, copia-o e recria a API (`up -d --force-recreate pod api`); as duas funcionalidades voltam a «indisponível». O ClamAV e os buckets não são apagados. Objetos já enviados ficam no R2.
 
 ## Subir os esquemas ao nível do ambiente local (Central 050 e tenant 040)
 
