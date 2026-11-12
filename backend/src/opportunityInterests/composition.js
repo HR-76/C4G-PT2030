@@ -3,6 +3,7 @@ const {AsyncLocalStorage}=require('node:async_hooks');
 const {createAuthorityDataRepository}=require('../authorization/authorityDataRepository');
 const {createTaxonomySessionAuthority}=require('../security/authenticatedAuthority');
 const {createTaxonomyAuthorization}=require('../authorization/resourceAuthorization');
+const {applicantOpportunityReadPolicy}=require('../applications/teamAccess');
 const {createTenantRuntime}=require('../security/tenantRuntime');
 const {createAuthorizedTenantOperationCatalog}=require('../security/tenantOperationCatalog');
 const {preparedAuthorityBinding}=require('../security/tenantLeaseExecutor');
@@ -28,6 +29,7 @@ function createOpportunityInterestComposition({sessionStore,sessionRegistry,auth
  const auditPort={accept(event){const active=scope.getStore();if(!active)throw Error('INTEREST_AUDIT_SCOPE_REQUIRED');const task=(active.auditTail||Promise.resolve()).then(()=>baseAudit.accept(event));active.auditTail=task;task.catch(()=>{});return task;}};
  const drain=()=>scope.getStore()?.auditTail||Promise.resolve();
  const authorization=createTaxonomyAuthorization({exactResourceScope:false,catalogs,...data,assurancePolicyVersion:policyVersion,recentMfaRequirement,clock,authorizationAuditPort:auditPort,
+  snapshotForResource:applicantOpportunityReadPolicy,
   withAuthorityReads:work=>coordinator.withAuthority(work)});
  const guard=coordinator.bindAuthority({sessionAuthority:authority,authorization,operationCatalog:catalogs.operationCatalog,permissionCatalog:catalogs.permissionCatalog,recentMfaRequirement});
  const append=createAppendService({appendPort:new PostgresAppendRepository()}),adapters={};

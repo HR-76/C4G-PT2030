@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),{randomUUID}=require('node:crypto');
-const {createTeamAccessPolicy}=require('../src/applications/teamAccess');
+const {createTeamAccessPolicy,applicantOpportunityReadPolicy}=require('../src/applications/teamAccess');
 const {createTaxonomyAuthorization}=require('../src/authorization/resourceAuthorization');
 const {validateProductionAuthorizationBootstrap}=require('../src/authorization/productionAuthorization');
 const {resource}=require('../src/applications/repository');
@@ -71,4 +71,20 @@ test('central suspension, stale authority, wrong tenant and failed team query fa
  f.membership.status='ACTIVE';f.snapshot.authorizationVersion=2;assert.equal((await f.read('APPLICATION_READ')).allowed,false);
  f.snapshot.authorizationVersion=1;const otherOrg=randomUUID();assert.equal((await f.auth.authorize('APPLICATION_READ',{actor:f.actor,correlationId:randomUUID(),assuranceEvidence:null},resource(f.app,otherOrg))).allowed,false);
  f.break();assert.equal((await f.read('APPLICATION_READ')).allowed,false);
+});
+
+test('the interest module derives the same organization-level opportunity read for applicants, without a database',async()=>{
+ const org=randomUUID(),actor={type:'HUMAN',organizationId:org},root={id:org,organizationId:org,resourceType:'OPPORTUNITY'};
+ const grant=(permission,extra={})=>({permission,scope:{type:'ORGANIZATION',id:org,organizationId:org},...extra});
+ const policy=(profileCode,grants,resource=root,operationCode='OPPORTUNITY_READ',who=actor)=>applicantOpportunityReadPolicy({actor:who,snapshot:{organizationId:org,profileCode,grants},resource,operationCode});
+ const derived=policy('CONTRIBUTOR',[grant('application.create')]);
+ assert.ok(derived.grants.some(g=>g.permission==='opportunity.read'&&g.resourceId===org&&g.scope.type==='ORGANIZATION'));
+ const unchanged=[policy('CONTRIBUTOR',[]),policy('CONTRIBUTOR',[grant('application.create')],{...root,id:randomUUID()}),
+  policy('CONTRIBUTOR',[grant('application.create')],root,'OPPORTUNITY_INTEREST_READ'),policy('CONTRIBUTOR',[grant('application.create')],{...root,resourceType:'APPLICATION'}),
+  policy('CONTRIBUTOR',[grant('application.create',{resourceId:randomUUID()})]),policy('CONTRIBUTOR',[grant('application.create')],root,'OPPORTUNITY_READ',{...actor,type:'SERVICE'}),
+  policy('VIEWER',[grant('application.create')])];
+ for(const snapshot of unchanged)assert.ok(!snapshot.grants.some(g=>g.permission==='opportunity.read'));
+});
+test('the interest authorizer installs the applicant read policy',()=>{
+ assert.match(require('node:fs').readFileSync(require.resolve('../src/opportunityInterests/composition'),'utf8'),/snapshotForResource:\s*applicantOpportunityReadPolicy/);
 });
