@@ -6,9 +6,19 @@ const { collectionPolicy, EXPANDED_APPROVAL, OFFICIAL_APPROVAL } = require('../f
 const { createPgBossQueueAdapter } = require('../async/adapters/pgBossQueueAdapter');
 const { inspectPgBossSchema } = require('../async/pgBossSchemaInspection');
 const { supportsCentralVersion } = require('../security/centralMigrationManifest');
+// Staging is the only place besides the local rehearsal where live collection is admitted, and only against the
+// staging Central reached by its network name over verified TLS, with an approval that names the scope.
+const STAGING_CENTRAL = Object.freeze({ hostname: 'c4g-postgres', port: '5432', pathname: '/c4g_central_staging' });
+function stagingTarget(env, target) {
+  collectionPolicy(env.FUNDING_TENDERS_SOURCE, env.FUNDING_TENDERS_REHEARSAL_APPROVED);
+  if (env.NODE_ENV !== 'production' || target.hostname !== STAGING_CENTRAL.hostname || target.port !== STAGING_CENTRAL.port
+      || target.pathname !== STAGING_CENTRAL.pathname || target.searchParams.get('sslmode') !== 'verify-full') throw new Error('FUNDING_STAGING_TARGET_INVALID');
+  return { target, live: true };
+}
 function fundingWorkerTarget(env) {
   if (env.FUNDING_TENDERS_RUNTIME !== 'central' || env.OPPORTUNITY_IMPORTS_RUNTIME === 'f12-xlsx') throw new Error('FUNDING_WORKER_REQUIRES_SEPARATE_PROCESS');
   const target = new URL(env.CENTRAL_DATABASE_URL);
+  if (env.FUNDING_TENDERS_SOURCE === 'live-staging') return stagingTarget(env, target);
   const demo = env.FUNDING_TENDERS_SOURCE === 'live-demo';
   const local = env.FUNDING_TENDERS_SOURCE === 'live-local';
   const live = env.FUNDING_TENDERS_SOURCE === 'live-rehearsal' || demo || local;

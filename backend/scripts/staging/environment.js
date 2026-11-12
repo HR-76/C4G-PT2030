@@ -76,10 +76,18 @@ function databaseUrl({ login, password, host, port, database }) {
   return url.toString();
 }
 
+// Live collection from the EU Funding & Tenders API is opt-in: --collection 5 or 100 names how many results one run may take.
+const COLLECTION_APPROVALS = Object.freeze({ 5: 'staging-eu-funding-tenders-5', 100: 'staging-eu-funding-tenders-100' });
+function collectionEnvironment(option) {
+  if (option === undefined) return {};
+  if (!Object.hasOwn(COLLECTION_APPROVALS, option)) throw failure('STAGING_COLLECTION_INVALID');
+  return { FUNDING_TENDERS_SOURCE: 'live-staging', FUNDING_TENDERS_REHEARSAL_APPROVED: COLLECTION_APPROVALS[option] };
+}
+
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
 // The Central pool connects as the PostgreSQL administrator, as the local profile does: the pinned Central
 // fingerprints do not admit a limited runtime login (its grants would count as schema drift).
-function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {} }) {
+function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {}, collection }) {
   if (state?.phase !== 'READY' || !state.credentials || !administratorPassword || !state.staging?.catalogPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
@@ -91,6 +99,7 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     // Central opportunity catalog, read-only. Collection from the sources is a separate step.
     FUNDING_TENDERS_RUNTIME: 'central',
     FUNDING_TENDERS_SOURCE: 'unconfigured',
+    ...collectionEnvironment(collection),
     CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
@@ -102,4 +111,4 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   return Object.entries(lines).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
-module.exports = Object.freeze({ AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });
+module.exports = Object.freeze({ COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });

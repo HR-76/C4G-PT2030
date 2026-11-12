@@ -69,3 +69,33 @@ test('Central user migrations retain funding tables and still reject catalog dri
   }
  }
 });
+
+// Regression: a Central at 048 or later (catalog read, PT2030 upload, billing PDFs) was rejected with
+// OPPORTUNITY_SCHEMA_DRIFT, which stopped the funding collection worker, because those packages were not
+// mapped to the tables the last opportunity package leaves behind.
+test('Central packages after the last opportunity package expect their catalog tables',async()=>{
+ const {centralAdditionsIndex,CENTRAL_ADDITIONS}=require('../src/opportunities/preflight');
+ const inherited=fixture(manifest.at(-1));
+ const base=['duplicate_candidate','idempotency_record','opportunity','provenance','revision','funding_run','funding_run_item','funding_identity',
+  'funding_observation','funding_cycle','funding_batch','funding_cycle_seen','funding_refresh_target','funding_resolution'];
+ const last=centralAdditionsIndex('045_opportunity_eu_legacy_prearchive');
+ assert.equal(last,CENTRAL_ADDITIONS.length-1);
+ for(const version of ['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents']){
+  assert.equal(centralAdditionsIndex(version),last);
+  for(const drift of [null,'missing','extra']){
+   // 049 adds the PT2030 upload table to opportunity_catalog; 048 and 050 add none.
+   const tables=[...base,...CENTRAL_ADDITIONS.flat(),...(version>='049_pt2030_document_upload'?['pt2030_document_upload']:[])];
+   if(drift==='missing')tables.pop();if(drift==='extra')tables.push('unexpected_table');
+   const pool={async query(sql){
+    if(sql.includes('FROM public.c4g_schema_migration'))return {rows:[{version}]};
+    if(sql.includes('AS table_name'))return {rows:tables.sort().map(table_name=>({table_name}))};
+    return inherited.query(sql);
+   }};
+   if(drift)await assert.rejects(()=>opportunityPreflight(pool,'central'),/OPPORTUNITY_SCHEMA_DRIFT/,`${version} ${drift}`);
+   else assert.equal((await opportunityPreflight(pool,'central')).ready,true,version);
+  }
+ }
+ // Earlier versions keep their own, smaller expectation.
+ assert.ok(centralAdditionsIndex('043_opportunity_eu_writer_v2')<last);
+ assert.equal(centralAdditionsIndex('035_funding_source_resolution'),-1);
+});

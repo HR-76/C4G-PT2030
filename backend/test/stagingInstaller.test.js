@@ -6,7 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, databaseUrl, apiPrivateEnvironment, carriedSettings,
-  CARRIED_KEYS, PROFILES, AUTH_POLICY_VERSION } = require('../scripts/staging/environment');
+  CARRIED_KEYS, PROFILES, AUTH_POLICY_VERSION, COLLECTION_APPROVALS, collectionEnvironment } = require('../scripts/staging/environment');
+const { STAGING_APPROVALS } = require('../src/fundingTenders/programmes');
 const { RECOGNIZED_ASSURANCE_POLICIES } = require('../src/security/authConfig');
 const { grantsForProfile } = require('../src/organizationDirectory/accessProfiles');
 const { main, CENTRAL_STEPS, TENANT_STEPS } = require('../scripts/staging/install');
@@ -93,6 +94,21 @@ test('projection operation id is a stable UUID per membership', () => {
   assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-8[0-9a-f]{3}-[0-9a-f]{12}$/);
   assert.equal(id, projectionOperationId('258802ac-504d-4087-9ac9-9136eb9f54c9'));
   assert.notEqual(id, projectionOperationId('258802ac-504d-4087-9ac9-9136eb9f54ca'));
+});
+
+test('collection is opt-in: nothing is generated unless a result limit is named, and only the approved ones',()=>{
+  assert.deepEqual(collectionEnvironment(undefined), {});
+  const base = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm' });
+  assert.match(base, /^FUNDING_TENDERS_SOURCE=unconfigured$/m);
+  assert.doesNotMatch(base, /FUNDING_TENDERS_REHEARSAL_APPROVED/);
+  for (const limit of ['5', '100']) {
+    const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', collection: limit });
+    assert.match(text, /^FUNDING_TENDERS_SOURCE=live-staging$/m);
+    assert.ok(text.includes('FUNDING_TENDERS_REHEARSAL_APPROVED=' + COLLECTION_APPROVALS[limit]));
+    assert.ok(Object.hasOwn(STAGING_APPROVALS, COLLECTION_APPROVALS[limit]), 'the installer only names approvals the code recognises');
+  }
+  assert.deepEqual(Object.keys(COLLECTION_APPROVALS).sort(), ['100', '5']);
+  for (const bad of ['0', '7', '1000', '', 'toString', '__proto__']) assert.throws(() => collectionEnvironment(bad), { code: 'STAGING_COLLECTION_INVALID' });
 });
 
 test('carry-over copies only the listed non-secret settings', () => {

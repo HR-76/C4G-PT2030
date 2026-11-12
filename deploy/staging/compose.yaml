@@ -21,6 +21,25 @@ services:
       - "127.0.0.1:8500:5000"
     networks: [default, data]
 
+  # Recolha de oportunidades. Não arranca com o resto: só com o perfil "collection" (ver o runbook), porque
+  # faz chamadas à API pública da Comissão Europeia. Usa o mesmo ficheiro de variáveis que a API.
+  worker:
+    profiles: ["collection"]
+    image: c4g-staging-api:${C4G_RELEASE:?defina C4G_RELEASE com o SHA do commit}
+    init: true
+    restart: unless-stopped
+    command: ["node", "src/worker.js"]
+    env_file:
+      - path: /srv/c4g-staging/api-oidc.env
+        format: raw
+      - path: /srv/c4g-staging/api-private.env
+        format: raw
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.pem
+    volumes:
+      - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
+    networks: [default, data]
+
 networks:
   data:
     external: true

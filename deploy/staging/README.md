@@ -84,6 +84,16 @@ sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9]*#root * /srv/c4g-sta
 
 A base PostgreSQL nova não é alterada pelo regresso; a release antiga volta a usar o Neon.
 
+## Recolha de oportunidades (worker)
+
+A recolha contacta a API pública da Comissão Europeia, por isso só corre quando a ligares de propósito, em duas partes:
+
+1. **Fila.** O `install` instala o esquema `pgboss` da Central, se faltar, e cria a fila `funding-tenders-refresh`. É repetível.
+2. **Variáveis.** O `env` só inclui a recolha com `--collection 5` (até 5 resultados por execução) ou `--collection 100`. Sem essa opção o ambiente fica com `FUNDING_TENDERS_SOURCE=unconfigured`, o ecrã Fontes diz «Configuração indisponível» e nada é chamado.
+3. **Worker.** Está no compose sob o perfil `collection`, que `up -d` não arranca sozinho: `docker compose -f deploy/staging/compose.yaml --profile collection up -d worker`. Para parar: `docker compose -f deploy/staging/compose.yaml --profile collection stop worker`.
+
+O worker só aceita a recolha de staging contra a base `c4g_central_staging` do anfitrião `c4g-postgres`, com TLS verificado e `NODE_ENV=production`; qualquer outra combinação impede o arranque. Cada atualização é pedida pelo administrador em Administração C4G → Fontes de oportunidades, com «Atualizar agora».
+
 ## Subir os esquemas ao nível do ambiente local (Central 050 e tenant 040)
 
 O `install` deixa a Central na 035 e o tenant na 033. O comando `upgrade` aplica, por ordem, os pacotes registados que o ambiente local usa: Central 042, 043, 044, 045, 048, 049 e 050 e tenant 034 a 040. Cada passo verifica o preflight da versão que deixou e o estado do tenant é publicado na Central. É repetível: o que já está aplicado é ignorado. **As migrações são irreversíveis**, por isso faz primeiro uma cópia:

@@ -101,7 +101,7 @@ function Catalog({ id, organization, platformAdmin }) {
     {platformAdmin && <Link className="btn btn-primary" to="/administracao/oportunidades/nova"><Plus size={16} /> Criar oportunidade</Link>}
     {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}</div>
     {mode && <aside className="catalog-source" aria-label="Dados do catálogo">
-      <strong>{mode === 'fixture' ? 'Dados de teste' : mode === 'live-demo' ? 'Demonstração' : mode === 'live-rehearsal' ? 'Recolha limitada' : 'Fontes oficiais'}</strong>
+      <strong>{mode === 'fixture' ? 'Dados de teste' : mode === 'live-demo' ? 'Demonstração' : mode === 'live-rehearsal' ? 'Recolha limitada' : mode === 'live-staging' ? 'Recolha de staging' : 'Fontes oficiais'}</strong>
       <details className="catalog-guidance"><summary>Catálogo parcial · cobertura e interpretação dos prazos</summary>
         <p>{mode === 'fixture' ? 'Estes registos servem para testar a aplicação. Não são oportunidades reais.' : 'Consulte a fonte oficial para confirmar os dados e as condições.'} A listagem inclui registos recolhidos e oportunidades criadas manualmente pela C4G; não representa toda a fonte.</p>
         {!id && <p>A listagem inclui todos os prazos. Use os filtros para consultar apenas prazos atuais ou históricos. Os atalhos incluem hoje e a data final, em UTC. Um prazo futuro não garante abertura nem elegibilidade; confirme a fonte oficial.</p>}

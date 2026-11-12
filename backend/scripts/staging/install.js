@@ -9,7 +9,7 @@
 //     node scripts/staging/install.js install
 // Commands: install
 //           | person --subject <uuid> --name <text> --email <address> [--platform-admin] [--profile <code> | --org-admin]
-//           | env [--out <file>] [--carry <previous private env>]
+//           | env [--out <file>] [--carry <previous private env>] [--collection <5|100>]
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
@@ -23,6 +23,8 @@ const { syncCentralObservation } = require('../localPlatform/centralObservation'
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
   CATALOG_LOGIN, AUTH_POLICY_VERSION } = require('./environment');
+
+const FUNDING_QUEUE = 'funding-tenders-refresh';
 
 function refuse(code) {
   return Object.assign(new Error(code), { code });
@@ -62,6 +64,27 @@ async function ensureCatalogReader(central, state, database) {
   await central.query(`GRANT CONNECT ON DATABASE ${identifier(database)} TO ${login}`);
 }
 
+// The queue the collection worker reads. The pgboss schema is not part of the Central migrations, so it is installed
+// here from the pinned pg-boss plan when missing; the plan digest is checked before anything runs.
+async function ensureFundingQueue(config, central) {
+  if (!(await central.query("SELECT to_regclass('pgboss.version') IS NOT NULL AS installed")).rows[0].installed) {
+    const { manifest } = require('../../src/async/migrationManifest');
+    const plan = fs.readFileSync(path.join(__dirname, '../../database/central/pgboss/045_pg_boss_12_37_0.sql'), 'utf8').replaceAll('\r\n', '\n');
+    if (!plan.includes(`Upstream plan SHA-256 before whitespace normalization: ${manifest.central.planDigest}`)) throw refuse('STAGING_PGBOSS_PLAN_MISMATCH');
+    await central.query(plan);
+  }
+  const url = new URL('postgresql://localhost');
+  url.hostname = config.host; url.port = String(config.port); url.username = config.user; url.password = config.password;
+  url.pathname = '/' + config.centralDatabase;
+  const { PgBoss } = await import('pg-boss');
+  const boss = new PgBoss({ connectionString: url.toString(), schema: 'pgboss', createSchema: false, migrate: false, supervise: false, schedule: false });
+  boss.on('error', () => {});
+  await boss.start();
+  try {
+    if (!(await boss.getQueue(FUNDING_QUEUE))) await boss.createQueue(FUNDING_QUEUE, { retryLimit: 0 });
+  } finally { await boss.stop({ graceful: true, close: true }); }
+}
+
 async function install(env) {
   const { config, stateFile, apiHost, organization } = settings(env);
   fs.mkdirSync(path.dirname(stateFile), { recursive: true, mode: 0o700 });
@@ -75,6 +98,7 @@ async function install(env) {
   try {
     await registerOrganization(central, state, organization);
     await ensureCatalogReader(central, state, config.centralDatabase);
+    await ensureFundingQueue(config, central);
     const checked = await require('../../src/security/centralMigrationPreflight').preflightCentral(central);
     state.phase = 'READY';
     persist(state);
@@ -247,10 +271,10 @@ async function upgrade(env, args) {
   } finally { await central.end(); await tenant.end(); }
 }
 
-function writeEnvironment(env, destination, carryFile) {
+function writeEnvironment(env, destination, carryFile, collection) {
   const { config, stateFile, apiHost } = settings(env);
   const content = apiPrivateEnvironment(readState(stateFile), { host: apiHost, centralDatabase: config.centralDatabase, administratorPassword: config.password,
-    carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {} });
+    carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection });
   fs.writeFileSync(destination, content, { mode: 0o600 });
   return { written: destination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
 }
@@ -263,8 +287,8 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   }
   if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
   if (command === 'env') {
-    const args = parseArguments(rest, { values: ['--out', '--carry'] });
-    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry);
+    const args = parseArguments(rest, { values: ['--out', '--carry', '--collection'] });
+    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection);
   }
   throw refuse('STAGING_COMMAND_INVALID');
 }
