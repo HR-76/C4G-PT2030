@@ -4,8 +4,9 @@ import {useEffect,useMemo,useState} from 'react'
 import {Link,useParams,useSearchParams} from 'react-router-dom'
 import {ReceiptText,ArrowLeft} from 'lucide-react'
 import {useAuth} from '../../contexts/AuthContext'
-import {customerBillingApi} from '../../api/api'
+import {customerBillingApi,organizationDirectoryApi} from '../../api/api'
 import {formatMoney,formatDate,formatInstant,paymentStates,paymentMethods,documentStates,documentTypes} from '../Platform/billingPresentation'
+import {profileDifferences} from '../Platform/billingAccountPrefill'
 import '../Platform/platform-billing.css'
 import './customer-billing.css'
 
@@ -18,8 +19,28 @@ function message(error){
   const status=error?.response?.status
   return status===403?'Não tem permissão para consultar a faturação desta entidade.':status===404?'Esta fatura não está disponível.':status===401||status===409?'A sessão ou o acesso mudou. Atualize a página.':'Não foi possível carregar a faturação. Tente novamente.'
 }
-export function CustomerBillingView({organizationId,api:providedApi,history=false}){
+// Read-only. The entity profile is only compared; when it cannot be read there is no warning.
+function BillingAccountSection({api,directoryApi}){
+  const [state,setState]=useState(null)
+  useEffect(()=>{
+    const controller=new AbortController();setState(null)
+    Promise.all([api.account(controller.signal).then(response=>({account:response.data.account}),()=>({failed:true})),directoryApi.context(controller.signal).then(response=>response.data,()=>null)])
+      .then(([result,profile])=>{if(!controller.signal.aborted)setState({...result,profile})})
+    return()=>controller.abort()
+  },[api,directoryApi])
+  const account=state?.account,differences=account?profileDifferences(account,state.profile?.registration,state.profile?.organization?.legalName):[]
+  const rows=account?[['Denominação legal',account.legalName],['NIF / identificação fiscal',account.taxIdentifier],['País fiscal',account.taxCountry],['Morada',[account.addressLine1,account.addressLine2].filter(Boolean).join(', ')],['Código postal',account.postalCode],['Localidade',account.locality],['Região',account.region],['Email de faturação',account.billingEmail],['Contacto',account.contactName]].filter(([,value])=>value):[]
+  return <section className="billing-section customer-billing-account" aria-label="Dados de faturação"><header><h2>Dados de faturação</h2><span>Só consulta</span></header>
+    {!state?<p className="billing-section-empty">A carregar dados de faturação…</p>:state.failed?<p className="billing-section-empty">Não foi possível carregar os dados de faturação. As faturas continuam disponíveis.</p>:!account?<p className="billing-section-empty">Os dados de faturação ainda não foram configurados pela C4G.</p>:<>
+      <dl>{rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      {differences.length>0&&<div className="alert alert-info" data-testid="billing-profile-difference"><strong>A ficha da entidade difere destes dados.</strong><ul>{differences.map(item=><li key={item.field}>{item.label}: ficha «{item.profile||'vazio'}»</li>)}</ul></div>}
+      <p>A alteração destes dados é feita pela C4G.</p>
+    </>}
+  </section>
+}
+export function CustomerBillingView({organizationId,api:providedApi,directoryApi:providedDirectoryApi,history=false}){
   const api=useMemo(()=>providedApi||customerBillingApi(organizationId),[providedApi,organizationId])
+  const directoryApi=useMemo(()=>providedDirectoryApi||organizationDirectoryApi(organizationId),[providedDirectoryApi,organizationId])
   const {id}=useParams(),[params,setParams]=useSearchParams(),query=params.toString()
   const [result,setResult]=useState(null),[error,setError]=useState(''),[reload,setReload]=useState(0)
   const requestKey=`${organizationId}:${id||''}:${query}:${reload}`
@@ -37,6 +58,7 @@ export function CustomerBillingView({organizationId,api:providedApi,history=fals
     {error?<div className="billing-error" role="alert">{error} <button className="btn btn-outline" onClick={()=>setReload(n=>n+1)}>Tentar novamente</button></div>:!data?<p role="status">A carregar faturação…</p>:id?<InvoiceDetail data={data} organizationId={organizationId}/>:<>
       {!history&&<section className="billing-ledger" aria-label="Resumo da conta">{data.summary.currencies.length?data.summary.currencies.map(row=><article key={row.currency}><header><strong>{row.currency}</strong><span>Conta corrente · todos os períodos</span></header><dl>{[['Faturado',row.billedAmount],['Pago',row.paidAmount],['Por pagar',row.balanceAmount],['Em atraso',row.overdueAmount]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{formatMoney(value,row.currency)}</dd></div>)}</dl></article>):<p>Ainda não existem valores faturados.</p>}</section>}
       {!history&&<div className="billing-enterprise-panels"><section><h2>Fatura em destaque</h2>{data.list.items[0]?<><p>Primeiro resultado da lista</p><Link to={`/faturacao/${data.list.items[0].cycleId}`}>Ver detalhe da fatura</Link><p>{data.list.items[0].number} · {data.list.items[0].serviceDescription}</p></>:<p>Não existem faturas para apresentar.</p>}</section><section><h2>Histórico de faturação</h2><p>Consulte as faturas, os respetivos estados e documentos.</p><Link className="btn btn-outline" to="/faturacao/historico">Consultar histórico</Link></section></div>}
+      {!history&&<BillingAccountSection api={api} directoryApi={directoryApi}/>}
       <InvoiceFilters key={query} params={params} onApply={values=>setParams(values)}/>
       <p className="billing-result" role="status">{data.list.total} {data.list.total===1?'fatura encontrada':'faturas encontradas'}</p>
       {data.list.items.length?<div className="customer-billing-table" tabIndex={0} role="region" aria-label="Faturas"><table><thead><tr>{['Fatura / Serviço','Período','Emissão / Vencimento','Total','Pago','Por pagar','Estado'].map(label=><th key={label} scope="col">{label}</th>)}</tr></thead><tbody>{data.list.items.map(row=><tr key={row.cycleId}>

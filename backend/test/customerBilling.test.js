@@ -52,6 +52,26 @@ test('list uses bound organization and filters, deterministic pagination and sco
   await repo.summary(client,org,'2026-11-06');assert.deepEqual(calls[2][1],[org,'2026-11-06']);
 });
 
+test('billing account read is scoped, current-version only and free of internal fields',async()=>{
+  const calls=[],repo=createCustomerBillingRepository();
+  const row={legal_name:'Cliente, Lda.',tax_country:'PT',tax_identifier:'501234567',address_line_1:'Rua Um',address_line_2:null,postal_code:'1000-100',locality:'Lisboa',region:null,billing_email:'financeiro@example.pt',contact_name:'Ana',updated_at:new Date('2026-11-12T10:00:00Z'),
+    notes:'SECRET',external_source:'SECRET',external_customer_ref:'SECRET',created_by:'SECRET',payment_terms_days:30,id:'SECRET',billing_account_id:'SECRET'};
+  const client={query:async(sql,args)=>{calls.push([sql,args]);return {rows:calls.length===1?[row]:[]}}};
+  const result=await repo.account(client,org);
+  assert.deepEqual(calls[0],[statements.account,[org]]);
+  assert.match(statements.account,/a\.organization_id=\$1/);assert.match(statements.account,/v\.version=a\.current_version/);
+  assert.ok(!/notes|external_|created_by|payment_terms/.test(statements.account));
+  assert.deepEqual(result,{account:{legalName:'Cliente, Lda.',taxCountry:'PT',taxIdentifier:'501234567',addressLine1:'Rua Um',addressLine2:null,postalCode:'1000-100',locality:'Lisboa',region:null,billingEmail:'financeiro@example.pt',contactName:'Ana',updatedAt:'2026-11-12T10:00:00.000Z'},origin:'MANUAL_C4G'});
+  assert.ok(!JSON.stringify(result).includes('SECRET'));
+  assert.deepEqual(await repo.account(client,org),{account:null,origin:'MANUAL_C4G'});
+});
+test('billing account read uses the same financial authorization as invoices',async()=>{
+  const make=(profile,header=org)=>{let reads=0;const service=createCustomerBillingService({centralPool:{connect:async()=>({query:async()=>({rows:[]}),release(){}})},coordinator:{withAuthority:fn=>fn(),pool:{}},authority:{captureAuthenticatedRequest:async()=>({}),resolve:async()=>({actor:{organizationId:org}})},authorizationDataPort:{load:async()=>({organizationId:org,profileCode:profile,grants:[]})},repository:{account:async(_client,scope)=>{reads++;assert.equal(scope,org);return {account:null,origin:'MANUAL_C4G'}}}});
+    return {run:()=>service.execute('account',{},null,{headers:{'x-c4g-organization':header}}),reads:()=>reads}};
+  const allowed=make('ORG_ADMIN');assert.deepEqual(await allowed.run(),{account:null,origin:'MANUAL_C4G'});assert.equal(allowed.reads(),1);
+  for(const denied of [make('CONTRIBUTOR'),make('ORG_ADMIN',other)]){await assert.rejects(()=>denied.run());assert.equal(denied.reads(),0)}
+});
+
 test('Express query objects are accepted without weakening filter validation',()=>{
   const express=require('express');const app=express();const req=Object.create(app.request);
   req.url='/invoices?q=FT&page=2';

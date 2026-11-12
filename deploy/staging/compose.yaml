@@ -5,8 +5,10 @@ services:
   # partilham uma rede. Se a API fosse a dona, cada reinício dela criaria uma rede nova e o antivírus ficava agarrado à
   # antiga (a API entrava em ciclo de reinícios sem o encontrar). Este contentor não faz nada e nunca reinicia com a API.
   # Se for recriado, recriar também api e clamav: `up -d --force-recreate pod api clamav`.
+  # A imagem é fixa e pequena, independente da versão da aplicação: se dependesse de C4G_RELEASE, cada atualização recriava o
+  # pod e o ClamAV ficava agarrado à rede antiga (a API não ficava pronta).
   pod:
-    image: c4g-staging-api:${C4G_RELEASE:?defina C4G_RELEASE com o SHA do commit}
+    image: alpine:3.20
     init: true
     restart: unless-stopped
     command: ["sleep", "infinity"]

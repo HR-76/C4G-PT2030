@@ -6,7 +6,7 @@ function createCustomerBillingRouter({express,service,authenticate,organizationM
     organizationMiddleware.requireServerSession,organizationMiddleware.resolveOrganizationContext,organizationMiddleware.requireOrganizationContext);
   router.use((req,res,next)=>req.method!=='GET'?res.status(405).json({error:{code:'OPERATION_NOT_AVAILABLE'}}):next());
   require('./pdfHttp').mountPdfRoutes(router,{express,service:pdfs,customer:true});
-  for(const [path,method] of [['/access','access'],['/summary','summary'],['/invoices','list'],['/invoices/:id','detail']]) {
+  for(const [path,method] of [['/access','access'],['/summary','summary'],['/account','account'],['/invoices','list'],['/invoices/:id','detail']]) {
     router.get(path,async(req,res)=>{try {
       if(req.body && Object.keys(req.body).length || method!=='list' && Object.keys(req.query).length) throw Object.assign(new Error(),{code:'INVALID_INPUT'});
       res.json(await service.execute(method,req.query,req.params.id,req));

@@ -143,7 +143,7 @@ echo 'C4G_R2_LAYER_C_VALIDATED=true' >> /srv/c4g-staging/r2.env
 docker run --rm --user 0:0 --env-file /srv/c4g-staging/postgres/.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/api-private.env:/carry.env:ro -v /srv/c4g-staging/r2.env:/r2.env:ro c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js env --carry /carry.env --storage /r2.env --out /state/api-private.env.generated
 ```
 
-**6. Ativar.** A API e o ClamAV partilham a rede do contentor `pod`, que nunca reinicia com a API (se a API fosse a dona, cada reinício criaria uma rede nova e o antivírus ficava para trás, deixando a API em ciclo de reinícios). Ao passar do compose antigo para este, o `pod` precisa da porta 8500 que a API antiga ocupa, por isso a API antiga é removida primeiro. A API pode reiniciar uma ou duas vezes até o antivírus responder, porque a prontidão (`/health/ready`) exige R2 e antivírus:
+**6. Ativar.** A API e o ClamAV partilham a rede do contentor `pod`, que nunca reinicia com a API (se a API fosse a dona, cada reinício criaria uma rede nova e o antivírus ficava para trás, deixando a API em ciclo de reinícios). Ao passar do compose antigo para este, o `pod` precisa da porta 8500 que a API antiga ocupa, por isso a API antiga é removida primeiro. Se alguma vez recriares o `pod` (por exemplo ao mudar a sua imagem), recria também o antivírus: `up -d --force-recreate clamav`; sem isso a API não fica pronta. A API pode reiniciar uma ou duas vezes até o antivírus responder, porque a prontidão (`/health/ready`) exige R2 e antivírus:
 
 ```bash
 cp /srv/c4g-staging/state/api-private.env.generated /srv/c4g-staging/api-private.env && chmod 600 /srv/c4g-staging/api-private.env

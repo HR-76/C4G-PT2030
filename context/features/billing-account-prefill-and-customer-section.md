@@ -1,6 +1,6 @@
 # Dados de faturação: pré-preenchimento e secção do cliente
 
-Estado: In Progress — 2026-11-12. Fase 1 em Review; Fases 2 a 4 não iniciadas.
+Estado: In Progress — 2026-11-12. Fases 1 e 2 em Review; Fases 3 e 4 não iniciadas.
 
 Estende [Controlo de faturação — Fase A](platform-billing-control-phase-a.md) e
 [Faturação do cliente](customer-billing.md). Responde à pergunta 5 de
@@ -151,6 +151,31 @@ permissões de leitura da ficha deixam de se aplicar a esta fase.
 - Não verificado: aspeto visual no browser e comportamento com dados reais no ambiente
   habitual. A divergência só aparece no modal "Preparar faturação"; a página de detalhe
   do ciclo não a mostra.
+
+## Fase 2 — implementação e verificação (12/11/2026)
+
+Consulta, sem escritas. Sem migração: o role das leituras centrais já tem `SELECT`
+sobre `billing_account` e `billing_account_version` (migração 027).
+
+- Backend: `GET /api/billing/account`, método `account` em `customerBilling`. Mesma
+  autorização das faturas (ORG_ADMIN ou `billing.read`, revalidada antes e depois),
+  transação só de leitura, organização vinda do contexto autenticado. Devolve só a
+  versão corrente e só denominação, país e identificação fiscal, morada, complemento,
+  código postal, localidade, região, email e contacto. Notas, origem e referência
+  externas, autor, identificadores e prazo de pagamento não são selecionados.
+- Frontend: secção "Dados de faturação" em `/faturacao`, só consulta; não aparece no
+  histórico nem no detalhe da fatura. Sem conta, explica que a C4G ainda não a
+  configurou. Falha na leitura da conta não esconde as faturas.
+- Aviso de divergência: a ficha é lida por `GET /api/organization-directory` (contexto
+  já existente). Quem não a pode ler não vê aviso. O aviso lista os campos e o valor
+  da ficha, sem ação: a ação de aplicar pertence à Fase 3.
+- Prazo de pagamento fica fora da consulta até a pergunta 2 ser respondida.
+- Regressões primeiro. Backend focado 12 PASS; frontend de faturação 34 PASS.
+- Suite backend: 3132 PASS, 9 SKIP e 1 falha em `outboundRedirectIsolation.test.js`,
+  que passa isolado e não toca em faturação. Suite frontend: 983 PASS e o mesmo timeout
+  de `ApplicationPartners.test.jsx`. `node --check`, build e lint PASS.
+- Não verificado: PostgreSQL real (a consulta SQL só correu contra doubles), browser e
+  ambiente habitual. O backend em execução tem de ser reiniciado para servir a rota.
 
 ## Critérios de aceitação
 

@@ -29,8 +29,14 @@ const statements = Object.freeze({
    sum(balance_amount)::text AS "balanceAmount",COALESCE(sum(balance_amount) FILTER(WHERE document_state='ISSUED' AND document_due_date<$2::date),0)::text AS "overdueAmount"
    FROM cycle_projection WHERE ${visible} GROUP BY currency ORDER BY currency`,
   visible: `SELECT c.id FROM public.billing_cycle c JOIN public.billing_fiscal_document d ON d.billing_cycle_id=c.id AND d.organization_id=c.organization_id
-   WHERE c.id=$1 AND c.organization_id=$2 AND c.state NOT IN ('DRAFT','READY_TO_ISSUE') AND d.document_type IN ('INVOICE','SIMPLIFIED_INVOICE','INVOICE_RECEIPT')`
+   WHERE c.id=$1 AND c.organization_id=$2 AND c.state NOT IN ('DRAFT','READY_TO_ISSUE') AND d.document_type IN ('INVOICE','SIMPLIFIED_INVOICE','INVOICE_RECEIPT')`,
+  // Current version only. Internal columns are never selected for the customer.
+  account: `SELECT v.legal_name,v.tax_country,v.tax_identifier,v.address_line_1,v.address_line_2,v.postal_code,v.locality,v.region,
+   v.billing_email,v.contact_name,a.updated_at FROM public.billing_account a JOIN public.billing_account_version v
+   ON v.billing_account_id=a.id AND v.organization_id=a.organization_id AND v.version=a.current_version WHERE a.organization_id=$1`
 });
+const accountColumns = Object.freeze({legalName:'legal_name',taxCountry:'tax_country',taxIdentifier:'tax_identifier',addressLine1:'address_line_1',
+  addressLine2:'address_line_2',postalCode:'postal_code',locality:'locality',region:'region',billingEmail:'billing_email',contactName:'contact_name'});
 
 function customerDetail(data) {
   return {
@@ -51,6 +57,12 @@ function createCustomerBillingRepository({ billing = createPlatformBillingReposi
     },
     async summary(client, organizationId, today) {
       return {currencies:(await client.query(statements.summary,[organizationId,today])).rows,origin:'MANUAL_C4G'};
+    },
+    async account(client, organizationId) {
+      const row=(await client.query(statements.account,[organizationId])).rows[0];
+      if(!row) return {account:null,origin:'MANUAL_C4G'};
+      const account=Object.fromEntries(Object.entries(accountColumns).map(([key,column])=>[key,row[column]??null]));
+      return {account:{...account,updatedAt:row.updated_at instanceof Date?row.updated_at.toISOString():row.updated_at??null},origin:'MANUAL_C4G'};
     },
     async detail(client, organizationId, id, today) {
       uuid(id);

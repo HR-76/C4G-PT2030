@@ -430,6 +430,7 @@ export function customerBillingApi(organizationId) {
   return {
     access: signal => get('/access',undefined,signal),
     summary: signal => get('/summary',undefined,signal),
+    account: signal => get('/account',undefined,signal),
     invoices: (params,signal) => get('/invoices',params,signal),
     invoice: (id,signal) => get('/invoices/'+encodeURIComponent(id),undefined,signal),
   }
