@@ -21,6 +21,24 @@ services:
       - "127.0.0.1:8500:5000"
     networks: [default, data]
 
+  # Antivírus dos ficheiros enviados (PDFs de faturação, carregamento PT2030). A aplicação só aceita um scanner em loopback,
+  # por isso o ClamAV partilha a rede da API (network_mode) e escuta em 127.0.0.1:3310 dentro dela; não tem porta publicada.
+  # Só arranca com o perfil "storage" (ver o runbook). Descarrega as assinaturas ao arrancar, o que demora alguns minutos.
+  clamav:
+    profiles: ["storage"]
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    network_mode: "service:api"
+    depends_on: [api]
+    volumes:
+      - clamav-db:/var/lib/clamav
+    healthcheck:
+      test: ["CMD-SHELL", "clamdcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
   # Recolha de oportunidades. Não arranca com o resto: só com o perfil "collection" (ver o runbook), porque
   # faz chamadas à API pública da Comissão Europeia. Usa o mesmo ficheiro de variáveis que a API.
   worker:
@@ -39,6 +57,9 @@ services:
     volumes:
       - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
     networks: [default, data]
+
+volumes:
+  clamav-db:
 
 networks:
   data:

@@ -86,10 +86,39 @@ function collectionEnvironment(option) {
     ...(option === 'all' ? { FUNDING_TENDERS_COVERAGE: 'durable-v1' } : {}) };
 }
 
+// Private object storage (Cloudflare R2, EU jurisdiction) and the ClamAV scanner. The R2 values are the operator's: they are
+// read from a file the operator writes on the server and are never generated, printed or sent anywhere by the installer.
+// ClamAV runs beside the API in the same network namespace (compose "clamav" service), because the runtime only accepts a
+// loopback scanner. Enabling it turns on the two features that need both: private billing PDFs and the central PT2030
+// upload preview.
+// C4G_R2_LAYER_C_VALIDATED is the operator's declaration that the real R2 has been validated: the runtime refuses to build the
+// storage without it. In staging, setting it is the operator's act after `storage-check` passes; it is never added for them.
+const STORAGE_KEYS = Object.freeze(['C4G_R2_ENDPOINT', 'C4G_R2_DOCUMENTS_BUCKET', 'C4G_R2_QUARANTINE_BUCKET', 'C4G_R2_ACCESS_KEY_ID', 'C4G_R2_SECRET_ACCESS_KEY', 'C4G_R2_LAYER_C_VALIDATED']);
+const SCANNER = Object.freeze({ C4G_CLAMAV_HOST: '127.0.0.1', C4G_CLAMAV_PORT: '3310' });
+function storageEnvironment(text) {
+  if (text === undefined) return {};
+  const values = {};
+  for (const raw of String(text).split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const at = line.indexOf('=');
+    const key = at < 0 ? '' : line.slice(0, at).trim(), value = at < 0 ? '' : line.slice(at + 1).trim();
+    if (!STORAGE_KEYS.includes(key)) throw failure('STAGING_STORAGE_KEY_UNKNOWN');
+    if (!/^\S+$/.test(value) || Object.hasOwn(values, key)) throw failure('STAGING_STORAGE_INVALID');
+    values[key] = value;
+  }
+  if (STORAGE_KEYS.some(key => !Object.hasOwn(values, key))) throw failure('STAGING_STORAGE_INCOMPLETE');
+  if (values.C4G_R2_LAYER_C_VALIDATED !== 'true') throw failure('STAGING_STORAGE_VALIDATION_NOT_DECLARED');
+  // The runtime's own loader is the authority on what is acceptable (EU endpoint, two distinct buckets, loopback scanner).
+  try { require('../../src/config/applicationDocuments').loadApplicationDocumentConfiguration({ ...values, ...SCANNER }); }
+  catch { throw failure('STAGING_STORAGE_INVALID'); }
+  return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'preview' };
+}
+
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
 // The Central pool connects as the PostgreSQL administrator, as the local profile does: the pinned Central
 // fingerprints do not admit a limited runtime login (its grants would count as schema drift).
-function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {}, collection }) {
+function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {}, collection, storage }) {
   if (state?.phase !== 'READY' || !state.credentials || !administratorPassword || !state.staging?.catalogPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
@@ -102,6 +131,7 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     FUNDING_TENDERS_RUNTIME: 'central',
     FUNDING_TENDERS_SOURCE: 'unconfigured',
     ...collectionEnvironment(collection),
+    ...storageEnvironment(storage),
     CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
@@ -113,4 +143,4 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   return Object.entries(lines).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
-module.exports = Object.freeze({ COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });
+module.exports = Object.freeze({ STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });

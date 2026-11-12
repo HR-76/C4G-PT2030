@@ -92,7 +92,68 @@ A recolha contacta a API pública da Comissão Europeia, por isso só corre quan
 2. **Variáveis.** O `env` só inclui a recolha com `--collection`. `--collection all` recolhe **tudo**: páginas de 100 (o máximo da fonte) encadeadas pela cobertura durável (`FUNDING_TENDERS_COVERAGE=durable-v1`) até esgotar a fonte; no ambiente local, 1119 registos foram 45 páginas e cerca de 81 segundos. `--collection 5` é um ensaio de 5 resultados, sem cobertura. Sem a opção o ambiente fica com `FUNDING_TENDERS_SOURCE=unconfigured`, o ecrã Fontes diz «Configuração indisponível» e nada é chamado.
 3. **Worker.** Está no compose sob o perfil `collection`, que `up -d` não arranca sozinho: `docker compose -f deploy/staging/compose.yaml --profile collection up -d worker`. Para parar: `docker compose -f deploy/staging/compose.yaml --profile collection stop worker`.
 
+A API pública da UE não devolve financiador e o contrato de oportunidade exige um; em staging o worker etiqueta os registos com «Financiador não indicado pela fonte (recolha de staging)» (nunca substitui um financiador que a fonte traga). É só para testar: produção usa o escritor v2 com revisão humana.
+
 O worker só aceita a recolha de staging contra a base `c4g_central_staging` do anfitrião `c4g-postgres`, com TLS verificado e `NODE_ENV=production`; qualquer outra combinação impede o arranque. Cada atualização é pedida pelo administrador em Administração C4G → Fontes de oportunidades, com «Atualizar agora».
+
+## Armazenamento privado (Cloudflare R2) e antivírus (ClamAV)
+
+Liga duas funcionalidades que precisam de ficheiros privados verificados: os PDFs de faturação e o carregamento central do PT2030 (pré-visualização). Os documentos das candidaturas são outra peça (fila e worker próprios) e **não** ficam ligados por este passo. O ClamAV corre ao lado da API, na mesma rede (`network_mode`), porque a aplicação só aceita um antivírus em `127.0.0.1:3310`; só arranca com o perfil `storage`.
+
+**1. Na Cloudflare (tu).** R2 → criar dois buckets **privados** na jurisdição **UE** (por exemplo `c4g-staging-documents` e `c4g-staging-quarantine`; têm de ser diferentes) → «Manage API tokens» → token com permissão de leitura e escrita de objetos **só nesses dois buckets** → guardar o *Access Key ID*, o *Secret Access Key* e o endpoint `https://<conta>.eu.r2.cloudflarestorage.com`. Nunca colar estes valores no chat nem em Git.
+
+**2. Ficheiro de valores na VPS.** Os valores ficam num ficheiro só do root. O bloco pede-os sem os mostrar (o segredo não aparece no ecrã):
+
+```bash
+install -m 600 /dev/null /srv/c4g-staging/r2.env
+read -rp 'Endpoint R2 (https://...eu.r2.cloudflarestorage.com): ' V1
+read -rp 'Bucket de documentos: ' V2
+read -rp 'Bucket de quarentena: ' V3
+read -rp 'Access Key ID: ' V4
+read -rsp 'Secret Access Key (não aparece): ' V5; echo
+printf 'C4G_R2_ENDPOINT=%s\nC4G_R2_DOCUMENTS_BUCKET=%s\nC4G_R2_QUARANTINE_BUCKET=%s\nC4G_R2_ACCESS_KEY_ID=%s\nC4G_R2_SECRET_ACCESS_KEY=%s\n' "$V1" "$V2" "$V3" "$V4" "$V5" > /srv/c4g-staging/r2.env
+unset V1 V2 V3 V4 V5; chmod 600 /srv/c4g-staging/r2.env; wc -l /srv/c4g-staging/r2.env
+```
+
+A aplicação recusa construir o armazenamento sem a declaração `C4G_R2_LAYER_C_VALIDATED=true`, que é **tua**: só a acrescentas no passo 4, depois de a verificação passar. A verificação prova credenciais, buckets acessíveis e antivírus a responder; a validação funcional completa (escrita condicional, ficheiros grandes) só fica provada com um carregamento real no passo 7. `C4G_R2_MULTIPART_CONDITIONAL_VALIDATED` mantém-se desligado, por isso ficheiros que exijam envio em partes são recusados.
+
+**3. Antivírus.** Descarrega as assinaturas ao arrancar (alguns minutos) e fica num volume persistente:
+
+```bash
+cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD)
+docker compose -f deploy/staging/compose.yaml --profile storage up -d clamav
+until [ "$(docker inspect -f '{{.State.Health.Status}}' c4g-staging-api-clamav-1)" = healthy ]; do sleep 10; done; echo clamav pronto
+```
+
+**4. Verificar R2 e antivírus** (só imprime booleanos; não escreve nem lê objetos). O contentor junta-se à rede da API, onde o antivírus escuta:
+
+```bash
+docker run --rm --network container:c4g-staging-api-api-1 --env-file /srv/c4g-staging/r2.env c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js storage-check
+```
+
+Esperado: `{"r2":true,"scanner":true}`. Se `r2` for `false`: token, endpoint, nomes dos buckets ou permissões. Se `scanner` for `false`: o passo 3 ainda não terminou. Só com os dois verdadeiros, faz a tua declaração:
+
+```bash
+echo 'C4G_R2_LAYER_C_VALIDATED=true' >> /srv/c4g-staging/r2.env
+```
+
+**5. Gerar o ambiente com o armazenamento.** Repete as mesmas opções que já usas (`--collection all` se a recolha estiver ligada); o `--storage` valida o ficheiro antes de escrever e recusa tudo o que não seja EU, buckets distintos ou declaração em falta:
+
+```bash
+docker run --rm --user 0:0 --env-file /srv/c4g-staging/postgres/.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/api-private.env:/carry.env:ro -v /srv/c4g-staging/r2.env:/r2.env:ro c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js env --carry /carry.env --storage /r2.env --out /state/api-private.env.generated
+```
+
+**6. Ativar.** O ClamAV partilha a rede da API: recriar a API obriga a recriar o antivírus. A API pode reiniciar uma ou duas vezes até o antivírus responder, porque a prontidão (`/health/ready`) exige R2 e antivírus:
+
+```bash
+cp /srv/c4g-staging/state/api-private.env.generated /srv/c4g-staging/api-private.env && chmod 600 /srv/c4g-staging/api-private.env
+docker compose -f deploy/staging/compose.yaml --profile storage up -d --force-recreate api clamav
+sleep 60; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
+```
+
+**7. Ensaio funcional (tu, no navegador).** Administração C4G: carregar uma folha de teste PT2030 e ver a pré-visualização; e, num ciclo de faturação, confirmar um PDF pequeno. Se algum falhar, diz-me o que o ecrã mostra.
+
+**Voltar atrás:** gera o ambiente sem `--storage`, copia-o e recria a API (`up -d --force-recreate api`); as duas funcionalidades voltam a «indisponível». O ClamAV e os buckets não são apagados. Objetos já enviados ficam no R2.
 
 ## Subir os esquemas ao nível do ambiente local (Central 050 e tenant 040)
 
@@ -135,4 +196,4 @@ $RUN person --subject "$TECNICO_SUBJECT" --name "Tecnico Staging" --email tecnic
 - O catálogo e o Dashboard ficam ativos mas **vazios**: a recolha de oportunidades (worker e fontes) ainda não está ligada.
 - Sem o `upgrade`, o tenant fica na 033 e as páginas que dependem das migrações 034 a 040 (chat, estratégia, detalhe de tarefas, eliminação de documentos) ficam indisponíveis.
 - A ligação da API à Central usa o administrador do PostgreSQL, como o perfil local. Um login limitado alteraria os fingerprints fixados da Central e exige um perfil de runtime próprio.
-- Não há worker, R2, e-mail nem ClamAV.
+- Sem e-mail. R2 e ClamAV só depois do passo «Armazenamento privado»; os documentos das candidaturas continuam por ligar.

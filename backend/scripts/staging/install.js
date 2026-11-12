@@ -9,7 +9,8 @@
 //     node scripts/staging/install.js install
 // Commands: install
 //           | person --subject <uuid> --name <text> --email <address> [--platform-admin] [--profile <code> | --org-admin]
-//           | env [--out <file>] [--carry <previous private env>] [--collection <5|all>]
+//           | env [--out <file>] [--carry <previous private env>] [--collection <5|all>] [--storage <R2 values file>]
+//           | storage-check   (inside the API container: R2 buckets and the ClamAV scanner answer; prints only booleans)
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
@@ -271,12 +272,28 @@ async function upgrade(env, args) {
   } finally { await central.end(); await tenant.end(); }
 }
 
-function writeEnvironment(env, destination, carryFile, collection) {
+function writeEnvironment(env, destination, carryFile, collection, storageFile) {
   const { config, stateFile, apiHost } = settings(env);
   const content = apiPrivateEnvironment(readState(stateFile), { host: apiHost, centralDatabase: config.centralDatabase, administratorPassword: config.password,
-    carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection });
+    carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection,
+    storage: storageFile ? fs.readFileSync(storageFile, 'utf8') : undefined });
   fs.writeFileSync(destination, content, { mode: 0o600 });
   return { written: destination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
+}
+
+// Reachability only: each R2 bucket answers a HEAD request with these credentials and the scanner answers PING. No object is
+// written, nothing is scanned and only booleans are printed.
+const SCANNER_LOOPBACK = Object.freeze({ C4G_CLAMAV_HOST: '127.0.0.1', C4G_CLAMAV_PORT: '3310' });
+async function storageCheck(env) {
+  let config;
+  // The check is what precedes the operator's declaration, so it builds the storage as if it were already declared.
+  try { config = require('../../src/config/applicationDocuments').loadApplicationDocumentConfiguration({ ...env, ...SCANNER_LOOPBACK, C4G_R2_LAYER_C_VALIDATED: 'true' }); } catch { throw refuse('STAGING_STORAGE_INVALID'); }
+  const store = require('../../src/documents/r2Storage').createR2Storage(config.r2, { authority: 'CENTRAL', credentials: config.credentials });
+  try {
+    const scanner = require('../../src/documents/clamavScanner').createClamavScanner({ authority: 'CENTRAL', storage: store, ...config.scanner });
+    const [r2, scan] = await Promise.all([store.health(), scanner.health()]);
+    return { r2: r2.ready === true, scanner: scan.ready === true };
+  } finally { await store.shutdown(); }
 }
 
 async function main(argv = process.argv.slice(2), env = process.env) {
@@ -287,9 +304,10 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   }
   if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
   if (command === 'env') {
-    const args = parseArguments(rest, { values: ['--out', '--carry', '--collection'] });
-    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection);
+    const args = parseArguments(rest, { values: ['--out', '--carry', '--collection', '--storage'] });
+    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection, args.storage);
   }
+  if (command === 'storage-check') { parseArguments(rest); return storageCheck(env); }
   throw refuse('STAGING_COMMAND_INVALID');
 }
 
