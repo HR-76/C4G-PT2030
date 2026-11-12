@@ -11,7 +11,7 @@ const {createPortugal2030CatalogAcceptance}=require('./catalogAcceptance');
 async function sessionAuthority(client,userId,sessionId){
  if(typeof sessionId!=='string'||!sessionId||!(await client.query(authoritySql+' FOR SHARE OF s,u,a',[sessionId,userId])).rowCount)throw Object.assign(Error(),{code:'C4G_ADMIN_REQUIRED'});
 }
-function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatformAudit({source:'API'}),authority=null}){
+function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatformAudit({source:'API'}),authority=null,readAuthority=null}){
  const central=createFundingRepository({pool});
  const projection=row=>row?{userId:row.requested_by,requestId:row.request_id,documentId:row.document_id,documentVersionId:row.document_version_id,filename:row.filename,mime:MIME,sizeBytes:row.size_bytes,sha256:row.sha256,sheets:row.sheets}:null;
  const repository={
@@ -51,7 +51,7 @@ function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatfo
    return {importId,mappingDigest:head.mapping_digest,rows:rows.map(r=>({physicalRow:Number(r.physical_row),externalIdentifier:r.external_identifier,errors:r.errors||[],revisionId:r.candidate_revision_id,contentDigest:r.content_digest,snapshot:r.canonical_snapshot,accepted:r.accepted_id?{opportunityId:r.accepted_id,revisionId:r.accepted_revision,rowVersion:Number(r.accepted_row_version)}:null}))};
   });
  }
- const acceptance=authority?createPortugal2030CatalogAcceptance({pool,authority,readImport}):null;
+ const acceptance=authority?createPortugal2030CatalogAcceptance({pool,authority,readAuthority:readAuthority||authority,readImport}):null;
  return Object.freeze({
   async availability(){try{
    const schema=await central.transaction(async c=>{
@@ -94,9 +94,12 @@ function configuredCentralImport({pool,env=process.env,authorityPolicy=null}){
  if(catalog&&(!authorityPolicy||typeof authorityPolicy.policyVersion!=='string'||!authorityPolicy.requirement))throw TypeError('Central import catalogue acceptance requires the authentication policy');
  // Accepting is a privileged action: a current administrator session and the deployment's own recent-authentication requirement
  // (whatever its policy says about MFA), like the other activation actions.
- const authority=catalog?require('../opportunities/v2/activationAuthority').createActivationAuthorityV2({policyVersion:authorityPolicy.policyVersion,recentMfaRequirement:authorityPolicy.requirement}):null;
+ const makeAuthority=requirement=>require('../opportunities/v2/activationAuthority').createActivationAuthorityV2({policyVersion:authorityPolicy.policyVersion,recentMfaRequirement:requirement});
+ const authority=catalog?makeAuthority(authorityPolicy.requirement):null;
+ // Reviewing is read-only: a current administrator session is enough, without the recent-authentication or MFA requirement.
+ const readAuthority=catalog?makeAuthority({mfa:false,maxAgeSeconds:86400,amrMode:'any',acceptedAcr:[],acceptedAmr:[]}):null;
  const config=require('../config/applicationDocuments').loadApplicationDocumentConfiguration(env);
  const store=require('../documents/r2Storage').createR2Storage(config.r2,{authority:'CENTRAL',credentials:config.credentials});
- try{return createCentralImportUploadRuntime({pool,store,authority,scanner:require('../documents/clamavScanner').createClamavScanner({authority:'CENTRAL',storage:store,...config.scanner})})}catch(error){store.shutdown();throw error}
+ try{return createCentralImportUploadRuntime({pool,store,authority,readAuthority,scanner:require('../documents/clamavScanner').createClamavScanner({authority:'CENTRAL',storage:store,...config.scanner})})}catch(error){store.shutdown();throw error}
 }
 module.exports={createCentralImportUploadRuntime,configuredCentralImport};

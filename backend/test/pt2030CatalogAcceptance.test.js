@@ -99,3 +99,16 @@ test('inputs are validated and one import is accepted at a time', async () => {
   release(); await assert.rejects(() => first, { code: 'PT2030_BATCH_STALE' });
   assert.throws(() => createPortugal2030CatalogAcceptance({ pool: {} }), TypeError);
 });
+
+// Regression: the review demanded the same recent authentication as writing, so an administrator whose login was older than the
+// limit got a 403 on a read-only screen. Reviewing uses the reading authority; accepting still needs the strict one.
+test('the review does not need what accepting needs', async () => {
+  const calls = [];
+  const repo = name => ({ async preview() { calls.push(name); if (name === 'strict') throw Object.assign(new Error('OPPORTUNITY_V2_AUTHORITY_DENIED'), { code: 'OPPORTUNITY_V2_AUTHORITY_DENIED' }); return { previewDigest: 'e'.repeat(64), items: [{ action: 'NEW' }] }; }, async accept() { throw new Error('not reached'); } });
+  const service = createPortugal2030CatalogAcceptance({ pool: {}, authority: { authorize: async () => true }, accepted: repo('strict'), reviewing: repo('reading'),
+    readImport: async () => ({ importId: IMPORT, mappingDigest: MAPPING, rows: [row(0)] }) });
+  const shown = await service.review(input());
+  assert.equal(shown.totals.ACCEPTABLE, 1); assert.deepEqual(calls, ['reading']);
+  await assert.rejects(() => service.accept(input({ batchDigest: shown.batchDigest })), { code: 'OPPORTUNITY_V2_AUTHORITY_DENIED' });
+  assert.deepEqual(calls, ['reading', 'strict']);
+});

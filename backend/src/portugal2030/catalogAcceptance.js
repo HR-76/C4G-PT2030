@@ -27,7 +27,9 @@ function publicCode(error) {
 // readImport({ userId, sessionId, importId }) is the trusted, authorized read of the staged import:
 //   { importId, mappingDigest, rows: [{ physicalRow, externalIdentifier, errors, revisionId, contentDigest, snapshot,
 //     accepted: { opportunityId, revisionId, rowVersion } | null }] }  (accepted: what the catalogue already holds for that identity)
-function createPortugal2030CatalogAcceptance({ pool, authority, audit = createActivationAuditV2(), readImport, accepted: injected = null } = {}) {
+// readAuthority: the same session and administrator check without the recent-authentication requirement. Reviewing only reads, so
+// it must not demand what writing demands; accepting always uses the stricter authority.
+function createPortugal2030CatalogAcceptance({ pool, authority, readAuthority = authority, audit = createActivationAuditV2(), readImport, accepted: injected = null, reviewing: injectedReview = null } = {}) {
   if (typeof readImport !== 'function' || !authority || typeof authority.authorize !== 'function') throw new TypeError('Catalogue acceptance requires an authorized import reader and the activation authority.');
   // The approval is the administrator's explicit batch request, bound to a digest the server recomputes. This port only
   // confirms that this exact candidate was bound for this exact context and that the session is still authorized.
@@ -38,13 +40,15 @@ function createPortugal2030CatalogAcceptance({ pool, authority, audit = createAc
       if (!bound || bound.requestId !== input.requestId || bound.approvalDigest !== input.approvalDigest) return false;
       return authority.authorize(client, context);
     } });
+  // Reconciliation preview for the review: it never writes and never reaches verifyApproval.
+  const reviewing = injectedReview || (injected ? injected : createAcceptedOpportunityV2Repository({ pool, authorize: readAuthority.authorize, audit, verifyApproval: async () => false }));
   const running = new Set();
 
   const contextFor = (userId, sessionId, importId) => Object.freeze({ actor: Object.freeze({ type: 'HUMAN', id: userId }), sessionId, planId: importId, fence: 1 });
   const commandFor = (row, mappingDigest) => ({ requestId: 'pt2030:' + sha({ importId: row.importId, externalIdentifier: row.externalIdentifier, contentDigest: row.contentDigest }),
     candidateId: 'pt2030:' + row.revisionId, snapshot: row.snapshot, mappingDigest, expected: row.accepted || null });
 
-  async function classify(userId, sessionId, importId, loaded) {
+  async function classify(repo, userId, sessionId, importId, loaded) {
     const context = contextFor(userId, sessionId, importId), rows = [];
     for (const row of loaded.rows) {
       const base = { physicalRow: row.physicalRow, externalIdentifier: row.externalIdentifier, title: row.snapshot?.description?.title?.value ?? null };
@@ -52,7 +56,7 @@ function createPortugal2030CatalogAcceptance({ pool, authority, audit = createAc
       const prepared = { ...row, importId };
       const cmd = commandFor(prepared, loaded.mappingDigest);
       let preview;
-      try { preview = await accepted.preview(cmd, context); }
+      try { preview = await repo.preview(cmd, context); }
       catch (error) {
         // Losing authority is not a reason to review one row: the whole request stops.
         if (error?.code === 'OPPORTUNITY_V2_AUTHORITY_DENIED') throw error;
@@ -78,7 +82,7 @@ function createPortugal2030CatalogAcceptance({ pool, authority, audit = createAc
     async review(input) {
       ids(input);
       const loaded = await readImport(input);
-      return view(input.importId, loaded, await classify(input.userId, input.sessionId, input.importId, loaded));
+      return view(input.importId, loaded, await classify(reviewing, input.userId, input.sessionId, input.importId, loaded));
     },
     async accept(input) {
       ids(input);
@@ -87,7 +91,7 @@ function createPortugal2030CatalogAcceptance({ pool, authority, audit = createAc
       running.add(input.importId);
       try {
         const loaded = await readImport(input);
-        const rows = await classify(input.userId, input.sessionId, input.importId, loaded);
+        const rows = await classify(accepted, input.userId, input.sessionId, input.importId, loaded);
         // The administrator approved what the review showed. If anything under it changed, nothing is written.
         if (digestOf(input.importId, loaded.mappingDigest, rows) !== input.batchDigest) fail('PT2030_BATCH_STALE');
         const result = { importId: input.importId, requested: 0, created: 0, failed: [], skipped: { alreadyAccepted: 0, needsReview: 0, rejected: 0 } };
