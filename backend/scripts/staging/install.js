@@ -9,7 +9,7 @@
 //     node scripts/staging/install.js install
 // Commands: install
 //           | person --subject <uuid> --name <text> --email <address> [--platform-admin] [--profile <code> | --org-admin]
-//           | env [--out <file>] [--carry <previous private env>] [--collection <5|100>]
+//           | env [--out <file>] [--carry <previous private env>] [--collection <5|all>]
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
@@ -294,7 +294,14 @@ async function main(argv = process.argv.slice(2), env = process.env) {
 }
 
 if (require.main === module) {
-  main().then(result => console.log(JSON.stringify(result)), error => {
+  // An unsettled promise with nothing left to wait for ends the process silently with a zero exit code. That must never
+  // look like success for a command that changes databases, so it is reported as an interruption.
+  let settled = false;
+  process.on('exit', code => {
+    if (!settled && code === 0) { console.error('STAGING_INSTALL_INTERRUPTED'); process.exitCode = 1; }
+  });
+  main().then(result => { settled = true; console.log(JSON.stringify(result)); }, error => {
+    settled = true;
     console.error(error.code || (/^[A-Z0-9_]+$/.test(error.message || '') ? error.message : 'STAGING_INSTALL_FAILED'));
     process.exitCode = 1;
   });

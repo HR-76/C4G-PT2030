@@ -89,7 +89,7 @@ A base PostgreSQL nova não é alterada pelo regresso; a release antiga volta a 
 A recolha contacta a API pública da Comissão Europeia, por isso só corre quando a ligares de propósito, em duas partes:
 
 1. **Fila.** O `install` instala o esquema `pgboss` da Central, se faltar, e cria a fila `funding-tenders-refresh`. É repetível.
-2. **Variáveis.** O `env` só inclui a recolha com `--collection 5` (até 5 resultados por execução) ou `--collection 100`. Sem essa opção o ambiente fica com `FUNDING_TENDERS_SOURCE=unconfigured`, o ecrã Fontes diz «Configuração indisponível» e nada é chamado.
+2. **Variáveis.** O `env` só inclui a recolha com `--collection`. `--collection all` recolhe **tudo**: páginas de 100 (o máximo da fonte) encadeadas pela cobertura durável (`FUNDING_TENDERS_COVERAGE=durable-v1`) até esgotar a fonte; no ambiente local, 1119 registos foram 45 páginas e cerca de 81 segundos. `--collection 5` é um ensaio de 5 resultados, sem cobertura. Sem a opção o ambiente fica com `FUNDING_TENDERS_SOURCE=unconfigured`, o ecrã Fontes diz «Configuração indisponível» e nada é chamado.
 3. **Worker.** Está no compose sob o perfil `collection`, que `up -d` não arranca sozinho: `docker compose -f deploy/staging/compose.yaml --profile collection up -d worker`. Para parar: `docker compose -f deploy/staging/compose.yaml --profile collection stop worker`.
 
 O worker só aceita a recolha de staging contra a base `c4g_central_staging` do anfitrião `c4g-postgres`, com TLS verificado e `NODE_ENV=production`; qualquer outra combinação impede o arranque. Cada atualização é pedida pelo administrador em Administração C4G → Fontes de oportunidades, com «Atualizar agora».
