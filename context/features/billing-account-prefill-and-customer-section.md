@@ -177,6 +177,23 @@ sobre `billing_account` e `billing_account_version` (migração 027).
 - Não verificado: PostgreSQL real (a consulta SQL só correu contra doubles), browser e
   ambiente habitual. O backend em execução tem de ser reiniciado para servir a rota.
 
+## Verificação visual com API simulada (12/11/2026)
+
+Ecrãs reais servidos pelo Vite, com `api` e `directoryApi` simulados, a 1440 e 390 px.
+O harness era temporário e foi removido.
+
+- C4G Admin: formulário pré-preenchido com nota de origem; aviso de divergência com
+  valores da conta e da ficha; "Aplicar valores da ficha" altera só os campos
+  divergentes e o aviso desaparece; morada acima de 200 caracteres mostra o erro e
+  bloqueia o botão de guardar.
+- Cliente: secção com os dados, sem controlos; aviso de divergência; estados sem conta
+  e de falha de leitura, este com as faturas visíveis. Sem overflow horizontal.
+- Corrigido nesta passagem: a 390 px o aviso do modal ficava comprimido ao lado do
+  botão; passa a empilhar abaixo de 640 px.
+- Continua por verificar: aplicação real com OIDC e PostgreSQL. Este checkout
+  (`C4G-PT2030`) não tem o estado privado `.tmp`, pelo que `npm run dev` recusa com
+  `LOCAL_DEV_SETUP_REQUIRED`; o instalador não foi executado.
+
 ## Critérios de aceitação
 
 - Entidade com ficha completa e sem conta: o modal C4G abre com NIF, morada, código
