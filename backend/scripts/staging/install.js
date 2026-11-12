@@ -19,7 +19,7 @@ const { Pool } = require('pg');
 const { connection, identifier, saveState } = require('../localPlatform/config');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
-  CATALOG_LOGIN } = require('./environment');
+  CATALOG_LOGIN, AUTH_POLICY_VERSION } = require('./environment');
 
 function refuse(code) {
   return Object.assign(new Error(code), { code });
@@ -80,13 +80,11 @@ async function install(env) {
   } finally { await central.end(); }
 }
 
-function policyFor(env, stateFile) {
+// The policy the API runs with, so the authority state matches what it will check.
+function policyFor() {
   const { RECOGNIZED_ASSURANCE_POLICIES } = require('../../src/security/authConfig');
-  const generated = path.join(path.dirname(stateFile), 'api-private.env.generated');
-  const policyVersion = env.AUTH_POLICY_VERSION || (fs.existsSync(generated) ? carriedSettings(fs.readFileSync(generated, 'utf8')).AUTH_POLICY_VERSION : undefined);
-  const policy = RECOGNIZED_ASSURANCE_POLICIES[policyVersion];
-  if (!policy) throw refuse('STAGING_POLICY_VERSION_REQUIRED');
-  return { policyVersion, requirement: policy.policy[policy.privilegedCategory] };
+  const policy = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
+  return { policyVersion: AUTH_POLICY_VERSION, requirement: policy.policy[policy.privilegedCategory] };
 }
 
 async function person(env, args) {
@@ -95,7 +93,7 @@ async function person(env, args) {
   if (state?.phase !== 'READY') throw refuse('STAGING_INSTALLATION_NOT_READY');
   const issuer = env.OIDC_ISSUER || env.C4G_STAGING_OIDC_ISSUER;
   if (!/^https:\/\/[^\s]+$/.test(issuer || '')) throw refuse('STAGING_ISSUER_REQUIRED');
-  const { policyVersion, requirement } = policyFor(env, stateFile);
+  const { policyVersion, requirement } = policyFor();
   const { subject, name, email } = requirePerson(args);
   const profile = requireProfile(args);
   const central = new Pool(connection(config, config.centralDatabase));
@@ -149,9 +147,11 @@ async function applyProfileGrants({ authority, central, state, membershipId, pro
     policyVersion, recentMfaRequirement: requirement });
   const { grantsForProfile } = require('../../src/organizationDirectory/accessProfiles');
   const prior = (await central.query('SELECT authorization_version, policy_version, grants FROM public.authority_f5_state WHERE membership_id = $1', [membershipId])).rows[0];
-  if (prior && prior.policy_version !== policyVersion) throw refuse('STAGING_AUTHORITY_POLICY_CONFLICT');
+  // Accounts created under the mandatory-MFA policy move to the current one, as the local installer does.
+  const policyChanged = Boolean(prior) && prior.policy_version !== policyVersion;
+  if (policyChanged && prior.policy_version !== 'c4g-assurance-v1') throw refuse('STAGING_AUTHORITY_POLICY_CONFLICT');
   const grants = grantsForProfile({ organizationId: state.organizationId, profileCode: profile, previousProfile: prior ? profile : undefined, previousGrants: prior?.grants });
-  if (prior && permissionsOf(prior.grants) === permissionsOf(grants)) return;
+  if (prior && !policyChanged && permissionsOf(prior.grants) === permissionsOf(grants)) return;
   await data.change({ organizationId: state.organizationId, membershipId, expectedVersion: prior ? Number(prior.authorization_version) : 0,
     assuranceRequirements: requirement, grants });
 }

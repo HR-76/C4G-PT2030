@@ -2,9 +2,13 @@
 
 // Pure helpers of the staging installer: argument parsing, the identities and credentials recorded for the
 // tenant, and the private environment file the API reads. Nothing here touches the database or the disk.
+const { RECOGNIZED_ASSURANCE_POLICIES } = require('../../src/security/authConfig');
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PROFILES = Object.freeze(['ORG_ADMIN', 'FUNDING_MANAGER', 'CONTRIBUTOR', 'VIEWER']);
 const CATALOG_LOGIN = 'c4g_catalog_staging';
+// MFA is each person's choice (decision of 2026-10-17); the older c4g-assurance-v1 requires it for privileged logins.
+const AUTH_POLICY_VERSION = 'c4g-user-mfa-v1';
+const ASSURANCE_POLICY = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
 const REGION = Object.freeze({ regionCode: 'EU', residencyPolicyVersion: 'staging-v1' });
 
 function failure(code) {
@@ -52,7 +56,7 @@ function stagingTarget({ apiHost, port = 5432 }) {
 }
 
 // Non-secret settings the previous release already carries. Only these names are ever copied from it.
-const CARRIED_KEYS = Object.freeze(['AUTH_MODE', 'AUTH_POLICY_VERSION', 'AUTH_ASSURANCE_POLICY_JSON', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY',
+const CARRIED_KEYS = Object.freeze(['AUTH_MODE',
   'OIDC_REDIRECT_URI', 'OIDC_POST_LOGOUT_REDIRECT_URI', 'OIDC_TRANSACTION_MS', 'SESSION_COOKIE_NAME', 'SESSION_IDLE_MS', 'SESSION_ABSOLUTE_MS']);
 
 function carriedSettings(text) {
@@ -79,6 +83,9 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   if (state?.phase !== 'READY' || !state.credentials || !administratorPassword || !state.staging?.catalogPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
+    AUTH_POLICY_VERSION,
+    AUTH_ASSURANCE_POLICY_JSON: JSON.stringify(ASSURANCE_POLICY.policy),
+    PRIVILEGED_LOGIN_ASSURANCE_CATEGORY: ASSURANCE_POLICY.privilegedCategory,
     // Production behaviour is part of what staging proves: Secure session cookies and verified database TLS.
     NODE_ENV: 'production',
     // Central opportunity catalog, read-only. Collection from the sources is a separate step.
@@ -95,4 +102,4 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   return Object.entries(lines).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
-module.exports = Object.freeze({ UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });
+module.exports = Object.freeze({ AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });

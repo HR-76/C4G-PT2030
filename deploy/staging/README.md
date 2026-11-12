@@ -90,7 +90,7 @@ Depois de `git pull` e de construir a imagem nova (passo 1), repete, por esta or
 
 1. `install` (passo 2): cria, se faltar, o login só de leitura do catálogo (`c4g_catalog_staging`).
 2. `env` (passo 3), com `--carry` apontado para o `api-private.env` atual: acrescenta `FUNDING_TENDERS_RUNTIME=central`, `FUNDING_TENDERS_SOURCE=unconfigured` e `CATALOG_DATABASE_URL`, que ligam o catálogo e o Dashboard.
-3. `person` outra vez para cada conta com perfil (passo 4): aplica as permissões do perfil e cria a pessoa no tenant, caso ainda não exista.
+3. `person` outra vez para cada conta com perfil (passo 4): aplica as permissões do perfil, cria a pessoa no tenant caso ainda não exista e passa as permissões antigas para a política de MFA opcional (`c4g-user-mfa-v1`).
 4. Ativar (passo 6).
 
 ### Conta de Técnico

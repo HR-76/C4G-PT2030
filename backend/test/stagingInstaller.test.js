@@ -6,7 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, databaseUrl, apiPrivateEnvironment, carriedSettings,
-  CARRIED_KEYS, PROFILES } = require('../scripts/staging/environment');
+  CARRIED_KEYS, PROFILES, AUTH_POLICY_VERSION } = require('../scripts/staging/environment');
+const { RECOGNIZED_ASSURANCE_POLICIES } = require('../src/security/authConfig');
 const { grantsForProfile } = require('../src/organizationDirectory/accessProfiles');
 const { main } = require('../scripts/staging/install');
 
@@ -52,11 +53,18 @@ test('private environment: generated values only, and only after a complete inst
   assert.throws(() => apiPrivateEnvironment({ ...ready, phase: 'INSTALLING' }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => apiPrivateEnvironment(ready, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => apiPrivateEnvironment({ ...ready, staging: {} }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
-  const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc' } });
+  const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc', AUTH_POLICY_VERSION: 'c4g-assurance-v1' } });
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
-  assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_MODE', 'CATALOG_DATABASE_URL',
-    'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV', 'OPPORTUNITY_ALLOWED_RESIDENCY_JSON',
-    'OPPORTUNITY_API_CREDENTIALS_JSON', 'SESSION_SECRET']);
+  assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_ASSURANCE_POLICY_JSON', 'AUTH_MODE',
+    'AUTH_POLICY_VERSION', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
+    'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY', 'SESSION_SECRET']);
+  // MFA stays each person's choice: a policy carried over from an older release never overrides it.
+  const policy = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
+  assert.equal(AUTH_POLICY_VERSION, 'c4g-user-mfa-v1');
+  assert.equal(lines.AUTH_POLICY_VERSION, 'c4g-user-mfa-v1');
+  assert.deepEqual(JSON.parse(lines.AUTH_ASSURANCE_POLICY_JSON), policy.policy);
+  assert.equal(policy.policy[policy.privilegedCategory].mfa, false);
+  assert.equal(lines.PRIVILEGED_LOGIN_ASSURANCE_CATEGORY, policy.privilegedCategory);
   assert.equal(lines.FUNDING_TENDERS_RUNTIME, 'central');
   assert.equal(lines.FUNDING_TENDERS_SOURCE, 'unconfigured');
   const catalog = new URL(lines.CATALOG_DATABASE_URL);
@@ -88,8 +96,8 @@ test('projection operation id is a stable UUID per membership', () => {
 });
 
 test('carry-over copies only the listed non-secret settings', () => {
-  const carried = carriedSettings('AUTH_MODE=oidc\r\nSESSION_SECRET=secret\nCENTRAL_DATABASE_URL=postgresql://u:p@h/d\nOIDC_REDIRECT_URI=https://x/cb?a=1\n# note\nAUTH_POLICY_VERSION=c4g-user-mfa-v1\n=bad');
-  assert.deepEqual(carried, { AUTH_MODE: 'oidc', OIDC_REDIRECT_URI: 'https://x/cb?a=1', AUTH_POLICY_VERSION: 'c4g-user-mfa-v1' });
+  const carried = carriedSettings('AUTH_MODE=oidc\r\nSESSION_SECRET=secret\nCENTRAL_DATABASE_URL=postgresql://u:p@h/d\nOIDC_REDIRECT_URI=https://x/cb?a=1\n# note\nAUTH_POLICY_VERSION=c4g-assurance-v1\n=bad');
+  assert.deepEqual(carried, { AUTH_MODE: 'oidc', OIDC_REDIRECT_URI: 'https://x/cb?a=1' });
   assert.ok(CARRIED_KEYS.every(key => !/SECRET|PASSWORD|DATABASE|CREDENTIALS|PERMIT/.test(key.replace('POST_LOGOUT', ''))));
 });
 
