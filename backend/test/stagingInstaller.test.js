@@ -52,7 +52,8 @@ test('private environment: generated values only, and only after a complete inst
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc' } });
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
   assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_MODE', 'CENTRAL_DATABASE_URL',
-    'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'SESSION_SECRET']);
+    'NODE_ENV', 'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'SESSION_SECRET']);
+  assert.equal(lines.NODE_ENV, 'production');
   assert.match(lines.AUTHORITY_DATABASE_URL, /^postgresql:\/\/c4g_authority_runtime:/);
   assert.match(lines.CENTRAL_DATABASE_URL, /sslmode=verify-full$/);
   assert.deepEqual(JSON.parse(lines.OPPORTUNITY_API_CREDENTIALS_JSON), [ready.credentials]);

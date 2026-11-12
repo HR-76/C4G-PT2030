@@ -63,6 +63,8 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   if (state?.phase !== 'READY' || !state.credentials || !administratorPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
+    // Production behaviour is part of what staging proves: Secure session cookies and verified database TLS.
+    NODE_ENV: 'production',
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
     AUTHORITY_DATABASE_URL: databaseUrl({ login: 'c4g_authority_runtime', password: state.authorityPassword, host, port, database: centralDatabase }),
