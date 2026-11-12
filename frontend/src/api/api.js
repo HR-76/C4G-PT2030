@@ -322,6 +322,9 @@ export const platformImportsApi = {
   upload: body => api.post('/admin/directory/imports/portugal2030/xlsx', body, { timeout: 180000 }),
   get: id => api.get(`/admin/directory/imports/portugal2030/${id}`, { timeout: 30000 }),
   preview: (id, body) => api.post(`/admin/directory/imports/portugal2030/${id}/preview`, body, { timeout: 180000 }),
+  stage: (id, body) => api.post(`/admin/directory/imports/portugal2030/${id}/stage`, body, { timeout: 180000 }),
+  review: importId => api.get(`/admin/directory/imports/portugal2030/staged/${importId}`, { timeout: 180000 }),
+  accept: (importId, body) => api.post(`/admin/directory/imports/portugal2030/staged/${importId}/accept`, body, { timeout: 300000 }),
 }
 export const importsApi = {
   upload: fd => api.post('/imports/xlsx', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),

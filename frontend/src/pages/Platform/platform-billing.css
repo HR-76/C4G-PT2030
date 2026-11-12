@@ -69,6 +69,8 @@
 .billing-full-field { margin-bottom:20px; }
 .billing-account-strip { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:15px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
 .billing-account-strip div { display:grid; gap:2px; }.billing-account-strip span,.billing-account-strip small { color:var(--text-secondary); font-size:12px; }
+.billing-profile-note { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:14px; }
+.billing-profile-note p,.billing-profile-note ul { margin:2px 0 0; }.billing-profile-note ul { padding-left:18px; }.billing-profile-note .btn { flex:0 0 auto; }
 .billing-command-form { padding:20px 0 22px; }
 .billing-command-form fieldset { border:0; min-width:0; }
 .billing-command-form legend { font-size:16px; font-weight:650; color:var(--color-text-primary); margin-bottom:16px; }

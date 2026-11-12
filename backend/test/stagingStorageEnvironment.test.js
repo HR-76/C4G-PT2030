@@ -25,10 +25,10 @@ test('without a storage file nothing about storage is enabled', () => {
   for (const name of [...STORAGE_KEYS, 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME', 'C4G_CLAMAV_HOST']) assert.ok(!text.includes(name), name);
 });
 
-test('a complete EU storage file enables the loopback scanner, private billing PDFs and the PT2030 preview', () => {
+test('a complete EU storage file enables the loopback scanner, private billing PDFs and the PT2030 import', () => {
   const env = storageEnvironment(file());
   assert.deepEqual(Object.keys(env).sort(), [...STORAGE_KEYS, 'C4G_CLAMAV_HOST', 'C4G_CLAMAV_PORT', 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME'].sort());
-  assert.equal(env.C4G_CLAMAV_HOST, '127.0.0.1'); assert.equal(env.BILLING_PDF_RUNTIME, 'private'); assert.equal(env.CENTRAL_PT2030_IMPORT_RUNTIME, 'preview');
+  assert.equal(env.C4G_CLAMAV_HOST, '127.0.0.1'); assert.equal(env.BILLING_PDF_RUNTIME, 'private'); assert.equal(env.CENTRAL_PT2030_IMPORT_RUNTIME, 'catalog');
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', storage: file() });
   assert.ok(text.includes(`C4G_R2_SECRET_ACCESS_KEY=${SECRET}`)); assert.ok(text.includes('BILLING_PDF_RUNTIME=private'));
   // Comments and blank lines are allowed.
@@ -75,7 +75,7 @@ test('storage-check refuses a missing configuration with a code', async () => {
 test('the generated variables are accepted by the billing PDF and PT2030 import runtimes', async () => {
   const env = { NODE_ENV: 'production', ...storageEnvironment(file()) }, pool = { connect: async () => { throw Error('unused'); }, query: async () => { throw Error('unused'); } };
   const billing = require('../src/customerBilling/pdfRuntime').configuredBillingPdfs({ pool, customerService: {}, env });
-  const imports = require('../src/portugal2030/uploadRuntime').configuredCentralImport({ pool, env });
+  const imports = require('../src/portugal2030/uploadRuntime').configuredCentralImport({ pool, env, authorityPolicy: { policyVersion: 'c4g-user-mfa-v1', requirement: { mfa: false, maxAgeSeconds: 300, acceptedAcr: ['c4g-loa1'], acceptedAmr: ['pwd'], amrMode: 'any' } } });
   try { assert.ok(billing && billing.service); assert.ok(imports); }
   finally { await billing?.close?.(); await imports?.close?.(); }
 });
