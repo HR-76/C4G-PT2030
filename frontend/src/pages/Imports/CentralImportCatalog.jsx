@@ -18,10 +18,10 @@ const errors = {
   PT2030_DOCUMENT_CHANGED: 'O original guardado não corresponde ao ficheiro verificado. Carregue novamente o ficheiro.',
   C4G_ADMIN_REQUIRED: 'Já não tem autorização para esta operação.'
 }
-// The import to resume after the administrator renews the authentication: the page reloads on return and the staged
-// candidates are still saved, so the review comes back without uploading anything again.
-export const RESUME_KEY = 'c4g.pt2030.import'
-const RETURN_PATH = '/administracao/importar'
+// The import to resume after the administrator renews the authentication travels in the return address (no browser storage):
+// the page reloads on return and the staged candidates are still saved, so the review comes back without uploading again.
+export const RETURN_PATH = '/administracao/importar'
+export const RESUME_PARAM = 'importacao'
 const message = error => errors[error?.response?.data?.error?.code] || 'Não foi possível concluir a operação. Pode repetir o pedido: nada é duplicado.'
 
 export default function CentralImportCatalog({ uploadId, sheetName, previewDigest, resumeImportId = null, api = platformImportsApi, auth = authApi }) {
@@ -31,7 +31,6 @@ export default function CentralImportCatalog({ uploadId, sheetName, previewDiges
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
   useEffect(() => {
     if (!resumeImportId) return
-    try { sessionStorage.removeItem(RESUME_KEY) } catch { /* storage unavailable */ }
     setBusy('review')
     api.review(resumeImportId).then(({ data }) => { if (alive.current) setReview(data) }, e => { if (alive.current) fail(e) }).finally(() => { if (alive.current) setBusy('') })
   }, [resumeImportId, api])
@@ -40,11 +39,10 @@ export default function CentralImportCatalog({ uploadId, sheetName, previewDiges
   }
   async function renew() {
     if (!review) return
-    try { sessionStorage.setItem(RESUME_KEY, review.importId) } catch { /* the review is then reloaded by hand */ }
     try {
       const { data } = await auth.stepUpPolicy()
       if (typeof data?.mfaOptional !== 'boolean') throw Error('POLICY')
-      auth.stepUp(data.mfaOptional ? 'recent-auth' : 'recent-mfa', RETURN_PATH)
+      auth.stepUp(data.mfaOptional ? 'recent-auth' : 'recent-mfa', `${RETURN_PATH}?${RESUME_PARAM}=${encodeURIComponent(review.importId)}`)
     } catch { setError('Não foi possível iniciar a renovação da autenticação. Termine a sessão e entre de novo.') }
   }
   async function reload() {

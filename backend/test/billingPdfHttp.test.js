@@ -11,6 +11,6 @@ test('private PDF HTTP returns attachment without cache and validates upload hea
  }finally{server.closeAllConnections();await new Promise(r=>server.close(r))}
 });
 test('PDF package preserves previous package boundaries and accepts complete catalog ledger',()=>{
- const m=require('../src/security/centralMigrationManifest'),pdf=require('../src/security/billingPdfMigrationPackage').entry,l=require('../src/opportunities/catalogRead/ledgerContract');assert.equal(m.knownManifest.at(-1),pdf);assert.equal(m.centralImportManifest.at(-1).version,'049_pt2030_document_upload');assert.equal(m.migrationSql(pdf.version,'up').checksum,pdf.upChecksum);assert.throws(()=>m.migrationSql(pdf.version,'down'),/irreversible/);
- const rows=m.knownManifest.map(e=>({version:e.version,checksum_sha256:m.migrationSql(e.version,'up').checksum,irreversible:e.irreversible}));l.assertLedgerRows(rows);assert.throws(()=>l.assertLedgerRows(rows.filter(r=>r.version!=='049_pt2030_document_upload')),/DRIFT/);
+ const m=require('../src/security/centralMigrationManifest'),pdf=require('../src/security/billingPdfMigrationPackage').entry,l=require('../src/opportunities/catalogRead/ledgerContract');assert.equal(m.billingPdfManifest.at(-1),pdf);assert.equal(m.centralImportManifest.at(-1).version,'049_pt2030_document_upload');assert.equal(m.migrationSql(pdf.version,'up').checksum,pdf.upChecksum);assert.throws(()=>m.migrationSql(pdf.version,'down'),/irreversible/);
+ const rows=m.billingPdfManifest.map(e=>({version:e.version,checksum_sha256:m.migrationSql(e.version,'up').checksum,irreversible:e.irreversible}));l.assertLedgerRows(rows);assert.throws(()=>l.assertLedgerRows(rows.filter(r=>r.version!=='049_pt2030_document_upload')),/DRIFT/);
 });

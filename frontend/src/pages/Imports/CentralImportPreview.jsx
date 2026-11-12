@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import {platformImportsApi as api} from '../../api/api'
 import LoadingIndicator from '../../components/LoadingIndicator'
-import CentralImportCatalog, { RESUME_KEY } from './CentralImportCatalog'
+import CentralImportCatalog, { RESUME_PARAM } from './CentralImportCatalog'
 
 const columns=[['A','Referência'],['D','Aviso'],['E','Programa'],['I','Início previsto'],['J','Fim previsto'],['H','Dotação (valor do ficheiro)']]
 const additional=[['B','Beneficiários'],['C','Natureza do aviso'],['F','Objetivo específico'],['G','Fundo'],['K','Quadrimestre'],['L','NUTS II'],['M','Modalidade de candidatura']]
@@ -19,7 +19,7 @@ const message=error=>errors[error?.response?.data?.error?.code]||(error?.respons
 // catalog: the deployment can also save the candidates and accept the new ones into the Catálogo (mode STAGE_AND_ACCEPT).
 export default function CentralImportPreview({catalog=false}){
  const [file,setFile]=useState(null),[document,setDocument]=useState(null),[sheet,setSheet]=useState(''),[preview,setPreview]=useState(null),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('')
- const [resume]=useState(()=>{try{const value=sessionStorage.getItem(RESUME_KEY);return /^[a-f0-9-]{36}$/i.test(value||'')?value:null}catch{return null}})
+ const [resume]=useState(()=>{const value=new URLSearchParams(window.location.search).get(RESUME_PARAM);return /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(value||'')?value:null})
  const alive=useRef(true),lock=useRef(false),uploadIntent=useRef(null),previewIntent=useRef(null)
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
  function choose(event){

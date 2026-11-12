@@ -38,8 +38,11 @@ test('staging does not widen what the local rehearsal admits', () => {
   assert.throws(() => fundingWorkerTarget({ ...staging, CENTRAL_DATABASE_URL: 'postgresql://t@localhost:5432/c4g_central_dev', NODE_ENV: 'development' }));
 });
 
-test('staging collection policy: EU Funding & Tenders only, with the results the approval names', () => {
-  assert.deepEqual(Object.keys(STAGING_APPROVALS).sort(), ['staging-eu-funding-tenders-100', 'staging-eu-funding-tenders-5']);
+test('staging collection policy: EU Funding & Tenders only unless the approval names every source, with the results it names', () => {
+  assert.deepEqual(Object.keys(STAGING_APPROVALS).sort(), ['staging-all-sources-100', 'staging-eu-funding-tenders-100', 'staging-eu-funding-tenders-5']);
+  // The wider approval admits the two EU programme selections and the two official programmes, with the same limits.
+  assert.deepEqual(collectionPolicy('live-staging', 'staging-all-sources-100'), { sources: ['EU_FUNDING_TENDERS', 'CORDIS', 'ERASMUS', 'INTERREG_EUROPE', 'POCTEP'], limits: { results: 100, pageSize: 100, pages: 1 } });
+  assert.deepEqual(collectionPolicy('live-local', 'staging-all-sources-100').sources, ['EU_FUNDING_TENDERS'], 'it unlocks nothing outside staging');
   assert.deepEqual(collectionPolicy('live-staging', 'staging-eu-funding-tenders-5'), { sources: ['EU_FUNDING_TENDERS'], limits: { results: 5, pageSize: 5, pages: 1 } });
   assert.deepEqual(collectionPolicy('live-staging', 'staging-eu-funding-tenders-100'), { sources: ['EU_FUNDING_TENDERS'], limits: { results: 100, pageSize: 100, pages: 1 } });
   for (const approval of [undefined, '', 'central-programmes-100', 'central-official-sources-100', 'toString', '__proto__']) {

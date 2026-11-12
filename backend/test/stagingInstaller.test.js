@@ -101,15 +101,15 @@ test('collection is opt-in: nothing is generated unless a result limit is named,
   const base = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm' });
   assert.match(base, /^FUNDING_TENDERS_SOURCE=unconfigured$/m);
   assert.doesNotMatch(base, /FUNDING_TENDERS_REHEARSAL_APPROVED/);
-  for (const limit of ['5', 'all']) {
+  for (const limit of ['5', 'all', 'all-sources']) {
     const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', collection: limit });
     assert.match(text, /^FUNDING_TENDERS_SOURCE=live-staging$/m);
     // Everything is collected only with durable coverage, which chains the pages; the trial run never enables it.
-    assert.equal(/^FUNDING_TENDERS_COVERAGE=durable-v1$/m.test(text), limit === 'all');
+    assert.equal(/^FUNDING_TENDERS_COVERAGE=durable-v1$/m.test(text), limit !== '5');
     assert.ok(text.includes('FUNDING_TENDERS_REHEARSAL_APPROVED=' + COLLECTION_APPROVALS[limit]));
     assert.ok(Object.hasOwn(STAGING_APPROVALS, COLLECTION_APPROVALS[limit]), 'the installer only names approvals the code recognises');
   }
-  assert.deepEqual(Object.keys(COLLECTION_APPROVALS).sort(), ['5', 'all']);
+  assert.deepEqual(Object.keys(COLLECTION_APPROVALS).sort(), ['5', 'all', 'all-sources']);
   assert.doesNotMatch(base, /FUNDING_TENDERS_COVERAGE/);
   for (const bad of ['0', '7', '100', '1000', '', 'ALL', 'toString', '__proto__']) assert.throws(() => collectionEnvironment(bad), { code: 'STAGING_COLLECTION_INVALID' });
 });

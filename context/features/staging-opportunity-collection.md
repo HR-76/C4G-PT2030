@@ -75,3 +75,13 @@ Por verificar antes de (3): como o `activationComposition.js` compõe as portas 
 ## Fora de âmbito
 
 Importação Portugal 2030 (R2 e ClamAV), PDFs de faturação (R2), e-mail e produção. Os pacotes 049 e 050 criam só o esquema; os respetivos runtimes ficam desligados.
+
+## Outras fontes em staging (12/11/2026)
+
+Pedido do utilizador, depois da recolha completa da UE (1188 recebidos = 519 vigentes criados + 669 excluídos só com prazos passados, 0 falhados, ciclo `SUCCESS` em 12 páginas e 26 s). Acrescentada a aprovação de staging `staging-all-sources-100` (`env --collection all-sources`, que também fixa a cobertura durável): admite, além da Funding & Tenders, o CORDIS (Horizon e Euratom), o Erasmus+ e as duas fontes oficiais (Interreg Europe e POCTEP), com os mesmos limites (100 por página). Sem a aprovação nova nada muda: `all` e `5` continuam só com a Funding & Tenders.
+
+- **Prova** (PostgreSQL 18, Central 050, cobertura durável, respostas simuladas ou capturas reais guardadas dos testes, nenhuma chamada externa): as cinco fontes terminam `SUCCESS`; o Interreg Europe reconhece 3 chamadas encerradas e cria 0; o POCTEP lê 10 chamadas e cria a única ainda vigente, com o financiador da própria fonte; o Erasmus+ cria os seus registos quando a resposta traz registos desse programa e rejeita, e bem, registos de outro programa (o primeiro ensaio falhou por a simulação devolver Horizon ao pedido do Erasmus+). O Catálogo lista as fontes e filtra por `POCTEP`.
+- **O que a recolha chama**: Funding & Tenders (CORDIS e Erasmus+ são pedidos à mesma API com filtro de programa), `interregeurope.eu` (um Excel) e `poctep.eu` (duas páginas da API WordPress). São anfitriões novos em relação à autorização anterior.
+- **Consultas individuais**: depois de cada varredura, os registos conhecidos do mesmo programa que a varredura não voltou a ver são consultados um a um. Na VPS devem ser poucos (a varredura acabou de ver todos os vigentes), mas não está medido; acompanhar o número de execuções.
+- **Duplicação**: o CORDIS e o Erasmus+ são recortes da mesma API e dos mesmos identificadores da Funding & Tenders, por isso não devem acrescentar registos novos aos 519; o esperado é «sem alterações».
+- Testes: `stagingFundingWorkerTarget`, `stagingInstaller`. Backend 3159, frontend 1003.

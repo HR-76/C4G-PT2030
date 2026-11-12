@@ -183,7 +183,9 @@ const catalogReadManifest = Object.freeze([...prearchiveManifest, ...catalogRead
 const centralImportEntry = require('./centralImportMigrationPackage').entry;
 const centralImportManifest=Object.freeze([...catalogReadManifest,centralImportEntry]);
 const billingPdfEntry=require('./billingPdfMigrationPackage').entry;
-const knownManifest = Object.freeze([...centralImportManifest,billingPdfEntry]);
+const billingPdfManifest = Object.freeze([...centralImportManifest,billingPdfEntry]);
+const emailTemplateEntry=require('./emailTemplateMigrationPackage').entry;
+const knownManifest = Object.freeze([...billingPdfManifest,emailTemplateEntry]);
 const receiptEntry = Object.freeze({
   ...manifest.at(-1), version: '036_f12_service_authority',
   requiresPreflightVersion: manifest.at(-1).version,
@@ -252,7 +254,7 @@ function sourceMigrationSql(version, direction, readSql) {
   if (!entry) throw new Error(`Unknown central migration: ${version}`);
   if (direction === "down" && entry.irreversible) throw new Error(`${version} is irreversible.`);
   if (!["up", "down"].includes(direction)) throw new Error(`Invalid migration direction: ${direction}`);
-  const sourcePath = centralEntries.includes(entry) || entry === writerEntry || entry === reconciliationEntry || entry === prearchiveEntry || catalogReadEntries.includes(entry) || entry === centralImportEntry || entry === billingPdfEntry || entry === receiptEntry || entry === replayCapacityEntry || entry === failureCapacityEntry
+  const sourcePath = centralEntries.includes(entry) || entry === writerEntry || entry === reconciliationEntry || entry === prearchiveEntry || catalogReadEntries.includes(entry) || entry === centralImportEntry || entry === billingPdfEntry || entry === emailTemplateEntry || entry === receiptEntry || entry === replayCapacityEntry || entry === failureCapacityEntry
     ? path.resolve(migrationsRoot, '../candidates', `${version.slice(4)}.${direction}.sql`)
     : path.join(migrationsRoot, `${version}.${direction}.sql`);
   const sourceSql = readSql(sourcePath);
@@ -298,6 +300,6 @@ function migrationRecordMatches(record, requirement) {
 
 module.exports = {
   canonicalizeMigrationSql, checksumSql, manifest, registeredManifest, writerManifest, reconciliationManifest,
-  knownManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest, allKnownMigrations, centralImportManifest, catalogReadManifest, prearchiveManifest, migrationChecksumPolicy, migrationSql,
+  knownManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest, allKnownMigrations, centralImportManifest, billingPdfManifest, catalogReadManifest, prearchiveManifest, migrationChecksumPolicy, migrationSql,
   migrationRecordMatches, requiredCentralMigrations, supportsCentralVersion
 };

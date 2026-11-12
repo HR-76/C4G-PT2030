@@ -10,6 +10,7 @@
 .email-entity-search { display: flex; gap: 8px; align-items: end; }
 .email-entity-search label { flex: 1; min-width: 0; }
 .email-panel .alert ul { margin: 6px 0 0 18px; }
+.email-form .alert { margin: 0; }
 .email-panel .alert .btn { margin-left: 10px; }
 
 .email-workspace { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); gap: 28px; align-items: start; }

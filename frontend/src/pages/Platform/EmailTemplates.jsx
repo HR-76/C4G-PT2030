@@ -137,11 +137,9 @@ export function EmailTemplatesView({ api = platformEmailApi, directoryApi = plat
       </div>
 
       {busy && <LoadingIndicator>A carregar o template…</LoadingIndicator>}
-      {error && <div className="alert alert-error" role="alert">{error}
-        {problems.length > 0 && <ul>{problems.map(problem => <li key={problem}>{problem}</li>)}</ul>}
-        {!data && !busy && <button className="btn btn-outline" onClick={() => setReload(value => value + 1)}>Tentar novamente</button>}
+      {error && !data && <div className="alert alert-error" role="alert">{error}
+        {!busy && <button className="btn btn-outline" onClick={() => setReload(value => value + 1)}>Tentar novamente</button>}
       </div>}
-      {notice && <p className="alert alert-success" role="status">{notice}</p>}
 
       {data && !busy && <div className="email-workspace">
         <form className="email-form" onSubmit={save} aria-label="Editar template">
@@ -160,6 +158,11 @@ export function EmailTemplatesView({ api = platformEmailApi, directoryApi = plat
             <button className="btn btn-outline" type="button" disabled={locked} aria-busy={working === 'test'} onClick={sendTest}><Send size={16} aria-hidden="true"/>Enviar teste para mim</button>
             {ownTemplate && !confirmReset && <button className="btn btn-secondary" type="button" disabled={locked} onClick={() => setConfirmReset(true)}><RotateCcw size={16} aria-hidden="true"/>{scope ? 'Usar o template global' : 'Repor o texto original'}</button>}
           </div>
+          {/* Feedback sits by the buttons that caused it, not at the top of a long page. */}
+          {error && <div className="alert alert-error" role="alert">{error}
+            {problems.length > 0 && <ul>{problems.map(problem => <li key={problem}>{problem}</li>)}</ul>}
+          </div>}
+          {notice && <p className="alert alert-success" role="status">{notice}</p>}
           {confirmReset && <div className="email-confirm" role="group" aria-label="Confirmar reposição">
             <p>{scope ? 'A entidade deixa de ter template próprio e passa a usar o global.' : 'O template global volta ao texto original da plataforma.'} As versões anteriores ficam guardadas.</p>
             <button className="btn btn-danger" type="button" disabled={locked} aria-busy={working === 'reset'} onClick={reset}>Confirmar</button>
@@ -180,7 +183,9 @@ export function EmailTemplatesView({ api = platformEmailApi, directoryApi = plat
               <p className="email-preview-subject"><span>Assunto</span>{preview.subject}</p>
               {removedSummary(preview.removed).length > 0 && <p className="alert alert-warn" role="status">Ao guardar será retirado: {removedSummary(preview.removed).join(', ')}.</p>}
               {previewPart === 'html'
-                ? <iframe title="Email em HTML" sandbox="" srcDoc={preview.html}/>
+                // No allow-scripts: the frame can never run code. allow-same-origin only
+                // lets it load the logo under the page's image policy.
+                ? <iframe title="Email em HTML" sandbox="allow-same-origin" srcDoc={preview.html}/>
                 : <pre tabIndex={0} aria-label="Email em texto simples">{preview.text}</pre>}
             </>}
           </section>

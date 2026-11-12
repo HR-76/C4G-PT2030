@@ -86,7 +86,7 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
   try {
     const centralReady = await require('../../src/security/centralMigrationPreflight').preflightCentral(centralPool);
     if(state.catalogRead?.mode==='controlled'){
-      if(!['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents'].includes(centralReady.currentVersion))throw Error('CATALOG_SCHEMA_REQUIRED');
+      if(!['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents','051_email_templates'].includes(centralReady.currentVersion))throw Error('CATALOG_SCHEMA_REQUIRED');
       const settings=JSON.parse(fs.readFileSync(path.join(folder,'catalog-controlled','settings.json'),'utf8'));
       catalogStartup=await require('../../src/opportunities/catalogRead/controlledStartup').prepareControlledStartup({centralPool,target:{host:config.host,port:config.port,database:config.centralDatabase},settings,Pool,express,policyVersion:state.identity.policyVersion||'c4g-assurance-v1',evidenceDirectory:path.join(root,'context/references/opportunity-v2/evidence'),sink:event=>fs.appendFileSync(path.join(folder,'catalog-controlled','telemetry.jsonl'),JSON.stringify(event)+'\n')});
     }

@@ -78,12 +78,13 @@ function databaseUrl({ login, password, host, port, database }) {
 
 // Live collection from the EU Funding & Tenders API is opt-in. --collection 5 is a trial run of five results; --collection all
 // collects everything: pages of 100 (the provider maximum) chained by durable coverage until the source is exhausted.
-const COLLECTION_APPROVALS = Object.freeze({ 5: 'staging-eu-funding-tenders-5', all: 'staging-eu-funding-tenders-100' });
+// --collection all-sources additionally admits CORDIS, Erasmus+, Interreg Europe and POCTEP (the last two read official websites).
+const COLLECTION_APPROVALS = Object.freeze({ 5: 'staging-eu-funding-tenders-5', all: 'staging-eu-funding-tenders-100', 'all-sources': 'staging-all-sources-100' });
 function collectionEnvironment(option) {
   if (option === undefined) return {};
   if (!Object.hasOwn(COLLECTION_APPROVALS, option)) throw failure('STAGING_COLLECTION_INVALID');
   return { FUNDING_TENDERS_SOURCE: 'live-staging', FUNDING_TENDERS_REHEARSAL_APPROVED: COLLECTION_APPROVALS[option],
-    ...(option === 'all' ? { FUNDING_TENDERS_COVERAGE: 'durable-v1' } : {}) };
+    ...(option === 'all' || option === 'all-sources' ? { FUNDING_TENDERS_COVERAGE: 'durable-v1' } : {}) };
 }
 
 // Private object storage (Cloudflare R2, EU jurisdiction) and the ClamAV scanner. The R2 values are the operator's: they are

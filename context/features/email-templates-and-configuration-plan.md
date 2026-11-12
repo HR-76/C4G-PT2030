@@ -78,6 +78,16 @@ Cada incremento fecha com `node --check`, testes focados, suites completas, lint
   - Validação: 14 testes focados aprovados, `node --check` e lint aprovados. Suite backend: 3147 aprovados, 9 ignorados, 1 falha em `SEC-AC-01` (`test/security/f2Security.test.js`, lê `frontend/src/api/api.js`), fora deste incremento, que não altera o frontend.
   - Decisões tomadas na implementação: `{Logotipo}` é uma variável posicionável; o corpo é limitado a 20 000 caracteres de HTML; ligações só `https` sem credenciais ou `{LigacaoAtivacao}`; a validade é escrita em hora de Lisboa por extenso; o texto por defeito mantém as frases atuais e passa a ter a ligação como "Ativar acesso".
 
+- 12/11/2026 — Incremento 6 em Review, contra API simulada. Página `frontend/src/pages/Platform/EmailTemplates.jsx` em `/administracao/email`, entrada "Email" no menu do Admin C4G, editor `EmailBodyEditor.jsx` (Tiptap), cliente `platformEmailApi` em `frontend/src/api/api.js`.
+  - O que o ecrã faz: escolher âmbito (global ou entidade), editar assunto e corpo, inserir variáveis, pré-visualizar em HTML e em texto, enviar teste, guardar com revisão, repor com confirmação, carregar ou repor o logótipo da C4G e consultar o da entidade.
+  - **O backend destas rotas ainda não existe.** Na aplicação real a página mostra erro ao carregar, até aos incrementos 2, 3 e 5. O contrato HTTP que a página espera está no cliente e na simulação; o incremento 3 tem de o cumprir ou ajustar os dois lados.
+  - Pré-visualização de desenvolvimento: `frontend/email-preview.html`, com `emailTemplatesSimulation.js`, servida só por `npm run dev` em `/email-preview.html`. Não é entrada do build; confirmado que a simulação não aparece em `dist`. A sanitização da simulação é aproximada e não é fronteira de segurança.
+  - Dependências: `@tiptap/react`, `@tiptap/starter-kit` e `@tiptap/pm` 3.32.2, versões fixas, MIT. A 3.33.1 tinha dois dias. `npm audit --omit=dev` sem vulnerabilidades. O editor fica num ficheiro próprio de 430 kB (137 kB comprimido), carregado só ao abrir esta página.
+  - Decisões tomadas: a moldura da pré-visualização usa `sandbox="allow-same-origin"` sem `allow-scripts`, porque sem isso a política de imagens da página bloqueia o logótipo; bloquear o editor durante um pedido não conta como edição; as mensagens de resultado aparecem junto aos botões.
+  - Validação: 17 testes novos aprovados (13 da página, 4 do editor real em jsdom), lint e build aprovados. Browser com API simulada a 1440 e 390 px: edição, gravação, pré-visualização com logótipo, envio de teste, troca de entidade e ausência de scroll horizontal. Suite frontend: 1003 aprovados numa execução; nas três seguintes, 1002 e 1 falha por tempo limite de 5 s em `ApplicationPartners.test.jsx` ("stops adding people at fifty"), que passa isolado (16 de 16) e não foi alterado. Suite backend: 3149 aprovados, 9 ignorados, 1 falha `SEC-AC-01`, a mesma de antes.
+  - Não verificado: a página dentro da aplicação com sessão real, leitores de ecrã, e o comportamento do editor em Safari e Firefox.
+- `.claude/launch.json` criado para arrancar o servidor de desenvolvimento do frontend na pré-visualização.
+
 ## Riscos
 
 - **HTML em clientes de email.** A sanitização garante segurança, não aparência. Testar em caixas reais só numa etapa autorizada com destinatários controlados.

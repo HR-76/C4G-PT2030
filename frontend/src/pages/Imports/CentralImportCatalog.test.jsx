@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 vi.mock('../../api/api', () => ({ platformImportsApi: { stage: vi.fn(), review: vi.fn(), accept: vi.fn() }, authApi: { stepUpPolicy: vi.fn(), stepUp: vi.fn() } }))
-import CentralImportCatalog, { RESUME_KEY } from './CentralImportCatalog'
+import CentralImportCatalog from './CentralImportCatalog'
 
 const DIGEST = 'a'.repeat(64)
 const review = (totals, extra = {}) => ({ importId: 'import-1', totalRows: Object.values(totals).reduce((a, b) => a + b, 0), batchDigest: 'b'.repeat(64),
@@ -11,7 +11,6 @@ const review = (totals, extra = {}) => ({ importId: 'import-1', totalRows: Objec
     { physicalRow: 4, externalIdentifier: '8486', title: 'Aviso alterado', status: 'NEEDS_REVIEW', reasons: ['CONTENT_CHANGED'] }], ...extra })
 let api, auth
 beforeEach(() => {
-  sessionStorage.clear()
   auth = { stepUpPolicy: vi.fn().mockResolvedValue({ data: { mfaOptional: true } }), stepUp: vi.fn() }
   api = { stage: vi.fn().mockResolvedValue({ data: { importId: 'import-1' } }), review: vi.fn().mockResolvedValue({ data: review({ ACCEPTABLE: 1, NEEDS_REVIEW: 1 }) }), accept: vi.fn() }
 })
@@ -74,25 +73,22 @@ it('keeps the same request id when saving is retried after an uncertain failure'
 
 // Regression: accepting with a login older than the policy allows only said "sign in again" and lost the screen. It now renews the
 // authentication through the existing step-up and comes back to the same review.
-it('offers to renew the authentication, remembers the import and asks for the category the policy names', async () => {
+it('offers to renew the authentication, returns to the same import and asks for the category the policy names', async () => {
   api.accept.mockRejectedValueOnce({ response: { status: 403, data: { error: { code: 'PT2030_RECENT_AUTHENTICATION_REQUIRED' } } } })
   ui()
   fireEvent.click(screen.getByRole('button', { name: 'Gravar candidatas' }))
   fireEvent.click(await screen.findByRole('button', { name: /Aceitar 1/ }))
   fireEvent.click(await screen.findByRole('button', { name: 'Renovar autenticação e continuar' }))
-  await waitFor(() => expect(auth.stepUp).toHaveBeenCalledWith('recent-auth', '/administracao/importar'))
-  expect(sessionStorage.getItem(RESUME_KEY)).toBe('import-1')
+  await waitFor(() => expect(auth.stepUp).toHaveBeenCalledWith('recent-auth', '/administracao/importar?importacao=import-1'))
   auth.stepUpPolicy.mockResolvedValue({ data: { mfaOptional: false } })
   fireEvent.click(screen.getByRole('button', { name: 'Renovar autenticação e continuar' }))
-  await waitFor(() => expect(auth.stepUp).toHaveBeenLastCalledWith('recent-mfa', '/administracao/importar'))
+  await waitFor(() => expect(auth.stepUp).toHaveBeenLastCalledWith('recent-mfa', '/administracao/importar?importacao=import-1'))
 })
 
 it('comes back to the saved review after the authentication is renewed, without uploading again', async () => {
-  sessionStorage.setItem(RESUME_KEY, 'import-1')
   render(<MemoryRouter><CentralImportCatalog resumeImportId="import-1" api={api} auth={auth} /></MemoryRouter>)
   await screen.findByText(/1 novas · 0 já aceites · 1 a rever/)
   expect(api.review).toHaveBeenCalledWith('import-1'); expect(api.stage).not.toHaveBeenCalled()
-  expect(sessionStorage.getItem(RESUME_KEY)).toBeNull()
   expect(screen.queryByRole('button', { name: 'Gravar candidatas' })).toBeNull()
   expect(screen.getByRole('button', { name: /Aceitar 1/ })).toBeTruthy()
 })

@@ -288,9 +288,18 @@ module.exports.applyRegisteredCentralImportPackage=applyRegisteredCentralImportP
 async function applyRegisteredBillingPdfsPackage(pool,packageId){
  const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/billingPdfMigrationPackage');
  if(packageId!==PACKAGE_ID)throw Error('BILLING_PDF_PACKAGE_NOT_REGISTERED');
- return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+ // Its own manifest, not knownManifest: installing billing PDFs must never pull in a later package.
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').billingPdfManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
 }
 module.exports.applyRegisteredBillingPdfsPackage=applyRegisteredBillingPdfsPackage;
+
+// Email template installation is explicit; existing package entrypoints never apply it.
+async function applyRegisteredEmailTemplatesPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/emailTemplateMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('EMAIL_TEMPLATES_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+}
+module.exports.applyRegisteredEmailTemplatesPackage=applyRegisteredEmailTemplatesPackage;
 
 async function applyRegisteredF12ReceiptPackage(pool) {
   const { receiptManifest } = require('../src/security/centralMigrationManifest');
