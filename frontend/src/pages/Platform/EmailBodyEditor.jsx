@@ -60,7 +60,8 @@ export default function EmailBodyEditor({ value, onChange, variables = [], disab
     const current = editor.isEmpty ? '' : editor.getHTML()
     if (value !== current) editor.commands.setContent(value || '', { emitUpdate: false })
   }, [editor, value])
-  useEffect(() => { editor?.setEditable(!disabled) }, [editor, disabled])
+  // Second argument false: locking the editor is not an edit and must not report one.
+  useEffect(() => { editor?.setEditable(!disabled, false) }, [editor, disabled])
 
   if (!editor || !state) return null
   const run = command => command(editor.chain().focus()).run()

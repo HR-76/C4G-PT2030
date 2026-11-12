@@ -10,7 +10,7 @@ const DEFAULTS = Object.freeze({
     version: 'default-1',
     subject: 'Ative o seu acesso à C4G',
     html: [
-      '{Logotipo}',
+      '<p>{Logotipo}</p>',
       '<p>Foi-lhe atribuído acesso à plataforma C4G.</p>',
       '<p>Abra a ligação para ativar o acesso e definir a sua palavra-passe. Se já tem conta, entre com a sua palavra-passe atual.</p>',
       '<p><a href="{LigacaoAtivacao}">Ativar acesso</a></p>',

@@ -7,7 +7,7 @@ import '../../dashboard-palette.css'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   LayoutDashboard, FileText, Zap, Bell, ListChecks, CalendarDays,
-  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus,
+  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus, Mail,
 } from 'lucide-react'
 
 export default function Sidebar({ open, mobile, hidden = false, panelRef, onClose, onNavigate, navigationAccess = {directory:true, units:true, access:true} }) {
@@ -37,6 +37,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
     ] }, { label: 'Administração e segurança', items: [
       { to: '/administracao/entidades', icon: Users, tone: 'violet', label: 'Entidades e utilizadores' },
       { to: '/administracao/faturacao', icon: ReceiptText, tone: 'amber', label: 'Faturação' },
+      { to: '/administracao/email', icon: Mail, tone: 'sky', label: 'Email' },
       { to: '/administracao/logs', icon: FileText, tone: 'blue', label: 'Logs' },
       { to: '/conta/seguranca', icon: ShieldCheck, tone: 'rose', label: 'Segurança da conta' },
     ] }] : []),
