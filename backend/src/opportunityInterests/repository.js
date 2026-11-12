@@ -192,8 +192,7 @@ function createOpportunityInterestRepository({organizationId:org,actor,protect,a
   const found=new Map();for(const row of allowed){
    found.set(row.central_opportunity_id,{opportunityId:row.central_opportunity_id,interestId:row.interest_id,status:row.status,unitIds:units.get(row.interest_id)||[]});
   }
-  const canRegister=await authorize(REGISTER,root);
-  return {capabilities:{canRegister},items:input.opportunityIds.map(opportunityId=>found.get(opportunityId)||{opportunityId,interestId:null,status:null,unitIds:[]})};
+  return {capabilities:await capabilities(),items:input.opportunityIds.map(opportunityId=>found.get(opportunityId)||{opportunityId,interestId:null,status:null,unitIds:[]})};
  }
  async function units(client,input){
   if(input.purpose==='ASSIGN'){

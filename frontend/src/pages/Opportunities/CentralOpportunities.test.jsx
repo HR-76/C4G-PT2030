@@ -105,6 +105,14 @@ it('starts an application straight from the table, without an interest, using th
  expect(url.searchParams.has('interesse')).toBe(false)
  expect(api.get).toHaveBeenCalledWith('one');expect(interestApi.create).not.toHaveBeenCalled()
 })
+it('shows Iniciar candidatura beside the heart when the summaries response carries the capability',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ interestApi.summaries.mockImplementation(ids=>Promise.resolve({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true},items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}))
+ render(view())
+ const start=await screen.findByRole('button',{name:'Iniciar candidatura para Open call'})
+ expect(within(start.closest('tr')).getByRole('button',{name:'Registar interesse em Open call'})).toBeTruthy()
+ expect(interestApi.context).not.toHaveBeenCalled()
+})
 it('hides Iniciar candidatura when the profile cannot create applications and offers Interesses and Candidaturas',async()=>{
  api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
  render(view());await screen.findByRole('button',{name:'Registar interesse em Open call'})
