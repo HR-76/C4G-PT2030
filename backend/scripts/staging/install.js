@@ -204,7 +204,8 @@ const CENTRAL_STEPS = Object.freeze([
   ['045_opportunity_eu_legacy_prearchive', (run, pool) => run.applyRegisteredEuLegacyPrearchivePackage(pool, 'opportunity-eu-legacy-prearchive-v1')],
   ['048_catalog_read_service_v1', (run, pool) => run.applyRegisteredCatalogReadPackage(pool, 'catalog-read-v1')],
   ['049_pt2030_document_upload', (run, pool) => run.applyRegisteredCentralImportPackage(pool, 'central-pt2030-upload-preview-v1')],
-  ['050_billing_private_documents', (run, pool) => run.applyRegisteredBillingPdfsPackage(pool, 'billing-private-documents-v1')]
+  ['050_billing_private_documents', (run, pool) => run.applyRegisteredBillingPdfsPackage(pool, 'billing-private-documents-v1')],
+  ['051_email_templates', (run, pool) => run.applyRegisteredEmailTemplatesPackage(pool, 'email-templates-v1')]
 ]);
 const TENANT_STEPS = Object.freeze([
   ['034_application_snapshot_v2', (runners, options) => runners.createRegisteredTenantMigrationRunner({ ...options, packageId: OPPORTUNITY_V2_PACKAGE })],
@@ -220,7 +221,7 @@ async function ledgerHead(pool, sql) {
   return (await pool.query(sql)).rows[0]?.version;
 }
 
-// Brings Central to 050 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
+// Brings Central to 051 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
 // The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
 async function upgrade(env, args) {
   const { config, stateFile } = settings(env);
