@@ -10,6 +10,7 @@
 // Commands: install
 //           | person --subject <uuid> --name <text> --email <address> [--platform-admin] [--profile <code> | --org-admin]
 //           | env [--out <file>] [--carry <previous private env>]
+//           | upgrade [--apply]   (without --apply it only reports the pending steps)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
 const fs = require('node:fs');
@@ -17,6 +18,8 @@ const path = require('node:path');
 const { randomBytes, randomUUID } = require('node:crypto');
 const { Pool } = require('pg');
 const { connection, identifier, saveState } = require('../localPlatform/config');
+const { withInstallerAuthority, nativePool } = require('../localPlatform/installerAuthority');
+const { syncCentralObservation } = require('../localPlatform/centralObservation');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
   CATALOG_LOGIN, AUTH_POLICY_VERSION } = require('./environment');
@@ -166,6 +169,84 @@ async function projectIntoTenant({ config, state, userId, membershipId, name, em
   return true;
 }
 
+// Registered packages after the base install, in the order the local environment applied them. Each step names the
+// version it leaves behind; steps already in the ledger are skipped, so the command can be repeated.
+const OPPORTUNITY_V2_PACKAGE = 'opportunity-v2-activation-11145';
+const CENTRAL_STEPS = Object.freeze([
+  ['042_opportunity_eu_source_control_v2', (run, pool) => run.applyRegisteredCentralPackage(pool, OPPORTUNITY_V2_PACKAGE)],
+  ['043_opportunity_eu_writer_v2', (run, pool) => run.applyRegisteredEuWriterPackage(pool, 'opportunity-eu-writer-v2')],
+  ['044_opportunity_eu_expired_reconciliation', (run, pool) => run.applyRegisteredEuReconciliationPackage(pool, 'opportunity-eu-expired-reconciliation-v1')],
+  ['045_opportunity_eu_legacy_prearchive', (run, pool) => run.applyRegisteredEuLegacyPrearchivePackage(pool, 'opportunity-eu-legacy-prearchive-v1')],
+  ['048_catalog_read_service_v1', (run, pool) => run.applyRegisteredCatalogReadPackage(pool, 'catalog-read-v1')],
+  ['049_pt2030_document_upload', (run, pool) => run.applyRegisteredCentralImportPackage(pool, 'central-pt2030-upload-preview-v1')],
+  ['050_billing_private_documents', (run, pool) => run.applyRegisteredBillingPdfsPackage(pool, 'billing-private-documents-v1')]
+]);
+const TENANT_STEPS = Object.freeze([
+  ['034_application_snapshot_v2', (runners, options) => runners.createRegisteredTenantMigrationRunner({ ...options, packageId: OPPORTUNITY_V2_PACKAGE })],
+  ['035_application_review_assignments', (runners, options) => runners.createAssignedReviewMigrationRunner(options)],
+  ['036_application_team_chat', (runners, options) => runners.createApplicationChatMigrationRunner(options)],
+  ['037_organization_strategy', (runners, options) => runners.createOrganizationStrategyMigrationRunner(options)],
+  ['038_application_task_details', (runners, options) => runners.createApplicationTaskDetailsMigrationRunner(options)],
+  ['039_document_deletion', (runners, options) => runners.createDocumentDeletionMigrationRunner(options)],
+  ['040_application_chat_retention', (runners, options) => runners.createChatRetentionMigrationRunner(options)]
+]);
+
+async function ledgerHead(pool, sql) {
+  return (await pool.query(sql)).rows[0]?.version;
+}
+
+// Brings Central to 050 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
+// The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
+async function upgrade(env, args) {
+  const { config, stateFile } = settings(env);
+  const state = readState(stateFile);
+  if (state?.phase !== 'READY') throw refuse('STAGING_INSTALLATION_NOT_READY');
+  const central = new Pool(connection(config, config.centralDatabase));
+  const tenant = new Pool(connection(config, config.tenantDatabase));
+  const persist = value => saveState(value, stateFile);
+  try {
+    const centralHead = () => ledgerHead(central, 'SELECT version FROM public.c4g_schema_migration ORDER BY version DESC LIMIT 1');
+    const tenantHead = () => ledgerHead(tenant, 'SELECT migration_id AS version FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1');
+    const report = { applied: Boolean(args.apply), central: { from: await centralHead(), steps: [] }, tenant: { from: await tenantHead(), steps: [] } };
+    const pendingCentral = CENTRAL_STEPS.filter(([to]) => to > report.central.from);
+    const pendingTenant = TENANT_STEPS.filter(([to]) => to > report.tenant.from);
+    if (!args.apply) {
+      report.central.pending = pendingCentral.map(([to]) => to);
+      report.tenant.pending = pendingTenant.map(([to]) => to);
+      return report;
+    }
+    const run = require('../runCentralMigrations');
+    const { preflightCentral } = require('../../src/security/centralMigrationPreflight');
+    for (const [to, apply] of pendingCentral) {
+      await withInstallerAuthority(central, { targets: [central] }, async ({ demote }) => { await apply(run, nativePool(central)); await demote(); });
+      const checked = await preflightCentral(central);
+      if (checked.currentVersion !== to) throw refuse('STAGING_UPGRADE_CENTRAL_VERSION_UNEXPECTED');
+      report.central.steps.push(to);
+    }
+    const runners = require('../../src/security/tenantMigrationRunner');
+    const { preflightTenant } = require('../../src/security/tenantMigrationPreflight');
+    const identity = { tenantId: state.tenantId, databaseGenerationId: state.generationId };
+    for (const [to, createRunner] of pendingTenant) {
+      await withInstallerAuthority(central, { targets: [central] }, async ({ demote }) => {
+        await createRunner(runners, { pool: nativePool(tenant), observationPublisher: { async publish() {} }, timeoutMs: 30000,
+          scheduler: { setTimeout, clearTimeout } }).migrate({ ...identity, expectedRevision: 1, correlationId: state.installationId,
+          idempotencyKey: `${state.installationId}-${to}` });
+        await demote();
+      });
+      const observation = await preflightTenant(tenant, identity, undefined, { timeoutMs: 15000 });
+      if (observation.currentVersion !== to) throw refuse('STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED');
+      const synced = await syncCentralObservation({ central, observation, tenantId: state.tenantId, installationId: state.installationId, apply: true });
+      state.snapshot.schema = { ...state.snapshot.schema, currentVersion: observation.currentVersion, schemaFingerprint: observation.schemaFingerprint,
+        verifiedCapabilities: Object.fromEntries(observation.capabilities.map(code => [code, true])) };
+      persist(state);
+      report.tenant.steps.push(`${to}:${synced.status}`);
+    }
+    report.central.to = await centralHead();
+    report.tenant.to = await tenantHead();
+    return report;
+  } finally { await central.end(); await tenant.end(); }
+}
+
 function writeEnvironment(env, destination, carryFile) {
   const { config, stateFile, apiHost } = settings(env);
   const content = apiPrivateEnvironment(readState(stateFile), { host: apiHost, centralDatabase: config.centralDatabase, administratorPassword: config.password,
@@ -180,6 +261,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   if (command === 'person') {
     return person(env, parseArguments(rest, { values: ['--subject', '--name', '--email', '--profile'], flags: ['--platform-admin', '--org-admin'] }));
   }
+  if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
   if (command === 'env') {
     const args = parseArguments(rest, { values: ['--out', '--carry'] });
     return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry);
@@ -193,4 +275,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-module.exports = { main };
+module.exports = { main, CENTRAL_STEPS, TENANT_STEPS };

@@ -84,6 +84,24 @@ sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9]*#root * /srv/c4g-sta
 
 A base PostgreSQL nova não é alterada pelo regresso; a release antiga volta a usar o Neon.
 
+## Subir os esquemas ao nível do ambiente local (Central 050 e tenant 040)
+
+O `install` deixa a Central na 035 e o tenant na 033. O comando `upgrade` aplica, por ordem, os pacotes registados que o ambiente local usa: Central 042, 043, 044, 045, 048, 049 e 050 e tenant 034 a 040. Cada passo verifica o preflight da versão que deixou e o estado do tenant é publicado na Central. É repetível: o que já está aplicado é ignorado. **As migrações são irreversíveis**, por isso faz primeiro uma cópia:
+
+```bash
+install -d -m 700 /srv/c4g-staging/backups && for d in c4g_central_staging c4g_tenant_staging; do docker exec c4g-staging-postgres-db-1 pg_dump -U postgres -Fc $d > /srv/c4g-staging/backups/$d-$(date +%Y%m%d%H%M).dump; done; ls -la /srv/c4g-staging/backups | tail -4
+```
+
+Sem `--apply` o comando só mostra o que falta e não altera nada:
+
+```bash
+RUN="docker run --rm --user 0:0 --network container:c4g-staging-postgres-db-1 --env-file /srv/c4g-staging/postgres/.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js"
+$RUN upgrade
+$RUN upgrade --apply
+```
+
+Depois reinicia a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate`) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
+
 ## Atualizar um staging já instalado
 
 Depois de `git pull` e de construir a imagem nova (passo 1), repete, por esta ordem, os comandos de instalação e de variáveis. Ambos são repetíveis e não alteram o que já existe:
@@ -105,6 +123,6 @@ $RUN person --subject "$TECNICO_SUBJECT" --name "Tecnico Staging" --email tecnic
 ## Limites conhecidos
 
 - O catálogo e o Dashboard ficam ativos mas **vazios**: a recolha de oportunidades (worker e fontes) ainda não está ligada.
-- O tenant fica na versão 033. As migrações 034 a 040 têm cada uma o seu executor e ainda não estão neste instalador; as páginas que dependem delas (chat, estratégia, detalhe de tarefas, eliminação de documentos) ficam indisponíveis até serem aplicadas.
+- Sem o `upgrade`, o tenant fica na 033 e as páginas que dependem das migrações 034 a 040 (chat, estratégia, detalhe de tarefas, eliminação de documentos) ficam indisponíveis.
 - A ligação da API à Central usa o administrador do PostgreSQL, como o perfil local. Um login limitado alteraria os fingerprints fixados da Central e exige um perfil de runtime próprio.
 - Não há worker, R2, e-mail nem ClamAV.

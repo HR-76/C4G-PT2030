@@ -9,7 +9,7 @@ const { parseArguments, requirePerson, requireProfile, projectionOperationId, st
   CARRIED_KEYS, PROFILES, AUTH_POLICY_VERSION } = require('../scripts/staging/environment');
 const { RECOGNIZED_ASSURANCE_POLICIES } = require('../src/security/authConfig');
 const { grantsForProfile } = require('../src/organizationDirectory/accessProfiles');
-const { main } = require('../scripts/staging/install');
+const { main, CENTRAL_STEPS, TENANT_STEPS } = require('../scripts/staging/install');
 
 const ready = Object.freeze({
   phase: 'READY', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
@@ -109,6 +109,34 @@ test('commands fail closed before touching any database', async () => {
     const env = { POSTGRES_PASSWORD: 'x', C4G_STAGING_STATE: path.join(folder, 'install.json') };
     await assert.rejects(() => main(['person', '--subject', '1cb952a5-4284-4325-bfe3-20f9dc6fb5aa', '--name', 'Nome Teste', '--email', 'a@c4g.invalid'], env), { code: 'STAGING_INSTALLATION_NOT_READY' });
     await assert.rejects(() => main(['person', '--bogus'], env), { code: 'STAGING_ARGUMENT_INVALID' });
+  } finally { fs.rmSync(folder, { recursive: true, force: true }); }
+});
+
+test('upgrade: steps follow the registered chains, in order, up to the latest versions', () => {
+  const central = require('../src/security/centralMigrationManifest');
+  const tenant = require('../src/security/tenantMigrationManifest');
+  const centralVersions = CENTRAL_STEPS.map(([to]) => to);
+  assert.deepEqual(centralVersions, [...centralVersions].sort());
+  assert.equal(centralVersions.at(-1), central.knownManifest.at(-1).version);
+  assert.ok(centralVersions.every(version => central.knownManifest.some(entry => entry.version === version)));
+  const tenantVersions = TENANT_STEPS.map(([to]) => to);
+  assert.deepEqual(tenantVersions, [...tenantVersions].sort());
+  assert.equal(tenantVersions.at(-1), tenant.chatRetentionManifest.at(-1).version);
+  assert.ok(tenantVersions.every(version => tenant.chatRetentionManifest.some(entry => entry.version === version)));
+  // Every step calls an operation that exists in the migrators it relies on.
+  const recorder = calls => new Proxy({}, { get: (_, name) => (...args) => { calls.push(name); return args[0]; } });
+  const centralOperations = Object.keys(require('../scripts/runCentralMigrations'));
+  const tenantOperations = Object.keys(require('../src/security/tenantMigrationRunner'));
+  for (const [, apply] of CENTRAL_STEPS) { const calls = []; apply(recorder(calls), {}); assert.ok(calls.length === 1 && centralOperations.includes(calls[0]), calls.join()); }
+  for (const [, create] of TENANT_STEPS) { const calls = []; create(recorder(calls), {}); assert.ok(calls.length === 1 && tenantOperations.includes(calls[0]), calls.join()); }
+});
+
+test('upgrade: refuses unknown flags and an installation that is not ready, before any database work', async () => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-staging-'));
+  try {
+    const env = { POSTGRES_PASSWORD: 'x', C4G_STAGING_STATE: path.join(folder, 'install.json') };
+    await assert.rejects(() => main(['upgrade', '--bogus'], env), { code: 'STAGING_ARGUMENT_INVALID' });
+    await assert.rejects(() => main(['upgrade', '--apply'], env), { code: 'STAGING_INSTALLATION_NOT_READY' });
   } finally { fs.rmSync(folder, { recursive: true, force: true }); }
 });
 
