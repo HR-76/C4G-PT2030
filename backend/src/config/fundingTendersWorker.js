@@ -60,7 +60,8 @@ async function loadFundingTendersWorker({ env = process.env } = {}) {
     const official = require('../fundingTenders/officialSources').createOfficialSource({fetchImpl: live ? globalThis.fetch : async()=>{throw new Error('OFFICIAL_LIVE_TRANSPORT_REQUIRED');}, limits:{...LIMITS,...collection.limits}});
     const source = {lookup(input){if(!collection.sources.includes(input.source))throw new Error("INVALID_INPUT");return euSource.lookup(input);},collect(input) { if (!collection.sources.includes(input.source)) throw Object.assign(new Error('INVALID_INPUT'), {code:'INVALID_INPUT'}); return require('../fundingTenders/sourceIdentity').OFFICIAL.includes(input.source) ? official.collect(input) : euSource.collect(input); }};
     const repository=require('../fundingTenders/repository').createFundingRepository({pool,euSourceControlEnabled,euWriterV2,coverageEnabled:coverage.supported,startCoverage:coverage.enabled,refreshEnabled:coverage.temporalSupported===true,resolutionEnabled:coverage.resolutionSupported===true,enrichmentEnabled:coverage.enrichmentEnabled===true});
-    const runtime = createFundingWorker({ pool, queue, source, repository });
+    const runtime = createFundingWorker({ pool, queue, source, repository,
+      log: entry => process.stdout.write(JSON.stringify({ at: new Date().toISOString(), ...entry }) + '\n') });
     const scheduled = schedule ? require('../fundingTenders/scheduledRefresh').createScheduledRefresh({ repository, userId: schedule.userId, sources: schedule.sources, at: schedule.at,
       log: entry => process.stdout.write(`${JSON.stringify({ at: new Date().toISOString(), ...entry })}
 `) }) : null;
