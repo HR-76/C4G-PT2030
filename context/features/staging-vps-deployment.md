@@ -26,6 +26,7 @@ Ambiente `app-teste.c4g.ai` e `login-teste.c4g.ai` na VPS C4G: PostgreSQL 18 em 
 
 - [install.js](../../backend/scripts/staging/install.js) e [environment.js](../../backend/scripts/staging/environment.js): comandos `install`, `person` e `env`, sobre o instalador local parametrizado ([schema.js](../../backend/scripts/localPlatform/schema.js)). Segredos gerados no primeiro uso, guardados num estado com modo 600 e escritos só em ficheiros.
 - [deploy/staging](../../deploy/staging/README.md): Dockerfile, compose da API e runbook com os comandos da VPS.
+- Perfis `ORG_ADMIN`, `FUNDING_MANAGER`, `CONTRIBUTOR` (Técnico) e `VIEWER` com as permissões da aplicação e projeção no diretório do tenant; login só de leitura do catálogo (`c4g_catalog_staging`) e `FUNDING_TENDERS_RUNTIME=central`, que ligam as rotas do catálogo e do Dashboard (sem isto respondiam `FUNDING_NOT_CONFIGURED`/`SERVICE_UNAVAILABLE`).
 - Correção: `schema.js` deixou de conceder `USAGE` em `opportunity_catalog` a `c4g_f12_admin`, concessão que nenhum fingerprint fixado inclui. Teste de regressão em `stagingInstaller.test.js`. Instalações locais existentes mantêm a concessão que já têm.
 
 ## Verificação (12/11/2026)

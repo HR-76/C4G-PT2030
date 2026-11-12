@@ -47,12 +47,12 @@ GESTOR_SUBJECT=$(python3 /tmp/criar-gestor.py); echo "$GESTOR_SUBJECT"
 rm -f /tmp/criar-admin.py /tmp/criar-gestor.py
 ```
 
-Liga cada conta à plataforma. `--platform-admin` dá a Administração C4G; `--org-admin` dá administração da organização de staging:
+Liga cada conta à plataforma. `--platform-admin` dá a Administração C4G; `--profile` dá um perfil da organização de staging (`ORG_ADMIN` Administrador, `FUNDING_MANAGER` Gestor de candidaturas, `CONTRIBUTOR` Técnico, `VIEWER`). O comando concede as mesmas permissões que a aplicação dá ao perfil e cria a pessoa no diretório do tenant:
 
 ```bash
 RUN="docker run --rm --user 0:0 --network container:c4g-staging-postgres-db-1 --env-file /srv/c4g-staging/postgres/.env --env-file /srv/c4g-staging/api-oidc.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js"
 $RUN person --subject "$ADMIN_SUBJECT" --name "Administrador Staging" --email admin.staging@c4g.invalid --platform-admin
-$RUN person --subject "$GESTOR_SUBJECT" --name "Gestor Staging" --email gestor.staging@c4g.invalid --org-admin
+$RUN person --subject "$GESTOR_SUBJECT" --name "Gestor Staging" --email gestor.staging@c4g.invalid --profile ORG_ADMIN
 ```
 
 ## 5. Frontend
@@ -84,8 +84,27 @@ sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9]*#root * /srv/c4g-sta
 
 A base PostgreSQL nova não é alterada pelo regresso; a release antiga volta a usar o Neon.
 
+## Atualizar um staging já instalado
+
+Depois de `git pull` e de construir a imagem nova (passo 1), repete, por esta ordem, os comandos de instalação e de variáveis. Ambos são repetíveis e não alteram o que já existe:
+
+1. `install` (passo 2): cria, se faltar, o login só de leitura do catálogo (`c4g_catalog_staging`).
+2. `env` (passo 3), com `--carry` apontado para o `api-private.env` atual: acrescenta `FUNDING_TENDERS_RUNTIME=central`, `FUNDING_TENDERS_SOURCE=unconfigured` e `CATALOG_DATABASE_URL`, que ligam o catálogo e o Dashboard.
+3. `person` outra vez para cada conta com perfil (passo 4): aplica as permissões do perfil e cria a pessoa no tenant, caso ainda não exista.
+4. Ativar (passo 6).
+
+### Conta de Técnico
+
+```bash
+cd /srv/c4g-staging/primeiro-utilizador-staging-0715f01
+sed -e "s/utilizador-teste/tecnico-staging/" -e "s/utilizador.teste@c4g.invalid/tecnico.staging@c4g.invalid/" -e "s/'Utilizador'/'Tecnico'/g" -e "s/'Teste'/'Staging'/g" criar-keycloak.py > /tmp/criar-tecnico.py
+TECNICO_SUBJECT=$(python3 /tmp/criar-tecnico.py); echo "$TECNICO_SUBJECT"; rm -f /tmp/criar-tecnico.py
+$RUN person --subject "$TECNICO_SUBJECT" --name "Tecnico Staging" --email tecnico.staging@c4g.invalid --profile CONTRIBUTOR
+```
+
 ## Limites conhecidos
 
+- O catálogo e o Dashboard ficam ativos mas **vazios**: a recolha de oportunidades (worker e fontes) ainda não está ligada.
 - O tenant fica na versão 033. As migrações 034 a 040 têm cada uma o seu executor e ainda não estão neste instalador; as páginas que dependem delas (chat, estratégia, detalhe de tarefas, eliminação de documentos) ficam indisponíveis até serem aplicadas.
 - A ligação da API à Central usa o administrador do PostgreSQL, como o perfil local. Um login limitado alteraria os fingerprints fixados da Central e exige um perfil de runtime próprio.
 - Não há worker, R2, e-mail nem ClamAV.

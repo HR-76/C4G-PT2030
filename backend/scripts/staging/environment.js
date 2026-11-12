@@ -3,6 +3,8 @@
 // Pure helpers of the staging installer: argument parsing, the identities and credentials recorded for the
 // tenant, and the private environment file the API reads. Nothing here touches the database or the disk.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PROFILES = Object.freeze(['ORG_ADMIN', 'FUNDING_MANAGER', 'CONTRIBUTOR', 'VIEWER']);
+const CATALOG_LOGIN = 'c4g_catalog_staging';
 const REGION = Object.freeze({ regionCode: 'EU', residencyPolicyVersion: 'staging-v1' });
 
 function failure(code) {
@@ -26,6 +28,20 @@ function requirePerson({ subject, name, email }) {
   if (typeof name !== 'string' || name.trim().length < 2 || name.length > 120) throw failure('STAGING_NAME_INVALID');
   if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw failure('STAGING_EMAIL_INVALID');
   return { subject: subject.toLowerCase(), name: name.trim(), email: email.trim() };
+}
+
+// --profile <code> (organization profile) or the older --org-admin switch; at most one of them.
+function requireProfile(args) {
+  if (args.profile !== undefined && args['org-admin']) throw failure('STAGING_PROFILE_INVALID');
+  const requested = args.profile ?? (args['org-admin'] ? 'ORG_ADMIN' : null);
+  if (requested !== null && !PROFILES.includes(requested)) throw failure('STAGING_PROFILE_INVALID');
+  return requested;
+}
+
+// Stable per membership, so repeating the projection into the tenant is recognised as the same operation.
+function projectionOperationId(membershipId) {
+  const digest = require('node:crypto').createHash('sha256').update('c4g-staging-member-projection:' + membershipId).digest('hex');
+  return `${digest.slice(0, 8)}-${digest.slice(8, 12)}-4${digest.slice(13, 16)}-8${digest.slice(17, 20)}-${digest.slice(20, 32)}`;
 }
 
 // How the API reaches the tenant database: by the container network name and over verified TLS.
@@ -60,11 +76,15 @@ function databaseUrl({ login, password, host, port, database }) {
 // The Central pool connects as the PostgreSQL administrator, as the local profile does: the pinned Central
 // fingerprints do not admit a limited runtime login (its grants would count as schema drift).
 function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {} }) {
-  if (state?.phase !== 'READY' || !state.credentials || !administratorPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
+  if (state?.phase !== 'READY' || !state.credentials || !administratorPassword || !state.staging?.catalogPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
     // Production behaviour is part of what staging proves: Secure session cookies and verified database TLS.
     NODE_ENV: 'production',
+    // Central opportunity catalog, read-only. Collection from the sources is a separate step.
+    FUNDING_TENDERS_RUNTIME: 'central',
+    FUNDING_TENDERS_SOURCE: 'unconfigured',
+    CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
     AUTHORITY_DATABASE_URL: databaseUrl({ login: 'c4g_authority_runtime', password: state.authorityPassword, host, port, database: centralDatabase }),
@@ -75,4 +95,4 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
   return Object.entries(lines).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
-module.exports = Object.freeze({ UUID, REGION, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });
+module.exports = Object.freeze({ UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });

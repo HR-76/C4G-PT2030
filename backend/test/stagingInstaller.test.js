@@ -5,11 +5,13 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
-const { parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, carriedSettings, CARRIED_KEYS } = require('../scripts/staging/environment');
+const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, databaseUrl, apiPrivateEnvironment, carriedSettings,
+  CARRIED_KEYS, PROFILES } = require('../scripts/staging/environment');
+const { grantsForProfile } = require('../src/organizationDirectory/accessProfiles');
 const { main } = require('../scripts/staging/install');
 
 const ready = Object.freeze({
-  phase: 'READY', permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
+  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
   credentials: { tenantId: 't', credentialRef: 'staging-api-x', connectionVersion: 1, host: 'c4g-postgres', port: 5432,
     database: 'c4g_tenant_staging', login: 'c4g_staging_api', password: 'w'.repeat(64), ssl: true }
 });
@@ -49,16 +51,40 @@ test('database URLs verify the server certificate and encode credentials', () =>
 test('private environment: generated values only, and only after a complete installation', () => {
   assert.throws(() => apiPrivateEnvironment({ ...ready, phase: 'INSTALLING' }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => apiPrivateEnvironment(ready, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
+  assert.throws(() => apiPrivateEnvironment({ ...ready, staging: {} }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc' } });
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
-  assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_MODE', 'CENTRAL_DATABASE_URL',
-    'NODE_ENV', 'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'SESSION_SECRET']);
+  assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_MODE', 'CATALOG_DATABASE_URL',
+    'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV', 'OPPORTUNITY_ALLOWED_RESIDENCY_JSON',
+    'OPPORTUNITY_API_CREDENTIALS_JSON', 'SESSION_SECRET']);
+  assert.equal(lines.FUNDING_TENDERS_RUNTIME, 'central');
+  assert.equal(lines.FUNDING_TENDERS_SOURCE, 'unconfigured');
+  const catalog = new URL(lines.CATALOG_DATABASE_URL);
+  assert.deepEqual([catalog.username, catalog.hostname, catalog.port, catalog.pathname, catalog.searchParams.get('sslmode')],
+    ['c4g_catalog_staging', 'c4g-postgres', '5432', '/c4g_central_staging', 'verify-full']);
   assert.equal(lines.NODE_ENV, 'production');
   assert.match(lines.AUTHORITY_DATABASE_URL, /^postgresql:\/\/c4g_authority_runtime:/);
   assert.match(lines.CENTRAL_DATABASE_URL, /sslmode=verify-full$/);
   assert.deepEqual(JSON.parse(lines.OPPORTUNITY_API_CREDENTIALS_JSON), [ready.credentials]);
   assert.deepEqual(JSON.parse(lines.OPPORTUNITY_ALLOWED_RESIDENCY_JSON), [{ regionCode: 'EU', policyVersion: 'staging-v1' }]);
   assert.ok(!text.includes('undefined'));
+});
+
+test('profiles: one of the application profiles, or the older --org-admin switch', () => {
+  assert.deepEqual([...PROFILES], ['ORG_ADMIN', 'FUNDING_MANAGER', 'CONTRIBUTOR', 'VIEWER']);
+  assert.equal(requireProfile({}), null);
+  assert.equal(requireProfile({ 'org-admin': true }), 'ORG_ADMIN');
+  assert.equal(requireProfile({ profile: 'CONTRIBUTOR' }), 'CONTRIBUTOR');
+  for (const args of [{ profile: 'ADMIN' }, { profile: 'ORG_ADMIN', 'org-admin': true }, { profile: '' }]) assert.throws(() => requireProfile(args), { code: 'STAGING_PROFILE_INVALID' });
+  // Every profile the installer accepts is one the application can grant.
+  for (const profileCode of PROFILES) assert.ok(grantsForProfile({ organizationId: 'o', profileCode }).length > 0);
+});
+
+test('projection operation id is a stable UUID per membership', () => {
+  const id = projectionOperationId('258802ac-504d-4087-9ac9-9136eb9f54c9');
+  assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-8[0-9a-f]{3}-[0-9a-f]{12}$/);
+  assert.equal(id, projectionOperationId('258802ac-504d-4087-9ac9-9136eb9f54c9'));
+  assert.notEqual(id, projectionOperationId('258802ac-504d-4087-9ac9-9136eb9f54ca'));
 });
 
 test('carry-over copies only the listed non-secret settings', () => {
