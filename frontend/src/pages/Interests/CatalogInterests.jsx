@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { opportunityInterestsApi as api } from '../../api/api'
 import FormModal from '../../components/FormModal'
@@ -21,7 +21,7 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
   const [selection, setSelection] = useState(null), [units, setUnits] = useState([]), [unitIds, setUnitIds] = useState([]), [opening, setOpening] = useState(false), [openError, setOpenError] = useState('')
   const [transversal,setTransversal]=useState(false), [notes,setNotes]=useState('')
   const scopeChosen=transversal || unitIds.length>0
-  const alive = useRef(true), epoch = useRef(0), openMutex = useRef(false), location = useLocation()
+  const alive = useRef(true), epoch = useRef(0), openMutex = useRef(false), location = useLocation(), navigate = useNavigate()
   const returnFocusRef = useRef(null)
   const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
   const command = useInterestCommand(userId, organizationId, data => { setSelection(null); setSummaries(previous => ({ ...previous, [data.opportunityId]: data })) })
@@ -57,6 +57,18 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
     }
     read(); return () => { active = false; controller.abort() }
   }, [ids, organizationId, refresh])
+  // Starts an application straight from the opportunities table, without a registered interest.
+  async function startApplication(item) {
+    if (openMutex.current || command.pending || command.blocked || !capabilities?.canCreateApplication || state !== 'ready') return
+    openMutex.current = true; setOpening(true); setOpenError(''); const token = ++epoch.current
+    try {
+      const { data } = await catalogApi.get(item.opportunityId)
+      if (!alive.current || token !== epoch.current) return
+      if (data.opportunityId !== item.opportunityId || !data.revisionId || (data.lifecycleState || data.snapshot?.lifecycleState) === 'ARCHIVED') throw Error('Unavailable')
+      navigate('/candidaturas?' + new URLSearchParams({ nova: '1', origem: 'CENTRAL', oportunidade: item.opportunityId, revisao: data.revisionId, retorno: safeInterestReturn(location.pathname + location.search, '/catalogo') }))
+    } catch { if (alive.current && token === epoch.current) setOpenError('Não foi possível preparar a candidatura. Tente novamente.') }
+    finally { openMutex.current = false; if (alive.current && token === epoch.current) setOpening(false) }
+  }
   async function open(item) {
     if (openMutex.current || command.pending || command.blocked || !capabilities?.canRegister || state !== 'ready') return
     returnFocusRef.current = document.activeElement
@@ -70,7 +82,7 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
     finally { if (alive.current && token === epoch.current) { openMutex.current = false; setOpening(false) } }
   }
   const returnTo = safeInterestReturn(location.pathname + location.search, '/catalogo')
-  const value = { summaries, capabilities, state, open, busy: opening || command.busy || Boolean(command.pending) || command.blocked, returnTo }
+  const value = { summaries, capabilities, state, open, startApplication, busy: opening || command.busy || Boolean(command.pending) || command.blocked, returnTo }
   const feedback = <>{command.error && <p role="alert">{command.error}</p>}{command.pending && <p role="status">Existe um envio por confirmar. <button type="button" className="btn btn-outline" disabled={command.busy || state !== 'ready'} onClick={command.retry}>Confirmar envio pendente</button></p>}</>
   return <InterestContext.Provider value={value}>
     {state === 'error' && <p role="alert">Não foi possível consultar os interesses da organização. <button className="btn btn-outline btn-sm" onClick={() => setRefresh(value => value + 1)}>Repetir consulta de interesses</button></p>}

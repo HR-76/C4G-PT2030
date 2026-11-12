@@ -8,6 +8,7 @@ const central=vi.hoisted(()=>({get:vi.fn()}))
 vi.mock('../../api/api',()=>({privateApplicationsApi:api,opportunityInterestsApi:interests,centralOpportunitiesApi:central,privateOpportunitiesApi:{get:vi.fn().mockResolvedValue({data:{title:'Oportunidade'}})},pq1Api:{session:work=>work()}}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>auth}))
 import PrivateApplications from './PrivateApplications'
+import Interests from '../Interests/Interests'
 import {applicationIntentKey,clearApplicationIntentions} from './intentions'
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
 const org=id(1),opp=id(2),application=id(3),userA=id(4),userB=id(5)
@@ -56,20 +57,23 @@ it('opens the application while its history is pending and permits retry after f
  expect(screen.getByRole('heading',{name:'Antes'})).toBeTruthy()
 })
 
-it('keeps interests inside the applications area when applying and clearing filters',async()=>{
+it('sends the old interests view inside Candidaturas to the Interests page and keeps its filters',async()=>{
+ const Probe=()=>{const l=useLocation();return <p>{l.pathname+l.search}</p>}
+ render(<MemoryRouter initialEntries={['/candidaturas?ver=interesses&q=energia&status=ARCHIVED']}><Routes><Route path="/candidaturas" element={<PrivateApplications/>}/><Route path="/interesses" element={<Probe/>}/></Routes></MemoryRouter>)
+ expect(await screen.findByText('/interesses?q=energia&status=ARCHIVED')).toBeTruthy()
+})
+it('shows Interests as its own page, without the Candidaturas tabs, and applies and clears filters',async()=>{
  interests.list.mockResolvedValue({data:{items:[],nextCursor:null}})
- mount('/candidaturas?ver=interesses')
- expect(await screen.findByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
- const area=screen.getByRole('navigation',{name:'Área de candidaturas'})
- expect(within(area).getByRole('link',{name:'Interesses'}).getAttribute('aria-current')).toBe('page')
- expect(within(area).getByRole('link',{name:'Candidaturas'}).getAttribute('href')).toBe('/candidaturas')
+ render(<MemoryRouter initialEntries={['/interesses']}><Routes><Route path="/interesses" element={<Interests/>}/></Routes></MemoryRouter>)
+ expect(await screen.findByRole('heading',{name:'Interesses'})).toBeTruthy()
+ expect(screen.queryByRole('navigation',{name:'Área de candidaturas'})).toBeNull()
+ expect(screen.getByRole('link',{name:'Oportunidades'}).getAttribute('href')).toBe('/catalogo')
+ expect(screen.getByRole('link',{name:'Candidaturas'}).getAttribute('href')).toBe('/candidaturas')
  fireEvent.change(screen.getByLabelText('Pesquisar'),{target:{value:'energia'}})
  fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}))
  await waitFor(()=>expect(interests.list.mock.lastCall[0].q).toBe('energia'))
- expect(screen.getByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
  fireEvent.click(screen.getByRole('button',{name:'Limpar filtros'}))
  await waitFor(()=>expect(interests.list.mock.lastCall[0]).toEqual({status:'ACTIVE'}))
- expect(screen.getByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
  expect(api.create).not.toHaveBeenCalled()
 })
 afterEach(()=>{cleanup();vi.restoreAllMocks()})

@@ -52,6 +52,17 @@ test('source dependencies are derived only for references in the active team; do
  assert.equal((await f.read('DOCUMENT_READ',f.other,'DOCUMENT')).allowed,false);
  f.remove();assert.equal((await f.read('OPPORTUNITY_READ',f.source,'OPPORTUNITY')).allowed,false);
 });
+test('a technician who may start applications reads opportunities at organization level without opening individual ones',async()=>{
+ const f=fixture();f.remove();f.snapshot.grants=[f.grant('application.create')];
+ assert.equal((await f.read('OPPORTUNITY_READ',f.org,'OPPORTUNITY')).allowed,true);
+ assert.equal((await f.read('OPPORTUNITY_READ',f.other,'OPPORTUNITY')).allowed,false);
+ assert.equal((await f.read('APPLICATION_READ',f.other)).allowed,false);
+ const without=fixture();without.remove();assert.equal((await without.read('OPPORTUNITY_READ',without.org,'OPPORTUNITY')).allowed,false);
+ for(const scope of [{type:'RESOURCE',id:f.app,organizationId:f.org},{type:'ORGANIZATION',id:f.org,organizationId:randomUUID()}]){
+  const scoped=fixture();scoped.remove();scoped.snapshot.grants=[{permission:'application.create',scope}];
+  assert.equal((await scoped.read('OPPORTUNITY_READ',scoped.org,'OPPORTUNITY')).allowed,false);
+ }
+});
 test('non-technician profiles retain explicit grants and do not query participation',async()=>{
  for(const profile of ['ORG_ADMIN','FUNDING_MANAGER','VIEWER']){const f=fixture(profile);f.snapshot.grants=[f.grant('application.read')];f.remove();assert.equal((await f.read('APPLICATION_READ',f.other)).allowed,true);assert.equal(f.queries(),0)}
 });

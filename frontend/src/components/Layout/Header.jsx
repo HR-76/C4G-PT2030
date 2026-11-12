@@ -55,10 +55,10 @@ export default function Header({ metronicSection, title, onMenuToggle, menuOpen,
 
 function pagesFor(user, organization, navigationAccess = {directory:true,units:true,access:true}) {
   const admin = user?.platformRoles?.includes('C4G_ADMIN')
-  const pages = [{to:'/catalogo', label:'Catálogo C4G'}, {to:'/conta/seguranca', label:'Segurança da conta'}]
+  const pages = [{to:'/catalogo', label:'Oportunidades'}, {to:'/conta/seguranca', label:'Segurança da conta'}]
   if (admin) pages.push({to:'/integracoes', label:'Fontes de oportunidades'})
   if (organization?.profileCode === 'ORG_ADMIN') pages.push({to:'/calendario', label:'Calendário da entidade'})
-  if (organization) pages.push(...[{to:'/dashboard',label:'Dashboard'}, {to:'/meu-trabalho',label:'O meu trabalho'}, {to:'/candidaturas',label:'Candidaturas'}, {to:'/parceiros',label:'Parceiros'}, {to:'/matching',label:'Matching'}, {to:'/notificacoes',label:'Alertas'}, ...(navigationAccess.directory ? [{to:'/perfil-organizacao',label:'Perfil da organização'}, {to:'/perfil-organizacao/pessoas',label:'Pessoas'}] : []), ...(navigationAccess.units ? [{to:'/perfil-organizacao/unidades',label:'Departamentos / Unidades'}] : []), ...(navigationAccess.access ? [{to:'/utilizadores',label:'Acessos'}] : []), {to:'/perfil',label:'Perfil pessoal'}])
+  if (organization) pages.push(...[{to:'/dashboard',label:'Dashboard'}, {to:'/meu-trabalho',label:'O meu trabalho'}, {to:'/interesses',label:'Interesses'}, {to:'/candidaturas',label:'Candidaturas'}, ...(organization.profileCode !== 'CONTRIBUTOR' ? [{to:'/parceiros',label:'Parceiros'}] : []), {to:'/matching',label:'Matching'}, {to:'/notificacoes',label:'Alertas'}, ...(navigationAccess.directory ? [{to:'/perfil-organizacao',label:'Perfil da organização'}, {to:'/perfil-organizacao/pessoas',label:'Pessoas'}] : []), ...(navigationAccess.units ? [{to:'/perfil-organizacao/unidades',label:'Departamentos / Unidades'}] : []), ...(navigationAccess.access ? [{to:'/utilizadores',label:'Acessos'}] : []), {to:'/perfil',label:'Perfil pessoal'}])
   if (admin) pages.push(...[{to:'/administracao/dashboard',label:'Dashboard C4G'}, {to:'/administracao/entidades',label:'Entidades e utilizadores'}, {to:'/administracao/faturacao',label:'Faturação da plataforma'}, {to:'/administracao/logs',label:'Logs'}, {to:'/administracao/importar',label:'Importar Portugal 2030'}, {to:'/administracao/oportunidades/nova',label:'Criar oportunidade'}])
   return pages
 }

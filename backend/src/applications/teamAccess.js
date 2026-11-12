@@ -16,7 +16,12 @@ function createTeamAccessPolicy({currentClient, operationCatalog}) {
 
     // A collection read only opens the filtered list. Individual resources below
     // must still pass the current participant check, including broad old grants.
-    let participating = application && root && operation.permission === 'application.read';
+    // A technician allowed to start applications may read opportunities at organization level (list and
+    // capabilities only); individual opportunities stay limited to the teams they belong to.
+    const mayStart = source && root && operationCode === 'OPPORTUNITY_READ'
+      && snapshot.grants.some(g => g.permission === 'application.create' && g.scope?.type === 'ORGANIZATION'
+        && g.scope.organizationId === actor.organizationId && !g.resourceId);
+    let participating = (application && root && operation.permission === 'application.read') || mayStart;
     if (application && root && operation.permission !== 'application.read') return snapshot;
     if (!participating) {
       const predicate = application ? 'a.application_id=$3'

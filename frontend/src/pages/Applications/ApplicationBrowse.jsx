@@ -11,7 +11,7 @@ import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { privateApplicationsApi as api } from '../../api/api'
 import InfoTooltip from '../../components/InfoTooltip'
 import { ApplicationsTable, SortIcon } from './ApplicationPresentation'
-import ApplicationAreaNav, { ApplicationAreaHeader } from './ApplicationAreaNav'
+import { ApplicationAreaHeader } from './ApplicationAreaNav'
 import { LABEL, CHIP, budgetLabel, dateLabel } from './lifecycle'
 import { primaryApplicationStatuses } from '../../utils/applicationStatuses'
 import { applicationIntentKey, loadApplicationIntention } from './intentions'
@@ -70,8 +70,7 @@ export default function ApplicationBrowse(){
  const otherStates=Object.keys(LABEL).filter(code=>!primaryApplicationStatuses.includes(code))
  const stateDot=code=><span aria-hidden="true" className="state-dot" data-state={code}/>
  const stateButton=code=><button key={code} aria-pressed={status===code} className="state-option" onClick={()=>filter({status:status===code?'':code})}>{stateDot(code)}<span>{LABEL[code]}</span><span className="pill-count">{data?data.countsByStatus[code]??0:'—'}</span></button>
- return <main className="page application-browse"><ApplicationAreaHeader organization={organization} title="Candidaturas"><Link className="btn btn-primary" to="/candidaturas?ver=interesses" title="Escolher um interesse para iniciar a candidatura"><Plus size={17} aria-hidden="true"/>Nova candidatura</Link></ApplicationAreaHeader>
-  <ApplicationAreaNav/>
+ return <main className="page application-browse"><ApplicationAreaHeader organization={organization} title="Candidaturas"><Link className="btn btn-primary" to="/catalogo" title="Escolher uma oportunidade para iniciar a candidatura"><Plus size={17} aria-hidden="true"/>Nova candidatura</Link></ApplicationAreaHeader>
   {pending&&<p role="status">Existe um envio por confirmar. <button className="btn btn-outline" disabled={busy} onClick={()=>send(pending)}>Repetir o mesmo envio</button></p>}
   {notice&&<p role="status">{notice}</p>}
   <FilterBar aria-label="Filtros de candidaturas"><label className="filter-search">Pesquisar candidaturas<SearchInput aria-label="Pesquisar candidaturas" placeholder="Pesquisar candidatura, oportunidade ou responsável…" value={q} maxLength={200} onChange={e=>filter({q:e.target.value})}/></label>

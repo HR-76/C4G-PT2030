@@ -13,7 +13,7 @@ import { OpportunityReadModelDetails } from '../Opportunities/OpportunityReadMod
 import UnitSelector, { unitLabel } from './UnitSelector'
 import useInterestCommand, { interestError } from './useInterestCommand'
 import { safeInterestReturn } from './intentions'
-import ApplicationAreaNav, { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
+import { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
 import './interests.css'
 
 const date = value => value ? new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleDateString('pt-PT') : 'Não indicado'
@@ -70,9 +70,7 @@ function InterestList({ userId, organizationId, organization }) {
     setParams(copy)
   }
   function applyFilters(values) {
-    const next = new URLSearchParams(values)
-    if (location.pathname === '/candidaturas') next.set('ver', 'interesses')
-    setParams(next)
+    setParams(new URLSearchParams(values))
   }
   async function prepareApplication(item) {
     if (openingRequest.current || loading || commandLocked || !canPrepareApplication(item)) return
@@ -94,8 +92,7 @@ function InterestList({ userId, organizationId, organization }) {
       if (current()) setOpeningError([401, 403, 404].includes(error?.response?.status) ? interestError(error) : 'Não foi possível preparar a candidatura. Tente novamente para consultar os dados atuais.')
     } finally { if (current()) { openingRequest.current = null; setOpeningId(null) } }
   }
-  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses da organização"><Link className="btn btn-outline" to="/catalogo">Catálogo C4G</Link></ApplicationAreaHeader>
-    <ApplicationAreaNav/>
+  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses"><Link className="btn btn-outline" to="/catalogo">Oportunidades</Link><Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link></ApplicationAreaHeader>
     <Feedback command={command}/>
     <FilterBar as="form" onSubmit={event => { event.preventDefault(); applyFilters(Object.fromEntries(Object.entries(draft).filter(([,value]) => value))) }}>
       <label className="filter-search">Pesquisar<SearchInput maxLength={200} value={draft.q} onChange={event => setDraft(previous => ({ ...previous, q: event.target.value }))}/></label>

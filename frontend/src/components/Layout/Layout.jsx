@@ -11,8 +11,8 @@ import { afterPageRequests } from '../../api/pageRequests'
 const titles = {
   '/meu-trabalho': 'O meu trabalho',
   '/dashboard':     'Dashboard',
-  '/catalogo':      'Catálogo C4G',
-  '/interesses':    'Interesses da organização',
+  '/catalogo':      'Oportunidades',
+  '/interesses':    'Interesses',
   '/oportunidades': 'Oportunidades privadas',
   '/perfil-organizacao': 'Perfil da organização',
   '/pre-qualificacao': 'Análise parcial',

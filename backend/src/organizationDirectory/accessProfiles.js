@@ -9,6 +9,8 @@ const common=['opportunity_interest.read','notification.read','personal_profile.
 const management=['opportunity_interest.manage','opportunity.read','opportunity.private.create','opportunity.private.update','opportunity.archive',
  'application.read','application.create','application.edit','application.transition','prequalification.read',
  'organization_directory.read','organization_directory.edit','organizational_scope.read','organization_membership.read','organization_membership.manage'];
+// Técnico (12/11/2026): manages interests and starts applications; no directory, membership or archive powers.
+const technician=['opportunity_interest.manage','application.create'];
 const administration=['organization_notice.manage','organizational_scope.create','organizational_scope.rename','organizational_scope.reparent'];
 const work=new Set(['application.read','application.edit','application.transition','application.review.decide',
  'document.read','document.version.list','document.version.create','document.download.request','document.upload.initiate','document.upload.confirm']);
@@ -20,7 +22,7 @@ function capabilities(profile,actorId,target){
 }
 function grantsForProfile({organizationId,profileCode,previousProfile,previousGrants=[]}){
  if(!['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER'].includes(profileCode))throw Object.assign(new Error('INVALID_INPUT'),{code:'INVALID_INPUT'});
- const codes=[...common,...(profileCode!=='VIEWER'?['opportunity_interest.register']:[]),...(canManage(profileCode)?management:[]),...(profileCode==='ORG_ADMIN'?administration:[])];
+ const codes=[...common,...(profileCode!=='VIEWER'?['opportunity_interest.register']:[]),...(canManage(profileCode)?management:[]),...(profileCode==='CONTRIBUTOR'?technician:[]),...(profileCode==='ORG_ADMIN'?administration:[])];
  const grants=codes.map(permission=>({permission,scope:{type:'ORGANIZATION',id:organizationId,organizationId}}));
  // Explicit work grants survive; an old administrator/manager's broad powers do not.
  for(const grant of previousGrants){

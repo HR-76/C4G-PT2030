@@ -38,10 +38,17 @@ async function storeUnits(client,org,id,ids){
  await client.query('UPDATE opportunity_catalog.application_unit SET active=false WHERE organization_id=$1 AND application_id=$2 AND active AND NOT(scope_id=ANY($3::uuid[]))',[org,id,ids]);
  for(const unitId of ids)await client.query('INSERT INTO opportunity_catalog.application_unit(organization_id,application_id,scope_id) SELECT $1,$2,$3 WHERE NOT EXISTS(SELECT 1 FROM opportunity_catalog.application_unit WHERE organization_id=$1 AND application_id=$2 AND scope_id=$3 AND active) ON CONFLICT(organization_id,application_id,scope_id) DO UPDATE SET active=true',[org,id,unitId]);
 }
-async function includeResponsible(client,org,id,membershipId,actor){
- // Only called for a freshly created application after cumulative APPLICATION_WORK_EDIT authorization.
- await client.query('INSERT INTO opportunity_catalog.application_work(organization_id,application_id,revision) VALUES($1,$2,2)',[org,id]);
- await client.query('INSERT INTO opportunity_catalog.application_participant(organization_id,application_id,membership_id) VALUES($1,$2,$3)',[org,id,membershipId]);
- await client.query("INSERT INTO opportunity_catalog.application_work_change(organization_id,application_id,revision,kind,membership_id,actor_subject_id) VALUES($1,$2,2,'PARTICIPANT_ADDED',$3,$4)",[org,id,membershipId,actor.id]);
+// Only called for a freshly created application: either after cumulative APPLICATION_WORK_EDIT authorization
+// (explicit responsible) or for the creator's own membership. Revisions are consecutive from 2.
+async function addTeam(client,org,id,membershipIds,actor){
+ const ids=[...new Set(membershipIds)];
+ if(!ids.length)return;
+ await client.query('INSERT INTO opportunity_catalog.application_work(organization_id,application_id,revision) VALUES($1,$2,$3)',[org,id,ids.length+1]);
+ let revision=1;
+ for(const membershipId of ids){
+  revision+=1;
+  await client.query('INSERT INTO opportunity_catalog.application_participant(organization_id,application_id,membership_id) VALUES($1,$2,$3)',[org,id,membershipId]);
+  await client.query("INSERT INTO opportunity_catalog.application_work_change(organization_id,application_id,revision,kind,membership_id,actor_subject_id) VALUES($1,$2,$3,'PARTICIPANT_ADDED',$4,$5)",[org,id,revision,membershipId,actor.id]);
+ }
 }
-module.exports={requested,currentUnits,hydratePageUnits,prepare,storeUnits,includeResponsible};
+module.exports={requested,currentUnits,hydratePageUnits,prepare,storeUnits,addTeam};

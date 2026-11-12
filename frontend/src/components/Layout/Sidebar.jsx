@@ -7,7 +7,7 @@ import '../../dashboard-palette.css'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   LayoutDashboard, FileText, Zap, Bell, ListChecks, CalendarDays,
-  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus, Mail,
+  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus, Mail, Heart,
 } from 'lucide-react'
 
 export default function Sidebar({ open, mobile, hidden = false, panelRef, onClose, onNavigate, navigationAccess = {directory:true, units:true, access:true} }) {
@@ -30,7 +30,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
     ...(platformAdmin ? [{ label: 'Plataforma C4G', items: [
       { to: '/administracao/dashboard', icon: LayoutDashboard, tone: 'blue', label: 'Dashboard C4G' },
     ] }, { label: 'Oportunidades e catálogo', items: [
-      { to: '/catalogo', icon: Globe, tone: 'sky', label: 'Catálogo C4G' },
+      { to: '/catalogo', icon: Globe, tone: 'sky', label: 'Oportunidades' },
       { to: '/administracao/oportunidades/nova', icon: FileText, tone: 'rose', label: 'Criar oportunidade' },
       { to: '/integracoes', icon: Globe, tone: 'violet', label: 'Fontes de oportunidades' },
       { to: '/administracao/importar', icon: Upload, tone: 'amber', label: 'Importar Portugal 2030' },
@@ -44,10 +44,10 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
     ...(organization ? [{ label: 'Trabalho diário', items: [
       { to: '/dashboard', icon: LayoutDashboard, tone: 'blue', label: 'Dashboard' },
       { to: '/meu-trabalho', icon: ListChecks, tone: 'violet', label: 'O meu trabalho' },
-      ...(!platformAdmin ? [{ to: '/catalogo', icon: Globe, tone: 'sky', label: 'Catálogo C4G' }] : []),
+      ...(!platformAdmin ? [{ to: '/catalogo', icon: Globe, tone: 'sky', label: 'Oportunidades' }, { to: '/interesses', icon: Heart, tone: 'rose', label: 'Interesses' }] : []),
       { to: '/candidaturas', icon: FileText, tone: 'rose', label: 'Candidaturas' },
       ...(organization.profileCode === 'ORG_ADMIN' ? [{ to: '/calendario', icon: CalendarDays, tone: 'blue', label: 'Calendário da entidade' }] : []),
-      { to: '/parceiros', icon: Handshake, tone: 'blue', label: 'Parceiros' },
+      ...(organization.profileCode !== 'CONTRIBUTOR' ? [{ to: '/parceiros', icon: Handshake, tone: 'blue', label: 'Parceiros' }] : []),
       { to: '/matching', icon: Zap, tone: 'violet', label: 'Matching' },
       { to: '/notificacoes', icon: Bell, tone: 'amber', label: 'Alertas' },
     ] }, ...((navigationAccess.directory || navigationAccess.units || navigationAccess.access || canReadBilling) ? [{ label: 'Organização', items: [
@@ -57,7 +57,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
       ...(canReadBilling ? [{ to: '/faturacao', icon: ReceiptText, tone: 'amber', label: 'Faturação' }] : []),
       ...(navigationAccess.access ? [{ to: '/utilizadores', icon: ShieldCheck, tone: 'rose', label: 'Acessos' }] : []),
     ] }] : [])] : !platformAdmin ? [{ label: 'Trabalho diário', items: [
-      { to: '/catalogo', icon: Globe, tone: 'sky', label: 'Catálogo C4G' },
+      { to: '/catalogo', icon: Globe, tone: 'sky', label: 'Oportunidades' },
     ] }] : []),
     ...(!platformAdmin || organization ? [{ label: 'A minha conta', items: [
       ...(organization ? [{ to: '/perfil', icon: User, tone: 'blue', label: 'Perfil pessoal' }] : []),

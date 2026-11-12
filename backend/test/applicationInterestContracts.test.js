@@ -30,10 +30,11 @@ test('interest permissions are distinct and install least privilege for each pro
  assert.equal(catalogs.operationCatalog.resolve('OPPORTUNITY_INTEREST_REGISTER').resourceType,'OPPORTUNITY_INTEREST');
  const perms=profileCode=>grantsForProfile({organizationId:org,profileCode}).map(g=>g.permission);
  for(const p of ['ORG_ADMIN','FUNDING_MANAGER'])for(const op of ['read','register','manage'])assert.ok(perms(p).includes('opportunity_interest.'+op));
- assert.ok(perms('CONTRIBUTOR').includes('opportunity_interest.register'));
- assert.ok(!perms('CONTRIBUTOR').includes('opportunity_interest.manage'));
- assert.ok(!perms('CONTRIBUTOR').includes('organization_directory.read'));
- assert.ok(!perms('CONTRIBUTOR').includes('application.create'));
+ // 12/11/2026: the Técnico may manage interests and start applications; the rest of the management set stays out.
+ for(const p of ['opportunity_interest.register','opportunity_interest.manage','application.create'])assert.ok(perms('CONTRIBUTOR').includes(p),p);
+ assert.ok(!perms('CONTRIBUTOR').includes('opportunity.read'),'source reads stay derived from the team');
+ for(const p of ['organization_directory.read','organization_directory.edit','organization_membership.manage','opportunity.private.create','opportunity.archive','application.transition'])assert.ok(!perms('CONTRIBUTOR').includes(p),p);
+ assert.ok(!perms('VIEWER').includes('opportunity_interest.manage')&&!perms('VIEWER').includes('application.create'));
  assert.ok(perms('VIEWER').includes('opportunity_interest.read'));
  assert.ok(!perms('VIEWER').includes('opportunity_interest.register'));
 });

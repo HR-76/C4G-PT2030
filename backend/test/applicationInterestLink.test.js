@@ -6,7 +6,7 @@ const {selection}=require('../src/applications/browseSql');
 const {storeUnits}=require('../src/applications/interestLink');
 const {project}=require('../src/applications/repository');
 const {query}=require('../src/applications/contracts');
-function fixture({schema=true,denied=false}={}){
+function fixture({schema=true,denied=false,creatorJoinsTeam=null}={}){
  const org=randomUUID(),actor={id:randomUUID(),membershipId:randomUUID()},opportunityId=randomUUID(),unitId=randomUUID(),interestId=randomUUID(),centralRevisionId=randomUUID();
  const history=[],receipts=new Map(),apps=[],guards=[],audit=[],queries=[];
  const interest={organization_id:org,interest_id:interestId,central_opportunity_id:opportunityId,central_revision_id:randomUUID(),revision:2,status:'ACTIVE'};
@@ -25,9 +25,9 @@ function fixture({schema=true,denied=false}={}){
   return {rows:[],rowCount:1};
  }};
  const repo=createApplicationRepository({organizationId:org,actor,protect:async args=>{guards.push(args);if(denied)throw Object.assign(Error(),{code:'NOT_AUTHORIZED'});},authorize:async()=>true,verifyResponsible:async()=>true,
-  centralOrigin:async()=>({title:'Aviso',lifecycleState:'ACTIVE'}),centralCurrent:async()=>({revisionId:centralRevisionId}),audit:async(c,e)=>audit.push(e)});
+  centralOrigin:async()=>({title:'Aviso',lifecycleState:'ACTIVE'}),centralCurrent:async()=>({revisionId:centralRevisionId}),audit:async(c,e)=>audit.push(e),...(creatorJoinsTeam?{creatorJoinsTeam}:{})});
  const input=command('create',{origin:'CENTRAL',opportunityId,centralRevisionId,evaluationId:null,title:'Projeto',responsibleMembershipId:randomUUID(),deadline:'2026-12-31',idempotencyKey:randomUUID(),sourceInterestId:interestId,sourceInterestRevision:2,unitIds:[unitId],includeResponsibleInTeam:true});
- return {repo,client,input,interest,units,apps,history,guards,queries,audit,unitId,org};
+ return {repo,client,input,interest,units,apps,history,guards,queries,audit,unitId,org,actor};
 }
 test('conversion preserves signal observation, selected units, exact new source and explicit team in one command',async()=>{
  const f=fixture(),result=await f.repo.create(f.client,f.input);
@@ -117,4 +117,28 @@ test('browse hydrates the returned page with current unit labels without one que
  const links=f.queries.filter(entry=>entry.sql.includes('FROM opportunity_catalog.application_unit'));
  assert.equal(links.length,1);assert.deepEqual(links[0].params,[f.org,result.items.map(row=>row.applicationId)]);
  assert.equal(f.queries.filter(entry=>entry.sql.includes('FROM organizational_scope.scope')).length,1);
+});
+
+const teamRows=f=>({participants:f.queries.filter(q=>q.sql.startsWith('INSERT INTO opportunity_catalog.application_participant')).map(q=>q.params[2]),
+ work:f.queries.filter(q=>q.sql.startsWith('INSERT INTO opportunity_catalog.application_work(')).map(q=>q.params[2]),
+ changes:f.queries.filter(q=>q.sql.startsWith('INSERT INTO opportunity_catalog.application_work_change')).map(q=>[q.params[2],q.params[3]])});
+const withoutTeam=f=>{const input={...f.input};delete input.includeResponsibleInTeam;return input};
+test('a technician who creates an application joins its team without any extra authorization',async()=>{
+ const f=fixture({creatorJoinsTeam:async()=>true});await f.repo.create(f.client,withoutTeam(f));
+ assert.deepEqual(teamRows(f),{participants:[f.actor.membershipId],work:[2],changes:[[2,f.actor.membershipId]]});
+ assert.ok(!f.guards[0].additionalAuthorizations.some(check=>check.operationCode==='APPLICATION_WORK_EDIT'));
+ assert.ok(!f.audit.some(e=>e.operationCode==='APPLICATION_WORK_EDIT'));
+});
+test('creator and a different responsible both join with consecutive revisions; the same person joins once',async()=>{
+ const both=fixture({creatorJoinsTeam:async()=>true});await both.repo.create(both.client,both.input);
+ const rows=teamRows(both);assert.equal(rows.participants.length,2);assert.ok(rows.participants.includes(both.actor.membershipId));
+ assert.deepEqual(rows.work,[3]);assert.deepEqual(rows.changes.map(c=>c[0]),[2,3]);
+ const same=fixture({creatorJoinsTeam:async()=>true});same.input.responsibleMembershipId=same.actor.membershipId;await same.repo.create(same.client,same.input);
+ assert.deepEqual(teamRows(same).participants,[same.actor.membershipId]);assert.deepEqual(teamRows(same).work,[2]);
+});
+test('other creators are not added to the team unless the responsible is requested explicitly',async()=>{
+ const none=fixture();await none.repo.create(none.client,withoutTeam(none));
+ assert.deepEqual(teamRows(none),{participants:[],work:[],changes:[]});
+ const explicit=fixture();await explicit.repo.create(explicit.client,explicit.input);
+ assert.deepEqual(teamRows(explicit).participants,[explicit.input.responsibleMembershipId]);
 });

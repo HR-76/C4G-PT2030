@@ -13,7 +13,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { OpportunityOverview } from './OpportunityPresentation'
 import OpportunityListTable from './OpportunityListTable'
 import OpportunityApplicationCount from './OpportunityApplicationCount'
-import CatalogInterestButton from './CatalogInterestButton'
+import CatalogInterestButton, { CatalogApplicationButton } from './CatalogInterestButton'
 import CatalogInterests from '../Interests/CatalogInterests'
 import { downloadOpportunityPage, opportunityDisplay } from './opportunityReadModel'
 import { emptyCatalogFilters as emptyFilters, initialCatalogFilters, catalogFilterParams, catalogPaginationParams, catalogPeriodDates, catalogQuery, catalogSourceOptions } from './catalogFilters'
@@ -96,8 +96,9 @@ function Catalog({ id, organization, platformAdmin }) {
   }
   const pendingFilters = Object.keys(emptyFilters).some(key => draft[key] !== filters[key])
   const invalidDates = draft.closingFrom && draft.closingTo && draft.closingFrom > draft.closingTo
-  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Catálogo C4G</h1>}</div>
-    {organization && <Link className="btn btn-brand" to="/candidaturas?ver=interesses">Candidaturas</Link>}
+  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Oportunidades</h1>}</div>
+    {organization && <Link className="btn btn-outline" to="/interesses">Interesses</Link>}
+    {organization && <Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link>}
     {platformAdmin && <Link className="btn btn-primary" to="/administracao/oportunidades/nova"><Plus size={16} /> Criar oportunidade</Link>}
     {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}</div>
     {mode && <aside className="catalog-source" aria-label="Dados do catálogo">
@@ -148,7 +149,7 @@ function Catalog({ id, organization, platformAdmin }) {
     </div>}
     {!id && !loading && !error && canRead && <Card><CardHeader><p className="table-meta" role="status">{items.length} {items.length === 1 ? 'oportunidade' : 'oportunidades'} nesta página{filtered ? ' · filtros aplicados' : ''}</p>
       {!!items.length && <div className="catalog-actions"><CatalogColumnVisibility selected={columns} hasOrganization={Boolean(organization)} onChange={changeColumns}/><button className="btn btn-outline btn-sm" type="button" onClick={() => downloadOpportunityPage(items)}>Exportar página</button></div>}</CardHeader>
-      {!!items.length && <OpportunityListTable sort={sort} onSort={changeSort} visibleColumns={columns} items={items} organizationId={organization?.id} central interestOnly search={search} applicationsLabel="Interesse" renderApplicationAction={organization?item=><CatalogInterestButton key={item.opportunityId} item={item} compact/>:undefined} />}
+      {!!items.length && <OpportunityListTable sort={sort} onSort={changeSort} visibleColumns={columns} items={items} organizationId={organization?.id} central interestOnly search={search} applicationsLabel="Interesse" renderApplicationAction={organization?item=><div key={item.opportunityId} className="catalog-row-actions"><CatalogInterestButton item={item} compact/><CatalogApplicationButton item={item}/></div>:undefined} />}
       {!items.length && <div className="catalog-empty"><h2>{filtered ? 'Sem resultados para estes filtros' : 'Ainda não existem oportunidades no catálogo comum.'}</h2><p>{filtered ? 'Experimente outro termo ou limpe os filtros.' : 'As oportunidades ficam disponíveis depois de a Administração C4G as criar ou atualizar uma fonte.'}</p>{filtered && <button type="button" className="btn btn-outline" onClick={() => { setPeriod('all'); setDraft(emptyFilters); applyFilters(emptyFilters, 'all') }}>Ver todo o catálogo</button>}</div>}
       {(pages.length > 1 || next) && <nav className="catalog-actions" aria-label="Páginas do catálogo"><button className="btn btn-secondary" disabled={pages.length === 1} onClick={() => changePage(pages.slice(0, -1))}>Página anterior</button><span>Página {pages.length}</span><button className="btn btn-secondary" disabled={!next} onClick={() => changePage([...pages, next])}>Página seguinte</button></nav>}</Card>}
   </div></CatalogInterests>

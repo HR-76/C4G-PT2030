@@ -223,6 +223,8 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     taskDetailsAvailable,
     recordStatusEmail:statusEmailProducer||(statusEmailIsolatedCapture===true?require('./statusEmails/producer').createProducer({mode:'isolated',isolated:true,clock:()=>clock.now(),capture:require('./statusEmails/capture').createCapture({centralPool:{query:(sql,values)=>coordinator.withAuthority(()=>coordinator.pool.query(sql,values))},organizationId:org,actorUserId:context.actor.id,assertAuthorized:assertCurrent})}):undefined),
     readAuthority,transitionCapability:id=>capability(resource(id,org)),
+    // A Técnico only sees the applications of their teams, so the creator joins the one just created.
+    creatorJoinsTeam:async()=>{const current=await data.authorizationDataPort.load(context.actor);if(!current)fail('SERVICE_UNAVAILABLE');return current.profileCode==='CONTRIBUTOR'},
     responsibleDirectory:()=>readResponsibleDirectory({client,organizationId:org,responsibles,assertCurrent}),
     canReadStrategyAlignment:async()=>{
      if(s.method!=='dashboard'||!reportChecks.length)return false;

@@ -64,3 +64,5 @@
  .interests-page .interest-table td { padding:12px 14px; }
  .c4g-shell #main-content .interest-row-actions .btn { min-height:var(--control-h-touch); }
 }
+.catalog-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.catalog-start-application { display: inline-flex; align-items: center; gap: 6px; }
