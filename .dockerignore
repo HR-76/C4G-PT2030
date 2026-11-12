@@ -1,0 +1,17 @@
+.git
+.github
+.vscode
+.tmp
+**/node_modules
+frontend
+context
+dev
+experiments
+lint-harness
+source-docs
+test
+backend/test
+backend/output
+output
+**/.env
+**/.env.*
