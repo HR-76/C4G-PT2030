@@ -90,8 +90,8 @@ function collectionEnvironment(option) {
 // Private object storage (Cloudflare R2, EU jurisdiction) and the ClamAV scanner. The R2 values are the operator's: they are
 // read from a file the operator writes on the server and are never generated, printed or sent anywhere by the installer.
 // ClamAV runs beside the API in the same network namespace (compose "clamav" service), because the runtime only accepts a
-// loopback scanner. Enabling it turns on the features that need both: private billing PDFs, the central PT2030 import (upload,
-// preview, staging of the candidates and acceptance of the new ones into the catalogue) and application documents (F11, R2).
+// loopback scanner. Enabling it turns on the two features that need both: private billing PDFs and the central PT2030
+// import (upload, preview, staging of the candidates and acceptance of the new ones into the catalogue).
 // C4G_R2_LAYER_C_VALIDATED is the operator's declaration that the real R2 has been validated: the runtime refuses to build the
 // storage without it. In staging, setting it is the operator's act after `storage-check` passes; it is never added for them.
 const STORAGE_KEYS = Object.freeze(['C4G_R2_ENDPOINT', 'C4G_R2_DOCUMENTS_BUCKET', 'C4G_R2_QUARANTINE_BUCKET', 'C4G_R2_ACCESS_KEY_ID', 'C4G_R2_SECRET_ACCESS_KEY', 'C4G_R2_LAYER_C_VALIDATED']);
@@ -113,21 +113,7 @@ function storageEnvironment(text) {
   // The runtime's own loader is the authority on what is acceptable (EU endpoint, two distinct buckets, loopback scanner).
   try { require('../../src/config/applicationDocuments').loadApplicationDocumentConfiguration({ ...values, ...SCANNER }); }
   catch { throw failure('STAGING_STORAGE_INVALID'); }
-  return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'catalog', DOCUMENTS_RUNTIME: 'f11-r2' };
-}
-
-// Document API and worker settings. Only with the storage file. The organization list is the one organization the installer
-// registered; a new organization needs the environment regenerated. The worker reads the same file and listens on the pod.
-const DOCUMENT_WORKER_HEALTH_PORT = '8600';
-function documentEnvironment(state) {
-  if (!UUID.test(state?.organizationId || '')) throw failure('STAGING_DOCUMENT_ORGANIZATION_MISSING');
-  return {
-    DOCUMENT_API_ORGANIZATIONS_JSON: JSON.stringify([state.organizationId]),
-    DOCUMENT_API_STAGING_DIRECTORY: '/var/tmp/c4g-documents',
-    DOCUMENT_WORKER_HEALTH_URL: `http://127.0.0.1:${DOCUMENT_WORKER_HEALTH_PORT}/health/ready`,
-    DOCUMENT_WORKER_HEALTH_PORT,
-    DOCUMENT_WORKER_RUNTIME: 'f11-documents'
-  };
+  return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'catalog' };
 }
 
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
@@ -147,9 +133,6 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     FUNDING_TENDERS_SOURCE: 'unconfigured',
     ...collectionEnvironment(collection),
     ...storageEnvironment(storage),
-    // Documents need an explicit organization list (the single organization the installer registered), a staging directory
-    // and the health address of the separate document worker, which shares the pod network with the API.
-    ...(storage ? documentEnvironment(state) : {}),
     CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,

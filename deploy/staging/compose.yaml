@@ -35,27 +35,6 @@ services:
     volumes:
       - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
 
-  # Worker de documentos: varredura antivírus, reconciliação e expiração das versões enviadas. Corre à parte da API para
-  # não bloquear pedidos, e partilha a rede do "pod" para o endereço de saúde 127.0.0.1 que a API consulta antes de ficar
-  # pronta. Só arranca com o perfil "storage", junto com a API e o antivírus (ver o runbook).
-  document-worker:
-    profiles: ["storage"]
-    image: c4g-staging-api:${C4G_RELEASE:?defina C4G_RELEASE com o SHA do commit}
-    init: true
-    restart: unless-stopped
-    network_mode: "service:pod"
-    depends_on: [pod]
-    command: ["node", "src/documentWorker.js"]
-    env_file:
-      - path: /srv/c4g-staging/api-oidc.env
-        format: raw
-      - path: /srv/c4g-staging/api-private.env
-        format: raw
-    environment:
-      NODE_EXTRA_CA_CERTS: /certs/ca.pem
-    volumes:
-      - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
-
   # Antivírus dos ficheiros enviados (PDFs de faturação, carregamento PT2030). Partilha a rede do "pod" com a API e escuta em
   # 127.0.0.1:3310 dentro dela; não tem porta publicada.
   # Só arranca com o perfil "storage" (ver o runbook). Descarrega as assinaturas ao arrancar, o que demora alguns minutos.
