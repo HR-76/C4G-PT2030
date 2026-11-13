@@ -137,3 +137,11 @@ test('a technician is matched against the catalog only and is told that private 
  const failing=createOrganizationMatching({directory:{execute:async()=>person,canReadPrivateOpportunities:async()=>{throw Object.assign(Error(),{code:'SERVICE_UNAVAILABLE'})}},opportunities:{list:async()=>({items:[],nextCursor:null})},central:{list:async()=>({items:[],nextCursor:null})}});
  await assert.rejects(failing.execute({},{}),{code:'SERVICE_UNAVAILABLE'});
 });
+
+test('refuses opportunity matching with NOT_AUTHORIZED when the caller cannot read people (not a dependency failure)',async()=>{
+ const opportunityId=randomUUID();
+ const directory={execute:async(operation)=>{if(operation==='context')return {};throw Object.assign(Error('denied'),{code:'AUTHORIZATION_DENIED'})}};
+ const opportunities={get:async()=>({snapshot:{title:'Education training',lifecycleState:'ACTIVE',closingDate:'2027-01-01'}})};
+ const service=createOrganizationMatching({directory,opportunities,central:{get:async()=>({snapshot:{title:'Education training',lifecycleState:'ACTIVE',closingDate:'2027-01-01'}}),list:async()=>({items:[],nextCursor:null})}});
+ await assert.rejects(service.execute({opportunityId,origin:'CENTRAL'},{}),error=>error.code==='NOT_AUTHORIZED');
+});

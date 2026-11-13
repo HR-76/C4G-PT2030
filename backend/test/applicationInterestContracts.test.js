@@ -41,8 +41,9 @@ test('interest permissions are distinct and install least privilege for each pro
 
 test('the navigation policy is decided by the backend: partners, calendar and the dashboard variant per profile',()=>{
  const {navigationFor}=require('../src/organizationDirectory/accessProfiles');
- assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false,calendar:false,dashboard:'TECHNICIAN'});
- assert.deepEqual(navigationFor('ORG_ADMIN'),{partners:true,calendar:true,dashboard:'ORGANIZATION'});
- for(const profile of ['FUNDING_MANAGER','VIEWER'])assert.deepEqual(navigationFor(profile),{partners:true,calendar:false,dashboard:'ORGANIZATION'});
+ assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false,calendar:false,people:false,dashboard:'TECHNICIAN'});
+ assert.deepEqual(navigationFor('ORG_ADMIN'),{partners:true,calendar:true,people:true,dashboard:'ORGANIZATION'});
+ assert.deepEqual(navigationFor('FUNDING_MANAGER'),{partners:true,calendar:false,people:true,dashboard:'ORGANIZATION'});
+ assert.deepEqual(navigationFor('VIEWER'),{partners:true,calendar:false,people:false,dashboard:'ORGANIZATION'});
  assert.equal(navigationFor('UNKNOWN'),null);
 });

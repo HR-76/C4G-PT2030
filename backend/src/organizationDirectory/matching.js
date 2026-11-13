@@ -34,7 +34,9 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
   let items,privateIncluded=true;
   const today=civilToday(new Date(asOf));
   if(byOpportunity){
-   const opportunity=await load(query.origin,query.opportunityId),people=await pages(q=>directory.execute('peopleWithResearchAreas',q,null,request));
+   const opportunity=await load(query.origin,query.opportunityId);
+   // Without organisation-wide people access the answer is a clear refusal, not a dependency failure.
+   const people=await pages(q=>directory.execute('peopleWithResearchAreas',q,null,request)).catch(error=>{if(['AUTHORITY_DENIED','AUTHORIZATION_DENIED','NOT_AUTHORIZED'].includes(error?.code))fail('NOT_AUTHORIZED');throw error;});
    items=[];
    for(const person of people){
     if(!Array.isArray(person.areaIds))fail('SERVICE_UNAVAILABLE');

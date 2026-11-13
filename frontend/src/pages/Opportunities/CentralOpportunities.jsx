@@ -136,7 +136,7 @@ function Catalog({ id, organization, platformAdmin }) {
     {fields && <article className="detail-page">
       <OpportunityOverview interventionClassification={record.interventionClassification} centralPresentation={record.catalogPresentation} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} temporal={record.temporal} sourceReview={record.sourceReview} fields={fields} source={record.source} reference={fields.callReference || record.externalIdentifier} observedAt={record.observedAt} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization?.id} opportunityId={id} />} central>
         {organization && <CatalogInterestButton item={contextItem} />}
-        {organization&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}
+        {organization?.navigation?.people===true&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}
       </OpportunityOverview>
     </article>}
     {!id && canRead && <div className="catalog-compare-tools">
