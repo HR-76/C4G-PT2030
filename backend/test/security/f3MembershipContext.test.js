@@ -38,8 +38,8 @@ test('session exposes only a presentation label from the resolved current member
     assert.equal(res.body.organization.profileLabel, label);
     assert.equal(res.body.organization.profileCode, role);
     // The backend decides which areas a profile may open; the client only follows this list.
-    assert.deepEqual(res.body.organization.navigation, { ORG_ADMIN: { partners: true, calendar: true, dashboard: 'ORGANIZATION' }, FUNDING_MANAGER: { partners: true, calendar: false, dashboard: 'ORGANIZATION' },
-      CONTRIBUTOR: { partners: false, calendar: false, dashboard: 'TECHNICIAN' }, VIEWER: { partners: true, calendar: false, dashboard: 'ORGANIZATION' } }[role]);
+    assert.deepEqual(res.body.organization.navigation, { ORG_ADMIN: { partners: true, calendar: true, people: true, dashboard: 'ORGANIZATION' }, FUNDING_MANAGER: { partners: true, calendar: false, people: true, dashboard: 'ORGANIZATION' },
+      CONTRIBUTOR: { partners: false, calendar: false, people: false, dashboard: 'TECHNICIAN' }, VIEWER: { partners: true, calendar: false, people: false, dashboard: 'ORGANIZATION' } }[role]);
     assert.equal(res.body.organization.membershipId, undefined);
     assert.equal(res.body.organization.baseRoleCode, undefined);
   }
