@@ -79,3 +79,11 @@ Princípio do utilizador: as decisões de acesso ficam no backend; o frontend n�
 - Frontend (`Sidebar`, `Header`, `App`): esconde Parceiros e redireciona `/parceiros` apenas quando `organization.navigation.partners === false`; sem `profileCode`. Ausência da lista (sessão antiga) mostra a entrada.
 - Provas: testes novos em `partnerBrowseBoundary`, `applicationInterestContracts` (política) e `f3MembershipContext` (sessão), todos falharam antes; teste de navegação do frontend. Lint, frontend 1009, backend 3166 aprovados, build ok. **Não provado em staging nem contra PostgreSQL**: a recusa na API e a leitura do perfil atual usam o mesmo padrão de `creatorJoinsTeam`.
 - Não alterado, por não ter sido pedido: `profileCode` do Calendário (`ORG_ADMIN`) e do Dashboard do Técnico, que já existiam no frontend.
+
+### Calendário e Dashboard no backend (13/11/2026)
+
+A lista de navegação do backend passa a cobrir as duas regras por perfil que ainda estavam no frontend. `navigationFor(profileCode)` devolve `{ partners, calendar, dashboard }`: `partners` falso só para o Técnico; `calendar` verdadeiro só para `ORG_ADMIN`; `dashboard` `'TECHNICIAN'` para o Técnico e `'ORGANIZATION'` para os outros.
+
+- Backend: o endpoint do calendário (`applications/composition.js`) usa a mesma política em vez de comparar o perfil, por isso o que o cliente oferece e o que o servidor aceita deixam de poder divergir.
+- Frontend: Sidebar, pesquisa de páginas e rota `/calendario` seguem `organization.navigation.calendar === true` (ausente ou falso: sem Calendário); o Dashboard escolhe a variante por `organization.navigation.dashboard` (`utils/dashboardVariant.js`). Já não existe `profileCode` em nenhuma decisão de apresentação do frontend; só as telas de gestão de acessos (`OrganizationAccess`, `EntityUsers`) o mostram e escolhem, como dados.
+- Provas: testes de política e de sessão atualizados (falhavam antes), teste da barra lateral e do auxiliar do Dashboard. Lint limpo, frontend 1011, backend 3177 aprovados, build ok. Por validar em staging: sessões abertas antes da implantação não têm a lista e deixam de mostrar o Calendário e o Dashboard do Técnico até ao novo login.

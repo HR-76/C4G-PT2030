@@ -93,7 +93,7 @@ function AppRoutes() {
 
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/meu-trabalho" element={<MyWork key={applicationSessionKey} />} />
-        <Route path="/calendario" element={organization?.profileCode === 'ORG_ADMIN'
+        <Route path="/calendario" element={organization?.navigation?.calendar === true
           ? <OrganizationCalendar key={applicationSessionKey} /> : <Navigate to={home} replace />} />
         <Route path="/dashboard" element={<Dashboard key={applicationSessionKey} />} />
         <Route path="/oportunidades" element={<OpportunitiesList />} />

@@ -17,7 +17,7 @@ const work=new Set(['application.read','application.edit','application.transitio
 // Which areas a profile may open. Decided here only; the client follows the list and has no per-profile rules.
 function navigationFor(profileCode){
  if(!['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER'].includes(profileCode))return null;
- return {partners:profileCode!=='CONTRIBUTOR'};
+ return {partners:profileCode!=='CONTRIBUTOR',calendar:profileCode==='ORG_ADMIN',dashboard:profileCode==='CONTRIBUTOR'?'TECHNICIAN':'ORGANIZATION'};
 }
 function canManage(profile){return ['ORG_ADMIN','FUNDING_MANAGER'].includes(profile)}
 function capabilities(profile,actorId,target){

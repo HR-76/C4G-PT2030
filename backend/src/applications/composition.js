@@ -216,7 +216,10 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     const decision=await guard.protect(client,{handle:s.handle,operationCode:'APPLICATION_WORK_READ',resource:resource(org,org)});
     s.guard=decision.token;
     await drain();
-    if(!await isOrganizationAdmin())fail('NOT_AUTHORIZED');
+    // Same policy that tells the client whether to offer the calendar.
+    const profile=await projectionData.authorizationDataPort.load(context.actor);
+    if(!profile)fail('SERVICE_UNAVAILABLE');
+    if(require('../organizationDirectory/accessProfiles').navigationFor(profile.profileCode)?.calendar!==true)fail('NOT_AUTHORIZED');
     return organizationCalendar.read(client,{organizationId:org,authority:await readAuthority(),clock,taskDetailsAvailable},s.input);
    }
    const repository=createApplicationRepository({organizationId:org,organizationName:s.organizationName,actor:context.actor,cursor:tokens,centralOrigin,centralCurrent,notify:alerts.notify,

@@ -225,3 +225,15 @@ it('orders the organization navigation as Oportunidades, Interesses, Candidatura
   expect(screen.queryByRole('link', { name: 'Parceiros' })).toBeNull()
   expect(screen.getByRole('link', { name: 'Interesses' })).toBeTruthy()
 })
+
+it('shows the organization calendar only when the backend navigation list allows it, without looking at the profile', () => {
+  state.auth.organization = { id: 'a', profileCode: 'ORG_ADMIN' }
+  sidebar()
+  expect(screen.queryByRole('link', { name: 'Calendário da entidade' })).toBeNull()
+  cleanup(); state.auth.organization = { id: 'a', profileCode: 'VIEWER', navigation: { calendar: true } }
+  sidebar()
+  expect(screen.getByRole('link', { name: 'Calendário da entidade' }).getAttribute('href')).toBe('/calendario')
+  cleanup(); state.auth.organization = { id: 'a', profileCode: 'ORG_ADMIN', navigation: { calendar: false } }
+  sidebar()
+  expect(screen.queryByRole('link', { name: 'Calendário da entidade' })).toBeNull()
+})
