@@ -145,7 +145,6 @@ function Catalog({ id, organization, platformAdmin }) {
         <option value="closing_asc">Fecho mais próximo</option><option value="closing_desc">Fecho mais tardio</option>
         <option value="amount_desc">Maior dotação por moeda</option><option value="amount_asc">Menor dotação por moeda</option>
       </select></label>
-      <button type="button" className="btn btn-outline btn-sm" onClick={() => changeColumns(['fecho','dotacao','programa'])}>Comparar oportunidades</button>
     </div>}
     {!id && !loading && !error && canRead && <Card><CardHeader><p className="table-meta" role="status">{items.length} {items.length === 1 ? 'oportunidade' : 'oportunidades'} nesta página{filtered ? ' · filtros aplicados' : ''}</p>
       {!!items.length && <div className="catalog-actions"><CatalogColumnVisibility selected={columns} hasOrganization={Boolean(organization)} onChange={changeColumns}/><button className="btn btn-outline btn-sm" type="button" onClick={() => downloadOpportunityPage(items)}>Exportar página</button></div>}</CardHeader>
