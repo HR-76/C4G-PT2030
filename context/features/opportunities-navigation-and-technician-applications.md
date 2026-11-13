@@ -87,3 +87,7 @@ A lista de navegação do backend passa a cobrir as duas regras por perfil que a
 - Backend: o endpoint do calendário (`applications/composition.js`) usa a mesma política em vez de comparar o perfil, por isso o que o cliente oferece e o que o servidor aceita deixam de poder divergir.
 - Frontend: Sidebar, pesquisa de páginas e rota `/calendario` seguem `organization.navigation.calendar === true` (ausente ou falso: sem Calendário); o Dashboard escolhe a variante por `organization.navigation.dashboard` (`utils/dashboardVariant.js`). Já não existe `profileCode` em nenhuma decisão de apresentação do frontend; só as telas de gestão de acessos (`OrganizationAccess`, `EntityUsers`) o mostram e escolhem, como dados.
 - Provas: testes de política e de sessão atualizados (falhavam antes), teste da barra lateral e do auxiliar do Dashboard. Lint limpo, frontend 1011, backend 3177 aprovados, build ok. Por validar em staging: sessões abertas antes da implantação não têm a lista e deixam de mostrar o Calendário e o Dashboard do Técnico até ao novo login.
+
+### Rótulo de origem no Matching (13/11/2026)
+
+A linha de contexto de cada resultado de Matching deixou de mostrar «Catálogo C4G» (pedido do utilizador). Oportunidades do catálogo mostram só o programa (e nada, se não houver); as privadas mantêm «Privada» seguido do programa. Teste novo em `MatchingWorkspace.test.jsx` (falhava antes); frontend 1012 aprovados, lint e build ok. Só texto de apresentação; por validar em staging com o próximo frontend.

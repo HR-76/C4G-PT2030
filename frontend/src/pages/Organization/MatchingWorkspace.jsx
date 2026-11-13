@@ -70,8 +70,8 @@ function MatchingResult({row,personMode}){
   <div className="matching-result-header">
    <div>
     <h3><Link to={href}>{title}</Link></h3>
-    {!personMode&&<p className="matching-meta">
-     {row.origin==='CENTRAL'?'Catálogo C4G':'Privada'}{row.programmeName&&` · ${row.programmeName}`}
+    {!personMode&&(row.origin!=='CENTRAL'||row.programmeName)&&<p className="matching-meta">
+     {[row.origin==='CENTRAL'?null:'Privada',row.programmeName].filter(Boolean).join(' · ')}
     </p>}
    </div>
    {!personMode&&<OpportunityTiming row={row}/>}

@@ -117,3 +117,15 @@ it('tells a user without access to private opportunities that only the catalog w
  await screen.findByText('Sem correspondências')
  expect(screen.queryByText(/apenas as oportunidades do catálogo/i)).toBeNull()
 })
+
+it('does not label catalog results with an origin name and keeps the programme; private ones stay marked',async()=>{
+ const rows=[{opportunityId:'c',origin:'CENTRAL',href:'/catalogo/c',title:'Central call',programmeName:'HORIZON',matchedAreas:[]},
+  {opportunityId:'n',origin:'CENTRAL',href:'/catalogo/n',title:'Central without programme',matchedAreas:[]},
+  {opportunityId:'p',origin:'PRIVATE',href:'/oportunidades/p',title:'Private call',programmeName:'Interno',matchedAreas:[]}]
+ const api={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:true,items:rows}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Central call'})
+ expect(screen.queryByText(/Catálogo C4G/)).toBeNull()
+ expect(screen.getByText('HORIZON')).toBeTruthy()
+ expect(screen.getByText('Privada · Interno')).toBeTruthy()
+})
