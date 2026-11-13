@@ -20,7 +20,9 @@ function createPersonalRepository({org,actor,guarded,receipt,finish,memberships,
   const units=(await client.query(`SELECT s.scope_id AS "scopeId",s.label,u.is_primary AS "isPrimary"
    FROM organizational_scope.person_unit u JOIN organizational_scope.scope s USING(organization_id,scope_id)
    WHERE u.organization_id=$1 AND u.person_id=$2 ORDER BY u.is_primary DESC,s.label`,[org,id])).rows;
-  return {person:{personId:id,name:row.name,email:row.email,functionLabel:row.function_label,active:row.active},profile:project(profile),units,
+  const availableUnits=self?(await client.query(`SELECT scope_id AS "scopeId",label FROM organizational_scope.scope
+   WHERE organization_id=$1 AND scope_type='UNIT' AND lifecycle='ACTIVE' ORDER BY label,scope_id LIMIT 201`,[org])).rows:null;
+  return {person:{personId:id,name:row.name,email:row.email,functionLabel:row.function_label,active:row.active},profile:project(profile),units,...(self?{availableUnits}:{}),
    areas,areaCatalogVersion:version,permissions:{edit:await authorize(self?'PERSONAL_PROFILE_EDIT':'ORGANIZATION_DIRECTORY_EDIT',root)}};
  }
  async function write(client,method,input,id){
@@ -37,6 +39,16 @@ function createPersonalRepository({org,actor,guarded,receipt,finish,memberships,
   if(method==='personLinkEdit'&&input.membershipId!==null){
    const member=(await memberships()).find(m=>m.membershipId===input.membershipId);
    if(!member||!['ACTIVE','SUSPENDED'].includes(member.status))fail('MEMBERSHIP_UNAVAILABLE');
+  }
+  if(self&&Object.hasOwn(input,'name')){
+   // The person changes her own name, function and units. Units must be active units of this organization.
+   if(input.unitIds.length){
+    const found=(await client.query(`SELECT scope_id FROM organizational_scope.scope WHERE organization_id=$1 AND scope_type='UNIT' AND lifecycle='ACTIVE' AND scope_id=ANY($2::uuid[]) FOR SHARE`,[org,input.unitIds])).rows.length;
+    if(found!==input.unitIds.length)fail('RESOURCE_NOT_AVAILABLE');
+   }
+   await client.query('UPDATE organizational_scope.person SET name=$3,function_label=$4 WHERE organization_id=$1 AND person_id=$2',[org,id,input.name,input.functionLabel]);
+   await client.query('DELETE FROM organizational_scope.person_unit WHERE organization_id=$1 AND person_id=$2',[org,id]);
+   if(input.unitIds.length)await client.query('INSERT INTO organizational_scope.person_unit(organization_id,person_id,scope_id,is_primary) SELECT $1,$2,u,(u=$4::uuid) FROM unnest($3::uuid[]) AS u',[org,id,input.unitIds,input.primaryUnitId]);
   }
   const saved=(await client.query(`INSERT INTO organizational_scope.person_profile(organization_id,person_id,membership_id,biography,keywords,area_ids,updated_by${supportsStrategy?',interest_area_ids':''})
    VALUES($1,$2,$3,$4,$5,$6,$7${supportsStrategy?',$8':''}) ON CONFLICT(organization_id,person_id) DO UPDATE SET membership_id=$3,biography=$4,keywords=$5,

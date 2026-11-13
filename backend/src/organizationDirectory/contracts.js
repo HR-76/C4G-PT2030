@@ -45,12 +45,22 @@ function parse(method,raw){
  }
  if(method==='strategyEdit')return parseStrategy(raw);
  if(['personProfileEdit','selfEdit','personLinkEdit'].includes(method)){
-  const link=method==='personLinkEdit',hasInterests=!link&&raw&&Object.hasOwn(raw,'interestAreaIds');
-  exact(raw,[...(link?['membershipId']:['biography','keywords','areaIds',...(hasInterests?['interestAreaIds']:[])]),'expectedRevision','idempotencyKey']);
+  const link=method==='personLinkEdit',self=method==='selfEdit',hasInterests=!link&&raw&&Object.hasOwn(raw,'interestAreaIds');
+  // The person's own name, function and units are optional, but when one is sent they are all sent. The email and the
+  // active state are never accepted here: they remain with the organization's administration.
+  const hasPerson=self&&raw&&Object.hasOwn(raw,'name');
+  exact(raw,[...(link?['membershipId']:['biography','keywords','areaIds',...(hasInterests?['interestAreaIds']:[]),...(hasPerson?['name','functionLabel','unitIds','primaryUnitId']:[])]),'expectedRevision','idempotencyKey']);
   uuid(raw.idempotencyKey);revision(raw.expectedRevision,0);
   if(link){if(raw.membershipId!==null)uuid(raw.membershipId);}else{
    text(raw.biography,4000);text(raw.keywords,1000);
-   return Object.freeze({...raw,areaIds:areaIds(raw.areaIds),...(hasInterests?{interestAreaIds:areaIds(raw.interestAreaIds)}:{})});
+   const out={...raw,areaIds:areaIds(raw.areaIds),...(hasInterests?{interestAreaIds:areaIds(raw.interestAreaIds)}:{})};
+   if(hasPerson){
+    if(!scope.label(raw.name))fail();text(raw.functionLabel,256);
+    if(!Array.isArray(raw.unitIds)||raw.unitIds.length>50||new Set(raw.unitIds).size!==raw.unitIds.length)fail();raw.unitIds.forEach(uuid);
+    if(raw.unitIds.length?!raw.unitIds.includes(raw.primaryUnitId):raw.primaryUnitId!==null)fail();
+    out.unitIds=[...raw.unitIds].sort();
+   }
+   return Object.freeze(out);
   }
   return Object.freeze({...raw});
  }

@@ -27,7 +27,10 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
   setForm(profile?{
    biography:profile.biography,
    keywords:profile.keywords,
-   thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])]
+   thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])],
+   // Own profile only: the person's name, function and units. The administration keeps the email and the active state.
+   ...(personId?{}:{name:value.person?.name??'',functionLabel:value.person?.functionLabel??'',
+    unitIds:(value.units??[]).map(unit=>unit.scopeId),primaryUnitId:(value.units??[]).find(unit=>unit.isPrimary)?.scopeId??null})
   }:null)
   setMembershipId(profile?.membershipId||'')
  }catch{if(alive.current&&gen===generation.current){setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
@@ -52,6 +55,8 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
    keywords:clean(form.keywords),
    areaIds:selected.filter(id=>areaIds.includes(id)||!interestAreaIds?.includes(id)),
    ...(interestAreaIds?{interestAreaIds:interestAreaIds.filter(id=>selected.includes(id))}:{}),
+   ...(personId?{}:{name:clean(form.name),functionLabel:clean(form.functionLabel),unitIds:form.unitIds,
+    primaryUnitId:form.unitIds.includes(form.primaryUnitId)?form.primaryUnitId:(form.unitIds[0]??null)}),
    expectedRevision:revision,
    idempotencyKey:crypto.randomUUID()
   }
@@ -68,6 +73,21 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
    {!data.permissions.edit&&<p>Acesso de consulta. Sem permissão para editar este perfil.</p>}
    <form onSubmit={save}><fieldset disabled={busy||Boolean(pending)||!data.permissions.edit}>
     <section className="detail-section personal-competencies"><h3>Apresentação</h3><div className="field-grid"><label className="field field-full">Biografia<textarea rows={3} maxLength={4000} value={form.biography} onChange={e=>setForm(f=>({...f,biography:e.target.value}))}/></label><label className="field field-full">Palavras-chave<textarea rows={2} maxLength={1000} value={form.keywords} onChange={e=>setForm(f=>({...f,keywords:e.target.value}))}/></label></div></section>
+    {!personId&&<section className="detail-section personal-identity" aria-label="Nome, função e unidades">
+     <h3>Nome, função e unidades</h3>
+     <div className="field-grid">
+      <label className="field">Nome<input required maxLength={200} value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></label>
+      <label className="field">Função<input maxLength={256} value={form.functionLabel} onChange={e=>setForm(f=>({...f,functionLabel:e.target.value}))}/></label>
+     </div>
+     <fieldset className="field-full">
+      <legend>Departamentos / Unidades</legend>
+      {(data.availableUnits??[]).length===0&&<p>Não há unidades ativas na organização.</p>}
+      {(data.availableUnits??[]).map(unit=><div key={unit.scopeId} className="unit-choice">
+       <label><input type="checkbox" checked={form.unitIds.includes(unit.scopeId)} onChange={e=>setForm(f=>{const unitIds=e.target.checked?[...f.unitIds,unit.scopeId]:f.unitIds.filter(id=>id!==unit.scopeId);return {...f,unitIds,primaryUnitId:unitIds.includes(f.primaryUnitId)?f.primaryUnitId:(unitIds[0]??null)}})}/> {unit.label}</label>
+       {form.unitIds.includes(unit.scopeId)&&<label><input type="radio" name="primary-unit" checked={form.primaryUnitId===unit.scopeId} onChange={()=>setForm(f=>({...f,primaryUnitId:unit.scopeId}))}/> Principal</label>}
+      </div>)}
+     </fieldset>
+    </section>}
     <section className="detail-section personal-areas" aria-label="Áreas temáticas">
      <h3>Áreas temáticas</h3>
      <AreaOptions areas={data.areas} selected={form.thematicAreaIds}
