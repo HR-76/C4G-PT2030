@@ -19,10 +19,11 @@ function fixture(profileCode='CONTRIBUTOR'){
  const grant=permission=>({permission,scope:{type:'ORGANIZATION',id:org,organizationId:org}});
  return {org,app,other,source,evaluation,snapshot,membership,actor,auth,events,read,grant,created,queries:()=>queries,remove:()=>{active=false},restore:()=>{active=true},break:()=>{broken=true}};
 }
-test('team membership derives only application read and collection access, with no stored grants',async()=>{
+test('team membership reads applications and writes them; review decisions stay with managers',async()=>{
  const f=fixture();assert.equal((await f.read('APPLICATION_READ',f.org)).allowed,true);
  for(const op of ['APPLICATION_READ','APPLICATION_WORK_READ','APPLICATION_DOCUMENT_READ'])assert.equal((await f.read(op)).allowed,true);
- for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT','APPLICATION_TRANSITION','APPLICATION_REVIEW_DECIDE'])assert.equal((await f.read(op)).allowed,false);
+ for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT','APPLICATION_TRANSITION','APPLICATION_DOCUMENT_EDIT'])assert.equal((await f.read(op)).allowed,true);
+ assert.equal((await f.read('APPLICATION_REVIEW_DECIDE')).allowed,false);
  assert.equal((await f.read('APPLICATION_READ',f.other)).allowed,false);assert.deepEqual(f.snapshot.grants,[]);
  assert(f.events.some(e=>e.result==='ALLOW'));assert(f.events.some(e=>e.result==='DENY'));
 });
@@ -34,11 +35,11 @@ test('broad old application grants cannot escape the current team, including wri
  f.remove();assert.equal((await f.read('APPLICATION_READ')).allowed,false);assert.equal((await f.read('APPLICATION_EDIT')).allowed,false);
  assert.equal(f.snapshot.grants.length,3);f.restore();assert.equal((await f.read('APPLICATION_READ')).allowed,true);
 });
-test('active technicians can read and send chat messages without editing the application',async()=>{
+test('active technicians can read and send chat messages; review decisions stay with managers',async()=>{
  const f=fixture();
  assert.equal((await f.read('APPLICATION_CHAT_READ')).allowed,true);
  assert.equal((await f.read('APPLICATION_CHAT_SEND')).allowed,true);
- assert.equal((await f.read('APPLICATION_WORK_EDIT')).allowed,false);
+ assert.equal((await f.read('APPLICATION_REVIEW_DECIDE')).allowed,false);
  assert.equal((await f.read('APPLICATION_CHAT_SEND',f.other)).allowed,false);
  f.remove();
  assert.equal((await f.read('APPLICATION_CHAT_READ')).allowed,false);
@@ -88,17 +89,17 @@ test('the interest module derives the same organization-level opportunity read f
 test('the interest authorizer installs the applicant read policy',()=>{
  assert.match(require('node:fs').readFileSync(require.resolve('../src/opportunityInterests/composition'),'utf8'),/snapshotForResource:\s*applicantOpportunityReadPolicy/);
 });
-test('the creator of an application keeps edit rights over its data and team while an active participant',async()=>{
- const f=fixture();f.created.add(f.app);
- for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT'])assert.equal((await f.read(op)).allowed,true);
- for(const op of ['APPLICATION_TRANSITION','APPLICATION_DOCUMENT_EDIT','APPLICATION_REVIEW_DECIDE'])assert.equal((await f.read(op)).allowed,false);
+test('a participating technician runs the application: data, team, tasks, state and documents, never the review decision',async()=>{
+ const f=fixture();
+ for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT','APPLICATION_TRANSITION','APPLICATION_DOCUMENT_EDIT'])assert.equal((await f.read(op)).allowed,true);
+ assert.equal((await f.read('APPLICATION_REVIEW_DECIDE')).allowed,false);
  assert.equal((await f.read('APPLICATION_EDIT',f.other)).allowed,false);
- f.remove();assert.equal((await f.read('APPLICATION_EDIT')).allowed,false);
- f.restore();assert.equal((await f.read('APPLICATION_EDIT')).allowed,true);
+ f.remove();
+ for(const op of ['APPLICATION_EDIT','APPLICATION_TRANSITION'])assert.equal((await f.read(op)).allowed,false);
+ f.restore();assert.equal((await f.read('APPLICATION_TRANSITION')).allowed,true);
  assert.deepEqual(f.snapshot.grants,[]);
 });
-test('a participant who did not create the application cannot edit it',async()=>{
+test('a technician outside the team cannot write to an application of the same organization',async()=>{
  const f=fixture();
- assert.equal((await f.read('APPLICATION_EDIT')).allowed,false);
- assert.equal((await f.read('APPLICATION_WORK_EDIT')).allowed,false);
+ for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT','APPLICATION_TRANSITION'])assert.equal((await f.read(op,f.other)).allowed,false);
 });

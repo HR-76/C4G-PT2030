@@ -66,8 +66,8 @@ Achado em staging: o Matching por pessoa dava 503 ao Técnico e funcionava ao Ad
 
 - `createOrganizationMatching` consulta `directory.canReadPrivateOpportunities(request)`. Falso: não lê as privadas e devolve `privateIncluded:false`; verdadeiro, ou serviço sem esse método: comportamento anterior (`privateIncluded:true`). Uma falha da consulta recusa o pedido (fecha em falha). Matching por oportunidade não muda.
 - `organizationDirectory/composition.js` implementa-o com a sessão autenticada e o registo central de autoridade: só `CONTRIBUTOR` devolve falso.
-- A página mostra, quando `privateIncluded===false`, a nota «Nesta consulta foram consideradas apenas as oportunidades do catálogo…».
-- Provas: testes em `organizationMatching.test.js` e `MatchingWorkspace.test.jsx` (falharam antes). Lint, frontend 1009 e backend 3164 aprovados; build ok. **Não provado:** a implementação em `composition.js` com a autoridade real (só `node --check` e o uso do mesmo padrão de resolução do resto do módulo); por validar em staging com a conta de Técnico.
+- A página não mostra aviso sobre as privadas. A nota «Nesta consulta foram consideradas apenas as oportunidades do catálogo…» foi retirada a pedido do utilizador (13/11/2026); o campo `privateIncluded` continua na resposta do backend.
+- Provas: testes em `organizationMatching.test.js` (falharam antes). A verificação da nota em `MatchingWorkspace.test.jsx` foi retirada com a nota. Build ok. **Não provado:** a implementação em `composition.js` com a autoridade real (só `node --check` e o uso do mesmo padrão de resolução do resto do módulo); por validar em staging com a conta de Técnico.
 
 ## Decisão no backend: Parceiros (13/11/2026)
 
