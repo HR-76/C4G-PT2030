@@ -116,6 +116,20 @@ function storageEnvironment(text) {
   return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'catalog', DOCUMENTS_RUNTIME: 'f11-r2' };
 }
 
+// Document API and worker settings. Only with the storage file. The organization list is the one organization the installer
+// registered; a new organization needs the environment regenerated. The worker reads the same file and listens on the pod.
+const DOCUMENT_WORKER_HEALTH_PORT = '8600';
+function documentEnvironment(state) {
+  if (!UUID.test(state?.organizationId || '')) throw failure('STAGING_DOCUMENT_ORGANIZATION_MISSING');
+  return {
+    DOCUMENT_API_ORGANIZATIONS_JSON: JSON.stringify([state.organizationId]),
+    DOCUMENT_API_STAGING_DIRECTORY: '/var/tmp/c4g-documents',
+    DOCUMENT_WORKER_HEALTH_URL: `http://127.0.0.1:${DOCUMENT_WORKER_HEALTH_PORT}/health/ready`,
+    DOCUMENT_WORKER_HEALTH_PORT,
+    DOCUMENT_WORKER_RUNTIME: 'f11-documents'
+  };
+}
+
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
 // The Central pool connects as the PostgreSQL administrator, as the local profile does: the pinned Central
 // fingerprints do not admit a limited runtime login (its grants would count as schema drift).
@@ -133,6 +147,9 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     FUNDING_TENDERS_SOURCE: 'unconfigured',
     ...collectionEnvironment(collection),
     ...storageEnvironment(storage),
+    // Documents need an explicit organization list (the single organization the installer registered), a staging directory
+    // and the health address of the separate document worker, which shares the pod network with the API.
+    ...(storage ? documentEnvironment(state) : {}),
     CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,

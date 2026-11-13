@@ -15,7 +15,7 @@ const values = Object.freeze({
 });
 const file = (delta = {}) => Object.entries({ ...values, ...delta }).filter(([, v]) => v !== undefined).map(([k, v]) => `${k}=${v}`).join('\n') + '\n';
 const ready = Object.freeze({
-  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
+  phase: 'READY', organizationId: '11111111-1111-4111-8111-111111111111', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
   credentials: { tenantId: 't', credentialRef: 'x', connectionVersion: 1, host: 'c4g-postgres', port: 5432, database: 'c4g_tenant_staging', login: 'l', password: 'w'.repeat(64), ssl: true }
 });
 
@@ -31,6 +31,9 @@ test('a complete EU storage file enables the loopback scanner, private billing P
   assert.equal(env.C4G_CLAMAV_HOST, '127.0.0.1'); assert.equal(env.BILLING_PDF_RUNTIME, 'private'); assert.equal(env.CENTRAL_PT2030_IMPORT_RUNTIME, 'catalog'); assert.equal(env.DOCUMENTS_RUNTIME, 'f11-r2');
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', storage: file() });
   assert.ok(text.includes(`C4G_R2_SECRET_ACCESS_KEY=${SECRET}`)); assert.ok(text.includes('BILLING_PDF_RUNTIME=private')); assert.ok(text.includes('DOCUMENTS_RUNTIME=f11-r2'));
+  assert.ok(text.includes('DOCUMENT_API_ORGANIZATIONS_JSON=["11111111-1111-4111-8111-111111111111"]'));
+  assert.ok(text.includes('DOCUMENT_WORKER_HEALTH_URL=http://127.0.0.1:8600/health/ready'));
+  assert.ok(text.includes('DOCUMENT_WORKER_RUNTIME=f11-documents'));
   // Comments and blank lines are allowed.
   assert.equal(storageEnvironment('# R2\n\n' + file()).C4G_R2_DOCUMENTS_BUCKET, values.C4G_R2_DOCUMENTS_BUCKET);
 });
