@@ -20,6 +20,7 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
  const [data,setData]=useState(null),[form,setForm]=useState(null),[members,setMembers]=useState(null),[membershipId,setMembershipId]=useState('')
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[pending,setPending]=useState(null)
  const alive=useRef(true),generation=useRef(0)
+ const [editingIdentity,setEditingIdentity]=useState(false)
  async function load(){const gen=++generation.current;setLoading(true);setError('');try{
   const {data:value}=await (personId?api.person(personId):api.self());if(!alive.current||gen!==generation.current)return
   const profile=value.profile
@@ -40,7 +41,7 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
   if(command.method==='selfEdit')await api.selfEdit(command.body);else await api[command.method](personId,command.body)
   clearDirectoryCache()
   if(!alive.current)return
-  setPending(null);await load();if(alive.current)setNotice('Perfil atualizado.')
+  setPending(null);await load();if(alive.current){setEditingIdentity(false);setNotice('Perfil atualizado.')}
  }catch(e){if(!alive.current)return;const status=e.response?.status
   if(status&&status<500)setPending(null)
   setError(status===409?'O perfil mudou ou a conta já está associada. Consulte novamente antes de editar.':'Não foi possível confirmar a gravação. Pode repetir o mesmo envio.')
@@ -74,19 +75,29 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
    <form onSubmit={save}><fieldset disabled={busy||Boolean(pending)||!data.permissions.edit}>
     <section className="detail-section personal-competencies"><h3>Apresentação</h3><div className="field-grid"><label className="field field-full">Biografia<textarea rows={3} maxLength={4000} value={form.biography} onChange={e=>setForm(f=>({...f,biography:e.target.value}))}/></label><label className="field field-full">Palavras-chave<textarea rows={2} maxLength={1000} value={form.keywords} onChange={e=>setForm(f=>({...f,keywords:e.target.value}))}/></label></div></section>
     {!personId&&<section className="detail-section personal-identity" aria-label="Nome, função e unidades">
-     <h3>Nome, função e unidades</h3>
-     <div className="field-grid">
-      <label className="field">Nome<input required maxLength={200} value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></label>
-      <label className="field">Função<input maxLength={256} value={form.functionLabel} onChange={e=>setForm(f=>({...f,functionLabel:e.target.value}))}/></label>
-     </div>
-     <fieldset className="field-full">
-      <legend>Departamentos / Unidades</legend>
-      {(data.availableUnits??[]).length===0&&<p>Não há unidades ativas na organização.</p>}
-      {(data.availableUnits??[]).map(unit=><div key={unit.scopeId} className="unit-choice">
-       <label><input type="checkbox" checked={form.unitIds.includes(unit.scopeId)} onChange={e=>setForm(f=>{const unitIds=e.target.checked?[...f.unitIds,unit.scopeId]:f.unitIds.filter(id=>id!==unit.scopeId);return {...f,unitIds,primaryUnitId:unitIds.includes(f.primaryUnitId)?f.primaryUnitId:(unitIds[0]??null)}})}/> {unit.label}</label>
-       {form.unitIds.includes(unit.scopeId)&&<label><input type="radio" name="primary-unit" checked={form.primaryUnitId===unit.scopeId} onChange={()=>setForm(f=>({...f,primaryUnitId:unit.scopeId}))}/> Principal</label>}
-      </div>)}
-     </fieldset>
+     <div className="toolbar"><h3>Nome, função e unidades</h3>{data.permissions.edit&&!editingIdentity&&<button type="button" className="btn btn-outline" onClick={()=>setEditingIdentity(true)}>Editar dados</button>}</div>
+     {!editingIdentity?<dl className="dl-list">
+      <div className="dl-row"><dt>Nome</dt><dd>{data.person?.name}</dd></div>
+      <div className="dl-row"><dt>Função</dt><dd>{data.person?.functionLabel||'Por indicar'}</dd></div>
+      <div className="dl-row"><dt>Departamentos / Unidades</dt><dd>{(data.units??[]).length?(data.units??[]).map(unit=>unit.label).join(', '):'Afeta à organização'}</dd></div>
+     </dl>:<>
+      <div className="field-grid">
+       <label className="field">Nome<input required maxLength={200} value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></label>
+       <label className="field">Função<input maxLength={256} value={form.functionLabel} onChange={e=>setForm(f=>({...f,functionLabel:e.target.value}))}/></label>
+      </div>
+      <fieldset className="field-full">
+       <legend>Departamentos / Unidades</legend>
+       {(data.availableUnits??[]).length===0&&<p>Não há unidades ativas na organização.</p>}
+       {(data.availableUnits??[]).map(unit=><div key={unit.scopeId} className="unit-choice">
+        <label><input type="checkbox" checked={form.unitIds.includes(unit.scopeId)} onChange={e=>setForm(f=>{const unitIds=e.target.checked?[...f.unitIds,unit.scopeId]:f.unitIds.filter(id=>id!==unit.scopeId);return {...f,unitIds,primaryUnitId:unitIds.includes(f.primaryUnitId)?f.primaryUnitId:(unitIds[0]??null)}})}/> {unit.label}</label>
+        {form.unitIds.includes(unit.scopeId)&&<label><input type="radio" name="primary-unit" checked={form.primaryUnitId===unit.scopeId} onChange={()=>setForm(f=>({...f,primaryUnitId:unit.scopeId}))}/> Principal</label>}
+       </div>)}
+      </fieldset>
+      <div className="form-actions">
+       <button type="button" className="btn btn-outline" onClick={()=>{setEditingIdentity(false);setForm(f=>({...f,name:data.person?.name??'',functionLabel:data.person?.functionLabel??'',unitIds:(data.units??[]).map(unit=>unit.scopeId),primaryUnitId:(data.units??[]).find(unit=>unit.isPrimary)?.scopeId??null}))}}>Cancelar</button>
+       <button type="submit" className="btn btn-primary">Guardar dados</button>
+      </div>
+     </>}
     </section>}
     <section className="detail-section personal-areas" aria-label="Áreas temáticas">
      <h3>Áreas temáticas</h3>

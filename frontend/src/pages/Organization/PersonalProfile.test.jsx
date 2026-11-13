@@ -16,7 +16,7 @@ it('submits only the own profile with its revision and retries an uncertain writ
  expect(api.selfEdit.mock.calls[0][0]).toEqual(api.selfEdit.mock.calls[1][0]);expect(api.selfEdit.mock.calls[0][0]).toMatchObject({biography:'Experiência',areaIds:['education'],expectedRevision:2});expect(api.selfEdit.mock.calls[0][0]).not.toHaveProperty('membershipId')
 })
 it('keeps read-only profile visible with editing disabled',async()=>{
- mount({self:vi.fn().mockResolvedValue({data:{...record,permissions:{edit:false}}})});await screen.findByText('Pessoa de ensaio');expect(screen.getByLabelText('Educação').closest('fieldset').disabled).toBe(true);expect(screen.queryByRole('button',{name:'Guardar perfil'})).toBeNull()
+ mount({self:vi.fn().mockResolvedValue({data:{...record,permissions:{edit:false}}})});await screen.findAllByText('Pessoa de ensaio');expect(screen.getByLabelText('Educação').closest('fieldset').disabled).toBe(true);expect(screen.queryByRole('button',{name:'Guardar perfil'})).toBeNull()
 })
 it('edits both sources in a single thematic area selector while preserving existing classifications',async()=>{
  const data={...record,
@@ -44,6 +44,7 @@ it('lets the person change her own name, function and units, and sends the prima
  const unitA={scopeId:'unit-a',label:'Unidade A'},unitB={scopeId:'unit-b',label:'Unidade B'}
  const api={self:vi.fn().mockResolvedValue({data:{...record,units:[{...unitA,isPrimary:true}],availableUnits:[unitA,unitB]}}),selfEdit:vi.fn().mockResolvedValue({})}
  mount(api)
+ fireEvent.click(await screen.findByRole('button',{name:'Editar dados'}))
  const name=await screen.findByLabelText('Nome');fireEvent.change(name,{target:{value:'Nova Pessoa'}})
  fireEvent.change(screen.getByLabelText('Função'),{target:{value:'Coordenadora'}})
  fireEvent.click(screen.getByLabelText('Unidade B'))
