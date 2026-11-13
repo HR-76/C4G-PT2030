@@ -44,13 +44,14 @@ it('lets the person change her own name, function and units, and sends the prima
  const unitA={scopeId:'unit-a',label:'Unidade A'},unitB={scopeId:'unit-b',label:'Unidade B'}
  const api={self:vi.fn().mockResolvedValue({data:{...record,units:[{...unitA,isPrimary:true}],availableUnits:[unitA,unitB]}}),selfEdit:vi.fn().mockResolvedValue({})}
  mount(api)
- fireEvent.click(await screen.findByRole('button',{name:'Editar dados'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Editar dados do perfil'}))
  const name=await screen.findByLabelText('Nome');fireEvent.change(name,{target:{value:'Nova Pessoa'}})
  fireEvent.change(screen.getByLabelText('Função'),{target:{value:'Coordenadora'}})
  fireEvent.click(screen.getByLabelText('Unidade B'))
  fireEvent.click(within(screen.getByText('Unidade B').closest('.unit-choice')).getByLabelText('Principal'))
- fireEvent.click(screen.getByRole('button',{name:'Guardar perfil'}))
+ fireEvent.click(screen.getByRole('button',{name:'Guardar dados'}))
  await waitFor(()=>expect(api.selfEdit).toHaveBeenCalledTimes(1))
  expect(api.selfEdit.mock.calls[0][0]).toMatchObject({name:'Nova Pessoa',functionLabel:'Coordenadora',unitIds:['unit-a','unit-b'],primaryUnitId:'unit-b'})
  expect(api.selfEdit.mock.calls[0][0]).not.toHaveProperty('email')
+ await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull())
 })
