@@ -107,17 +107,6 @@ it('oferece consulta direta do catálogo quando o matching excede a capacidade',
  mount(Promise.reject({response:{status:409,data:{error:{code:'LIMIT_EXCEEDED'}}}}));const alert=await screen.findByRole('alert');const link=screen.getByRole('link',{name:'consultar o catálogo diretamente'});expect(link.getAttribute('href')).toBe('/catalogo');expect(alert.textContent).toMatch(/não apresenta correspondências calculadas/)
 })
 
-it('tells a user without access to private opportunities that only the catalog was considered',async()=>{
- const api={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:false,items:[]}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
- render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
- expect(await screen.findByText(/apenas as oportunidades do catálogo/i)).toBeTruthy()
- cleanup()
- const full={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:true,items:[]}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
- render(<MemoryRouter><MatchingTable organizationId="org" api={full}/></MemoryRouter>)
- await screen.findByText('Sem correspondências')
- expect(screen.queryByText(/apenas as oportunidades do catálogo/i)).toBeNull()
-})
-
 it('does not label catalog results with an origin name and keeps the programme; private ones stay marked',async()=>{
  const rows=[{opportunityId:'c',origin:'CENTRAL',href:'/catalogo/c',title:'Central call',programmeName:'HORIZON',matchedAreas:[]},
   {opportunityId:'n',origin:'CENTRAL',href:'/catalogo/n',title:'Central without programme',matchedAreas:[]},

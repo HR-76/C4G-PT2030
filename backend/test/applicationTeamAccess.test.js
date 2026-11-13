@@ -10,14 +10,14 @@ function fixture(profileCode='CONTRIBUTOR'){
  const actor={type:'HUMAN',id,organizationId:org,membershipId:member,membershipVersion:1,authorizationVersion:1};
  const membership={id:member,globalUserId:id,organizationId:org,status:'ACTIVE',membershipVersion:1};
  const snapshot={organizationId:org,membershipVersion:1,authorizationVersion:1,profileCode,grants:[],sodRules:[],supportGrant:null};
- let active=true,broken=false,queries=0;
- const policy=createTeamAccessPolicy({operationCatalog:catalogs.operationCatalog,currentClient(expected){assert.equal(expected,org);return {async query(sql,params){queries++;if(broken)throw Error('DB_DOWN');assert.equal(params[0],org);assert.equal(params[1],member);return {rows:active&&[app,source,evaluation,undefined].includes(params[2])?[{exists:1}]:[]}}}}});
+ let active=true,broken=false,queries=0;const created=new Set();
+ const policy=createTeamAccessPolicy({operationCatalog:catalogs.operationCatalog,currentClient(expected){assert.equal(expected,org);return {async query(sql,params){queries++;if(broken)throw Error('DB_DOWN');assert.equal(params[0],org);if(sql.includes('created_by')){assert.equal(params[2],id);return {rows:active&&created.has(params[1])?[{exists:1}]:[]}}assert.equal(params[1],member);return {rows:active&&[app,source,evaluation,undefined].includes(params[2])?[{exists:1}]:[]}}}}});
  const auth=createTaxonomyAuthorization({catalogs,exactResourceScope:false,snapshotForResource:policy,
   membershipPort:{async revalidate(){return membership}},authorizationDataPort:{async load(){return snapshot}},authorizationAuditPort:{async accept(e){events.push(e);return 'ACCEPTED'}},
   assurancePolicyVersion:'test',recentMfaRequirement:{mfa:false,maxAgeSeconds:300},clock:{now:()=>new Date()}});
  const read=(operationCode,target=app,type='APPLICATION')=>auth.authorize(operationCode,{actor,correlationId:randomUUID(),assuranceEvidence:{authTime:Date.now()/1000,acr:'test',amr:[]}},resource(target,org,type));
  const grant=permission=>({permission,scope:{type:'ORGANIZATION',id:org,organizationId:org}});
- return {org,app,other,source,evaluation,snapshot,membership,actor,auth,events,read,grant,queries:()=>queries,remove:()=>{active=false},restore:()=>{active=true},break:()=>{broken=true}};
+ return {org,app,other,source,evaluation,snapshot,membership,actor,auth,events,read,grant,created,queries:()=>queries,remove:()=>{active=false},restore:()=>{active=true},break:()=>{broken=true}};
 }
 test('team membership derives only application read and collection access, with no stored grants',async()=>{
  const f=fixture();assert.equal((await f.read('APPLICATION_READ',f.org)).allowed,true);
@@ -87,4 +87,18 @@ test('the interest module derives the same organization-level opportunity read f
 });
 test('the interest authorizer installs the applicant read policy',()=>{
  assert.match(require('node:fs').readFileSync(require.resolve('../src/opportunityInterests/composition'),'utf8'),/snapshotForResource:\s*applicantOpportunityReadPolicy/);
+});
+test('the creator of an application keeps edit rights over its data and team while an active participant',async()=>{
+ const f=fixture();f.created.add(f.app);
+ for(const op of ['APPLICATION_EDIT','APPLICATION_WORK_EDIT'])assert.equal((await f.read(op)).allowed,true);
+ for(const op of ['APPLICATION_TRANSITION','APPLICATION_DOCUMENT_EDIT','APPLICATION_REVIEW_DECIDE'])assert.equal((await f.read(op)).allowed,false);
+ assert.equal((await f.read('APPLICATION_EDIT',f.other)).allowed,false);
+ f.remove();assert.equal((await f.read('APPLICATION_EDIT')).allowed,false);
+ f.restore();assert.equal((await f.read('APPLICATION_EDIT')).allowed,true);
+ assert.deepEqual(f.snapshot.grants,[]);
+});
+test('a participant who did not create the application cannot edit it',async()=>{
+ const f=fixture();
+ assert.equal((await f.read('APPLICATION_EDIT')).allowed,false);
+ assert.equal((await f.read('APPLICATION_WORK_EDIT')).allowed,false);
 });

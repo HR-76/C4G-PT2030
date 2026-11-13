@@ -49,7 +49,6 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
   {!loading&&result?.state==='PROFILE_NOT_LINKED'&&<EmptyStatePanel title="Perfil ainda não associado" description="O gestor pode associar a sua conta à ficha da pessoa nesta organização." actionLabel="Consultar perfil pessoal" actionTo="/perfil"/>}
   {!loading&&result?.state==='NO_AREAS'&&<EmptyStatePanel title="Perfil sem áreas temáticas" description="Selecione as competências da pessoa para encontrar áreas coincidentes." actionLabel="Completar áreas do perfil" actionTo={personId?`/perfil-organizacao/pessoas/${personId}`:'/perfil'}/>}
   {!loading&&result?.state==='READY'&&rows.length===0&&<EmptyStatePanel title="Sem correspondências" description={opportunityId?'Nenhuma pessoa acessível tem áreas coincidentes com esta oportunidade.':'Não foram encontradas oportunidades acessíveis com áreas coincidentes e prazo atual ou não indicado.'}/>}
-  {!loading&&!opportunityId&&result?.state==='READY'&&result.privateIncluded===false&&<p role="status" className="matching-scope-note">Nesta consulta foram consideradas apenas as oportunidades do catálogo. As oportunidades privadas da organização não são incluídas para o seu perfil.</p>}
   {rows.length>0&&<section className="matching-results" aria-labelledby="matching-results-title">
    <h2 id="matching-results-title" className="matching-results-title">
     {opportunityId?<UsersRound size={16} aria-hidden="true"/>:<Files size={16} aria-hidden="true"/>}
