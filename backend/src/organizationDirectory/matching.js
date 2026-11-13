@@ -31,7 +31,7 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    if(!snapshot)fail('SERVICE_UNAVAILABLE');
    return projectMatchOpportunity(detail,{origin,opportunityId,asOf});
   };
-  let items;
+  let items,privateIncluded=true;
   const today=civilToday(new Date(asOf));
   if(byOpportunity){
    const opportunity=await load(query.origin,query.opportunityId),people=await pages(q=>directory.execute('peopleWithResearchAreas',q,null,request));
@@ -45,8 +45,10 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    items.sort((a,b)=>b.matchedAreas.length-a.matchedAreas.length||a.name.localeCompare(b.name,'pt')||a.personId.localeCompare(b.personId));
   }else{
    if(!central)fail('SERVICE_UNAVAILABLE');
+   // A technician has no organization-wide read of private opportunities: match against the catalog only.
+   privateIncluded=typeof directory.canReadPrivateOpportunities==='function'?await directory.canReadPrivateOpportunities(request)===true:true;
    const privateList=typeof opportunities.listForMatching==='function'?opportunities.listForMatching.bind(opportunities):opportunities.list.bind(opportunities);
-   const [publicItems,privateItems]=await Promise.all([pages(q=>central.list(q)),pages(q=>privateList(q,request))]),all=[];
+   const [publicItems,privateItems]=await Promise.all([pages(q=>central.list(q)),privateIncluded?pages(q=>privateList(q,request)):Promise.resolve([])]),all=[];
    for(const [origin,list] of [['CENTRAL',publicItems],['PRIVATE',privateItems]]){
     for(const item of list){if(currentForMatching(item,today))all.push(item.snapshot||item.readModel?
       projectMatchOpportunity(item,{origin,opportunityId:item.opportunityId,asOf}):await load(origin,item.opportunityId));}
@@ -56,7 +58,7 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
   // Revalidate authority after all source reads; never publish a result from an old context.
   const current=await directory.execute(byOpportunity?'context':id?'person':'self',{},id,request);
   if(!byOpportunity&&(!current?.person||!Array.isArray(current.profile?.areaIds)||JSON.stringify({active:current.person.active,areas:[...current.profile.areaIds].sort()})!==initialMatchingProfile))fail('CONTEXT_CHANGED');
-  return {state:'READY',person:initial.person||null,items,areaCatalogVersion:version,
+  return {state:'READY',person:initial.person||null,items,areaCatalogVersion:version,...(byOpportunity?{}:{privateIncluded}),
    explanation:'Áreas sugeridas por palavras-chave, cruzadas com as áreas da pessoa. Não determina elegibilidade.'};
  }};
 }

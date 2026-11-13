@@ -59,3 +59,12 @@ Correção: a derivação passou a uma função pura, `applicantOpportunityReadP
 ### Segunda correção (12/11/2026)
 
 Após a primeira correção, a lista de Interesses passou a mostrar «Preparar candidatura» ao Técnico, mas a tabela de Oportunidades continuava sem «Iniciar candidatura». Causa: `summaries` devolvia só `capabilities.canRegister`, e a tabela lê `canCreateApplication` dessa mesma resposta. `summaries` passa a devolver as quatro capacidades (`capabilities()`), com teste em `opportunityInterestsRepository.test.js` e no catálogo. Também: botões do cabeçalho de Interesses/Candidaturas agrupados à direita (`.application-area-actions`) e «Catálogo» passa a «Oportunidades» no percurso (breadcrumb). Lint, frontend 1008 e backend 3163 aprovados; por validar em staging.
+
+## Matching do Técnico só com o catálogo (13/11/2026)
+
+Achado em staging: o Matching por pessoa dava 503 ao Técnico e funcionava ao Administrador da entidade. O Matching lê o catálogo e as oportunidades privadas da organização; a segunda leitura exige `opportunity.read`, que o Técnico não tem. Decisão do utilizador: o Técnico é comparado só com o catálogo; as privadas ficam de fora, sem alargar permissões; a página deixa de dar erro e avisa.
+
+- `createOrganizationMatching` consulta `directory.canReadPrivateOpportunities(request)`. Falso: não lê as privadas e devolve `privateIncluded:false`; verdadeiro, ou serviço sem esse método: comportamento anterior (`privateIncluded:true`). Uma falha da consulta recusa o pedido (fecha em falha). Matching por oportunidade não muda.
+- `organizationDirectory/composition.js` implementa-o com a sessão autenticada e o registo central de autoridade: só `CONTRIBUTOR` devolve falso.
+- A página mostra, quando `privateIncluded===false`, a nota «Nesta consulta foram consideradas apenas as oportunidades do catálogo…».
+- Provas: testes em `organizationMatching.test.js` e `MatchingWorkspace.test.jsx` (falharam antes). Lint, frontend 1009 e backend 3164 aprovados; build ok. **Não provado:** a implementação em `composition.js` com a autoridade real (só `node --check` e o uso do mesmo padrão de resolução do resto do módulo); por validar em staging com a conta de Técnico.
