@@ -90,8 +90,8 @@ function collectionEnvironment(option) {
 // Private object storage (Cloudflare R2, EU jurisdiction) and the ClamAV scanner. The R2 values are the operator's: they are
 // read from a file the operator writes on the server and are never generated, printed or sent anywhere by the installer.
 // ClamAV runs beside the API in the same network namespace (compose "clamav" service), because the runtime only accepts a
-// loopback scanner. Enabling it turns on the two features that need both: private billing PDFs and the central PT2030
-// import (upload, preview, staging of the candidates and acceptance of the new ones into the catalogue).
+// loopback scanner. Enabling it turns on the features that need both: private billing PDFs, the central PT2030 import (upload,
+// preview, staging of the candidates and acceptance of the new ones into the catalogue) and application documents (F11, R2).
 // C4G_R2_LAYER_C_VALIDATED is the operator's declaration that the real R2 has been validated: the runtime refuses to build the
 // storage without it. In staging, setting it is the operator's act after `storage-check` passes; it is never added for them.
 const STORAGE_KEYS = Object.freeze(['C4G_R2_ENDPOINT', 'C4G_R2_DOCUMENTS_BUCKET', 'C4G_R2_QUARANTINE_BUCKET', 'C4G_R2_ACCESS_KEY_ID', 'C4G_R2_SECRET_ACCESS_KEY', 'C4G_R2_LAYER_C_VALIDATED']);
@@ -113,7 +113,7 @@ function storageEnvironment(text) {
   // The runtime's own loader is the authority on what is acceptable (EU endpoint, two distinct buckets, loopback scanner).
   try { require('../../src/config/applicationDocuments').loadApplicationDocumentConfiguration({ ...values, ...SCANNER }); }
   catch { throw failure('STAGING_STORAGE_INVALID'); }
-  return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'catalog' };
+  return { ...values, ...SCANNER, BILLING_PDF_RUNTIME: 'private', CENTRAL_PT2030_IMPORT_RUNTIME: 'catalog', DOCUMENTS_RUNTIME: 'f11-r2' };
 }
 
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.

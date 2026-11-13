@@ -22,15 +22,15 @@ const ready = Object.freeze({
 test('without a storage file nothing about storage is enabled', () => {
   assert.deepEqual(storageEnvironment(undefined), {});
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm' });
-  for (const name of [...STORAGE_KEYS, 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME', 'C4G_CLAMAV_HOST']) assert.ok(!text.includes(name), name);
+  for (const name of [...STORAGE_KEYS, 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME', 'DOCUMENTS_RUNTIME', 'C4G_CLAMAV_HOST']) assert.ok(!text.includes(name), name);
 });
 
 test('a complete EU storage file enables the loopback scanner, private billing PDFs and the PT2030 import', () => {
   const env = storageEnvironment(file());
-  assert.deepEqual(Object.keys(env).sort(), [...STORAGE_KEYS, 'C4G_CLAMAV_HOST', 'C4G_CLAMAV_PORT', 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME'].sort());
-  assert.equal(env.C4G_CLAMAV_HOST, '127.0.0.1'); assert.equal(env.BILLING_PDF_RUNTIME, 'private'); assert.equal(env.CENTRAL_PT2030_IMPORT_RUNTIME, 'catalog');
+  assert.deepEqual(Object.keys(env).sort(), [...STORAGE_KEYS, 'C4G_CLAMAV_HOST', 'C4G_CLAMAV_PORT', 'BILLING_PDF_RUNTIME', 'CENTRAL_PT2030_IMPORT_RUNTIME', 'DOCUMENTS_RUNTIME'].sort());
+  assert.equal(env.C4G_CLAMAV_HOST, '127.0.0.1'); assert.equal(env.BILLING_PDF_RUNTIME, 'private'); assert.equal(env.CENTRAL_PT2030_IMPORT_RUNTIME, 'catalog'); assert.equal(env.DOCUMENTS_RUNTIME, 'f11-r2');
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', storage: file() });
-  assert.ok(text.includes(`C4G_R2_SECRET_ACCESS_KEY=${SECRET}`)); assert.ok(text.includes('BILLING_PDF_RUNTIME=private'));
+  assert.ok(text.includes(`C4G_R2_SECRET_ACCESS_KEY=${SECRET}`)); assert.ok(text.includes('BILLING_PDF_RUNTIME=private')); assert.ok(text.includes('DOCUMENTS_RUNTIME=f11-r2'));
   // Comments and blank lines are allowed.
   assert.equal(storageEnvironment('# R2\n\n' + file()).C4G_R2_DOCUMENTS_BUCKET, values.C4G_R2_DOCUMENTS_BUCKET);
 });
