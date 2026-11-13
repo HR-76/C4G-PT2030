@@ -1,0 +1,11 @@
+[Unit]
+Description=C4G staging: copia diaria das bases (02:30 UTC)
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+Unit=c4g-staging-backup.service
+
+[Install]
+WantedBy=timers.target
