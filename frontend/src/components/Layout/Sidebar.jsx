@@ -47,7 +47,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
       ...(!platformAdmin ? [{ to: '/catalogo', icon: Globe, tone: 'sky', label: 'Oportunidades' }, { to: '/interesses', icon: Heart, tone: 'rose', label: 'Interesses' }] : []),
       { to: '/candidaturas', icon: FileText, tone: 'rose', label: 'Candidaturas' },
       ...(organization.profileCode === 'ORG_ADMIN' ? [{ to: '/calendario', icon: CalendarDays, tone: 'blue', label: 'Calendário da entidade' }] : []),
-      ...(organization.profileCode !== 'CONTRIBUTOR' ? [{ to: '/parceiros', icon: Handshake, tone: 'blue', label: 'Parceiros' }] : []),
+      ...(organization.navigation?.partners !== false ? [{ to: '/parceiros', icon: Handshake, tone: 'blue', label: 'Parceiros' }] : []),
       { to: '/matching', icon: Zap, tone: 'violet', label: 'Matching' },
       { to: '/notificacoes', icon: Bell, tone: 'amber', label: 'Alertas' },
     ] }, ...((navigationAccess.directory || navigationAccess.units || navigationAccess.access || canReadBilling) ? [{ label: 'Organização', items: [

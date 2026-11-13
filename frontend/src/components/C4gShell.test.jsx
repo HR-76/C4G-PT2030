@@ -214,13 +214,13 @@ it('dismisses the mobile menu and moves focus into the page even when its active
   await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull())
   expect(document.activeElement.id).toBe('main-content')
 })
-it('orders the organization navigation as Oportunidades, Interesses, Candidaturas and hides Parceiros from the Técnico', () => {
+it('orders the organization navigation as Oportunidades, Interesses, Candidaturas and hides Parceiros when the backend navigation list says so', () => {
   sidebar()
   const names = screen.getAllByRole('link').map(link => link.textContent)
   expect(names.indexOf('Interesses')).toBe(names.indexOf('Oportunidades') + 1)
   expect(names.indexOf('Candidaturas')).toBeGreaterThan(names.indexOf('Interesses'))
   expect(screen.getByRole('link', { name: 'Parceiros' })).toBeTruthy()
-  cleanup(); state.auth.organization = { ...state.auth.organization, profileCode: 'CONTRIBUTOR' }
+  cleanup(); state.auth.organization = { ...state.auth.organization, navigation: { partners: false } }
   sidebar()
   expect(screen.queryByRole('link', { name: 'Parceiros' })).toBeNull()
   expect(screen.getByRole('link', { name: 'Interesses' })).toBeTruthy()

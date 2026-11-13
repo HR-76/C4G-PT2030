@@ -274,6 +274,7 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     audit:(c,entry)=>audit(c,s,entry),authorize:async(op,target)=>{if(isUiCapability(op))return capability(target,op);const decision=await authorization.authorize(op,context,target);await drain();return decision.allowed},
     protect:async args=>{const decision=await guard.protect(client,{handle:s.handle,...args});s.guard=decision.token;await drain();return decision}});
    const partnersRepository=createPartnersRepository({organizationId:org,actor:context.actor,cursor:tokens,audit:(c,entry)=>audit(c,s,entry),
+    browseAllowed:async()=>{const current=await data.authorizationDataPort.load(context.actor);if(!current)fail('SERVICE_UNAVAILABLE');return require('../organizationDirectory/accessProfiles').navigationFor(current.profileCode)?.partners===true},
     protect:async args=>{const decision=await guard.protect(client,{handle:s.handle,...args});s.guard=decision.token;await drain();return decision},
     authorize:async(op,target)=>{if(isUiCapability(op))return capability(target,op);const key=JSON.stringify([op,target]);if(decisions.has(key)){coordinator.assert(s.guard,client,preparedAuthorityBinding(client).transactionId);return decisions.get(key)}
      const decision=await authorization.authorize(op,context,target);await drain();if(!decision.allowed&&/AUDIT|UNAVAILABLE|STALE|MEMBERSHIP|POLICY_INVALID/.test(decision.reasonCode))fail('SERVICE_UNAVAILABLE');decisions.set(key,decision.allowed);return decision.allowed;}});

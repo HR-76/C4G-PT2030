@@ -23,7 +23,7 @@ Estado: In Progress (12/11/2026). Pedido do utilizador em sessão, depois de ana
 - `/interesses` abre a lista sem separadores de Candidaturas; `/candidaturas?ver=interesses` (ligações antigas) redireciona para `/interesses` conservando os filtros.
 - Oportunidades: botões **Interesses** e **Candidaturas** no cabeçalho. Interesses: botão **Oportunidades**. Candidaturas: **Nova candidatura** leva às Oportunidades.
 - Tabela de Oportunidades: **Iniciar candidatura** só com a capacidade `canCreateApplication` da organização e oportunidade não arquivada; consulta a revisão atual antes de abrir o formulário; sem gravação.
-- Técnico: sem entrada Parceiros na barra lateral nem na pesquisa de páginas; `/parceiros` redireciona para o início. Outros perfis inalterados.
+- Técnico: sem entrada Parceiros na barra lateral nem na pesquisa de páginas; `/parceiros` redireciona para o início. Outros perfis inalterados. **A decisão é do backend (ver «Decisão no backend»)**; o frontend só segue a lista de navegação.
 - Permissões do Técnico concedidas por `grantsForProfile`. Os Técnicos **já existentes** só as recebem ao repetir a atribuição do perfil; fazê-lo em bases reais exige autorização própria.
 
 ## Validação prevista
@@ -68,3 +68,14 @@ Achado em staging: o Matching por pessoa dava 503 ao Técnico e funcionava ao Ad
 - `organizationDirectory/composition.js` implementa-o com a sessão autenticada e o registo central de autoridade: só `CONTRIBUTOR` devolve falso.
 - A página mostra, quando `privateIncluded===false`, a nota «Nesta consulta foram consideradas apenas as oportunidades do catálogo…».
 - Provas: testes em `organizationMatching.test.js` e `MatchingWorkspace.test.jsx` (falharam antes). Lint, frontend 1009 e backend 3164 aprovados; build ok. **Não provado:** a implementação em `composition.js` com a autoridade real (só `node --check` e o uso do mesmo padrão de resolução do resto do módulo); por validar em staging com a conta de Técnico.
+
+## Decisão no backend: Parceiros (13/11/2026)
+
+Princípio do utilizador: as decisões de acesso ficam no backend; o frontend não leva regras por perfil. A primeira versão do ponto 4 escondia Parceiros no frontend por `profileCode`; foi substituída.
+
+- `navigationFor(profileCode)` (`organizationDirectory/accessProfiles.js`) é a única política: `{partners:false}` para `CONTRIBUTOR`, `{partners:true}` para os outros perfis conhecidos, `null` para desconhecidos.
+- A resposta de sessão da organização (`organizationAuthController.publicOrganization`) passa a incluir `navigation`, só de apresentação.
+- A lista de parceiros entre candidaturas (`partnersBrowse`, `GET /api/applications/partners`) recusa com `NOT_AUTHORIZED` quando a política o nega, depois do guarda de autoridade e antes de qualquer leitura (`browseAllowed` em `partners.js`, ligado em `applications/composition.js` ao perfil atual do registo central). Os parceiros dentro de cada candidatura continuam a depender da equipa.
+- Frontend (`Sidebar`, `Header`, `App`): esconde Parceiros e redireciona `/parceiros` apenas quando `organization.navigation.partners === false`; sem `profileCode`. Ausência da lista (sessão antiga) mostra a entrada.
+- Provas: testes novos em `partnerBrowseBoundary`, `applicationInterestContracts` (política) e `f3MembershipContext` (sessão), todos falharam antes; teste de navegação do frontend. Lint, frontend 1009, backend 3166 aprovados, build ok. **Não provado em staging nem contra PostgreSQL**: a recusa na API e a leitura do perfil atual usam o mesmo padrão de `creatorJoinsTeam`.
+- Não alterado, por não ter sido pedido: `profileCode` do Calendário (`ORG_ADMIN`) e do Dashboard do Técnico, que já existiam no frontend.

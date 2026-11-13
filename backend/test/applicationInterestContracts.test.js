@@ -38,3 +38,10 @@ test('interest permissions are distinct and install least privilege for each pro
  assert.ok(perms('VIEWER').includes('opportunity_interest.read'));
  assert.ok(!perms('VIEWER').includes('opportunity_interest.register'));
 });
+
+test('the navigation policy is decided by the backend: only the Técnico loses the partner list',()=>{
+ const {navigationFor}=require('../src/organizationDirectory/accessProfiles');
+ assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false});
+ for(const profile of ['ORG_ADMIN','FUNDING_MANAGER','VIEWER'])assert.deepEqual(navigationFor(profile),{partners:true});
+ assert.equal(navigationFor('UNKNOWN'),null);
+});

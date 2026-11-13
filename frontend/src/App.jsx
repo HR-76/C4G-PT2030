@@ -106,7 +106,7 @@ function AppRoutes() {
         <Route path="/interesses/:id" element={<Interests key={applicationSessionKey} />} />
         <Route path="/candidaturas" element={<PrivateApplications key={applicationSessionKey} />} />
         <Route path="/candidaturas/:id" element={<ApplicationLinkGate><PrivateApplications key={applicationSessionKey} /></ApplicationLinkGate>} />
-        <Route path="/parceiros" element={organization?.profileCode === 'CONTRIBUTOR' ? <Navigate to={home} replace /> : <Partners />} />
+        <Route path="/parceiros" element={organization?.navigation?.partners === false ? <Navigate to={home} replace /> : <Partners />} />
         <Route path="/matching" element={<Matching />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/conta/seguranca" element={<AccountSecurity showProfile={Boolean(organization)} />} />

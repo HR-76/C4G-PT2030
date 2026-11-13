@@ -37,6 +37,8 @@ test('session exposes only a presentation label from the resolved current member
     controller.session(req, res);
     assert.equal(res.body.organization.profileLabel, label);
     assert.equal(res.body.organization.profileCode, role);
+    // The backend decides which areas a profile may open; the client only follows this list.
+    assert.deepEqual(res.body.organization.navigation, { partners: role !== 'CONTRIBUTOR' });
     assert.equal(res.body.organization.membershipId, undefined);
     assert.equal(res.body.organization.baseRoleCode, undefined);
   }

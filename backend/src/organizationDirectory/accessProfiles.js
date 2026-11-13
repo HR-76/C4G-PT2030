@@ -14,6 +14,11 @@ const technician=['opportunity_interest.manage','application.create'];
 const administration=['organization_notice.manage','organizational_scope.create','organizational_scope.rename','organizational_scope.reparent'];
 const work=new Set(['application.read','application.edit','application.transition','application.review.decide',
  'document.read','document.version.list','document.version.create','document.download.request','document.upload.initiate','document.upload.confirm']);
+// Which areas a profile may open. Decided here only; the client follows the list and has no per-profile rules.
+function navigationFor(profileCode){
+ if(!['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER'].includes(profileCode))return null;
+ return {partners:profileCode!=='CONTRIBUTOR'};
+}
 function canManage(profile){return ['ORG_ADMIN','FUNDING_MANAGER'].includes(profile)}
 function capabilities(profile,actorId,target){
  const own=actorId===target.membershipId;
@@ -38,4 +43,4 @@ function accessSnapshot({snapshot,resource,operationCode}){
  if(!snapshot||!canManage(snapshot.profileCode)||snapshot.organizationId!==resource.organizationId)return snapshot;
  return {...snapshot,grants:[...snapshot.grants,{permission:operationCode==='ORGANIZATION_MEMBERSHIP_READ'?'organization_membership.read':'organization_membership.manage',scope:{type:'ORGANIZATION',id:snapshot.organizationId,organizationId:snapshot.organizationId}}]};
 }
-module.exports={profiles,canManage,capabilities,grantsForProfile,accessSnapshot};
+module.exports={profiles,canManage,capabilities,grantsForProfile,accessSnapshot,navigationFor};
