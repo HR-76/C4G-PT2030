@@ -201,7 +201,7 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
    const projectionData=['get','calendar','workMine','workGet','taskDelete','documentGet','partnersGet','browse','browsePage','unitOptions','report','reportExport','dashboard'].includes(s.method)
     ?require('./protectedAuthoritySnapshot').createProtectedAuthoritySnapshot({actor:context.actor,data,withAuthority:coordinator.withAuthority,assertCurrent,clock}):data;
    const readAuthority=require('./readAuthority').createReadAuthority({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock,includeWork:['calendar','workMine'].includes(s.method)});
-   const capability=require('./browseAuthority').createTransitionCapability({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock});
+   const capability=require('./browseAuthority').createTransitionCapability({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock,snapshotForResource});
    const uiCapabilities={get:['APPLICATION_EDIT','APPLICATION_TRANSITION'],workGet:['APPLICATION_WORK_EDIT'],documentGet:['APPLICATION_DOCUMENT_EDIT','APPLICATION_REVIEW_DECIDE','DOCUMENT_UPLOAD_INITIATE'],partnersGet:['APPLICATION_EDIT']};
    const isUiCapability=op=>uiCapabilities[s.method]?.includes(op)===true;
    const usesTaskDetails=['browsePage','calendar','workGet','workMine'].includes(s.method)||s.method.startsWith('task');
