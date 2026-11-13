@@ -5,7 +5,8 @@ KEY_FILE="$ROOT/backup/backup.key"
 WORK="$ROOT/backup/work"
 R2_ENV="$ROOT/r2.env"
 DATABASES=(c4g_central_staging c4g_tenant_staging)
-RELEASE="${C4G_RELEASE:-$(git -C "$ROOT/src" rev-parse --short HEAD)}"
+# Imagem da API mais recente construída nesta VPS (contém scripts/staging/r2Backup.js). C4G_RELEASE força uma etiqueta.
+RELEASE="${C4G_RELEASE:-$(docker images c4g-staging-api --format '{{.Tag}}' 2>/dev/null | head -n 1)}"
 IMAGE="c4g-staging-api:$RELEASE"
 
 # Contagens registadas no manifesto no momento da cópia e repetidas no restauro (mesma consulta nos dois lados).

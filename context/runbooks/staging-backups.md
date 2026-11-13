@@ -72,7 +72,7 @@ systemctl enable --now c4g-staging-backup.timer c4g-staging-restore-test.timer
 systemctl list-timers 'c4g-staging-*'
 ```
 
-Os temporizadores têm `Persistent=true`: se a VPS estiver desligada à hora, correm no arranque. Os serviços usam o commit em `/srv/c4g-staging/src`, por isso a imagem `c4g-staging-api:<commit>` desse checkout tem de existir. **Depois de cada `git pull`, construa a imagem** (passo 1) ou a próxima cópia falha com `BACKUP_IMAGE_MISSING`.
+Os temporizadores têm `Persistent=true`: se a VPS estiver desligada à hora, correm no arranque. Os serviços usam a imagem `c4g-staging-api` mais recente construída na VPS (ou a etiqueta de `C4G_RELEASE`, se a definir). Essa imagem tem de conter `scripts/staging/r2Backup.js`, ou seja, ter sido construída de um commit com esta feature.
 
 Verificar a última execução e o estado:
 

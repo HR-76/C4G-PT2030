@@ -26,6 +26,8 @@ for db in "${DATABASES[@]}"; do
   rm -f "$WORK"/restore-*
   if ! r2 latest --database "$db" --out "/b/restore-$db.dump.enc" --manifest-out "/b/restore-$db.json" >/dev/null; then echo "RESTORE_FAIL $db no-copy-in-r2"; fail=1; continue; fi
   if ! decrypt "$WORK/restore-$db.dump.enc" "$WORK/restore-$db.dump"; then echo "RESTORE_FAIL $db decrypt"; fail=1; continue; fi
+  # O servidor lê o manifesto com pg_read_file como utilizador postgres: o ficheiro (só contagens e nomes de papéis) tem de ser legível.
+  chmod 644 "$WORK/restore-$db.json"
   docker cp "$WORK/restore-$db.dump" "$NAME:/tmp/$db.dump" && docker cp "$WORK/restore-$db.json" "$NAME:/tmp/$db.json" || { echo "RESTORE_FAIL $db copy"; fail=1; continue; }
 
   # Os papéis c4g_* do manifesto (só nomes, sem ligação) têm de existir antes do restauro, como no servidor de origem.
