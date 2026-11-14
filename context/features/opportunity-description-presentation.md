@@ -47,32 +47,41 @@ Alternativa: novo mapeamento `pt2030-plan-xlsx-v2.1` que inclui o resumo no snap
 
 Decisão do utilizador em 14/11/2026: **complemento separado**, com possibilidade de o Admin C4G editar a descrição e os outros dados do aviso.
 
-## 3. Complemento da oportunidade e edição pelo Admin — In Progress
+## 3. Complemento da oportunidade e edição pelo Admin — Review
 
-### Desenho
+Migração autorizada pelo utilizador em 14/11/2026 («Sim, autorizo»), medida primeiro num PostgreSQL descartável.
 
-- Complemento guardado ao lado da oportunidade, por `opportunity_id`, fora da revisão canónica. Duas camadas: `COLLECTED` (o que a fonte pública publica, com URL e data de observação) e `EDITORIAL` (o que o Admin C4G escreveu, com autor e data). Histórico só de acrescento.
-- Na leitura, o valor do Admin prevalece campo a campo; cada campo indica a origem. Uma nova recolha nunca apaga nem altera o que o Admin escreveu.
+### Contrato
+
+- Complemento guardado ao lado da oportunidade, por `opportunity_id`, fora da revisão canónica: nenhuma revisão, digest ou reimportação muda. Duas camadas: `COLLECTED` (o que a fonte pública publica, com URL e data de observação) e `EDITORIAL` (o que o Admin C4G escreveu, com autor e data). Histórico só de acrescento.
+- Na leitura, o valor do Admin prevalece campo a campo; cada campo indica a origem. Uma nova recolha nunca apaga nem altera o que o Admin escreveu. Gravar um campo vazio devolve o valor recolhido.
 - Campos: descrição, página oficial do aviso, código do aviso, prioridades, tipologias de ação, de intervenção e de operação, taxa de comparticipação.
-- Serve qualquer oportunidade do catálogo (o Admin pode escrever a descrição de um aviso EU ou manual); a recolha automática só existe para `PORTUGAL2030_PLAN`, ligada pelo ID do plano.
-- Edição só por `C4G_ADMIN`, com sessão atual, CSRF e a autenticação recente das outras ações administrativas; auditada; idempotente; recusa versão desatualizada.
-- Ficha: a descrição mostra a origem («Resumo publicado em portugal2030.pt» ou «Texto da C4G»), «Ler na fonte» quando truncada, e «Consultar fonte oficial» aponta para a página do aviso.
+- Serve qualquer oportunidade do catálogo (PT2030, EU ou manual). A recolha automática só existe para `PORTUGAL2030_PLAN`, ligada pelo ID do plano.
+- Edição e recolha só por `C4G_ADMIN`: a função de escrita na base confirma a sessão ativa e o papel em cada escrita, com bloqueio contra revogação concorrente. Idempotente por pedido; recusa versão desatualizada. O autor e a data ficam no próprio histórico; não é emitido evento na cadeia de auditoria e não é exigida autenticação recente (igual aos templates de email).
+- Recolha desligada por omissão. `OPPORTUNITY_COMPLEMENT_COLLECTION=facts` copia a página do aviso, código, prioridade, tipologias e taxa; `facts-and-summary` copia também o resumo. Só é escrito o que mudou.
+- Ficha: a descrição indica a origem («Texto redigido pela C4G» ou «Resumo [parcial] publicado em portugal2030.pt», com ligação), «Consultar fonte oficial» passa a apontar para a página do aviso e aparece a secção «Informação complementar». Admin C4G: botão «Editar informação» na ficha e «Atualizar dados PT2030» na lista.
 
-### Feito (14/11/2026)
+### Implementação
 
-- `backend/src/opportunities/complement.js`: campos, validação da entrada (chaves desconhecidas recusadas, texto normalizado, só URL https, limites), digest e junção das camadas.
-- `backend/src/portugal2030/noticeSite.js`: leitor da API com endereço fixo, sem redirecionamentos, limite de páginas, tamanho e tempo; itens sem ID de plano, fora do site ou com ID repetido são ignorados e contados; a marcação nunca passa para o texto.
-- 7 testes novos; backend 3232 aprovados, 9 ignorados, 0 falhas; lint aprovado. Nenhum pedido automático foi feito ao site pelo código; nada gravado em bases.
+- Central `053_opportunity_complement` (`backend/database/central/candidates/opportunity_complement.up.sql`, pacote `opportunity-complement-v1`), a seguir à 052, irreversível. Tabela `public.opportunity_complement_version` e função `public.opportunity_complement_write`; nada é criado, alterado ou concedido em `opportunity_catalog`, e o leitor restrito do catálogo não recebe acesso. Sem chave estrangeira para a oportunidade (para não tocar no esquema do catálogo): o serviço confirma que existe antes de escrever.
+- Versões conhecidas atualizadas: manifesto, executor e preflight da Central, preflight de oportunidades, leitor do catálogo (esquema e segurança), PDFs de faturação, carregamento PT2030, contrato do ledger do catálogo, instalador de staging e admissão da variante de staging (pins próprios da 053).
+- Modelo e validação em `opportunities/complement.js`; serviço e rotas em `opportunities/complementService.js` (`GET`/`PUT /api/admin/opportunity-complements/:id`, `POST /api/admin/opportunity-complements/collections/portugal2030`); leitor do site em `portugal2030/noticeSite.js`. O detalhe da oportunidade (`/api/central-opportunities/:id` e a variante de administração) inclui `complement`; numa Central ainda sem a 053 o detalhe responde sem complemento.
+- Frontend: `OpportunityComplementEditor.jsx`, `opportunityFirstAnalysis.js`, `OpportunityReadModelView.jsx`, `CentralOpportunities.jsx`.
 
-### Por fazer e bloqueado
+### Validação (14/11/2026)
 
-1. **Migração nova da Central (053)** para a tabela do complemento. Não há tabela existente que sirva sem inventar identidades de conector. Exige: SQL e pacote com fingerprints medidos num PostgreSQL 18 descartável, e atualização das listas de versões conhecidas (preflight de oportunidades, leitor do catálogo, PDFs de faturação, admissão de email, instalador de staging e runtime local) — a falta de uma delas foi o que pôs o staging em ciclo de reinícios com a 052. **Precisa de autorização** para o gate isolado e, depois, para aplicar à Central local e à VPS.
-2. Rotas (`GET`/`PUT /api/admin/central-opportunities/:id/complement`, recolha administrativa) e inclusão do complemento no detalhe lido por clientes (o leitor restrito do catálogo precisa de `SELECT` na tabela nova).
-3. Ficha e formulário de edição no Admin.
+- Gate isolado `node test/integration/opportunity-complement/gate.cjs` (PostgreSQL 18 próprio em `.tmp`, sem ligação a bases existentes), aprovado nas duas variantes: genérica e com os logins de runtime do staging (`COMPLEMENT_GATE_STAGING_LOGINS=1`). A variante de staging reproduz primeiro os pins da 052 fixados na VPS. Prova: aplicação pelo pacote registado, repetição sem efeito, preflight da Central, preflight de oportunidades e admissão do leitor na 053; privilégios; fronteira de escrita (não administrador, sessão expirada, versão desatualizada, repetição, conflito, dois escritores concorrentes, histórico imutável); serviço completo (edição, recolha `facts` e `facts-and-summary`, precedência do Admin, fonte indisponível).
+- Backend 3264 aprovados, 9 ignorados, 0 falhas. Frontend 1088 aprovados e 1 falha por tempo limite já conhecida em `ApplicationPartners` (passa isolado). Lint e build aprovados.
+- Não feito: browser; aplicação a qualquer base habitual; recolha real contra portugal2030.pt pelo código (só leitura manual no browser durante a investigação).
+
+### Limites
+
+- Com a ligação da API pelo login limitado `c4g_central_runtime` (hoje desligada no staging), o serviço não consegue confirmar a oportunidade em `opportunity_catalog`; a edição responderia 503. Fica para o perfil de runtime completo.
+- O leitor experimental `catalogRead` (modo controlado) só conhece a Central até à 051; já não admitia a 052.
+- A API do site não é um serviço documentado: uma mudança de formato faz a recolha falhar ou ignorar itens, sem alterar o que está guardado.
 
 ### Perguntas em aberto
 
-1. **Termos do site.** Os Termos e Condições de portugal2030.pt dizem que o conteúdo «não poderá ser copiado, alterado ou distribuído, salvo com autorização expressa da Agência, I.P.», com exceção do direito de citação com origem identificada. `robots.txt` não restringe. Mostrar o resumo com origem e ligação pode caber na citação, mas é uma decisão do utilizador (ou um pedido de autorização à Agência). Os dados factuais (código, prioridade, tipologias, taxa) e a ligação para a página são menos sensíveis do que o texto.
-2. **«Outros dados» editáveis.** Assumido: os campos do complemento acima. Editar dados que vêm do Excel (título, programa, datas previstas, dotação) é outro mecanismo: esses valores alimentam filtros, ordenação e estado na base, por isso exigem uma revisão nova da oportunidade e voltam a aparecer como «alterados» numa reimportação.
-3. Texto integral do PDF: continua por ler; só interessa se o resumo truncado não chegar.
-4. Recolha manual (botão no Admin, proposta) ou agendada.
+1. **Termos do site.** Os Termos e Condições de portugal2030.pt dizem que o conteúdo «não poderá ser copiado, alterado ou distribuído, salvo com autorização expressa da Agência, I.P.», com exceção do direito de citação com origem identificada. `robots.txt` não restringe. Por isso a recolha fica desligada até o utilizador escolher `facts`, `facts-and-summary` ou pedir autorização à Agência.
+2. **«Outros dados» editáveis.** Implementado: os campos do complemento. Editar dados que vêm da fonte (título, programa, datas previstas, dotação) é outro mecanismo: alimentam filtros, ordenação e estado, exigem uma revisão nova da oportunidade e voltam a aparecer como «alterados» numa reimportação.
+3. Texto integral do PDF da ficha resumo: por ler; só interessa se o resumo truncado não chegar.

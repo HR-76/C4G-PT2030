@@ -157,9 +157,9 @@ Sem migração nova: a tabela `email_logo_version` e a função `email_logo_writ
 - **Frontend:** o cliente passa a enviar `Idempotency-Key`; mensagem nova para `EMAIL_LOGO_NOT_SET`.
 - **Testes:** `backend/test/emailLogoApi.test.js`, 15 testes (serviço, HTTP das três rotas, ordem de montagem). Suíte do backend: 3264 a passar, 0 falhas, 9 ignorados. Lint e build aprovados. Suíte do frontend: 1088 a passar e 1 falha por tempo limite em `ApplicationPartners.test.jsx` ("stops adding people at fifty"), a mesma já registada acima e fora deste incremento.
 
-Decisão tomada na implementação, por confirmar pelo utilizador:
+Decisão tomada na implementação, confirmada pelo utilizador a 14/11/2026:
 
-- **Que logótipo leva um email de uma entidade.** Seguiu-se o critério 4d do contrato: uma entidade com logótipo próprio usa o dela, mesmo com o template global; sem logótipo próprio usa o da C4G. A frase da decisão de 12/11 ("o template de convite próprio de uma organização usa o dela") também admite a leitura de que só o template próprio leva o logótipo da entidade.
+- **Que logótipo leva um email de uma entidade.** Seguiu-se o critério 4d do contrato: uma entidade com logótipo próprio usa o dela, mesmo com o template global; sem logótipo próprio usa o da C4G. A frase da decisão de 12/11 ("o template de convite próprio de uma organização usa o dela") também admite a leitura de que só o template próprio leva o logótipo da entidade. O utilizador confirmou a primeira leitura: o logótipo segue a entidade, não o template.
 
 Limites e por fazer:
 
