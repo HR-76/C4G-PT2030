@@ -1,6 +1,6 @@
 # Emails: templates e configuração
 
-Estado: Draft — contrato proposto em 12/11/2026, por aprovar. Nada implementado. Decisões de produto da fase 1 fechadas, com [plano técnico](email-templates-and-configuration-plan.md) por aprovar. Há perguntas em aberto que bloqueiam as fases 2 e 3.
+Estado: In Progress na fase 1 — ver o ponto de situação de 14/11/2026 no [plano técnico](email-templates-and-configuration-plan.md). Fases 2 e 3 em Draft, com perguntas em aberto. Estado anterior: Draft — contrato proposto em 12/11/2026, por aprovar. Nada implementado. Decisões de produto da fase 1 fechadas, com [plano técnico](email-templates-and-configuration-plan.md) por aprovar. Há perguntas em aberto que bloqueiam as fases 2 e 3.
 
 ## Pedido
 

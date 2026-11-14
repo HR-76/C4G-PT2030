@@ -291,6 +291,8 @@ export const privateApplicationsApi = {
   edit: (id, body, organizationId) => api.put(`/applications/${id}`, body, applicationContext(organizationId)),
   transition: (id, body, organizationId) => api.post(`/applications/${id}/transitions`, body, applicationContext(organizationId)),
   myWork: (params, organizationId, signal) => api.get('/applications/my-work', { params, ...applicationContext(organizationId, signal) }),
+  // Tasks, alerts and assigned reviews of the Técnico dashboard in one request; a part that failed carries `error`.
+  technicianDashboard: (organizationId, signal) => api.get('/applications/technician-dashboard', { ...applicationContext(organizationId, signal), timeout: 30000 }),
   calendar: (params, organizationId, signal) => api.get('/applications/calendar', { params, ...applicationContext(organizationId, signal) }),
   work: (id, params, signal) => inSessionContext(() => api.get(`/applications/${id}/work`, withSignal({ params }, signal))),
   workHistory: (id, params, signal) => inSessionContext(() => api.get(`/applications/${id}/work/history`, withSignal({ params }, signal))),

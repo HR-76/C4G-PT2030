@@ -1,6 +1,6 @@
 # Plano técnico — Emails, fase 1 (template do convite e logótipos)
 
-Estado: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
+Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2 e 6 feitos; 3, 4, 5 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
 
 Âmbito: só a fase 1. Emails do Keycloak, configuração e histórico têm plano próprio depois das respetivas perguntas.
 
@@ -99,3 +99,19 @@ Cada incremento fecha com `node --check`, testes focados, suites completas, lint
 ## Ordem sugerida
 
 1, depois 2 e 6 em paralelo (o 6 pode avançar com a API simulada), depois 3, 4, 5 e 7.
+
+## Ponto de situação (14/11/2026)
+
+Verificado no código e por execução das suítes. A frase "Nada implementado; nenhuma dependência instalada" do estado anterior já não era verdadeira.
+
+| # | Incremento | Situação | Evidência |
+| --- | --- | --- | --- |
+| 1 | Núcleo puro | Feito | `backend/src/emailTemplates/` e 14 testes. Sanitização ensaiada a 14/11 com 23 entradas de ataque, 0 fugas ([registo](../reviews/email-html-sanitization-2026-11-14.md)). |
+| 2 | Pacote da Central | Feito, sem registo anterior neste plano | Migração `051_email_templates` (2 tabelas, funções de escrita com verificação de administrador, registos imutáveis), pacote e manifestos, gate em `test/integration/email-templates/`. Aplicada no staging a 14/11/2026, como predecessora da 052. Não existe `sql.js` com as consultas admitidas. |
+| 3 | Serviço e API do Admin C4G | Por fazer | Nenhuma rota `/api/admin/email` montada; não existem `service`, `repository`, `http` nem `audit`. |
+| 4 | Envio com o template guardado | Por fazer | `activationEmail.js` envia o texto fixo atual. |
+| 5 | Logótipos e rota pública | Por fazer | Só existe a validação de imagem do incremento 1. |
+| 6 | Interface Admin C4G | Feito contra API simulada | Página, editor e cliente. A entrada "Email" está no menu e a página dá erro na aplicação real, porque falta o incremento 3. |
+| 7 | Logótipo na ficha da entidade | Por fazer | Sem referências no frontend fora da página do Admin C4G. |
+
+Condicionantes: o staging não envia email, por isso o incremento 4 e o envio de teste só se provam com um fornecedor de email autorizado. As fases 2 e 3 do contrato dependem das perguntas 3, 4 e 5, ainda em aberto.
