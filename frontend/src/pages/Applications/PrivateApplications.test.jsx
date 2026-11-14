@@ -423,7 +423,14 @@ it('recovers UBI next-step guidance and links existing sections without adding m
  api.responsibles.mockResolvedValue({data:{items:[]}})
  mount(`/candidaturas/${application}`)
  await screen.findByRole('heading',{name:'Próximo passo'})
- expect(screen.getByText('Completar equipa, parceiros e documentação antes de registar a submissão.')).toBeTruthy()
+ const guidance=screen.getByRole('region',{name:'Orientação da candidatura'})
+ expect(guidance.querySelector('p').textContent).toBe('Completar equipa, parceiros e documentação antes de registar a submissão.')
+ // The guidance leads to the sections; without the transition, "registar a submissão" stays plain text.
+ expect(within(guidance).queryByRole('button',{name:'registar a submissão'})).toBeNull()
+ for(const [phrase,name] of [['equipa','Equipa e tarefas'],['parceiros','Parceiros'],['documentação','Documentos']]){
+  fireEvent.click(within(guidance).getByRole('button',{name:phrase}))
+  expect(screen.getByRole('tab',{name,exact:true}).getAttribute('aria-selected')).toBe('true')
+ }
  for(const [name,target] of [['Equipa e tarefas','#equipa-tarefas'],['Parceiros','#parceiros'],['Documentos','#documentos-revisao']]){
   fireEvent.click(screen.getByRole('tab',{name,exact:true}))
   expect(screen.getByRole('tabpanel',{name,exact:true})).toBeTruthy()
