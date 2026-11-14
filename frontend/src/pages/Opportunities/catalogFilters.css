@@ -131,6 +131,8 @@
  .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table :is(th,td) { font-size:clamp(.7rem, calc(.5rem + .33cqi), .9rem); }
  .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table thead th { font-size:clamp(.62rem, calc(.42rem + .28cqi), .8rem); }
  .catalog-custom.catalog-wide .habitual-catalog-table .cr-status { white-space:nowrap; }
+ /* The amount must stay on one line; its size shrinks with the table so the number is never cut. */
+ .catalog-custom.catalog-wide .habitual-catalog-table .catalog-amount { white-space:nowrap; font-size:clamp(.6rem, calc(.4rem + .3cqi), .85rem); }
  .catalog-custom.catalog-wide .habitual-catalog-table .intervention-area-badge { overflow-wrap:normal; }
 }
 @media(max-width:768px) {
