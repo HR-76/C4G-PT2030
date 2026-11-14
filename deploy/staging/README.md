@@ -176,18 +176,18 @@ $RUN upgrade --apply
 
 Os comandos continuam no instalador para quando existir o perfil de runtime completo. Nessa altura a ordem é `upgrade --apply`, depois `runtime-logins`, depois `env --central-runtime-login`, e o `compose.yaml` tem de voltar a carregar o ficheiro do worker (`worker-central.env`) a seguir ao `api-private.env`. Os logins só podem existir como membros de `c4g_central_runtime` depois de a cadeia Central estar completa, porque as pertenças mudam o fingerprint de cada versão a partir da 036. Para aplicar uma migração nova com as pertenças ativas, revoga-as primeiro (`REVOKE c4g_central_runtime FROM c4g_central_staging_api, c4g_central_staging_worker`).
 
-Depois reinicia a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate`) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
+Depois reinicia só a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate api`; sem o nome do serviço o `pod` também é recriado, o antivírus fica na rede antiga e a API entra em ciclo de reinícios, como aconteceu em 14/11/2026) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
 
 ### Central 053: complemento das oportunidades
 
 O `upgrade` aplica também a Central 053 (`053_opportunity_complement`), a seguir à 052. Guarda a descrição e os dados complementares que o Admin C4G escreve na ficha de uma oportunidade e o que for recolhido de portugal2030.pt ([contrato](../../context/features/opportunity-description-presentation.md)). A migração é irreversível e uma release anterior deixa de arrancar depois dela: faz a cópia das bases antes. O código novo arranca com a Central ainda na 052 (a ficha fica sem complemento), por isso podes ativar a release primeiro e aplicar a migração depois. As pertenças dos logins de runtime não precisam de ser revogadas para a 053: a variante com as pertenças ativas foi medida e está admitida.
 
-A recolha a partir de portugal2030.pt vem desligada. Para a ligar, acrescenta ao `api-private.env` uma destas linhas e recria a API:
+A recolha a partir de portugal2030.pt vem desligada. Liga-se com a variável `OPPORTUNITY_COMPLEMENT_COLLECTION` no `api-private.env`:
 
-```bash
-OPPORTUNITY_COMPLEMENT_COLLECTION=facts               # página do aviso, código, prioridade, tipologias e taxa
-OPPORTUNITY_COMPLEMENT_COLLECTION=facts-and-summary   # o mesmo, mais o resumo publicado
-```
+- `facts`: página do aviso, código, prioridade, tipologias e taxa.
+- `facts-and-summary`: o mesmo, mais o resumo publicado.
+
+O ficheiro é lido em bruto: a linha leva só `NOME=valor`, sem espaços nem comentário a seguir ao valor.
 
 Os Termos e Condições do site não permitem copiar conteúdo sem autorização, salvo citação com a origem identificada; a escolha de copiar o resumo é do responsável pelo ambiente. **Decisão de 14/11/2026: `facts`.** O `env --carry` mantém esta linha quando o ficheiro é regenerado. Um valor diferente dos três aceites (`disabled`, `facts`, `facts-and-summary`) impede a API de arrancar.
 
@@ -195,7 +195,7 @@ Para a ligar num staging já instalado:
 
 ```bash
 F=/srv/c4g-staging/api-private.env; grep -q '^OPPORTUNITY_COMPLEMENT_COLLECTION=' $F && sed -i 's/^OPPORTUNITY_COMPLEMENT_COLLECTION=.*/OPPORTUNITY_COMPLEMENT_COLLECTION=facts/' $F || echo 'OPPORTUNITY_COMPLEMENT_COLLECTION=facts' >> $F
-cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD) && docker compose -f deploy/staging/compose.yaml up -d --force-recreate
+cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD) && docker compose -f deploy/staging/compose.yaml up -d --force-recreate api
 ```
 
 Depois, em Oportunidades, o Admin C4G usa «Atualizar dados PT2030».

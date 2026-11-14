@@ -16,6 +16,10 @@ Quarto bloco da revisão de desempenho página a página (14/11/2026), depois do
 
 - `InterestFlow.test.jsx` (+5) e `PrivateApplications.test.jsx` (+1). Frontend 1049 aprovados, build e lint aprovados. Sem browser nem sessão real.
 
-## Não feito
+## Ponto 6 — uma decisão por pedido nas leituras (servidor, 14/11/2026)
 
-6. **Servidor: verificações repetidas por linha.** Na lista de interesses e nos resumos, `capabilities()` repete por linha quatro autorizações que não dependem da linha (registar interesse, criar candidatura, ler oportunidades, editar equipa), cada uma com o seu registo de auditoria; `opportunityInterests/composition.js` não reutiliza decisões dentro do pedido, ao contrário de `applications/composition.js`. Mexe em autorização e auditoria: exige testes e medição em PostgreSQL real.
+Na lista de interesses, `capabilities()` repetia por linha quatro autorizações que não dependem da linha (registar interesse, criar candidatura, ler oportunidades, editar equipa), cada uma com a sua evidência de auditoria. `createOpportunityInterestRepository`, que serve uma única operação protegida, aceita agora `reuseDecisions`: cada pergunta é decidida uma vez e a resposta reutilizada. O que depende da linha (ler e gerir cada interesse) continua a ser perguntado por linha. `composition.js` liga-o só nas leituras, e cada reutilização confirma que a guarda continua atual, como no browse de candidaturas e nos alertas. Uma decisão que não pôde ser tomada continua a falhar a operação e nunca é guardada. As escritas perguntam sempre.
+
+Com 25 linhas, passa de cerca de 150 autorizações para cerca de 55 por pedido de lista. Consequência: a auditoria passa a ter uma evidência por pergunta em cada operação de leitura, em vez de uma por linha; as decisões são as mesmas.
+
+Validação: `opportunityInterestDecisions.test.js` (3), RED antes e GREEN depois; 76 testes de interesses aprovados. Suite backend: 3262 aprovados, 9 ignorados e 1 falha em `launcherDrain.test.js`, que não toca em interesses e passa isolado (8 de 8, duas vezes). Lint aprovado. A ligação em `composition.js` não tem teste próprio de composição. Sem PostgreSQL real nem medição.

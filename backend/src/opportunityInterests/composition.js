@@ -75,6 +75,9 @@ function createOpportunityInterestComposition({sessionStore,sessionRegistry,auth
      if(!decision.allowed&&/AUDIT|UNAVAILABLE|STALE|MEMBERSHIP|POLICY_INVALID|SESSION_INVALID/.test(decision.reasonCode))fail('SERVICE_UNAVAILABLE');
      return decision.allowed;},
     protect:async args=>{const decision=await guard.protect(client,{handle:state.handle,...args});state.guard=decision.token;await drain();return decision;},
+    // Only reads reuse a decision inside the operation; each reuse confirms the guard is still current.
+    reuseDecisions:operation(state.method)===OPERATIONS.READ,
+    onDecisionReuse:()=>{if(state.guard)coordinator.assert(state.guard,client,preparedAuthorityBinding(client).transactionId);},
     audit:(connection,entry)=>audit(connection,state,entry)});
    return await repository[state.method](client,state.input,state.id);
   }finally{await drain();}});
