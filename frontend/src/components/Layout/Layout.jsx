@@ -47,22 +47,36 @@ const titles = {
 export default function Layout() {
   const { organization, user } = useAuth()
   const [directoryAccess, setDirectoryAccess] = useState(null)
+  // The session says which parts of the organization area this profile may open (decided by the server), so the menu
+  // is complete at once. The requests below still run for what is allowed: they let those pages open at once and
+  // correct the menu if the server refuses. A profile with none of them asks nothing. An older API sends no such
+  // answer; the menu then waits for the requests, as before.
+  const navigation = organization?.navigation
+  const directoryAllowed = typeof navigation?.directory === 'boolean' ? navigation.directory : null
+  const unitsAllowed = typeof navigation?.units === 'boolean' ? navigation.units : null
+  const accessAllowed = typeof navigation?.access === 'boolean' ? navigation.access : null
+  const sessionAccess = directoryAllowed === null || unitsAllowed === null || accessAllowed === null ? null : { directory: directoryAllowed, units: unitsAllowed, access: accessAllowed }
   useEffect(() => {
     if (!organization?.id || !user?.id) { setDirectoryAccess(null); return }
     const controller = new AbortController(), orgId = organization.id, userId = user.id
     setDirectoryAccess(null)
-    const api = organizationDirectoryApi(orgId)
-    afterPageRequests(controller.signal, () => { const since = confirmedReadsEpoch(); return Promise.allSettled([api.context(controller.signal), api.access(controller.signal)]).then(([directory, access]) => {
+    const known = directoryAllowed !== null && accessAllowed !== null
+    if (known && !directoryAllowed && !accessAllowed) return
+    const api = organizationDirectoryApi(orgId), skipped = () => Promise.reject(Object.assign(new Error('Not offered to this profile'), { response: { status: 403 } }))
+    // Only a refusal removes what the session offered; a failed request does not.
+    const refused = result => result.status === 'rejected' && [401, 403, 404].includes(result.reason?.response?.status)
+    const open = (result, offered) => result.status === 'fulfilled' || (known && offered === true && !refused(result))
+    afterPageRequests(controller.signal, () => { const since = confirmedReadsEpoch(); return Promise.allSettled([known && !directoryAllowed ? skipped() : api.context(controller.signal), known && !accessAllowed ? skipped() : api.access(controller.signal)]).then(([directory, access]) => {
       if (controller.signal.aborted) return
       // The answer that decides the menu also lets the Acessos page open at once; that page reads it again on entry.
       if (access.status === 'fulfilled' && Array.isArray(access.value.data?.items)) keepConfirmedRead(readScope(userId, orgId), 'organization-access', access.value.data, since)
       // Lets the organization pages open at once; they read the context again on entry.
       if (directory.status === 'fulfilled' && directory.value.data?.permissions && !readDirectoryCache(directoryCacheKey(userId, orgId))) writeDirectoryCache(directoryCacheKey(userId, orgId), {context: directory.value.data})
-      setDirectoryAccess({orgId, userId, directory: directory.status === 'fulfilled', units: directory.status === 'fulfilled' && directory.value.data?.permissions?.units === true, access: access.status === 'fulfilled'})
+      setDirectoryAccess({orgId, userId, directory: open(directory, directoryAllowed), units: directory.status === 'fulfilled' ? directory.value.data?.permissions?.units === true : open(directory, unitsAllowed), access: open(access, accessAllowed)})
     }) })
     return () => controller.abort()
-  }, [organization?.id, user?.id])
-  const navigationAccess = directoryAccess?.orgId === organization?.id && directoryAccess?.userId === user?.id ? directoryAccess : {directory:false, units:false, access:false}
+  }, [organization?.id, user?.id, directoryAllowed, unitsAllowed, accessAllowed])
+  const navigationAccess = directoryAccess?.orgId === organization?.id && directoryAccess?.userId === user?.id ? directoryAccess : sessionAccess || {directory:false, units:false, access:false}
   const breakpoint = '(max-width: 768px)'
   const { pathname, key: locationKey } = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)

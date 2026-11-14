@@ -1,7 +1,7 @@
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {MemoryRouter} from 'react-router-dom'
-const api=vi.hoisted(()=>Object.fromEntries(['context','units','people','unitCreate','unitRename','unitMove','profileEdit','descriptionEdit','strategyEdit','registrationProfile','registrationContacts','personCreate','personEdit'].map(k=>[k,vi.fn()])))
+const api=vi.hoisted(()=>Object.fromEntries(['context','units','people','unitCreate','unitRename','unitMove','profileEdit','descriptionEdit','strategyEdit','registrationProfile','registrationContacts','personCreate','personEdit','emailLogo','emailLogoWrite','emailLogoRemove'].map(k=>[k,vi.fn()])))
 const auth=vi.hoisted(()=>({user:{id:'user-a'},organization:{id:'org-a'}}))
 vi.mock('../../api/api',()=>({organizationDirectoryApi:()=>api}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>auth}))
@@ -387,4 +387,14 @@ it('shows the units already confirmed on return and removes them when the permis
  cleanup();api.context.mockResolvedValue({data:{...info,permissions:{...info.permissions,units:false}}});mount('/perfil-organizacao/unidades')
  await screen.findByText('Sem permissão para consultar a estrutura completa da organização.')
  expect(screen.queryByRole('link',{name:'Ver pessoas de Direção'})).toBeNull()
+})
+it('offers the email logo only to the entity administrator',async()=>{
+ api.context.mockResolvedValue({data:{...info,registration}});api.emailLogo.mockResolvedValue({data:{url:null,revision:0,updatedAt:null}})
+ mount();await screen.findByRole('heading',{name:'Ficha da entidade'})
+ expect(screen.queryByRole('heading',{name:'Logótipo nos emails'})).toBeNull();expect(api.emailLogo).not.toHaveBeenCalled()
+ cleanup();auth.organization.profileCode='FUNDING_MANAGER'
+ try{mount();await screen.findByRole('heading',{name:'Ficha da entidade'});expect(screen.queryByRole('heading',{name:'Logótipo nos emails'})).toBeNull();expect(api.emailLogo).not.toHaveBeenCalled()
+  cleanup();auth.organization.profileCode='ORG_ADMIN';mount()
+  expect(await screen.findByRole('heading',{name:'Logótipo nos emails'})).toBeTruthy();await screen.findByText('A entidade ainda não carregou um logótipo.');expect(api.emailLogo).toHaveBeenCalledTimes(1)
+ }finally{delete auth.organization.profileCode}
 })

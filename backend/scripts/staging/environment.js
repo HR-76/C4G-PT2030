@@ -60,7 +60,9 @@ function stagingTarget({ apiHost, port = 5432 }) {
 
 // Non-secret settings the previous release already carries. Only these names are ever copied from it.
 const CARRIED_KEYS = Object.freeze(['AUTH_MODE',
-  'OIDC_REDIRECT_URI', 'OIDC_POST_LOGOUT_REDIRECT_URI', 'OIDC_TRANSACTION_MS', 'SESSION_COOKIE_NAME', 'SESSION_IDLE_MS', 'SESSION_ABSOLUTE_MS']);
+  'OIDC_REDIRECT_URI', 'OIDC_POST_LOGOUT_REDIRECT_URI', 'OIDC_TRANSACTION_MS', 'SESSION_COOKIE_NAME', 'SESSION_IDLE_MS', 'SESSION_ABSOLUTE_MS',
+  // What the collection from portugal2030.pt may copy (decision of 14/11/2026: facts); kept when the file is regenerated.
+  'OPPORTUNITY_COMPLEMENT_COLLECTION']);
 
 function carriedSettings(text) {
   const carried = {};

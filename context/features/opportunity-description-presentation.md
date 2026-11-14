@@ -82,6 +82,6 @@ Migração autorizada pelo utilizador em 14/11/2026 («Sim, autorizo»), medida 
 
 ### Perguntas em aberto
 
-1. **Termos do site.** Os Termos e Condições de portugal2030.pt dizem que o conteúdo «não poderá ser copiado, alterado ou distribuído, salvo com autorização expressa da Agência, I.P.», com exceção do direito de citação com origem identificada. `robots.txt` não restringe. Por isso a recolha fica desligada até o utilizador escolher `facts`, `facts-and-summary` ou pedir autorização à Agência.
+1. **Termos do site.** Os Termos e Condições de portugal2030.pt dizem que o conteúdo «não poderá ser copiado, alterado ou distribuído, salvo com autorização expressa da Agência, I.P.», com exceção do direito de citação com origem identificada. `robots.txt` não restringe. **Decidido pelo utilizador em 14/11/2026: só dados factuais (`facts`).** A descrição dos avisos PT2030 fica para o Admin C4G escrever; o resumo do site não é copiado. O modo é uma variável do ambiente e mantém-se quando as variáveis de staging são regeneradas.
 2. **«Outros dados» editáveis.** Implementado: os campos do complemento. Editar dados que vêm da fonte (título, programa, datas previstas, dotação) é outro mecanismo: alimentam filtros, ordenação e estado, exigem uma revisão nova da oportunidade e voltam a aparecer como «alterados» numa reimportação.
 3. Texto integral do PDF da ficha resumo: por ler; só interessa se o resumo truncado não chegar.

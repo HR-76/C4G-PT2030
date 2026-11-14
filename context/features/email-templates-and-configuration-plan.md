@@ -1,6 +1,6 @@
 # Plano técnico — Emails, fase 1 (template do convite e logótipos)
 
-Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3, 5 e 6 feitos; 4 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
+Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3, 5, 6 e 7 feitos; 4 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
 
 Âmbito: só a fase 1. Emails do Keycloak, configuração e histórico têm plano próprio depois das respetivas perguntas.
 
@@ -112,7 +112,7 @@ Verificado no código e por execução das suítes. A frase "Nada implementado; 
 | 4 | Envio com o template guardado | Por fazer | `activationEmail.js` envia o texto fixo atual. |
 | 5 | Logótipos e rota pública | Feito a 14/11/2026, em Review | Ver "Incremento 5" abaixo. |
 | 6 | Interface Admin C4G | Feito contra API simulada | Página, editor e cliente. A entrada "Email" está no menu e a página dá erro na aplicação real, porque falta o incremento 3. |
-| 7 | Logótipo na ficha da entidade | Por fazer | Sem referências no frontend fora da página do Admin C4G. |
+| 7 | Logótipo na ficha da entidade | Feito a 14/11/2026, em Review | Ver "Incremento 7" abaixo. |
 
 Condicionantes: o staging não envia email, por isso o incremento 4 e o envio de teste só se provam com um fornecedor de email autorizado. As fases 2 e 3 do contrato dependem das perguntas 3, 4 e 5, ainda em aberto.
 
@@ -165,5 +165,14 @@ Limites e por fazer:
 
 - **Não verificado:** contra PostgreSQL real (o gate `test/integration/email-templates/` não foi repetido), na aplicação com sessão real e no staging.
 - **O envio ainda não usa o logótipo:** depende do incremento 4.
-- **Interface do cliente:** a API da entidade existe, mas o ecrã para a entidade carregar o logótipo é o incremento 7.
+- **Interface do cliente:** feita no incremento 7 (abaixo).
 - **Versões antigas:** o histórico é imutável, por isso não há limpeza de versões substituídas (até 512 KiB cada).
+
+### Incremento 7 (14/11/2026, em Review)
+
+- **Código:** `frontend/src/pages/Organization/EntityEmailLogo.jsx` (secção "Logótipo nos emails"), mostrada em `OrganizationProfile.jsx` a seguir à ficha da entidade; cliente em `organizationDirectoryApi` (`emailLogo`, `emailLogoWrite`, `emailLogoRemove`); estilos em `entity-profile.css`.
+- **Desvio ao plano:** a secção não ficou dentro de `EntityProfileCard.jsx`, porque esse componente também é usado pelo Admin C4G no diretório da plataforma, onde o logótipo de uma entidade não pode ser alterado.
+- **Quem vê:** só o Administrador da entidade (`profileCode` `ORG_ADMIN` na sessão). Os outros perfis não veem a secção nem fazem o pedido. O servidor volta a decidir em cada pedido.
+- **O que faz:** mostra o logótipo atual ou a indicação de que se usa o da C4G; carrega, substitui e remove. Recusa no browser ficheiros que não sejam PNG ou JPEG ou que excedam 512 KB; as dimensões são validadas pelo servidor. Depois de uma revisão desatualizada, recarrega o logótipo atual.
+- **Testes:** `EntityEmailLogo.test.jsx` (6) e um teste novo em `OrganizationProfile.test.jsx`. Suíte do frontend: 1096 a passar, 0 falhas. Lint e build aprovados.
+- **Não verificado:** verificação visual a 1440 e 390 px, a secção com sessão real e o staging.

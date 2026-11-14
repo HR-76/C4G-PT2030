@@ -17,7 +17,12 @@ const work=new Set(['application.read','application.edit','application.transitio
 // Which areas a profile may open. Decided here only; the client follows the list and has no per-profile rules.
 function navigationFor(profileCode){
  if(!['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER'].includes(profileCode))return null;
- return {partners:profileCode!=='CONTRIBUTOR',calendar:profileCode==='ORG_ADMIN',people:canManage(profileCode),dashboard:profileCode==='CONTRIBUTOR'?'TECHNICIAN':'ORGANIZATION'};
+ // The organization area of the menu follows the permissions the profile is granted below, so the
+ // client can show it with the session instead of asking each page first. Presentation only: every
+ // page is still authorized by the engine. Billing depends on an individual grant and is not here.
+ const granted=permission=>canManage(profileCode)&&management.includes(permission);
+ return {partners:profileCode!=='CONTRIBUTOR',calendar:profileCode==='ORG_ADMIN',people:canManage(profileCode),dashboard:profileCode==='CONTRIBUTOR'?'TECHNICIAN':'ORGANIZATION',
+  directory:granted('organization_directory.read'),units:granted('organizational_scope.read'),access:granted('organization_membership.read')};
 }
 function canManage(profile){return ['ORG_ADMIN','FUNDING_MANAGER'].includes(profile)}
 function capabilities(profile,actorId,target){

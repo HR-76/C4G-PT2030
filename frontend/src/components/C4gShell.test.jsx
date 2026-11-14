@@ -1,16 +1,16 @@
 import React from 'react'
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
-import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import Sidebar from './Layout/Sidebar'
 import Layout from './Layout/Layout'
 
-const state = vi.hoisted(() => ({ auth: {}, directory: true, access: true }))
+const state = vi.hoisted(() => ({ auth: {}, directory: true, access: true, asked: [], failure: null }))
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => state.auth }))
-vi.mock('../api/api', () => ({ organizationDirectoryApi: () => ({context: () => state.directory ? Promise.resolve({data:{permissions:{units:true}}}) : Promise.reject({response:{status:403}}), access: () => state.access ? Promise.resolve({data:{items:[]}}) : Promise.reject({response:{status:403}})}), customerBillingApi: () => ({access: vi.fn().mockResolvedValue({data:{canRead:false}})}), organizationNotificationsApi: { refresh: vi.fn().mockResolvedValue({}), list: vi.fn().mockResolvedValue({ data: { items: [], unread_count: 0 } }) } }))
+vi.mock('../api/api', () => ({ organizationDirectoryApi: () => ({context: () => { state.asked.push('context'); return state.failure ? Promise.reject(state.failure) : state.directory ? Promise.resolve({data:{permissions:{units:true}}}) : Promise.reject({response:{status:403}}) }, access: () => { state.asked.push('access'); return state.failure ? Promise.reject(state.failure) : state.access ? Promise.resolve({data:{items:[]}}) : Promise.reject({response:{status:403}}) }}), customerBillingApi: () => ({access: vi.fn().mockResolvedValue({data:{canRead:false}})}), organizationNotificationsApi: { refresh: vi.fn().mockResolvedValue({}), list: vi.fn().mockResolvedValue({ data: { items: [], unread_count: 0 } }) } }))
 vi.mock('./OrganizationSelector', () => ({ default: () => <span>Entidade: Entidade A</span> }))
 beforeEach(() => {
-  state.directory = true; state.access = true
+  state.directory = true; state.access = true; state.asked = []; state.failure = null
   state.auth = { user: { id: 'one', name: 'Gestor', platformRoles: [] }, organization: { id: 'a' }, isAdmin: false, logout: vi.fn() }
   window.matchMedia = vi.fn(() => ({ matches: false, addEventListener() {}, removeEventListener() {} }))
 })
@@ -245,4 +245,35 @@ it('shows the organization calendar only when the backend navigation list allows
   cleanup(); state.auth.organization = { id: 'a', profileCode: 'ORG_ADMIN', navigation: { calendar: false } }
   sidebar()
   expect(screen.queryByRole('link', { name: 'Calendário da entidade' })).toBeNull()
+})
+const shell = () => render(<MemoryRouter><Routes><Route element={<Layout/>}><Route path="/" element={<p>Conteúdo</p>}/></Route></Routes></MemoryRouter>)
+const organizationArea = { partners: true, calendar: false, people: true, dashboard: 'ORGANIZATION', directory: true, units: true, access: true }
+it('shows the organization area at once from the session, before any request answers', () => {
+  state.auth.organization = { id: 'a', navigation: organizationArea }
+  shell()
+  const area = screen.getByRole('region', { name: 'Organização' })
+  for (const name of ['Perfil da organização', 'Departamentos / Unidades', 'Pessoas', 'Acessos']) expect(within(area).getByRole('link', { name })).toBeTruthy()
+})
+it('asks nothing about the organization area when the session offers none of it', async () => {
+  state.auth.organization = { id: 'a', navigation: { ...organizationArea, people: false, directory: false, units: false, access: false } }
+  shell()
+  await new Promise(resolve => setTimeout(resolve, 20))
+  expect(state.asked).toEqual([]); expect(screen.queryByRole('region', { name: 'Organização' })).toBeNull()
+})
+it('removes what the session offered when the server refuses it, and keeps it when the request merely fails', async () => {
+  state.auth.organization = { id: 'a', navigation: organizationArea }; state.access = false
+  shell()
+  await waitFor(() => expect(screen.queryByRole('link', { name: 'Acessos' })).toBeNull())
+  expect(screen.getByRole('link', { name: 'Perfil da organização' })).toBeTruthy()
+  cleanup(); state.access = true; state.failure = { response: { status: 503 } }; state.asked = []
+  shell()
+  await waitFor(() => expect(state.asked.length).toBe(2)); await new Promise(resolve => setTimeout(resolve, 20))
+  const area = screen.getByRole('region', { name: 'Organização' })
+  for (const name of ['Perfil da organização', 'Departamentos / Unidades', 'Acessos']) expect(within(area).getByRole('link', { name })).toBeTruthy()
+})
+it('waits for the requests, as before, when the session carries no answer about the organization area', async () => {
+  state.auth.organization = { id: 'a', navigation: { partners: true } }
+  shell()
+  expect(screen.queryByRole('region', { name: 'Organização' })).toBeNull()
+  expect(await screen.findByRole('link', { name: 'Perfil da organização' })).toBeTruthy()
 })

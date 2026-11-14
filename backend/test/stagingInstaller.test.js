@@ -117,6 +117,7 @@ test('collection is opt-in: nothing is generated unless a result limit is named,
 test('carry-over copies only the listed non-secret settings', () => {
   const carried = carriedSettings('AUTH_MODE=oidc\r\nSESSION_SECRET=secret\nCENTRAL_DATABASE_URL=postgresql://u:p@h/d\nOIDC_REDIRECT_URI=https://x/cb?a=1\n# note\nAUTH_POLICY_VERSION=c4g-assurance-v1\n=bad');
   assert.deepEqual(carried, { AUTH_MODE: 'oidc', OIDC_REDIRECT_URI: 'https://x/cb?a=1' });
+  assert.deepEqual(carriedSettings('OPPORTUNITY_COMPLEMENT_COLLECTION=facts\nOPPORTUNITY_OTHER=1'), { OPPORTUNITY_COMPLEMENT_COLLECTION: 'facts' });
   assert.ok(CARRIED_KEYS.every(key => !/SECRET|PASSWORD|DATABASE|CREDENTIALS|PERMIT/.test(key.replace('POST_LOGOUT', ''))));
 });
 

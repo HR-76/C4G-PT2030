@@ -255,6 +255,10 @@ export function organizationDirectoryApi(organizationId) {
     profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
     unitRename:(id,body)=>write('put',`/units/${id}/name`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
     personCreate:body=>write('post','/people',body),personEdit:(id,body)=>write('put',`/people/${id}`,body),
+    // The entity's own email logo. The body of an upload is the image itself, so the revision and the idempotency key travel in headers.
+    emailLogo:signal=>read('/email-logo',{},signal),
+    emailLogoWrite:(file,revision)=>api.put(root+'/email-logo',file,{timeout:30000,headers:{...options.headers,'Content-Type':file.type,'X-Logo-Revision':String(revision),'Idempotency-Key':crypto.randomUUID()}}),
+    emailLogoRemove:revision=>api.delete(root+'/email-logo',{timeout:20000,headers:{...options.headers,'X-Logo-Revision':String(revision),'Idempotency-Key':crypto.randomUUID()}}),
   }
 }
 

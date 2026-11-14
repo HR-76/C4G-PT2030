@@ -41,9 +41,19 @@ test('interest permissions are distinct and install least privilege for each pro
 
 test('the navigation policy is decided by the backend: partners, calendar and the dashboard variant per profile',()=>{
  const {navigationFor}=require('../src/organizationDirectory/accessProfiles');
- assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false,calendar:false,people:false,dashboard:'TECHNICIAN'});
- assert.deepEqual(navigationFor('ORG_ADMIN'),{partners:true,calendar:true,people:true,dashboard:'ORGANIZATION'});
- assert.deepEqual(navigationFor('FUNDING_MANAGER'),{partners:true,calendar:false,people:true,dashboard:'ORGANIZATION'});
- assert.deepEqual(navigationFor('VIEWER'),{partners:true,calendar:false,people:false,dashboard:'ORGANIZATION'});
+ const organizationArea={directory:true,units:true,access:true},none={directory:false,units:false,access:false};
+ assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false,calendar:false,people:false,dashboard:'TECHNICIAN',...none});
+ assert.deepEqual(navigationFor('ORG_ADMIN'),{partners:true,calendar:true,people:true,dashboard:'ORGANIZATION',...organizationArea});
+ assert.deepEqual(navigationFor('FUNDING_MANAGER'),{partners:true,calendar:false,people:true,dashboard:'ORGANIZATION',...organizationArea});
+ assert.deepEqual(navigationFor('VIEWER'),{partners:true,calendar:false,people:false,dashboard:'ORGANIZATION',...none});
  assert.equal(navigationFor('UNKNOWN'),null);
+});
+test('the organization area of the menu follows the permissions the profile is actually granted',()=>{
+ const {navigationFor,grantsForProfile}=require('../src/organizationDirectory/accessProfiles');
+ const organizationId='00000000-0000-4000-8000-000000000001';
+ const areas={directory:'organization_directory.read',units:'organizational_scope.read',access:'organization_membership.read'};
+ for(const profileCode of ['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER']){
+  const granted=new Set(grantsForProfile({organizationId,profileCode}).map(grant=>grant.permission)),navigation=navigationFor(profileCode);
+  for(const [area,permission] of Object.entries(areas))assert.equal(navigation[area],granted.has(permission),`${profileCode} ${area}`);
+ }
 });

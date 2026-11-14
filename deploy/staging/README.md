@@ -189,7 +189,16 @@ OPPORTUNITY_COMPLEMENT_COLLECTION=facts               # página do aviso, códig
 OPPORTUNITY_COMPLEMENT_COLLECTION=facts-and-summary   # o mesmo, mais o resumo publicado
 ```
 
-Os Termos e Condições do site não permitem copiar conteúdo sem autorização, salvo citação com a origem identificada; a escolha de copiar o resumo é do responsável pelo ambiente.
+Os Termos e Condições do site não permitem copiar conteúdo sem autorização, salvo citação com a origem identificada; a escolha de copiar o resumo é do responsável pelo ambiente. **Decisão de 14/11/2026: `facts`.** O `env --carry` mantém esta linha quando o ficheiro é regenerado. Um valor diferente dos três aceites (`disabled`, `facts`, `facts-and-summary`) impede a API de arrancar.
+
+Para a ligar num staging já instalado:
+
+```bash
+F=/srv/c4g-staging/api-private.env; grep -q '^OPPORTUNITY_COMPLEMENT_COLLECTION=' $F && sed -i 's/^OPPORTUNITY_COMPLEMENT_COLLECTION=.*/OPPORTUNITY_COMPLEMENT_COLLECTION=facts/' $F || echo 'OPPORTUNITY_COMPLEMENT_COLLECTION=facts' >> $F
+cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD) && docker compose -f deploy/staging/compose.yaml up -d --force-recreate
+```
+
+Depois, em Oportunidades, o Admin C4G usa «Atualizar dados PT2030».
 
 ## Atualizar um staging já instalado
 
