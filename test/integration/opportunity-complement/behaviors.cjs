@@ -92,9 +92,93 @@ async function verify({ pool, port }) {
     const results = await Promise.allSettled([1, 2].map(() => write('admin', 'admin', { target: racing, expected: 0, fields: { noticeCode: 'A' + randomUUID().slice(0, 8) } })));
     assert.deepEqual(results.map(item => item.status).sort(), ['fulfilled', 'rejected']);
     assert.equal(results.find(item => item.status === 'rejected').reason.message, 'STALE_REVISION');
+    await service({ pool, ids, sessions });
   } finally {
     await runtime.end();
   }
+}
+
+// The application service over the same database: administrator view, edition,
+// collection from a synthetic site and the reader's effective complement.
+async function service({ pool, ids, sessions }) {
+  const { createOpportunityComplementService } = require(path.resolve(__dirname, '../../../backend/src/opportunities/complementService'));
+  const { adaptNotice } = require(path.resolve(__dirname, '../../../backend/src/portugal2030/noticeSite'));
+  const request = who => ({ authContext: { sessionId: sessions[who] }, sessionID: sessions[who], user: { id: ids[who === 'expiredAdmin' ? 'admin' : who] } });
+  const planned = { '7937': randomUUID(), '8000': randomUUID() }, manual = randomUUID();
+  const c = await pool.connect();
+  try {
+    await c.query('BEGIN');
+    await c.query("SET LOCAL session_replication_role='replica'");
+    for (const [opportunityId, records] of [[planned['7937'], [{ namespace: 'PORTUGAL2030_PLAN', externalId: '7937' }]], [planned['8000'], [{ namespace: 'PORTUGAL2030_PLAN', externalId: '8000' }]], [manual, null]]) {
+      const revisionId = randomUUID();
+      await c.query(`INSERT INTO opportunity_catalog.revision(revision_id,opportunity_id,revision_number,row_version,snapshot,normalized_projection,quality_projection,content_digest)
+        VALUES($1,$2,1,1,$3,'{}','{}',$4)`, [revisionId, opportunityId, JSON.stringify(records ? { schemaVersion: 2, contractVersion: 'opportunity-v2.0', sourceRecords: records } : { schemaVersion: 1, title: 'Manual' }), 'a'.repeat(64)]);
+      await c.query(`INSERT INTO opportunity_catalog.opportunity(opportunity_id,current_revision_id,revision_number,row_version,lifecycle_state,validation_state,title,funder_name,
+        quality_score,quality_bucket,content_digest,normalization_version,quality_rule_version)
+        VALUES($1,$2,1,1,'ACTIVE','PENDING_REVIEW','Synthetic complement opportunity','Synthetic',0,'LOW',$3,'opportunity-normalization-v1','opportunity-quality-v1')`, [opportunityId, revisionId, 'a'.repeat(64)]);
+    }
+    await c.query('COMMIT');
+  } catch (error) {
+    await c.query('ROLLBACK');
+    throw error;
+  } finally { c.release(); }
+
+  const notice = (id, summary) => adaptNotice({ link: `https://portugal2030.pt/aviso/aviso-${id}/`, modified_gmt: '2026-09-14T17:19:38', title: { rendered: 'Aviso ' + id },
+    yoast_head_json: { og_description: summary }, acf: { id, codigo: 'FA' + id, prioridade: ['4A'], comparticipacao: 85 } });
+  let published = [notice('7937', 'Resumo publicado do aviso [&hellip;]'), notice('8000', 'Outro resumo.'), notice('9999', 'Sem oportunidade.')];
+  const readSite = async () => ({ sourceNamespace: 'PORTUGAL2030_SITE', observedAt: '2026-11-14T10:00:00.000Z', total: published.length + 1, skipped: 1, ambiguous: [], notices: published });
+  const off = createOpportunityComplementService({ centralPool: pool, readSite });
+  const facts = createOpportunityComplementService({ centralPool: pool, collectionMode: 'facts', readSite });
+  const full = createOpportunityComplementService({ centralPool: pool, collectionMode: 'facts-and-summary', readSite });
+  const code = value => ({ code: value });
+
+  // --- administrator only, and only on opportunities that exist
+  await assert.rejects(off.get(manual, request('outsider')), code('C4G_ADMIN_REQUIRED'));
+  await assert.rejects(off.get(manual, request('expiredAdmin')), code('C4G_ADMIN_REQUIRED'));
+  await assert.rejects(off.save(manual, { fields: {}, expectedRevision: 0, idempotencyKey: randomUUID() }, request('outsider')), code('C4G_ADMIN_REQUIRED'));
+  await assert.rejects(off.get(randomUUID(), request('admin')), code('RESOURCE_NOT_AVAILABLE'));
+  await assert.rejects(off.save(randomUUID(), { fields: {}, expectedRevision: 0, idempotencyKey: randomUUID() }, request('admin')), code('RESOURCE_NOT_AVAILABLE'));
+  assert.equal(await off.effective(manual), null);
+  const empty = await off.get(manual, request('admin'));
+  assert.deepEqual([empty.editorial, empty.collected, empty.effective], [{ fields: {}, revision: 0, updatedAt: null, updatedBy: null }, null, null]);
+
+  // --- edition of any opportunity, with staleness and refused input
+  const key = randomUUID(), body = { fields: { description: 'Descrição escrita\npela C4G.', cofinancingRate: 70 }, expectedRevision: 0, idempotencyKey: key };
+  const saved = await off.save(manual, body, request('admin'));
+  assert.deepEqual([saved.editorial.revision, saved.editorial.updatedBy, saved.effective.fields.description], [1, ids.admin + '@example.invalid', { value: 'Descrição escrita\npela C4G.', origin: 'EDITORIAL' }]);
+  assert.equal((await off.save(manual, body, request('admin'))).editorial.revision, 1);
+  await assert.rejects(off.save(manual, { ...body, idempotencyKey: randomUUID() }, request('admin')), code('STALE_REVISION'));
+  await assert.rejects(off.save(manual, { ...body, fields: { title: 'x' } }, request('admin')), code('INVALID_INPUT'));
+  await assert.rejects(off.save(manual, { fields: {}, expectedRevision: 1 }, request('admin')), code('INVALID_INPUT'));
+  assert.deepEqual(await off.effective(manual), saved.effective);
+
+  // --- collection: off by default, facts only, then facts with the published summary
+  await assert.rejects(off.collect({ idempotencyKey: randomUUID() }, request('admin')), code('COLLECTION_NOT_CONFIGURED'));
+  await assert.rejects(facts.collect({ idempotencyKey: randomUUID() }, request('outsider')), code('C4G_ADMIN_REQUIRED'));
+  const sweep = randomUUID();
+  const firstSweep = await facts.collect({ idempotencyKey: sweep }, request('admin'));
+  assert.deepEqual(firstSweep, { mode: 'facts', observedAt: '2026-11-14T10:00:00.000Z', published: 4, skipped: 1, ambiguous: 0, matched: 2, unmatched: 1, written: 2, unchanged: 0 });
+  assert.deepEqual(Object.keys((await off.effective(planned['7937'])).fields).sort(), ['cofinancingRate', 'noticeCode', 'officialUrl', 'priorities']);
+  assert.deepEqual([(await facts.collect({ idempotencyKey: randomUUID() }, request('admin'))).written, 0], [0, 0]);
+  const second = await full.collect({ idempotencyKey: randomUUID() }, request('admin'));
+  assert.deepEqual([second.written, second.unchanged], [2, 0]);
+  const described = (await off.effective(planned['7937'])).fields.description;
+  assert.deepEqual(described, { value: 'Resumo publicado do aviso', origin: 'COLLECTED', sourceUrl: 'https://portugal2030.pt/aviso/aviso-7937/', observedAt: '2026-11-14T10:00:00.000Z', truncated: true });
+
+  // --- a later collection never overrides what the administrator wrote
+  await off.save(planned['7937'], { fields: { description: 'Texto da C4G' }, expectedRevision: 0, idempotencyKey: randomUUID() }, request('admin'));
+  published = [notice('7937', 'Resumo alterado na fonte.'), notice('8000', 'Outro resumo.')];
+  const third = await full.collect({ idempotencyKey: randomUUID() }, request('admin'));
+  assert.deepEqual([third.written, third.unchanged], [1, 1]);
+  const view = await off.get(planned['7937'], request('admin'));
+  assert.deepEqual([view.collected.fields.description, view.effective.fields.description, view.effective.fields.noticeCode.origin],
+    ['Resumo alterado na fonte.', { value: 'Texto da C4G', origin: 'EDITORIAL' }, 'COLLECTED']);
+  // Clearing the administrator's layer gives the collected value back.
+  await off.save(planned['7937'], { fields: {}, expectedRevision: 1, idempotencyKey: randomUUID() }, request('admin'));
+  assert.equal((await off.effective(planned['7937'])).fields.description.value, 'Resumo alterado na fonte.');
+  // A site that cannot be read writes nothing.
+  const broken = createOpportunityComplementService({ centralPool: pool, collectionMode: 'facts', readSite: async () => { throw new Error('offline'); } });
+  await assert.rejects(broken.collect({ idempotencyKey: randomUUID() }, request('admin')), code('SOURCE_UNAVAILABLE'));
 }
 
 module.exports = { verify };

@@ -144,9 +144,12 @@ it('renders manual opportunity authoring in the shell without a client membershi
 })
 it('renders the C4G email templates page without a client membership',()=>{
  state.auth.user.platformRoles=['C4G_ADMIN'];state.auth.organization=null
- page('/administracao/email',<p>Email templates</p>)
- expect(screen.getByText('Email templates')).toBeTruthy()
- expect(screen.queryByRole('heading',{name:'Área da organização'})).toBeNull()
+ for (const path of ['/administracao/email','/administracao/email/member-invitation']) {
+  const view=page(path,<p>Email templates</p>)
+  expect(screen.getByText('Email templates')).toBeTruthy()
+  expect(screen.queryByRole('heading',{name:'Área da organização'})).toBeNull()
+  view.unmount()
+ }
 })
 it('returns focus to the original action when a filtered list finishes loading', async () => {
   function List() {

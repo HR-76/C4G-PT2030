@@ -23,6 +23,22 @@ function createEmailTemplateRepository() {
         input.sessionId, input.actorId, input.type, input.organizationId, input.id, input.action,
         input.subject, input.html, input.contentSha256, input.requestId, input.expectedRevision
       ])).rows[0];
+    },
+    async isOrganizationAdmin(client, sessionId, actorId, organizationId) {
+      return (await client.query(sql.organizationAdmin, [sessionId, actorId, organizationId])).rows[0]?.allowed === true;
+    },
+    async latestLogo(client, organizationId) {
+      return (await client.query(sql.latestLogo, [organizationId])).rows[0] || null;
+    },
+    // content null removes the logo; the database computes the size and the digest from the bytes.
+    async writeLogo(client, input) {
+      return (await client.query(sql.logoWrite, [
+        input.sessionId, input.actorId, input.organizationId, input.id, input.publicId,
+        input.mime, input.width, input.height, input.content, input.requestId, input.expectedRevision
+      ])).rows[0];
+    },
+    async publicLogo(client, publicId) {
+      return (await client.query(sql.publicLogo, [publicId])).rows[0] || null;
     }
   });
 }

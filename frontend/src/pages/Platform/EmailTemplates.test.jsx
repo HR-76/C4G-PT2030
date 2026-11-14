@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { EmailTemplatesView } from './EmailTemplates'
 import { createEmailSimulation } from './emailTemplatesSimulation'
 import { missingVariables, reasonList, removedSummary } from './emailTemplatePresentation'
@@ -27,7 +28,7 @@ function setup(overrides = {}) {
     ...overrides,
   }
   const directoryApi = { entities: vi.fn().mockResolvedValue({ data: { items: [{ id: ORG, name: 'Associação A' }] } }) }
-  render(<EmailTemplatesView api={api} directoryApi={directoryApi} Editor={PlainEditor}/>)
+  render(<MemoryRouter><EmailTemplatesView api={api} directoryApi={directoryApi} Editor={PlainEditor}/></MemoryRouter>)
   return { api, directoryApi }
 }
 const body = () => screen.getByRole('textbox', { name: 'Corpo do email' })
@@ -39,6 +40,8 @@ it('loads the global template and offers only the variables the server lists', a
   expect(body().value).toBe(BODY)
   expect(screen.getByTestId('variables').textContent).toBe('Organizacao,LigacaoAtivacao,Validade,Logotipo')
   expect(screen.getByText('Texto original da plataforma.')).toBeTruthy()
+  expect(screen.getByRole('heading', { level: 1, name: 'Convite de colaborador' })).toBeTruthy()
+  expect(screen.getByRole('link', { name: 'Tipos de email' }).getAttribute('href')).toBe('/administracao/email')
   expect(screen.getByRole('button', { name: 'Guardar' }).disabled).toBe(true)
   expect(screen.queryByRole('button', { name: 'Repor o texto original' })).toBeNull()
   expect(await screen.findByRole('img', { name: 'Logótipo da C4G nos emails' })).toBeTruthy()

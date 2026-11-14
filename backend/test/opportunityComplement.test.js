@@ -93,3 +93,69 @@ test('an unavailable or unexpected site fails without partial results', async ()
   await assert.rejects(readNoticeSite({ fetch: async () => new Response('{"code":"rest_no_route"}', { headers: { 'content-type': 'application/json', 'x-wp-totalpages': '1' } }) }), { code: 'PT2030_SITE_UNEXPECTED' });
   await assert.rejects(readNoticeSite({ fetch: site(Array(51).fill([])).fetch }), { code: 'PT2030_SITE_TOO_LARGE' });
 });
+
+// --- service and routes over a scripted database (the real one is exercised by test/integration/opportunity-complement).
+const { createOpportunityComplementService, createOpportunityComplementRouter, publicError } = require('../src/opportunities/complementService');
+const OPPORTUNITY = '11111111-1111-4111-8111-111111111111', ACTOR = '22222222-2222-4222-8222-222222222222';
+const adminRequest = { authContext: { sessionId: 'sid-1' }, sessionID: 'sid-1', user: { id: ACTOR } };
+function scripted(answer) {
+  const statements = [];
+  const query = async (sql, params) => { statements.push({ sql, params }); return answer(sql, params) || { rows: [], rowCount: 0 }; };
+  return { statements, query, connect: async () => ({ query, release() {} }) };
+}
+
+test('a Central without 053 simply has no complement, and other failures are not hidden', async () => {
+  const missing = createOpportunityComplementService({ centralPool: scripted(() => { throw Object.assign(new Error('relation does not exist'), { code: '42P01' }); }) });
+  assert.equal(await missing.effective(OPPORTUNITY), null);
+  assert.equal(await missing.effective('not-an-id'), null);
+  const broken = createOpportunityComplementService({ centralPool: scripted(() => { throw Object.assign(new Error('connection lost'), { code: '08006' }); }) });
+  await assert.rejects(broken.effective(OPPORTUNITY), { code: '08006' });
+});
+
+test('writes are refused before the database is asked to store anything invalid', async () => {
+  const pool = scripted(sql => sql.includes('email_platform_admin') ? { rows: [{ allowed: true }] } : sql.includes('opportunity_catalog.opportunity') ? { rows: [{}], rowCount: 1 } : null);
+  const service = createOpportunityComplementService({ centralPool: pool });
+  const body = { fields: { description: 'Texto' }, expectedRevision: 0, idempotencyKey: '33333333-3333-4333-8333-333333333333' };
+  for (const invalid of [{ ...body, fields: { title: 'x' } }, { ...body, expectedRevision: -1 }, { ...body, idempotencyKey: 'x' }, { ...body, extra: 1 }, { fields: {} }, null]) {
+    await assert.rejects(service.save(OPPORTUNITY, invalid, adminRequest), { code: 'INVALID_INPUT' });
+  }
+  assert.equal(pool.statements.some(item => item.sql.includes('opportunity_complement_write')), false);
+  await assert.rejects(service.save('x', body, adminRequest), { code: 'RESOURCE_NOT_AVAILABLE' });
+  // A request whose session does not match its authenticated context never reaches the database.
+  const before = pool.statements.length;
+  await assert.rejects(service.save(OPPORTUNITY, body, { ...adminRequest, sessionID: 'other' }), { code: 'C4G_ADMIN_REQUIRED' });
+  assert.equal(pool.statements.slice(before).some(item => item.sql.includes('email_platform_admin')), false);
+  await service.save(OPPORTUNITY, body, adminRequest);
+  const write = pool.statements.find(item => item.sql.includes('opportunity_complement_write'));
+  assert.deepEqual([write.params[0], write.params[1], write.params[3], write.params[4], write.params[5], write.params.slice(7, 12), write.params[13]],
+    ['sid-1', ACTOR, OPPORTUNITY, 'EDITORIAL', '{"description":"Texto"}', [null, null, null, null, null], 0]);
+});
+
+test('collection is off unless the deployment chooses what may be copied', async () => {
+  const pool = scripted(sql => sql.includes('email_platform_admin') ? { rows: [{ allowed: true }] } : null);
+  let read = 0;
+  const service = createOpportunityComplementService({ centralPool: pool, readSite: async () => { read++; return {}; } });
+  await assert.rejects(service.collect({ idempotencyKey: '33333333-3333-4333-8333-333333333333' }, adminRequest), { code: 'COLLECTION_NOT_CONFIGURED' });
+  assert.equal(read, 0);
+  assert.throws(() => createOpportunityComplementService({ centralPool: pool, collectionMode: 'everything' }), TypeError);
+});
+
+test('only the closed list of codes leaves the server', async () => {
+  assert.deepEqual(publicError({ code: 'STALE_REVISION' }), { status: 409, body: { code: 'STALE_REVISION' } });
+  assert.deepEqual(publicError(Object.assign(new Error('secret detail'), { code: '08006' })), { status: 503, body: { code: 'SERVICE_UNAVAILABLE' } });
+  const express = require('express'), http = require('node:http');
+  const service = { get: async id => ({ opportunityId: id }), save: async () => { throw Object.assign(new Error('x'), { code: 'STALE_REVISION' }); }, collect: async () => ({ written: 0 }) };
+  const app = express(); app.use(express.json());
+  app.use('/c', createOpportunityComplementRouter({ express, service, authenticate: (request, response, next) => next() }));
+  const server = await new Promise(resolve => { const s = http.createServer(app).listen(0, '127.0.0.1', () => resolve(s)); });
+  const call = (method, path, body) => fetch(`http://127.0.0.1:${server.address().port}/c${path}`, { method, headers: { 'content-type': 'application/json' }, body: body && JSON.stringify(body) });
+  try {
+    const got = await call('GET', '/' + OPPORTUNITY);
+    assert.deepEqual([got.status, got.headers.get('cache-control'), await got.json()], [200, 'no-store', { opportunityId: OPPORTUNITY }]);
+    const stale = await call('PUT', '/' + OPPORTUNITY, {});
+    assert.equal(stale.status, 409); assert.equal((await stale.json()).error.code, 'STALE_REVISION');
+    assert.equal((await call('GET', '/' + OPPORTUNITY + '?x=1')).status, 400);
+    assert.equal((await call('POST', '/collections/portugal2030', {})).status, 200);
+    assert.equal((await call('DELETE', '/' + OPPORTUNITY)).status, 405);
+  } finally { await new Promise(resolve => server.close(resolve)); }
+});

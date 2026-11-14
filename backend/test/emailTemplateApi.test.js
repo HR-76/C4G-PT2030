@@ -35,6 +35,8 @@ function fixture({ organizations = { [ORG_A]: 'Entidade <A>', [ORG_B]: 'Entidade
       const orgs = new Set(versions.filter(row => row.type === type && row.organizationId).map(row => row.organizationId));
       return { global_customized: scopeRows(type, null).at(-1)?.action === 'SAVE', organizations: [...orgs].filter(org => scopeRows(type, org).at(-1).action === 'SAVE').length };
     },
+    // No logo has been uploaded in these tests; the logos have their own in emailLogoApi.test.js.
+    async latestLogo() { return null; },
     async write(client, input) {
       writes.push(input);
       if (failNext) { const error = failNext; failNext = null; throw error; }

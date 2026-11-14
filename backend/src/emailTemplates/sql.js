@@ -23,4 +23,17 @@ const summary = `SELECT
 
 const write = 'SELECT * FROM public.email_template_write($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)';
 
-module.exports = Object.freeze({ admin, organization, latest, summary, write });
+// Logos (increment 5). The image bytes are read only by the public route, by its unguessable name.
+const organizationAdmin = 'SELECT public.email_organization_admin($1,$2,$3) AS allowed';
+
+// The current row of one logo scope ($1 NULL is the C4G logo): the highest version, which may be a REMOVE.
+const latestLogo = `SELECT v.version, v.action, v.public_id, v.created_at
+  FROM public.email_logo_version v
+  WHERE v.organization_id IS NOT DISTINCT FROM $1
+  ORDER BY v.version DESC LIMIT 1`;
+
+const logoWrite = 'SELECT version, action, public_id FROM public.email_logo_write($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)';
+
+const publicLogo = 'SELECT mime_type, content FROM public.email_logo_version WHERE public_id=$1';
+
+module.exports = Object.freeze({ admin, organization, latest, summary, write, organizationAdmin, latestLogo, logoWrite, publicLogo });

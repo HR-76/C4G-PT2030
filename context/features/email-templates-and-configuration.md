@@ -42,6 +42,24 @@ Factos relevantes para o desenho:
 
 ## Contrato proposto
 
+### Lista de tipos (decisão de 14/11/2026)
+
+A entrada Email abre uma lista de tipos em `/administracao/email`; cada tipo configurável abre o seu ecrã em `/administracao/email/<tipo>`.
+
+- Linhas: Convite de colaborador, Reposição de palavra-passe e Código por email. Colunas: tipo, quem envia, âmbito e estado.
+- O convite mostra se o template global foi alterado e quantas entidades têm template próprio, e tem a ação «Configurar».
+- Os dois tipos do Keycloak aparecem já, marcados «Ainda não configurável» e sem ação, até a fase 2 existir. A lista não afirma que estão ativos: a reposição de palavra-passe é indicada como desligada.
+- Um endereço com um tipo desconhecido ou ainda não configurável não abre editor; mostra o aviso e a ligação de volta à lista.
+- A lista de tipos é fixa no frontend; o estado do convite vem de `GET /api/admin/email/templates`. Só `C4G_ADMIN` a vê.
+
+Critérios de aceitação:
+
+1. A lista mostra os três tipos; só o convite tem «Configurar».
+2. O estado do convite reflete a resposta do servidor (texto original ou alterado; número de entidades com template próprio).
+3. Falha ou recusa do servidor mostra o erro, sem linhas, com «Tentar novamente».
+4. O ecrã do tipo tem ligação de volta à lista e abre sem organização ativa.
+5. `/administracao/email/<tipo desconhecido ou do Keycloak>` não chama a API de templates.
+
 ### Fase 1 — Template do convite por organização
 
 Ecrã no Administrador C4G, menu Email › Tipos.

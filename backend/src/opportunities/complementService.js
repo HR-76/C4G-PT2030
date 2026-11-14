@@ -16,7 +16,7 @@ const SQL = Object.freeze({
     WHERE v.opportunity_id=$1 ORDER BY v.layer, v.version DESC`,
   effective: `SELECT DISTINCT ON (v.layer) v.layer, v.fields, v.source_url, v.observed_at, v.description_truncated
     FROM public.opportunity_complement_version v WHERE v.opportunity_id=$1 ORDER BY v.layer, v.version DESC`,
-  write: 'SELECT * FROM public.opportunity_complement_write($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)',
+  write: 'SELECT (public.opportunity_complement_write($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)).version AS version',
   // Catalog opportunities that came from the annual plan, by the identifier the plan gives them.
   planOpportunities: `SELECT o.opportunity_id AS "opportunityId", source->>'externalId' AS "planId"
     FROM opportunity_catalog.opportunity o JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id

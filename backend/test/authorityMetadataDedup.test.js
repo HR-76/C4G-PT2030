@@ -32,7 +32,8 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     Object.freeze({...entries[0], version:'049_pt2030_document_upload',schemaFingerprint:hash(schemaFor('central-import-package'))}),
     Object.freeze({...entries[0], version:'050_billing_private_documents',schemaFingerprint:hash(schemaFor('billing-pdf-package'))}),
     Object.freeze({...entries[0], version:'051_email_templates',schemaFingerprint:hash(schemaFor('email-template-package'))}),
-    Object.freeze({...entries[0], version:'052_central_runtime_read',schemaFingerprint:hash(schemaFor('central-runtime-read-package'))})]);
+    Object.freeze({...entries[0], version:'052_central_runtime_read',schemaFingerprint:hash(schemaFor('central-runtime-read-package'))}),
+    Object.freeze({...entries[0], version:'053_opportunity_complement',schemaFingerprint:hash(schemaFor('opportunity-complement-package'))})]);
   const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}]]);
   function load(name) {
     const filename = path.resolve(__dirname, '../src/security', name + '.js');

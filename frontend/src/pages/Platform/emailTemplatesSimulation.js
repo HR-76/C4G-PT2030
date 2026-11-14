@@ -78,7 +78,7 @@ export function createEmailSimulation({ user = 'admin@example.invalid' } = {}) {
   const bump = scope => revisions.set(scope || 'GLOBAL', (revisions.get(scope || 'GLOBAL') || 0) + 1)
 
   const api = {
-    types: () => reply({ items: [{ type: 'member-invitation' }] }),
+    types: () => reply({ items: [{ type: 'member-invitation', globalCustomized: saved.has('GLOBAL'), organizations: [...saved.keys()].filter(key => key !== 'GLOBAL').length }] }),
     template: (type, scope) => known(scope) ? reply(view(scope)) : refuse(404, 'RESOURCE_NOT_AVAILABLE'),
     save: (type, scope, body) => {
       const checked = validate(body)

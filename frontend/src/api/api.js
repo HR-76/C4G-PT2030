@@ -154,8 +154,9 @@ export const platformEmailApi = {
   preview: (type, scope, body, signal) => api.post(emailTemplatePath(type, scope) + '/preview', body, { signal, timeout: 15000 }),
   test: (type, scope, body) => api.post(emailTemplatePath(type, scope) + '/test', body, { timeout: 30000 }),
   logo: signal => api.get(emailRoot + '/logo', { signal, timeout: 15000 }),
-  logoWrite: (file, revision) => api.put(emailRoot + '/logo', file, { timeout: 30000, headers: { 'Content-Type': file.type, 'X-Logo-Revision': String(revision) } }),
-  logoRemove: revision => api.delete(emailRoot + '/logo', { timeout: 20000, headers: { 'X-Logo-Revision': String(revision) } }),
+  // The body of an upload is the image itself, so the revision and the idempotency key travel in headers.
+  logoWrite: (file, revision) => api.put(emailRoot + '/logo', file, { timeout: 30000, headers: { 'Content-Type': file.type, 'X-Logo-Revision': String(revision), 'Idempotency-Key': crypto.randomUUID() } }),
+  logoRemove: revision => api.delete(emailRoot + '/logo', { timeout: 20000, headers: { 'X-Logo-Revision': String(revision), 'Idempotency-Key': crypto.randomUUID() } }),
 }
 
 export function entityAccessApi(organizationId,platform=false){
@@ -421,6 +422,12 @@ export const platformCentralOpportunitiesApi = {
   create: body => api.post('/admin/central-opportunities', body),
   list: (query, signal) => api.get('/admin/central-opportunities', withSignal({ params: query || {} }, signal)),
   get: (id, signal) => api.get(`/admin/central-opportunities/${id}`, withSignal({}, signal)),
+}
+// Descriptive data kept beside a catalog opportunity; Admin C4G only.
+export const opportunityComplementsApi = {
+  get: (id, signal) => api.get(`/admin/opportunity-complements/${id}`, withSignal({}, signal)),
+  save: (id, body) => api.put(`/admin/opportunity-complements/${id}`, body),
+  collectPortugal2030: body => api.post('/admin/opportunity-complements/collections/portugal2030', body),
 }
 
 // Context-dependent work runs concurrently but remains ordered around context changes.

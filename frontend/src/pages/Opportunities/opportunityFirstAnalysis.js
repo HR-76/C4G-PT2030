@@ -2,6 +2,8 @@ import { formatCatalogAmount } from './CatalogPresentation'
 import { allocationScopes, commonSourceNames, conceptLabels, factStatus, factValue, getOpportunityReadModel, moneyText, opportunityDisplay, safeOpportunityUrl } from './opportunityReadModel'
 
 const unavailable = (fact, fallback) => ['CONFLICT', 'UNSUPPORTED'].includes(fact?.state) ? factStatus(fact) : fallback
+export const COMPLEMENT_FACTS = [['noticeCode', 'Código do aviso'], ['priorities', 'Prioridade'], ['actionTypologies', 'Tipologia de ação'],
+  ['interventionTypologies', 'Tipologia de intervenção'], ['operationTypologies', 'Tipologia de operação'], ['cofinancingRate', 'Taxa de comparticipação']]
 const at = value => value ? { precision: value.length === 10 ? 'DATE' : 'INSTANT', value } : null
 
 // Presentation only: a support range or a sum of parcels is never a call budget.
@@ -32,7 +34,9 @@ export function firstAnalysis(record = {}) {
   const enrichment = flat.sourceEnrichment || record.funding?.sourceEnrichment
   const programme = enrichment?.schemaVersion === 1 ? enrichment.fields.programme : null
   const programmes = model ? conceptLabels(p.programmes) : programme ? programme.status === 'PUBLISHED' ? programme.items.map(item => item.value.label).filter(Boolean) : [] : flat.programmeName ? [flat.programmeName] : []
-  const description = record.catalogPresentation?.description?.value || (modern ? factValue(p.description.summary) : flat.summary || record.funding?.summary || factValue(p?.description.summary))
+  // Complement kept beside the opportunity: the administrator's text or what the public source publishes.
+  const complement = record.complement?.fields || {}
+  const description = complement.description?.value || record.catalogPresentation?.description?.value || (modern ? factValue(p.description.summary) : flat.summary || record.funding?.summary || factValue(p?.description.summary))
   const title = modern ? display.title : flat.title || display.title
   const deadlines = modern ? factValue(p.schedule.deadlines) || [] : (flat.sourceTemporal?.deadlines || []).map((value, index) => ({ key: `legacy-${index}`, at: at(value) }))
   const deadlineValue = display.deadline?.value
@@ -43,12 +47,17 @@ export function firstAnalysis(record = {}) {
   return { ...display, title, deadline, opening: display.opening, deadlines, programmes,
     programmeFallback: unavailable(p?.programmes, ['CONFLICT', 'UNSUPPORTED'].includes(programme?.status) ? 'Programa por confirmar' : 'Não indicado'),
     description: description && description.trim() !== title?.trim() ? description : null,
+    descriptionSource: complement.description && description === complement.description.value ? complement.description : null,
+    complementFacts: COMPLEMENT_FACTS.filter(([key]) => complement[key]).map(([key, label]) => ({ key, label, origin: complement[key].origin,
+      value: key === 'cofinancingRate' ? `${String(complement[key].value).replace('.', ',')} %` : complement[key].value })),
     descriptionFallback: unavailable(p?.description.summary, display.officialUrl ? 'Consultar a descrição na fonte oficial.' : 'Descrição não disponível neste registo.'),
     openingFallback: unavailable(p?.schedule?.[display.deadlineKind === 'PLANNED' ? 'plannedOpening' : 'opening'], 'Não indicada'),
     deadlineFallback: unavailable(p?.schedule?.[display.deadlineKind === 'PLANNED' ? 'plannedClosing' : 'deadlines'], 'Não indicado'),
-    officialUrl: (modern ? display.officialUrl : safeOpportunityUrl(flat.officialUrl)) || display.officialUrl ||
+    // The administrator's address wins; a collected one only replaces the generic page of the plan.
+    officialUrl: (complement.officialUrl?.origin === 'EDITORIAL' ? safeOpportunityUrl(complement.officialUrl.value) : null) ||
+      (modern ? display.officialUrl : safeOpportunityUrl(flat.officialUrl)) || display.officialUrl ||
       model?.sourceRecords?.map(source => safeOpportunityUrl(source.url)).find(Boolean) ||
-      safeOpportunityUrl(record.catalogPresentation?.description?.sourceUrl) ||
+      safeOpportunityUrl(record.catalogPresentation?.description?.sourceUrl) || safeOpportunityUrl(complement.officialUrl?.value) ||
       (namespaces.includes('PORTUGAL2030_PLAN') ? 'https://portugal2030.pt/plano-anual-de-avisos/' : null),
     allocation: firstAnalysisAllocation(record), sources: [...new Set(namespaces.filter(source => source !== 'C4G_MANUAL').map(source => commonSourceNames[source] || 'Fonte publicada'))],
     eu: namespaces.includes('EU_FUNDING_TENDERS'), sourceReview: record.sourceReview || model?.freshness?.sourceReview,

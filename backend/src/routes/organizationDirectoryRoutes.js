@@ -2,7 +2,7 @@
 const {randomUUID}=require('node:crypto');
  const statuses={CONTACTS_CENTRAL:409,FISCAL_IDENTITY_LOCKED:409,FISCAL_IDENTITY_REVIEW_REQUIRED:409,ONBOARDING_INPUT_INVALID:400,REGISTRATION_FIELDS_INVALID:400,ONBOARDING_CONFLICT:409,ONBOARDING_STALE:409,ONBOARDING_NOT_READY:409,INVALID_INPUT:400,INVALID_CURSOR:400,SESSION_REQUIRED:401,AUTHORITY_REQUIRED:401,AUTHORITY_STALE:409,AUTHORITY_WRITE_PENDING:409,NOT_AUTHORIZED:403,RESOURCE_NOT_AVAILABLE:404,
  STALE_REVISION:409,SELF_ACCESS_PROTECTED:409,STATE_CONFLICT:409,IDEMPOTENCY_CONFLICT:409,DEPENDENCY_CONFLICT:409,UNIT_UNAVAILABLE:409,MEMBERSHIP_UNAVAILABLE:409,CONTEXT_CHANGED:409,LIMIT_EXCEEDED:409};
-function createDirectoryRouter({express,service,matching,membershipAccess,members,onFailure=()=>{},authenticate,organizationMiddleware}){
+function createDirectoryRouter({express,service,matching,membershipAccess,members,emailLogos=null,onFailure=()=>{},authenticate,organizationMiddleware}){
  const router=express.Router();
  const failure=(error,res)=>{
   try{onFailure(error);}catch{ /* Observation must not replace the public response. */ }
@@ -11,6 +11,8 @@ function createDirectoryRouter({express,service,matching,membershipAccess,member
  };
  router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()},authenticate,organizationMiddleware.requireServerSession,
   organizationMiddleware.resolveOrganizationContext,organizationMiddleware.requireOrganizationContext);
+ // The entity's own email logo: only its administrator, and always the entity the session selected.
+ if(emailLogos){require('../emailTemplates/logoHttp').requireLogoService(emailLogos);require('../emailTemplates/logoHttp').mountLogoRoutes(router,'/email-logo',{express,read:emailLogos.organizationLogo,set:emailLogos.organizationLogoSet,remove:emailLogos.organizationLogoRemove});}
  router.use('/access/users',require('./memberOnboardingRoutes').createMemberRoutes({express,service:members,resolveOrganization:req=>req.headers['x-c4g-organization']}));
  for(const [verb,path,method] of [['get','/access','list'],['put','/memberships/:id/profile','changeProfile'],['put','/memberships/:id/billing','changeBilling']]){
   router[verb](path,async(req,res)=>{try{

@@ -121,6 +121,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   let closeCatalogReader = async()=>{};
   let closeOwnedTenantPools = async()=>{};
   let functionalRuntimeDependencies = null;
+  let emailLogos = null;
   const memberOnboarding=security&&dependencies.createMemberOnboarding?.({authorityCoordinator,authConfig});
   if (security) {
     security.credentialGuard = createCredentialGuard();
@@ -170,9 +171,16 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       express,service:platformBillingService,authenticate,pdfs:billingPdfs?.service
     });
     // Invitation template of the Admin C4G (Central 051). Sending still uses the fixed text until the email plan's increment 4.
+    // Email logos (the email plan's increment 5): the C4G logo here, each entity's own in its directory, and the public read.
+    emailLogos=require('./emailTemplates/logoService').createEmailLogoService({centralPool});
     composedRoutes.platformEmail=require('./emailTemplates/http').createPlatformEmailRouter({
-      express,authenticate,service:require('./emailTemplates/service').createEmailTemplateService({centralPool})
+      express,authenticate,logos:emailLogos,service:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL})
     });
+    composedRoutes.publicEmailLogos=require('./emailTemplates/logoHttp').createPublicEmailLogoRouter({express,logos:emailLogos});
+    // Opportunity complement (Central 053): descriptive data beside a catalog opportunity. Collection from the public
+    // site stays off unless the deployment chooses what may be copied.
+    const opportunityComplements=require('./opportunities/complementService').createOpportunityComplementService({centralPool,collectionMode:env.OPPORTUNITY_COMPLEMENT_COLLECTION||'disabled'});
+    composedRoutes.opportunityComplements=require('./opportunities/complementService').createOpportunityComplementRouter({express,authenticate,service:opportunityComplements});
     composedRoutes.customerBilling=require('./customerBilling/http').createCustomerBillingRouter({
       express,authenticate,organizationMiddleware,service:customerBillingService,pdfs:billingPdfs?.service
     });
@@ -189,7 +197,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       catalogReader=require('./fundingTenders/catalogReader').createCatalogReader({env});
       closeCatalogReader=dependencies.ownResource?.(catalogReader,()=>catalogReader.close())||(()=>catalogReader.close());
       observability.health.register({code:'catalog-reader',criticality:'REQUIRED',check:async()=>{try{await catalogReader.ready();return true;}catch{return false;}}});
-      const funding=require('./fundingTenders/http').createFundingRouters({express,pool:centralPool,catalogReader,authenticate,organizationMiddleware,sessionRegistry,
+      const funding=require('./fundingTenders/http').createFundingRouters({express,pool:centralPool,catalogReader,complements:opportunityComplements,authenticate,organizationMiddleware,sessionRegistry,
         sourceMode:env.FUNDING_TENDERS_SOURCE||'fixture', sourceApproval:env.FUNDING_TENDERS_REHEARSAL_APPROVED,workerHealth:dependencies.fundingWorkerHealth,
         coverage:dependencies.fundingCoverage,euSourceControlEnabled:activationEnabled,euWriterV2,
         policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]});
@@ -243,7 +251,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
         tokenKeys:{session:require('node:crypto').createHmac('sha256',authConfig.sessionSecret).update('organization-directory-cursor-v1').digest('hex')},tokenKeyId:'session',
         onFailure:dependencies.directoryFailureObserver});
       composedRoutes={...composedRoutes,organizationDashboard:require('./routes/organizationDashboardRoutes').createOrganizationDashboardRouter({express,applications:applicationService,opportunities:opportunityService,central:catalogReader,authenticate,organizationMiddleware,centralSummaryReuseMs:30000})};
-      composedRoutes={...composedRoutes,organizationDirectory:require('./routes/organizationDirectoryRoutes').createDirectoryRouter({express,service:directoryService,members:memberOnboarding,onFailure:dependencies.directoryFailureObserver,membershipAccess:require('./organizationDirectory/membershipAccess').createMembershipAccess({sessionStore:security.sessionStore,sessionRegistry,authorityCoordinator,authorizationCatalogs,assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}),matching:require('./organizationDirectory/matching').createOrganizationMatching({directory:directoryService,opportunities:opportunityService,central:catalogReader,centralPagesReuseMs:30000}),authenticate,organizationMiddleware})};
+      composedRoutes={...composedRoutes,organizationDirectory:require('./routes/organizationDirectoryRoutes').createDirectoryRouter({express,service:directoryService,members:memberOnboarding,emailLogos,onFailure:dependencies.directoryFailureObserver,membershipAccess:require('./organizationDirectory/membershipAccess').createMembershipAccess({sessionStore:security.sessionStore,sessionRegistry,authorityCoordinator,authorizationCatalogs,assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}),matching:require('./organizationDirectory/matching').createOrganizationMatching({directory:directoryService,opportunities:opportunityService,central:catalogReader,centralPagesReuseMs:30000}),authenticate,organizationMiddleware})};
       let applicationDocumentAccessPort=null;
       if(documentsRuntime==='f11-r2'){
         if(authConfig.mode!=='oidc')throw new TypeError('Document runtime requires OIDC.');

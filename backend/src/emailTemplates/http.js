@@ -50,12 +50,14 @@ function hasBody(request) {
 
 // Admin C4G routes, mounted at /api/admin/email. The session, origin and CSRF checks are the application's;
 // who is an administrator is confirmed by the service on every request.
-function createPlatformEmailRouter({ express, service, authenticate }) {
+// logos is optional: without it the /logo routes answer OPERATION_NOT_AVAILABLE like any unknown path.
+function createPlatformEmailRouter({ express, service, authenticate, logos = null }) {
   const methods = ['types', 'template', 'save', 'reset', 'preview', 'test'];
   if (!express?.Router || typeof authenticate !== 'function'
       || methods.some(method => typeof service?.[method] !== 'function')) {
     throw new TypeError('Platform email HTTP composition is incomplete.');
   }
+  if (logos) require('./logoHttp').requireLogoService(logos);
   const router = express.Router();
   router.use((request, response, next) => {
     response.set({ 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
@@ -91,6 +93,8 @@ function createPlatformEmailRouter({ express, service, authenticate }) {
   router.get('/templates', handle('read', request => service.types(request)));
   mount('/templates', () => null);
   mount('/organizations/:organizationId/templates', request => request.params.organizationId);
+  // The C4G logo. An entity's logo is changed only by that entity, in /api/organization-directory/email-logo.
+  if (logos) require('./logoHttp').mountLogoRoutes(router, '/logo', { express, read: logos.platformLogo, set: logos.platformLogoSet, remove: logos.platformLogoRemove });
 
   router.use((request, response) => response.status(405).json({
     error: { code: 'OPERATION_NOT_AVAILABLE' }, correlationId: randomUUID()

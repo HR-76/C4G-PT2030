@@ -1,6 +1,6 @@
 # Plano técnico — Emails, fase 1 (template do convite e logótipos)
 
-Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3 e 6 feitos; 4, 5 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
+Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3, 5 e 6 feitos; 4 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
 
 Âmbito: só a fase 1. Emails do Keycloak, configuração e histórico têm plano próprio depois das respetivas perguntas.
 
@@ -110,11 +110,19 @@ Verificado no código e por execução das suítes. A frase "Nada implementado; 
 | 2 | Pacote da Central | Feito, sem registo anterior neste plano | Migração `051_email_templates` (2 tabelas, funções de escrita com verificação de administrador, registos imutáveis), pacote e manifestos, gate em `test/integration/email-templates/`. Aplicada no staging a 14/11/2026, como predecessora da 052. Não existe `sql.js` com as consultas admitidas. |
 | 3 | Serviço e API do Admin C4G | Feito a 14/11/2026, em Review | Ver "Incremento 3" abaixo. |
 | 4 | Envio com o template guardado | Por fazer | `activationEmail.js` envia o texto fixo atual. |
-| 5 | Logótipos e rota pública | Por fazer | Só existe a validação de imagem do incremento 1. |
+| 5 | Logótipos e rota pública | Feito a 14/11/2026, em Review | Ver "Incremento 5" abaixo. |
 | 6 | Interface Admin C4G | Feito contra API simulada | Página, editor e cliente. A entrada "Email" está no menu e a página dá erro na aplicação real, porque falta o incremento 3. |
 | 7 | Logótipo na ficha da entidade | Por fazer | Sem referências no frontend fora da página do Admin C4G. |
 
 Condicionantes: o staging não envia email, por isso o incremento 4 e o envio de teste só se provam com um fornecedor de email autorizado. As fases 2 e 3 do contrato dependem das perguntas 3, 4 e 5, ainda em aberto.
+
+### Lista de tipos (14/11/2026, em Review)
+
+- **Contrato:** secção "Lista de tipos" em [Emails: templates e configuração](email-templates-and-configuration.md).
+- **Código:** `frontend/src/pages/Platform/EmailTypes.jsx` (lista em `/administracao/email`) e `EmailTemplates.jsx` (ecrã do tipo em `/administracao/email/:type`); catálogo fixo em `emailTemplatePresentation.js`. Sem alterações no backend: usa `GET /api/admin/email/templates`.
+- **Correção associada:** `/administracao/email` e as suas subpáginas abrem sem organização ativa (`Layout.jsx`); antes mostravam "Área da organização".
+- **Testes:** `EmailTypes.test.jsx` (4) e regressão em `C4gShell.test.jsx`. Suíte do frontend: 1084 a passar, 0 falhas; build e lint sem erros.
+- **Não verificado:** a lista no navegador com sessão real, e o staging.
 
 ### Incremento 3 (14/11/2026, em Review)
 
@@ -131,6 +139,31 @@ Desvios e limites, por decidir ou por fazer:
 
 - **Auditoria (critério 8).** O registo de quem gravou ou repôs, quando e em que organização fica no histórico imutável `email_template_version`. Não foram acrescentados eventos de auditoria F7: os códigos de evento são uma lista fechada na base, e acrescentá-los exige uma migração nova, que este incremento não devia tocar. Decisão do utilizador a 14/11/2026: o histórico imutável basta como auditoria; não se acrescentam eventos F7.
 - **Envio de teste.** A rota existe e responde `EMAIL_DELIVERY_UNAVAILABLE` até ao incremento 4.
-- **Logótipos.** As rotas `/logo` não existem (incremento 5); respondem `OPERATION_NOT_AVAILABLE`, e a página mostra "Esta função ainda não está disponível." nessa secção.
+- **Logótipos.** Resolvido pelo incremento 5 (abaixo).
 - **Leitura do autor.** A consulta lê `global_user`, que o papel `c4g_central_runtime` só pode ler a partir da Central 052.
 - **Não verificado:** a página dentro da aplicação com sessão real, e o staging.
+
+### Incremento 5 (14/11/2026, em Review)
+
+Sem migração nova: a tabela `email_logo_version` e a função `email_logo_write` já vinham na Central 051.
+
+- **Código:** `backend/src/emailTemplates/{logoService,logoHttp}.js`, consultas em `sql.js` e `repository.js`; ligado em `productionComposition.js`, `app.js` e `routes/organizationDirectoryRoutes.js`.
+- **Rotas:** `GET|PUT|DELETE /api/admin/email/logo` (logótipo da C4G), `GET|PUT|DELETE /api/organization-directory/email-logo` (logótipo da entidade da sessão) e `GET /api/public/email-logos/:id`.
+- **Contrato de escrita:** o corpo do `PUT` é a própria imagem (`image/png` ou `image/jpeg`). A revisão vai em `X-Logo-Revision` e a chave de idempotência em `Idempotency-Key` (UUID). O `DELETE` leva os mesmos dois cabeçalhos. Resposta: `{ url, revision, updatedAt }`, com `url` nulo quando se usa a imagem original.
+- **Autorização:** o logótipo da C4G exige administrador C4G; o de uma entidade exige o Admin dessa entidade, na sessão que a selecionou. A entidade vem sempre do contexto da sessão, nunca do pedido. Um administrador C4G não altera o logótipo de uma entidade. A função da base volta a confirmar tudo dentro da escrita.
+- **Validação:** tipo e dimensões lidos dos bytes; SVG e o resto são recusados. Um corpo acima de 512 KiB é recusado enquanto é lido (413).
+- **Rota pública:** montada antes dos parsers e da sessão, por isso não lê nem cria cookies; fica atrás do limite de pedidos de `/api`. Serve só PNG e JPEG validados, com `Content-Type` do tipo guardado, `nosniff` e cache imutável. Não regista quem pede. Uma versão substituída ou removida continua a responder pelo seu nome.
+- **Template e pré-visualização:** a vista do template passa a indicar o logótipo do âmbito (`ORGANIZATION` ou `C4G`). A pré-visualização inclui a imagem quando `PUBLIC_APP_URL` é HTTPS; em desenvolvimento local (HTTP) fica sem imagem.
+- **Frontend:** o cliente passa a enviar `Idempotency-Key`; mensagem nova para `EMAIL_LOGO_NOT_SET`.
+- **Testes:** `backend/test/emailLogoApi.test.js`, 15 testes (serviço, HTTP das três rotas, ordem de montagem). Suíte do backend: 3264 a passar, 0 falhas, 9 ignorados. Lint e build aprovados. Suíte do frontend: 1088 a passar e 1 falha por tempo limite em `ApplicationPartners.test.jsx` ("stops adding people at fifty"), a mesma já registada acima e fora deste incremento.
+
+Decisão tomada na implementação, por confirmar pelo utilizador:
+
+- **Que logótipo leva um email de uma entidade.** Seguiu-se o critério 4d do contrato: uma entidade com logótipo próprio usa o dela, mesmo com o template global; sem logótipo próprio usa o da C4G. A frase da decisão de 12/11 ("o template de convite próprio de uma organização usa o dela") também admite a leitura de que só o template próprio leva o logótipo da entidade.
+
+Limites e por fazer:
+
+- **Não verificado:** contra PostgreSQL real (o gate `test/integration/email-templates/` não foi repetido), na aplicação com sessão real e no staging.
+- **O envio ainda não usa o logótipo:** depende do incremento 4.
+- **Interface do cliente:** a API da entidade existe, mas o ecrã para a entidade carregar o logótipo é o incremento 7.
+- **Versões antigas:** o histórico é imutável, por isso não há limpeza de versões substituídas (até 512 KiB cada).

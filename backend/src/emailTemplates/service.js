@@ -7,6 +7,7 @@ const {
 const { validateTemplate, renderTemplate, insertActivationLink } = require('./render');
 const { defaultTemplate } = require('./defaultTemplates');
 const { createEmailTemplateRepository } = require('./repository');
+const { logoForScope } = require('./logoService');
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 // The names the HTTP API uses for the template types kept in the database.
@@ -14,6 +15,8 @@ const API_TYPES = Object.freeze({ 'member-invitation': TEMPLATE_TYPES.MEMBER_INV
 const EXAMPLE_ORGANIZATION = 'Entidade de exemplo';
 const EXAMPLE_LINK = 'https://exemplo.invalid/ativacao-de-exemplo';
 const DAY_MS = 24 * 60 * 60 * 1000;
+// The image every email carries while the C4G administrator has not uploaded a logo.
+const BUILT_IN_LOGO_PATH = '/logo-c4g.png';
 // What the database write function raises, by name. Anything else stays internal.
 const DATABASE_CODES = Object.freeze([
   'C4G_ADMIN_REQUIRED', 'INVALID_INPUT', 'RESOURCE_NOT_AVAILABLE', 'IDEMPOTENCY_CONFLICT',
@@ -50,12 +53,21 @@ function translate(error) {
 
 // Admin C4G API of the invitation template (increment 3 of the email plan).
 // Templates are read and written only here; sending still uses the fixed text.
+// publicBaseUrl is the HTTPS origin emails point at for the logo; without it the preview carries no image.
 function createEmailTemplateService({
-  centralPool, repository = createEmailTemplateRepository(), clock = () => new Date(), uuid = randomUUID
+  centralPool, repository = createEmailTemplateRepository(), clock = () => new Date(), uuid = randomUUID, publicBaseUrl = null
 }) {
   if (typeof centralPool?.connect !== 'function' || typeof clock !== 'function' || typeof uuid !== 'function'
-      || !['isPlatformAdmin', 'organization', 'latest', 'summary', 'write'].every(name => typeof repository?.[name] === 'function')) {
+      || !['isPlatformAdmin', 'organization', 'latest', 'summary', 'write', 'latestLogo'].every(name => typeof repository?.[name] === 'function')) {
     throw new TypeError('Email template service composition is invalid.');
+  }
+  let publicOrigin = null;
+  if (publicBaseUrl !== null && publicBaseUrl !== undefined && publicBaseUrl !== '') {
+    let parsed = null;
+    try { parsed = new URL(publicBaseUrl); } catch { /* refused below */ }
+    if (!parsed || !['https:', 'http:'].includes(parsed.protocol) || parsed.username || parsed.password) throw new TypeError('Email template public base URL is invalid.');
+    // Email clients only get HTTPS images; a plain HTTP origin (local development) leaves the preview without one.
+    if (parsed.protocol === 'https:') publicOrigin = parsed.origin;
   }
 
   function actor(request) {
@@ -121,8 +133,7 @@ function createEmailTemplateService({
       updatedAt: stored ? new Date(stored[1].created_at).toISOString() : null,
       updatedBy: stored ? stored[1].author : null,
       variables: { body: [...BODY_VARIABLES], subject: [...SUBJECT_VARIABLES], required: [...REQUIRED_BODY_VARIABLES] },
-      // Logos arrive with increment 5; until then every email carries the C4G logo.
-      logo: { source: 'C4G', url: null }
+      logo: await logoForScope(repository, client, organizationId)
     };
   }
 
@@ -174,11 +185,14 @@ function createEmailTemplateService({
     const type = templateType(typeValue);
     return transaction('read', async client => {
       await authorize(client, request);
-      const { name } = await scope(client, scopeValue);
+      const { organizationId, name } = await scope(client, scopeValue);
       const input = plainObject(body, ['subject', 'html']);
       const checked = validateTemplate({ subject: input.subject, html: input.html });
+      const logo = publicOrigin ? await logoForScope(repository, client, organizationId) : null;
       const rendered = insertActivationLink(renderTemplate({ subject: checked.subject, html: checked.html }, {
-        organizationName: name || EXAMPLE_ORGANIZATION, expiresAt: new Date(clock().getTime() + DAY_MS)
+        organizationName: name || EXAMPLE_ORGANIZATION, expiresAt: new Date(clock().getTime() + DAY_MS),
+        logoUrl: logo ? publicOrigin + (logo.url || BUILT_IN_LOGO_PATH) : null,
+        logoAlt: logo?.source === 'ORGANIZATION' ? name : 'C4G'
       }), EXAMPLE_LINK);
       return { type: type.api, subject: rendered.subject, html: rendered.html, text: rendered.text, removed: [...checked.removed] };
     });

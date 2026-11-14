@@ -12,6 +12,7 @@ import { centralOpportunitiesApi, platformCentralOpportunitiesApi } from '../../
 import { useAuth } from '../../contexts/AuthContext'
 import { OpportunityOverview } from './OpportunityPresentation'
 import OpportunityListTable from './OpportunityListTable'
+import OpportunityComplementEditor, { ComplementCollection } from './OpportunityComplementEditor'
 import OpportunityApplicationCount from './OpportunityApplicationCount'
 import CatalogInterestButton, { CatalogApplicationButton } from './CatalogInterestButton'
 import CatalogInterests from '../Interests/CatalogInterests'
@@ -109,7 +110,8 @@ function Catalog({ id, organization, platformAdmin, scope = null }) {
     {organization && <Link className="btn btn-outline" to="/interesses">Interesses</Link>}
     {organization && <Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link>}
     {platformAdmin && <Link className="btn btn-primary" to="/administracao/oportunidades/nova"><Plus size={16} /> Criar oportunidade</Link>}
-    {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}</div>
+    {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}
+    {platformAdmin && !id && <ComplementCollection onCollected={() => setRetry(value => value + 1)} />}</div>
     {mode && <aside className="catalog-source" aria-label="Dados do catálogo">
       <strong>{mode === 'fixture' ? 'Dados de teste' : mode === 'live-demo' ? 'Demonstração' : mode === 'live-rehearsal' ? 'Recolha limitada' : mode === 'live-staging' ? 'Recolha de staging' : 'Fontes oficiais'}</strong>
       <details className="catalog-guidance"><summary>Catálogo parcial · cobertura e interpretação dos prazos</summary>
@@ -143,8 +145,9 @@ function Catalog({ id, organization, platformAdmin, scope = null }) {
     </section>}
     {loading && <LoadingIndicator>A consultar oportunidades…</LoadingIndicator>}{error && <div className="catalog-empty"><p role="alert">{error}</p><button className="btn btn-outline" onClick={() => setRetry(v => v + 1)}>Tentar novamente</button></div>}
     {fields && <article className="detail-page">
-      <OpportunityOverview interventionClassification={record.interventionClassification} centralPresentation={record.catalogPresentation} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} temporal={record.temporal} sourceReview={record.sourceReview} fields={fields} source={record.source} reference={fields.callReference || record.externalIdentifier} observedAt={record.observedAt} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization?.id} opportunityId={id} />} central>
+      <OpportunityOverview complement={record.complement} interventionClassification={record.interventionClassification} centralPresentation={record.catalogPresentation} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} temporal={record.temporal} sourceReview={record.sourceReview} fields={fields} source={record.source} reference={fields.callReference || record.externalIdentifier} observedAt={record.observedAt} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization?.id} opportunityId={id} />} central>
         {organization && <CatalogInterestButton item={contextItem} />}
+        {platformAdmin && <OpportunityComplementEditor opportunityId={record.opportunityId} onSaved={() => setRetry(value => value + 1)} />}
         {organization?.navigation?.people===true&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}
       </OpportunityOverview>
     </article>}

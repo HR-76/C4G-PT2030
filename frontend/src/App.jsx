@@ -39,6 +39,7 @@ const CustomerBilling = routePage(() => import('./pages/Billing/CustomerBilling.
 const PlatformBilling = routePage(() => import('./pages/Platform/PlatformBilling.jsx'))
 const PlatformBillingDetail = routePage(() => import('./pages/Platform/PlatformBillingDetail.jsx'))
 const EmailTemplates = routePage(() => import('./pages/Platform/EmailTemplates.jsx'))
+const EmailTypes = routePage(() => import('./pages/Platform/EmailTypes.jsx'))
 const CentralOpportunityCreate = routePage(() => import('./pages/Opportunities/CentralOpportunityCreate'))
 const CentralOpportunities = routePage(() => import('./pages/Opportunities/CentralOpportunities'))
 const ConnectedCatalogRead = routePage(() => import('./pages/Opportunities/ConnectedCatalogRead'))
@@ -135,7 +136,8 @@ function AppRoutes() {
         <Route path="/administracao/entidades/:entityId" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/faturacao" element={<ProtectedRoute platformOnly><PlatformBilling /></ProtectedRoute>} />
         <Route path="/administracao/faturacao/:cycleId" element={<ProtectedRoute platformOnly><PlatformBillingDetail /></ProtectedRoute>} />
-        <Route path="/administracao/email" element={<ProtectedRoute platformOnly><EmailTemplates /></ProtectedRoute>} />
+        <Route path="/administracao/email" element={<ProtectedRoute platformOnly><EmailTypes /></ProtectedRoute>} />
+        <Route path="/administracao/email/:type" element={<ProtectedRoute platformOnly><EmailTemplates /></ProtectedRoute>} />
         <Route path="/administracao/importar" element={<ProtectedRoute platformOnly><Import /></ProtectedRoute>} />
       </Route>
 

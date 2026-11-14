@@ -3,6 +3,7 @@
 // not an entry of the production build.
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { MemoryRouter } from 'react-router-dom'
 import { EmailTemplatesView } from './pages/Platform/EmailTemplates'
 import { createEmailSimulation } from './pages/Platform/emailTemplatesSimulation'
 import './index.css'
@@ -16,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <main className="page-content">
       <p className="alert alert-info" role="note">Pré-visualização de desenvolvimento com dados simulados. Nada é guardado nem enviado.</p>
-      <EmailTemplatesView api={api} directoryApi={directoryApi}/>
+      <MemoryRouter><EmailTemplatesView api={api} directoryApi={directoryApi}/></MemoryRouter>
     </main>
   </React.StrictMode>
 )

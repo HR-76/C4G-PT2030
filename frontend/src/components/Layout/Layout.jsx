@@ -76,7 +76,7 @@ export default function Layout() {
   const base  = '/' + pathname.split('/')[1]
   const sectionPath = '/' + pathname.split('/').slice(1, 3).join('/')
   const title = titles[pathname] || titles[sectionPath] || titles[base] || ''
-  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/email' || pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
+  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/email' || pathname.startsWith('/administracao/email/') ||pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
   const needsOrganization = !organization && !platformDirectory && !['/catalogo', '/integracoes', '/conta'].includes(base)
   const closeMenu = () => { setSidebarOpen(false); if (!mobile) setDesktopCollapsed(true); menuButton.current?.focus() }
 

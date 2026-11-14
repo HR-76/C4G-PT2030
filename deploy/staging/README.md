@@ -178,6 +178,19 @@ Os comandos continuam no instalador para quando existir o perfil de runtime comp
 
 Depois reinicia a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate`) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
 
+### Central 053: complemento das oportunidades
+
+O `upgrade` aplica também a Central 053 (`053_opportunity_complement`), a seguir à 052. Guarda a descrição e os dados complementares que o Admin C4G escreve na ficha de uma oportunidade e o que for recolhido de portugal2030.pt ([contrato](../../context/features/opportunity-description-presentation.md)). A migração é irreversível e uma release anterior deixa de arrancar depois dela: faz a cópia das bases antes. O código novo arranca com a Central ainda na 052 (a ficha fica sem complemento), por isso podes ativar a release primeiro e aplicar a migração depois. As pertenças dos logins de runtime não precisam de ser revogadas para a 053: a variante com as pertenças ativas foi medida e está admitida.
+
+A recolha a partir de portugal2030.pt vem desligada. Para a ligar, acrescenta ao `api-private.env` uma destas linhas e recria a API:
+
+```bash
+OPPORTUNITY_COMPLEMENT_COLLECTION=facts               # página do aviso, código, prioridade, tipologias e taxa
+OPPORTUNITY_COMPLEMENT_COLLECTION=facts-and-summary   # o mesmo, mais o resumo publicado
+```
+
+Os Termos e Condições do site não permitem copiar conteúdo sem autorização, salvo citação com a origem identificada; a escolha de copiar o resumo é do responsável pelo ambiente.
+
 ## Atualizar um staging já instalado
 
 Depois de `git pull` e de construir a imagem nova (passo 1), repete, por esta ordem, os comandos de instalação e de variáveis. Ambos são repetíveis e não alteram o que já existe:

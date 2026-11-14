@@ -2,6 +2,25 @@ export const emailTypes = {
   'member-invitation': 'Convite de colaborador',
 }
 
+// The types the Email list shows. Only those with `configurable` open an editor;
+// the others are sent by the authentication service and wait for phase 2.
+export const emailTypeCatalog = [
+  { type: 'member-invitation', label: emailTypes['member-invitation'], sender: 'Aplicação', scope: 'Global e por entidade', configurable: true },
+  { type: 'password-reset', label: 'Reposição de palavra-passe', sender: 'Serviço de autenticação', scope: 'Global', note: 'A reposição por email está desligada.' },
+  { type: 'email-code', label: 'Código por email', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
+]
+
+export const isConfigurableType = type => emailTypeCatalog.some(item => item.type === type && item.configurable)
+
+// What the server reports about a configurable type, in words.
+export function typeStatus(summary) {
+  const count = Number(summary?.organizations || 0)
+  return [
+    summary?.globalCustomized ? 'Template global alterado' : 'Texto original da plataforma',
+    ...(count ? [`${count} ${count === 1 ? 'entidade' : 'entidades'} com template próprio`] : []),
+  ]
+}
+
 export const variableLabels = {
   Organizacao: 'Nome da entidade',
   LigacaoAtivacao: 'Ligação de ativação',
@@ -54,12 +73,13 @@ export function emailError(error) {
     IDEMPOTENCY_CONFLICT: 'Este pedido já foi usado com dados diferentes. Repita a ação.',
     EMAIL_TEMPLATE_NOT_CUSTOMIZED: 'Este template já não tem alterações próprias para repor.',
     STATE_CONFLICT: 'O template foi alterado entretanto. Recarregue e repita.',
-    // The server answers these while sending and logos are not built yet.
+    // The server answers these while sending is not built yet, or where the logos are not installed.
     EMAIL_DELIVERY_UNAVAILABLE: 'O envio de teste ainda não está disponível.',
     OPERATION_NOT_AVAILABLE: 'Esta função ainda não está disponível.',
     EMAIL_LOGO_INVALID: 'O ficheiro não é uma imagem PNG ou JPEG válida.',
     EMAIL_LOGO_TOO_LARGE: 'A imagem excede 512 KB.',
     EMAIL_LOGO_DIMENSIONS: 'A imagem excede 1200 × 600 píxeis.',
+    EMAIL_LOGO_NOT_SET: 'O logótipo original já está em uso.',
   }
   if (error?.response?.status === 403 && !messages[code]) return messages.C4G_ADMIN_REQUIRED
   return messages[code] || 'Não foi possível concluir. Tente novamente.'

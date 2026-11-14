@@ -1,22 +1,30 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Eye, RotateCcw, Save, Send, Trash2, Upload } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+import { ArrowLeft, Eye, RotateCcw, Save, Send, Trash2, Upload } from 'lucide-react'
 import LoadingIndicator from '../../components/LoadingIndicator'
 import SearchInput from '../../components/SearchInput'
 import { platformDirectoryApi, platformEmailApi } from '../../api/api'
 import { useAuth } from '../../contexts/AuthContext'
 import EmailBodyEditor from './EmailBodyEditor'
 import {
-  emailError, emailTypes, errorReasons, formatInstant, limits, missingVariables,
+  emailError, emailTypes, errorReasons, formatInstant, isConfigurableType, limits, missingVariables,
   reasonList, removedSummary, testStatus, variableLabels,
 } from './emailTemplatePresentation'
 import './email-templates.css'
 
-const TYPE = 'member-invitation'
 const LOGO_BYTES = 512 * 1024
+const TYPES_PATH = '/administracao/email'
 
 export default function EmailTemplates() {
-  const { user } = useAuth()
-  return <EmailTemplatesView key={user?.id}/>
+  const { user } = useAuth(), { type } = useParams()
+  if (!isConfigurableType(type)) return <div className="page email-templates">
+    <header className="email-heading"><h1>Email</h1></header>
+    <section className="email-panel">
+      <p className="email-source">Este tipo de email ainda não é configurável.</p>
+      <p><Link to={TYPES_PATH}>Voltar aos tipos de email</Link></p>
+    </section>
+  </div>
+  return <EmailTemplatesView key={`${user?.id}:${type}`} type={type}/>
 }
 
 function sourceText(data, scope) {
@@ -27,7 +35,7 @@ function sourceText(data, scope) {
   return `${scope ? 'Template próprio desta entidade.' : 'Template global.'}${when}`
 }
 
-export function EmailTemplatesView({ api = platformEmailApi, directoryApi = platformDirectoryApi, Editor = EmailBodyEditor }) {
+export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = platformEmailApi, directoryApi = platformDirectoryApi, Editor = EmailBodyEditor }) {
   const [scope, setScope] = useState(''), [entities, setEntities] = useState([]), [entityQuery, setEntityQuery] = useState('')
   const [data, setData] = useState(null), [form, setForm] = useState({ subject: '', html: '' })
   const [busy, setBusy] = useState(true), [working, setWorking] = useState(''), [reload, setReload] = useState(0)
@@ -63,7 +71,7 @@ export function EmailTemplatesView({ api = platformEmailApi, directoryApi = plat
       })
       .finally(() => { if (epoch === generation.current) setBusy(false) })
     return () => { generation.current += 1; controller.abort() }
-  }, [api, scope, reload])
+  }, [api, TYPE, scope, reload])
 
   const dirty = Boolean(data) && (form.subject !== data.subject || form.html !== data.html)
   const required = data?.variables?.required || []
@@ -121,11 +129,13 @@ export function EmailTemplatesView({ api = platformEmailApi, directoryApi = plat
   })
 
   return <div className="page email-templates">
-    <header className="email-heading"><h1>Email</h1></header>
+    <header className="email-heading">
+      <Link className="email-back" to={TYPES_PATH}><ArrowLeft size={16} aria-hidden="true"/>Tipos de email</Link>
+      <h1>{emailTypes[TYPE]}</h1>
+    </header>
 
     <section className="email-panel" aria-label="Template de email">
       <div className="email-scope">
-        <label>Tipo de email<select value={TYPE} disabled><option value={TYPE}>{emailTypes[TYPE]}</option></select></label>
         <label>Aplicar a<select value={scope} disabled={locked} onChange={event => changeScope(event.target.value)}>
           <option value="">Todas as entidades (global)</option>
           {entities.map(entity => <option key={entity.id} value={entity.id}>{entity.name}</option>)}

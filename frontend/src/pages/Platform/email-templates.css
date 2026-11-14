@@ -3,9 +3,14 @@
 .email-templates h2 { font-size: 16px; font-weight: 650; margin: 0; }
 .email-templates :is(a,button,input,select,textarea,pre,.email-editor-content):focus-visible { outline: 3px solid var(--ui-action); outline-offset: 2px; }
 .email-heading { margin-bottom: 24px; }
+.email-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--ui-action); font-size: 13px; }
+.email-types th[scope=row] { font-weight: 600; }
+.email-types .btn { display: inline-flex; align-items: center; gap: 6px; }
+.email-type-line { display: block; font-size: 13px; }
+.email-type-note { margin-top: 4px; color: var(--color-text-secondary); }
 
 .email-panel { min-width: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 24px; }
-.email-scope { display: grid; grid-template-columns: minmax(200px, 260px) minmax(220px, 340px) minmax(260px, 1fr); gap: 16px; align-items: end; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+.email-scope { display: grid; grid-template-columns: minmax(220px, 340px) minmax(260px, 1fr); gap: 16px; align-items: end; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--color-border); }
 .email-scope label, .email-field { display: grid; gap: 6px; color: var(--color-action); font-size: 12px; font-weight: 600; }
 .email-entity-search { display: flex; gap: 8px; align-items: end; }
 .email-entity-search label { flex: 1; min-width: 0; }
