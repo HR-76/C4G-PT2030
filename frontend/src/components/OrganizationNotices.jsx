@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { organizationNotificationsApi as api } from '../api/api'
 import './OrganizationNotices.css'
 
-export default function OrganizationNotices({ organizationId, organizationName, onSent }) {
+export default function OrganizationNotices({ organizationId, organizationName, onSent, onAccess }) {
   const alive = useRef(false), lock = useRef(false), sequence = useRef(0), contextSequence = useRef(0)
   const [context, setContext] = useState(null), [contextError, setContextError] = useState(false)
   const [open, setOpen] = useState(false), [title, setTitle] = useState(''), [message, setMessage] = useState('')
@@ -15,7 +15,7 @@ export default function OrganizationNotices({ organizationId, organizationName, 
   const loadContext = () => {
     const current = ++contextSequence.current
     setContextError(false)
-    api.noticeContext(organizationId).then(r => { if (alive.current && current === contextSequence.current) setContext(r.data) })
+    api.noticeContext(organizationId).then(r => { if (alive.current && current === contextSequence.current) { setContext(r.data); onAccess?.(r.data?.canManage === true) } })
       .catch(() => { if (alive.current && current === contextSequence.current) setContextError(true) })
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; loadContext is read at that moment.
@@ -61,7 +61,7 @@ export default function OrganizationNotices({ organizationId, organizationName, 
   }
   if (contextError) return <p role="alert">Não foi possível verificar o acesso à comunicação. <button className="btn btn-outline btn-sm" onClick={loadContext}>Tentar novamente</button></p>
   if (!context) return <p role="status">A consultar permissões…</p>
-  if (!context.canManage) return <p>A comunicação da organização está disponível apenas para quem tem permissão para gerir avisos.</p>
+  if (!context.canManage) return null
   const recipients = context.recipients || []
   return <section className="organization-notices" aria-label="Comunicação da organização">
     <div className="notice-heading"><h2>Comunicação da organização</h2>

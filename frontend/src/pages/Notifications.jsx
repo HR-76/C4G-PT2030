@@ -12,39 +12,22 @@ import EmptyStatePanel from '../components/EmptyStatePanel'
 import './notifications.css'
 import OrganizationNotices from '../components/OrganizationNotices'
 
-/* ── Only types that have real data ─────────────────────────────────────── */
+/* ── The alert types the organization service produces ──────────────────── */
 const TYPE_OPTIONS = [
   { key: 'APPLICATION_STATUS_CHANGED', label: 'Candidatura' },
   { key: 'APPLICATION_TEAM_ADDED', label: 'Equipa' },
-  { key: 'APPLICATION_PREPARATION', label: 'Preparação' },
-  { key: 'APPLICATION_APPROVED', label: 'Aprovação' },
   { key: 'DEADLINE_30_DAYS', label: 'Prazo · 30 dias' },
   { key: 'DEADLINE_7_DAYS', label: 'Prazo · 7 dias' },
   { key: 'DEADLINE_1_DAYS', label: 'Prazo · 1 dia' },
-  { key: 'NEW_OPPORTUNITY', label: 'Oportunidade' },
-  { key: 'OPPORTUNITY_OPENED', label: 'Abertura' },
   { key: 'BROADCAST',        label: 'Geral' },
 ]
 
-const TYPE_LABELS = {
-  BROADCAST:               'Geral',
-  NEW_OPPORTUNITY:         'Oportunidade',
-  OPPORTUNITY_OPENED:      'Abertura',
-  APPLICATION_STATUS_CHANGED: 'Candidatura',
-  APPLICATION_PREPARATION: 'Candidatura',
-  APPLICATION_TEAM_ADDED:  'Equipa',
-  APPLICATION_APPROVED:    'Aprovação',
-  DEADLINE_30_DAYS: 'Prazo · 30 dias', DEADLINE_7_DAYS: 'Prazo · 7 dias', DEADLINE_1_DAYS: 'Prazo · 1 dia',
-}
+const TYPE_LABELS = Object.fromEntries(TYPE_OPTIONS.map(({ key, label }) => [key, label]))
 
 const TYPE_SEVERITY = {
   BROADCAST:               'info',
-  NEW_OPPORTUNITY:         'success',
-  OPPORTUNITY_OPENED:      'success',
   APPLICATION_STATUS_CHANGED: 'info',
-  APPLICATION_PREPARATION: 'warning',
   APPLICATION_TEAM_ADDED:  'info',
-  APPLICATION_APPROVED:    'success',
   DEADLINE_30_DAYS: 'warning', DEADLINE_7_DAYS: 'warning', DEADLINE_1_DAYS: 'warning',
 }
 
@@ -52,10 +35,6 @@ function notificationTarget(n) {
   if (n.related_application_id) return {
     label: n.application_title || 'Abrir candidatura',
     path:  `/candidaturas/${n.related_application_id}`,
-  }
-  if (n.related_opportunity_id) return {
-    label: n.opportunity_title || 'Abrir oportunidade',
-    path:  `/oportunidades/${n.related_opportunity_id}`,
   }
   // An internal notice can include a standalone link to a candidature.
   if (n.type === 'BROADCAST') {
@@ -77,6 +56,8 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
   const [groupClock, setGroupClock] = useState(() => new Date())
   useEffect(() => { const timer = setInterval(() => setGroupClock(new Date()), 60000); return () => clearInterval(timer) }, [])
   const [section, setSection] = useState("Alertas")
+  // Communication is shown only to whoever may manage the organization's notices.
+  const [canManageNotices, setCanManageNotices] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const api = organizationNotificationsApi
   const alive = useRef(false), requestId = useRef(0), actionLock = useRef(false)
@@ -184,8 +165,8 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
   return (
     <div className="alerts-workspace">
       {/* Toolbar */}
-      <header className="alerts-header"><p>{organizationName}</p><h1>Alertas e comunicação</h1></header>
-      <div role="tablist" aria-label="Área de notificações" className="filter-options">
+      <header className="alerts-header"><p>{organizationName}</p><h1>{canManageNotices ? 'Alertas e comunicação' : 'Alertas'}</h1></header>
+      {canManageNotices && <div role="tablist" aria-label="Área de notificações" className="filter-options">
         {['Alertas', 'Comunicação'].map((name, index) => (
           <button key={name} id={`notification-tab-${index}`} role="tab"
             className={section === name ? 'btn btn-primary' : 'btn btn-outline'}
@@ -200,8 +181,8 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
               tab.click()
             }}>{name}</button>
         ))}
-      </div>
-      <div role="tabpanel" id="notification-panel-0" aria-labelledby="notification-tab-0" hidden={section !== 'Alertas'}>
+      </div>}
+      <div {...(canManageNotices ? { role: 'tabpanel', id: 'notification-panel-0', 'aria-labelledby': 'notification-tab-0' } : {})} hidden={canManageNotices && section !== 'Alertas'}>
       <FilterBar aria-label="Filtros de alertas">
         <div className="filter-options">
           {/* Unread toggle */}
@@ -258,7 +239,7 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
         <LoadingIndicator>A consultar alertas…</LoadingIndicator>
       ) : visibleRows.length === 0 ? (
         <div data-alert-results-ready><EmptyStatePanel title={hasFilters ? 'Nenhuma notificação com estes filtros.' : 'Nenhuma notificação.'}
-          description={hasFilters ? 'Limpe os filtros para consultar todos os alertas.' : 'Os alertas da organização aparecem aqui quando estiverem disponíveis.'}
+          description={hasFilters ? 'Limpe os filtros para consultar todos os alertas.' : 'Os seus alertas aparecem aqui quando estiverem disponíveis.'}
           actionLabel={hasFilters ? 'Ver todos os alertas' : undefined} onAction={hasFilters ? () => setSearchParams({}, {replace:true}) : undefined}/></div>
       ) : (
         <div className="notif-list" data-alert-results-ready>
@@ -318,8 +299,8 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
       )}
 
       </div>
-      <div role="tabpanel" id="notification-panel-1" aria-labelledby="notification-tab-1" hidden={section !== 'Comunicação'}>
-        <OrganizationNotices organizationId={organizationId} organizationName={organizationName} onSent={load} />
+      <div {...(canManageNotices ? { role: 'tabpanel', id: 'notification-panel-1', 'aria-labelledby': 'notification-tab-1' } : {})} hidden={!canManageNotices || section !== 'Comunicação'}>
+        <OrganizationNotices organizationId={organizationId} organizationName={organizationName} onSent={load} onAccess={setCanManageNotices} />
       </div>
     </div>
   )

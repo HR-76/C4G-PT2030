@@ -129,3 +129,18 @@ it('does not label catalog results with an origin name and keeps the programme; 
  expect(screen.getByText('HORIZON')).toBeTruthy()
  expect(screen.getByText('Privada · Interno')).toBeTruthy()
 })
+// Found in staging on 14/11/2026 with the Técnico account: the selector request was always refused with 403.
+it('does not request the people list when the account has no people section',async()=>{
+ const api={matching:vi.fn(async()=>ready('Resultado do técnico')),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api} canReadPeople={false}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado do técnico'})
+ expect(api.matching).toHaveBeenCalledTimes(1);expect(api.people).not.toHaveBeenCalled()
+ expect(screen.queryByRole('combobox',{name:'Pessoa'})).toBeNull()
+})
+it('still requests the people list by default and when the account has the people section',async()=>{
+ for(const props of [{},{canReadPeople:true}]){
+  const api={matching:vi.fn(async()=>ready('Resultado')),people:vi.fn(async()=>({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}}))}
+  const view=render(<MemoryRouter><MatchingTable organizationId="org" api={api} {...props}/></MemoryRouter>)
+  await screen.findByRole('combobox',{name:'Pessoa'});expect(api.people).toHaveBeenCalledTimes(1);view.unmount()
+ }
+})

@@ -15,9 +15,10 @@ import './matching-workspace.css'
 export default function MatchingWorkspace(){
  const {organization,user}=useAuth()
  if(!organization?.id)return <p>Esta conta não tem uma entidade associada para consultar correspondências.</p>
- return <MatchingTable key={`${user?.id}:${organization.id}`} organizationId={organization.id} scope={readScope(user?.id,organization.id)} organizationName={organization.displayName || organization.name}/>
+ // Without the people section (the Técnico profile) the selector list is always refused, so it is never requested.
+ return <MatchingTable key={`${user?.id}:${organization.id}`} organizationId={organization.id} scope={readScope(user?.id,organization.id)} organizationName={organization.displayName || organization.name} canReadPeople={organization.navigation?.people===true}/>
 }
-export function MatchingTable({organizationId,organizationName,api:providedApi,scope=null}){
+export function MatchingTable({organizationId,organizationName,api:providedApi,scope=null,canReadPeople=true}){
  const api=useMemo(()=>providedApi||organizationDirectoryApi(organizationId),[providedApi,organizationId])
  const [params,setParams]=useSearchParams(),personId=params.get('pessoa')||'',opportunityId=params.get('oportunidade'),origin=params.get('origem')
  // A result this user and organization already received is shown at once and
@@ -34,10 +35,10 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
  // Queue the primary result before the auxiliary selector. Opportunity mode
  // does not display this selector and already receives people from Matching.
  useEffect(()=>{let current=true;const controller=new AbortController(),read=startConfirmedRead(scope,'matching-people');setPeople(read.held||[])
-  if(!opportunityId)Promise.resolve().then(()=>current?collectPages(q=>api.people(q,controller.signal),()=>current):null).then(items=>{if(items)read.keep(items);if(current&&items)setPeople(items)}).catch(()=>{if(current){read.drop();setPeople([])}})
+  if(!opportunityId&&canReadPeople)Promise.resolve().then(()=>current?collectPages(q=>api.people(q,controller.signal),()=>current):null).then(items=>{if(items)read.keep(items);if(current&&items)setPeople(items)}).catch(()=>{if(current){read.drop();setPeople([])}})
   return()=>{current=false;controller.abort()}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
- },[api,opportunityId])
+ },[api,opportunityId,canReadPeople])
  const rows=result?.items||[]
  return <section className="organization-matching">
   <header className="matching-header"><div><p>{organizationName}</p><div className="heading-with-info"><h1>Matching</h1><InfoTooltip label="Informação sobre o matching">As correspondências resultam das áreas temáticas e não determinam elegibilidade. Pode criar uma candidatura sem correspondência.</InfoTooltip></div></div>

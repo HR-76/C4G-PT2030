@@ -69,6 +69,7 @@ Achado em staging: o Matching por pessoa dava 503 ao Técnico e funcionava ao Ad
 - A frase «Escolha um perfil para consultar…» só aparece quando o seletor de pessoas está disponível (lista de pessoas não vazia), por isso sai do Técnico (13/11/2026).
 - «Pessoas correspondentes» (oportunidades Centrais, privadas e Interesses) só aparece quando `navigation.people` é verdadeiro, que `navigationFor` define como Administrador e Gestor de candidaturas. O matching por oportunidade sem leitura de pessoas responde 403 `NOT_AUTHORIZED` (antes 503). (13/11/2026)
 - A página não mostra aviso sobre as privadas. A nota «Nesta consulta foram consideradas apenas as oportunidades do catálogo…» foi retirada a pedido do utilizador (13/11/2026); o campo `privateIncluded` continua na resposta do backend.
+- A página de Matching só pede a lista de pessoas do seletor quando `navigation.people` é verdadeiro. Sem a secção Pessoas (Técnico e Consulta), o pedido era sempre recusado com 403; visto em staging com a conta de Técnico a 14/11/2026. A sondagem de permissões do layout mantém-se. Teste em `MatchingWorkspace.test.jsx`. (14/11/2026)
 - Provas: testes em `organizationMatching.test.js` (falharam antes). A verificação da nota em `MatchingWorkspace.test.jsx` foi retirada com a nota. Build ok. **Não provado:** a implementação em `composition.js` com a autoridade real (só `node --check` e o uso do mesmo padrão de resolução do resto do módulo); por validar em staging com a conta de Técnico.
 
 ## Decisão no backend: Parceiros (13/11/2026)
