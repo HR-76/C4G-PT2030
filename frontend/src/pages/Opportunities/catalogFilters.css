@@ -133,7 +133,7 @@
  .catalog-custom.catalog-wide .habitual-catalog-table .cr-status { white-space:nowrap; }
  /* The amount must stay on one line; its size shrinks with the table so the number is never cut. */
  .catalog-custom.catalog-wide .habitual-catalog-table .catalog-amount { white-space:nowrap; font-size:clamp(.6rem, calc(.4rem + .3cqi), .85rem); }
- .catalog-custom.catalog-wide .habitual-catalog-table .intervention-area-badge { overflow-wrap:normal; font-size:clamp(.6rem, calc(.4rem + .3cqi), .85rem); }
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table .intervention-area-badge { overflow-wrap:normal; font-size:clamp(.6rem, calc(.4rem + .25cqi), .8rem); padding:2px 6px; }
 }
 @media(max-width:768px) {
  .catalog-custom .habitual-catalog-table td:not([hidden]) { display:block; }
