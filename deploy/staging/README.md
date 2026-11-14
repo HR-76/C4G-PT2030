@@ -187,6 +187,16 @@ Depois de `git pull` e de construir a imagem nova (passo 1), repete, por esta or
 3. `person` outra vez para cada conta com perfil (passo 4): aplica as permissões do perfil, cria a pessoa no tenant caso ainda não exista e passa as permissões antigas para a política de MFA opcional (`c4g-user-mfa-v1`).
 4. Ativar (passo 6).
 
+### Logs da plataforma
+
+A página Administração C4G → Logs só funciona com `PLATFORM_LOGS_RUNTIME=central` no `api-private.env`; sem ela responde 503. O `env` passa a gerar a variável. Num staging já instalado basta acrescentar a linha ao ficheiro atual (não é preciso regenerá-lo, o que obrigaria a repetir `--collection` e `--storage`) e recriar a API:
+
+```bash
+grep -q '^PLATFORM_LOGS_RUNTIME=' /srv/c4g-staging/api-private.env || echo 'PLATFORM_LOGS_RUNTIME=central' >> /srv/c4g-staging/api-private.env
+```
+
+Com a variável ligada, a API recusa arrancar (`C4G_API_START_FAILED`) se a tabela `public.platform_support_event` (Central 026) não existir. O histórico começa no primeiro arranque com a variável.
+
 ### Conta de Técnico
 
 ```bash

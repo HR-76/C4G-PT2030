@@ -20,6 +20,8 @@ function assertLedgerRows(rows){
  if(rows?.some(r=>r.version===email.version)){if(!rows.some(r=>r.version===pdf.version))throw Error('CATALOG_READ_LEDGER_DRIFT');expected=[...expected,{version:email.version,irreversible:true,acceptedChecksums:[email.upChecksum]}];}
  const runtimeRead=require('../../security/centralRuntimeReadPackage').entry;
  if(rows?.some(r=>r.version===runtimeRead.version)){if(!rows.some(r=>r.version===email.version))throw Error('CATALOG_READ_LEDGER_DRIFT');expected=[...expected,{version:runtimeRead.version,irreversible:false,acceptedChecksums:[runtimeRead.upChecksum]}];}
+ const complement=require('../../security/opportunityComplementMigrationPackage').entry;
+ if(rows?.some(r=>r.version===complement.version)){if(!rows.some(r=>r.version===runtimeRead.version))throw Error('CATALOG_READ_LEDGER_DRIFT');expected=[...expected,{version:complement.version,irreversible:true,acceptedChecksums:[complement.upChecksum]}];}
  if(!Array.isArray(rows)||rows.length!==expected.length)throw Error('CATALOG_READ_LEDGER_DRIFT');
  const records=new Map(rows.map(r=>[r.version,r]));
  if(records.size!==expected.length||expected.some(e=>{const r=records.get(e.version);return !r||!e.acceptedChecksums.includes(r.checksum_sha256)||r.irreversible!==e.irreversible;}))throw Error('CATALOG_READ_LEDGER_DRIFT');

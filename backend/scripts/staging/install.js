@@ -247,7 +247,8 @@ const CENTRAL_STEPS = Object.freeze([
   ['049_pt2030_document_upload', (run, pool) => run.applyRegisteredCentralImportPackage(pool, 'central-pt2030-upload-preview-v1')],
   ['050_billing_private_documents', (run, pool) => run.applyRegisteredBillingPdfsPackage(pool, 'billing-private-documents-v1')],
   ['051_email_templates', (run, pool) => run.applyRegisteredEmailTemplatesPackage(pool, 'email-templates-v1')],
-  ['052_central_runtime_read', (run, pool) => run.applyRegisteredCentralRuntimeReadPackage(pool, 'central-runtime-read-v1')]
+  ['052_central_runtime_read', (run, pool) => run.applyRegisteredCentralRuntimeReadPackage(pool, 'central-runtime-read-v1')],
+  ['053_opportunity_complement', (run, pool) => run.applyRegisteredOpportunityComplementPackage(pool, 'opportunity-complement-v1')]
 ]);
 const TENANT_STEPS = Object.freeze([
   ['034_application_snapshot_v2', (runners, options) => runners.createRegisteredTenantMigrationRunner({ ...options, packageId: OPPORTUNITY_V2_PACKAGE })],
@@ -263,7 +264,7 @@ async function ledgerHead(pool, sql) {
   return (await pool.query(sql)).rows[0]?.version;
 }
 
-// Brings Central to 051 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
+// Brings Central to 053 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
 // The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
 async function upgrade(env, args) {
   const { config, stateFile } = settings(env);
@@ -346,7 +347,7 @@ async function storageCheck(env) {
 }
 
 async function main(argv = process.argv.slice(2), env = process.env) {
-  // This installer only serves staging, so it admits the staging runtime-login variant of Central 052 (exact pins only).
+  // This installer only serves staging, so it admits the staging runtime-login variant of Central 052 and 053 (exact pins only).
   // The API receives the same flag only when its environment is generated with --central-runtime-login; production never sets it.
   process.env[STAGING_ADMISSION.FLAG] ??= STAGING_ADMISSION.VALUE;
   const [command, ...rest] = argv;

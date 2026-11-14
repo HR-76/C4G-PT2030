@@ -33,6 +33,14 @@ Registar erros de autenticação reportados pelo controlador e respostas HTTP 5x
 
 Evidência: `output/playwright/c4g-logs/{service-verification,local-upgrade,native-verification}.json` e `native-logs-{1440,390}.png`. Instalação explícita local: `backend/scripts/localPlatform/logsSetup.js --apply`; o startup não migra bases. Rollback operacional: desativar `platformLogs` na configuração local e reiniciar, preservando o histórico; restauro apenas sob decisão explícita.
 
+## Correção de 14/11/2026: logs fora do perfil local
+
+Sintoma: no staging, `GET /api/admin/directory/logs` respondia 503 e a página mostrava «Não foi possível consultar os logs». Causa: só o runtime local criava o coletor (`state.platformLogs`); a API arrancada por `backend/src/server.js` nunca o criava, por isso o serviço lançava `LOGS_UNAVAILABLE` e nada era registado.
+
+Correção: seletor fechado `PLATFORM_LOGS_RUNTIME` (`disabled` por omissão, `central` cria o coletor sobre a pool Central) resolvido em `createProductionComposition`. Um coletor fornecido pelo chamador (perfil local) é mantido tal como está. Com `central`, o arranque exige a tabela `public.platform_support_event` (`LOGS_SCHEMA_REQUIRED`) e o encerramento aguarda os eventos pendentes. Falhas de recolha emitem `c4g.telemetry.dropped`. O `env` do staging passa a gerar a variável.
+
+Verificado: regressão `backend/test/platformLogsRuntime.test.js` (7 testes), suíte do backend com 3239 a passar e 0 falhas, lint sem avisos. Não verificado: comportamento na VPS (depende de o utilizador acrescentar a variável e atualizar) e a presença da migração 026 na Central do staging.
+
 ## Limites
 
 Este é um histórico simples de suporte, não substitui auditoria de segurança nem captura erros internos do Keycloak, browser ou infraestrutura. Erros esperados 4xx de validação/permissões não entram como falhas técnicas. Os nomes/emails apresentados são os atuais da conta central. A captura é assíncrona para não impedir o login: fila limitada a 500 e timeout de cinco segundos; falhas ficam sinalizadas no processo e no ecrã. Uma interrupção abrupta pode perder eventos ainda em memória; não se promete entrega garantida. O contador de falhas de recolha reinicia com o processo. O ambiente habitual continua a usar a configuração local privilegiada anterior; os limites SQL foram comprovados com a role runtime na prova isolada, não constituem aprovação de produção.

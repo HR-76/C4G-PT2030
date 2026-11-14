@@ -4,8 +4,9 @@ const {SUPPORTED_POSTGRES_MAJORS}=require('../security/postgresCatalogCompatibil
 const {chatRetentionManifest:tenantManifest}=require('../security/tenantMigrationManifest');
 const {centralEntries:activationEntries}=require('../security/opportunityV2MigrationPackage');
 const centralEntries=Object.freeze([...activationEntries,require('../security/opportunityEuWriterMigrationPackage').entry,require('../security/opportunityEuReconciliationMigrationPackage').entry,require('../security/opportunityEuLegacyPrearchiveMigrationPackage').entry]);
-// The chain that includes 052 (grants only, no opportunity_catalog tables): a Central at 052 is a known version here too.
-const {supportsCentralVersion,centralRuntimeReadManifest:centralManifest}=require('../security/centralMigrationManifest');
+// The chain that includes 052 (grants only) and 053 (a table in public): neither adds opportunity_catalog tables, and a
+// Central at either version is a known version here too.
+const {supportsCentralVersion,opportunityComplementManifest:centralManifest}=require('../security/centralMigrationManifest');
 const TABLES=Object.freeze(['duplicate_candidate','idempotency_record','opportunity','provenance','revision']);
 const CENTRAL_ADDITIONS=Object.freeze([
  ['funding_candidate_v2'],['manual_v2_candidate'],

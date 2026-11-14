@@ -141,6 +141,8 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     // Central opportunity catalog, read-only. Collection from the sources is a separate step.
     FUNDING_TENDERS_RUNTIME: 'central',
     FUNDING_TENDERS_SOURCE: 'unconfigured',
+    // Administração C4G → Logs: sign-ins and 5xx answers recorded in the Central (migration 026).
+    PLATFORM_LOGS_RUNTIME: 'central',
     ...collectionEnvironment(collection),
     ...storageEnvironment(storage),
     CATALOG_DATABASE_URL: databaseUrl({ login: CATALOG_LOGIN, password: state.staging.catalogPassword, host, port, database: centralDatabase }),

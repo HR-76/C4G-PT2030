@@ -58,7 +58,7 @@ test('private environment: generated values only, and only after a complete inst
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
   assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_ASSURANCE_POLICY_JSON', 'AUTH_MODE',
     'AUTH_POLICY_VERSION', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
-    'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY', 'SESSION_SECRET']);
+    'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'PLATFORM_LOGS_RUNTIME', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY', 'SESSION_SECRET']);
   // MFA stays each person's choice: a policy carried over from an older release never overrides it.
   const policy = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
   assert.equal(AUTH_POLICY_VERSION, 'c4g-user-mfa-v1');

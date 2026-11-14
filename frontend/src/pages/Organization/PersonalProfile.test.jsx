@@ -45,7 +45,7 @@ it('reopens with the confirmed profile at once, reads it again and never shows i
  const open=scope=>render(<MemoryRouter><ProfileForm organizationId="org-a" api={api} scope={scope}/></MemoryRouter>)
  open('user:org-a');await screen.findByLabelText('Biografia');cleanup()
  api.self.mockReturnValue(new Promise(()=>{}))
- open('user:org-a');expect(screen.getByLabelText('Biografia')).toBeTruthy();expect(api.self).toHaveBeenCalledTimes(2);cleanup()
+ open('user:org-a');expect(screen.getByLabelText('Biografia')).toBeTruthy();await waitFor(()=>expect(api.self).toHaveBeenCalledTimes(2));cleanup()
  open('other:org-a');expect(screen.queryByLabelText('Biografia')).toBeNull()
 })
 it('keeps an edit in progress when the new read confirms the profile already on screen and removes it when the read is refused',async()=>{

@@ -67,6 +67,9 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   const executor11145Enabled=require('./opportunities/v2/activationHttp').executor11145Enabled(env);
   const euWriterV2=require('./fundingTenders/euWriterConfig').configuredEuWriter(env);
   if(!['disabled','f12-xlsx'].includes(importsRuntime))throw new TypeError('C4G imports runtime must be disabled or f12-xlsx.');
+  // Resolved once: the sign-in audit, the Logs page and the HTTP middleware all share this collector.
+  const {logs:platformLogs,owned:ownsPlatformLogs}=require('./platformDirectory/logs').configuredPlatformLogs({env,pool:centralPool,provided:dependencies.platformLogs,
+    onFailure:()=>logger?.warn('c4g.telemetry.dropped',{component:'platform_logs',operation:'telemetry.export',outcome:'error'})});
   const authorizationCatalogs = validateProductionAuthorizationBootstrap();
   const auditBootstrap = validateProductionAuditBootstrap();
   let documentBootstrap = validateProductionDocumentsBootstrap();
@@ -131,7 +134,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       identityRepository: createIdentityRepository(authorityCoordinator),
       membershipRepository,
       sessionRegistry,
-      audit: (event,details) => { dependencies.platformLogs?.audit(event,details); }
+      audit: (event,details) => { platformLogs?.audit(event,details); }
     });
     const organizationController = createOrganizationAuthController({
       organizationSession,
@@ -152,7 +155,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,
       members:memberOnboarding,
       access:env.PLATFORM_ACCESS_RUNTIME==='central'?require('./platformDirectory/access').createPlatformAccess({coordinator:authorityCoordinator,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],recentMfaRequirement:authConfig.assurancePolicy['recent-mfa']}):null,
-      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:dependencies.platformLogs,health:observability.health})});
+      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health})});
     const platformBillingService=require('./platformBilling/service').createPlatformBillingService({
       coordinator:authorityCoordinator,centralPool
     });
@@ -331,7 +334,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     pool: centralPool,
     databaseReadiness,
     routes: {...composedRoutes,catalogRead:catalogReadConnection.router},
-    platformLogs: dependencies.platformLogs,
+    platformLogs,
     security,
     ...(admissionService?{
       admissionBoundary:require('./entityAdmission/http').createAdmissionBoundary({service:admissionService,authenticate}),
@@ -342,9 +345,9 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   });
   return {
     app, authMode: authConfig.mode, importsRuntime,authorizationCatalogs, auditBootstrap, documentBootstrap,
-    closeOpportunityRuntime:async()=>{try{await closeCatalogReadConnection();}finally{await closeReceiptRecovery();await closeCentralImport();await closeBillingPdfs();await closeDocumentInfrastructure();await closeCatalogReader();await closeOwnedTenantPools();}},
+    closeOpportunityRuntime:async()=>{try{if(ownsPlatformLogs)await platformLogs.flush();await closeCatalogReadConnection();}finally{await closeReceiptRecovery();await closeCentralImport();await closeBillingPdfs();await closeDocumentInfrastructure();await closeCatalogReader();await closeOwnedTenantPools();}},
     organizationalScopes, taxonomies, profileAuthoring,profileCompetencies,profileFinancial,profileOperational,profilePopulations,observability, featureTelemetry, logger, port: env.PORT || 5000,
-    assertDatabaseReadiness:async()=>{await databaseReadiness.assertReady();await readyBillingPdfs();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
+    assertDatabaseReadiness:async()=>{await databaseReadiness.assertReady();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
     logFrontendUrlHealth: () => logFrontendUrlHealth(env, logger)
   };
 }

@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === opportunityComplementManifest.at(-1).version)) return opportunityComplementManifest;
   if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
   return rows.some(row => row.version === receiptManifest.at(-1).version) ? receiptManifest : knownManifest;
 }
@@ -308,6 +309,14 @@ async function applyRegisteredCentralRuntimeReadPackage(pool,packageId){
  return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').centralRuntimeReadManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:require('../src/security/centralMigrationManifest').centralRuntimeReadManifest});
 }
 module.exports.applyRegisteredCentralRuntimeReadPackage=applyRegisteredCentralRuntimeReadPackage;
+// The opportunity complement is explicit too: it applies on top of 052 and never through existing entrypoints.
+async function applyRegisteredOpportunityComplementPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/opportunityComplementMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('OPPORTUNITY_COMPLEMENT_PACKAGE_NOT_REGISTERED');
+ const {opportunityComplementManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,opportunityComplementManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:opportunityComplementManifest});
+}
+module.exports.applyRegisteredOpportunityComplementPackage=applyRegisteredOpportunityComplementPackage;
 
 async function applyRegisteredF12ReceiptPackage(pool) {
   const { receiptManifest } = require('../src/security/centralMigrationManifest');
