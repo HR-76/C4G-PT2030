@@ -125,6 +125,10 @@
  .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:nth-child(n) { width:auto; }
  .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:first-child { width:33%; }
  .catalog-custom.catalog-wide .opportunity-analysis-table.habitual-catalog-table { min-width:1200px; }
+ /* With all columns visible the table is dense: smaller text keeps badges and tags from breaking mid-word. */
+ .catalog-custom.catalog-wide .habitual-catalog-table :is(th,td) { font-size:.8rem; }
+ .catalog-custom.catalog-wide .habitual-catalog-table thead th { font-size:.72rem; }
+ .catalog-custom.catalog-wide .habitual-catalog-table .catalog-amount { font-size:.85rem; }
 }
 @media(max-width:768px) {
  .catalog-custom .habitual-catalog-table td:not([hidden]) { display:block; }
