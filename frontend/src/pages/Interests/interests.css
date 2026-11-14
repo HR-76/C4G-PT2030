@@ -64,3 +64,9 @@
  .interests-page .interest-table td { padding:12px 14px; }
  .c4g-shell #main-content .interest-row-actions .btn { min-height:var(--control-h-touch); }
 }
+.catalog-row-actions { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; max-width: 100%; padding-right: 32px; box-sizing: border-box; }
+.catalog-row-actions .catalog-start-application,
+.c4g-shell #main-content .catalog-row-actions .catalog-start-application { display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px; max-width: 100%; min-width: 0; box-sizing: border-box; white-space: normal; text-align: left; line-height: 1.25; padding: 5px 8px; }
+.catalog-row-actions .catalog-start-application svg { flex: none; }
+.catalog-row-actions .catalog-start-application { width: 36px; height: 36px; min-height: 36px; padding: 0; justify-content: center; }
+@media (max-width:768px) { .catalog-row-actions .catalog-start-application { width: 44px; height: 44px; min-height: 44px; } }

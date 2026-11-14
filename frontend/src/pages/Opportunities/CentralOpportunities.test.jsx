@@ -1,7 +1,7 @@
 import React from 'react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import CentralOpportunities from './CentralOpportunities'
 import { centralOpportunitiesApi as api, platformCentralOpportunitiesApi as platformApi, catalogReadApi, privateApplicationsApi, opportunityInterestsApi as interestApi } from '../../api/api'
 const state = vi.hoisted(() => ({ organization: { id: 'a' }, user: { id: 'user' } }))
@@ -83,10 +83,43 @@ it('saves interest from the table using the current revision and hides new regis
  expect(saved.querySelector('svg').getAttribute('fill')).toBe('currentColor')
  expect(row.classList.contains('catalog-interest-registered')).toBe(true)
  expect(within(row).queryByRole('button')).toBeNull()
- expect(saved.getAttribute('href').split('?')[0]).toBe('/candidaturas')
+ expect(saved.getAttribute('href').split('?')[0]).toBe('/interesses')
  expect(screen.queryByRole('link',{name:'Consultar na lista de interesses'})).toBeNull()
  expect(privateApplicationsApi.opportunitySummaries).not.toHaveBeenCalled()
  expect(api.get).toHaveBeenCalledWith('one');expect(interestApi.create).toHaveBeenCalledWith(expect.objectContaining({opportunityId:'one',centralRevisionId:'current-revision',unitIds:[]}),'a');expect(screen.queryByText('Formulário de candidatura')).toBeNull()
+})
+it('starts an application straight from the table, without an interest, using the current revision',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'},{opportunityId:'old',title:'Archived call',lifecycleState:'ARCHIVED'}]))
+ api.get.mockResolvedValue({data:{opportunityId:'one',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}})
+ interestApi.context.mockResolvedValue({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true}}})
+ let target=''
+ const Probe=()=>{const l=useLocation();target=l.pathname+l.search;return <p>Formulário de candidatura</p>}
+ render(<MemoryRouter><Routes><Route path="/" element={<CentralOpportunities/>}/><Route path="/candidaturas" element={<Probe/>}/></Routes></MemoryRouter>)
+ const button=await screen.findByRole('button',{name:'Iniciar candidatura para Open call'})
+ expect(screen.queryByRole('button',{name:'Iniciar candidatura para Archived call'})).toBeNull()
+ fireEvent.click(button)
+ await screen.findByText('Formulário de candidatura')
+ const url=new URL(target,'https://example.invalid')
+ expect(url.searchParams.get('nova')).toBe('1');expect(url.searchParams.get('origem')).toBe('CENTRAL')
+ expect(url.searchParams.get('oportunidade')).toBe('one');expect(url.searchParams.get('revisao')).toBe('current-revision')
+ expect(url.searchParams.has('interesse')).toBe(false)
+ expect(api.get).toHaveBeenCalledWith('one');expect(interestApi.create).not.toHaveBeenCalled()
+})
+it('shows Iniciar candidatura beside the heart when the summaries response carries the capability',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ interestApi.summaries.mockImplementation(ids=>Promise.resolve({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true},items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}))
+ render(view())
+ const start=await screen.findByRole('button',{name:'Iniciar candidatura para Open call'})
+ expect(within(start.closest('tr')).getByRole('button',{name:'Registar interesse em Open call'})).toBeTruthy()
+ expect(interestApi.context).not.toHaveBeenCalled()
+})
+it('hides Iniciar candidatura when the profile cannot create applications and offers Interesses and Candidaturas',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ render(view());await screen.findByRole('button',{name:'Registar interesse em Open call'})
+ expect(screen.queryByRole('button',{name:/Iniciar candidatura/})).toBeNull()
+ expect(screen.getByRole('heading',{name:'Oportunidades'})).toBeTruthy()
+ expect(screen.getByRole('link',{name:'Interesses'}).getAttribute('href')).toBe('/interesses')
+ expect(screen.getByRole('link',{name:'Candidaturas'}).getAttribute('href')).toBe('/candidaturas')
 })
 it.each(['ARCHIVED',null,'UNKNOWN'])('does not highlight an interest with status %s as registered',async status=>{
  api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call'}]))

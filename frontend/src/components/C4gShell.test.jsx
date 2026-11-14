@@ -48,7 +48,7 @@ it.each([
 })
 it('keeps catalog, matching and import discoverable without granting platform administration', () => {
   sidebar()
-  expect(screen.getByRole('link', { name: 'Catálogo C4G' }).getAttribute('href')).toBe('/catalogo')
+  expect(screen.getByRole('link', { name: 'Oportunidades' }).getAttribute('href')).toBe('/catalogo')
   expect(screen.getByRole('link', { name: /Matching/ }).textContent).not.toContain('Em integração')
   expect(screen.queryByRole('link', { name: 'Importar oportunidades' })).toBeNull()
   expect(screen.queryByRole('link', { name: 'Importar Portugal 2030' })).toBeNull()
@@ -93,7 +93,7 @@ it('preserves catalog and matching route content', () => {
 it('keeps platform-only navigation free of private organization routes', () => {
   state.auth.user.platformRoles = ['C4G_ADMIN']; state.auth.organization = null
   sidebar()
-  expect(screen.getByRole('link', { name: 'Catálogo C4G' })).toBeTruthy()
+  expect(screen.getByRole('link', { name: 'Oportunidades' })).toBeTruthy()
   expect(screen.getByRole('link', { name: 'Fontes de oportunidades' })).toBeTruthy()
   for (const name of ['Oportunidades privadas', 'Candidaturas', 'Perfil da organização']) expect(screen.queryByRole('link', { name })).toBeNull()
 })
@@ -210,7 +210,30 @@ it('dismisses the mobile menu and moves focus into the page even when its active
   window.matchMedia = vi.fn(query => ({ matches:query === '(max-width: 768px)',addEventListener(){},removeEventListener(){} }))
   page('/catalogo',<button>Primeira ação</button>)
   fireEvent.click(screen.getByRole('button',{name:'Abrir menu'}))
-  fireEvent.click(screen.getByRole('link',{name:'Catálogo C4G'}))
+  fireEvent.click(screen.getByRole('link',{name:'Oportunidades'}))
   await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull())
   expect(document.activeElement.id).toBe('main-content')
+})
+it('orders the organization navigation as Oportunidades, Interesses, Candidaturas and hides Parceiros when the backend navigation list says so', () => {
+  sidebar()
+  const names = screen.getAllByRole('link').map(link => link.textContent)
+  expect(names.indexOf('Interesses')).toBe(names.indexOf('Oportunidades') + 1)
+  expect(names.indexOf('Candidaturas')).toBeGreaterThan(names.indexOf('Interesses'))
+  expect(screen.getByRole('link', { name: 'Parceiros' })).toBeTruthy()
+  cleanup(); state.auth.organization = { ...state.auth.organization, navigation: { partners: false } }
+  sidebar()
+  expect(screen.queryByRole('link', { name: 'Parceiros' })).toBeNull()
+  expect(screen.getByRole('link', { name: 'Interesses' })).toBeTruthy()
+})
+
+it('shows the organization calendar only when the backend navigation list allows it, without looking at the profile', () => {
+  state.auth.organization = { id: 'a', profileCode: 'ORG_ADMIN' }
+  sidebar()
+  expect(screen.queryByRole('link', { name: 'Calendário da entidade' })).toBeNull()
+  cleanup(); state.auth.organization = { id: 'a', profileCode: 'VIEWER', navigation: { calendar: true } }
+  sidebar()
+  expect(screen.getByRole('link', { name: 'Calendário da entidade' }).getAttribute('href')).toBe('/calendario')
+  cleanup(); state.auth.organization = { id: 'a', profileCode: 'ORG_ADMIN', navigation: { calendar: false } }
+  sidebar()
+  expect(screen.queryByRole('link', { name: 'Calendário da entidade' })).toBeNull()
 })

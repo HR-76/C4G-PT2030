@@ -5,7 +5,7 @@ export function ApplicationAreaHeader({ organization, title, children }) {
   return <header className="application-area-header"><div>
     <p>{organization.displayName || organization.name || 'Organização'}</p>
     <h1>{title}</h1>
-  </div>{children}</header>
+  </div>{children && <div className="application-area-actions">{children}</div>}</header>
 }
 
 export default function ApplicationAreaNav() {

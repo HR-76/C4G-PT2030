@@ -89,6 +89,9 @@ it('does not enable updates for an unconfigured source or misrepresent fixture r
  mocks.status.mockResolvedValue({data:{...value,sourceMode:'unconfigured'}});const view=render(<FundingTenders/>);await screen.findByText('8s');expect(screen.getByRole('button',{name:'Atualizar agora'}).disabled).toBe(true)
  view.unmount();mocks.status.mockResolvedValue({data:{...value,sourceMode:'fixture'}});render(<FundingTenders/>);await screen.findByText(/Modo de teste: dados sintéticos/);expect(screen.queryByText(/API real/)).toBeNull()
 })
+it('treats the staging collection mode as configured',async()=>{
+ mocks.status.mockResolvedValue({data:{...value,sourceMode:'live-staging'}});render(<FundingTenders/>);await screen.findByText('8s');expect(screen.getByRole('button',{name:'Atualizar agora'}).disabled).toBe(false)
+})
 it('retains the same intention after an uncertain response and prevents double submission',async()=>{
  mocks.update.mockRejectedValueOnce({response:{status:503}});render(<FundingTenders/>);await screen.findByText('8s')
  const button=screen.getByRole('button',{name:'Atualizar agora'});fireEvent.click(button);fireEvent.click(button);await screen.findByRole('button',{name:'Confirmar pedido anterior'});expect(mocks.update).toHaveBeenCalledTimes(1)

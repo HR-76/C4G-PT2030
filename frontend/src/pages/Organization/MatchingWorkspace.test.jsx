@@ -106,3 +106,26 @@ it('uses the same area list and explanation when matching people to an opportuni
 it('oferece consulta direta do catálogo quando o matching excede a capacidade',async()=>{
  mount(Promise.reject({response:{status:409,data:{error:{code:'LIMIT_EXCEEDED'}}}}));const alert=await screen.findByRole('alert');const link=screen.getByRole('link',{name:'consultar o catálogo diretamente'});expect(link.getAttribute('href')).toBe('/catalogo');expect(alert.textContent).toMatch(/não apresenta correspondências calculadas/)
 })
+
+it('shows the profile-choice sentence only when the profile picker is available',async()=>{
+ const noPeople={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:false,items:[]}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={noPeople}/></MemoryRouter>)
+ await screen.findByText('Sem correspondências')
+ expect(screen.queryByText(/Escolha um perfil/)).toBeNull()
+ cleanup()
+ const withPeople={matching:vi.fn(async()=>({data:{state:'READY',items:[]}})),people:vi.fn(async()=>({data:{items:[{personId:'p1',name:'Pessoa'}],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={withPeople}/></MemoryRouter>)
+ expect(await screen.findByText(/Escolha um perfil/)).toBeTruthy()
+})
+
+it('does not label catalog results with an origin name and keeps the programme; private ones stay marked',async()=>{
+ const rows=[{opportunityId:'c',origin:'CENTRAL',href:'/catalogo/c',title:'Central call',programmeName:'HORIZON',matchedAreas:[]},
+  {opportunityId:'n',origin:'CENTRAL',href:'/catalogo/n',title:'Central without programme',matchedAreas:[]},
+  {opportunityId:'p',origin:'PRIVATE',href:'/oportunidades/p',title:'Private call',programmeName:'Interno',matchedAreas:[]}]
+ const api={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:true,items:rows}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Central call'})
+ expect(screen.queryByText(/Catálogo C4G/)).toBeNull()
+ expect(screen.getByText('HORIZON')).toBeTruthy()
+ expect(screen.getByText('Privada · Interno')).toBeTruthy()
+})

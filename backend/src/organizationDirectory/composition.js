@@ -97,7 +97,19 @@ function createDirectoryComposition({sessionStore,sessionRegistry,authorityCoord
   return await lease.execute(input);
  }catch(error){onFailure(error);if(error.internalCode==='COMMIT_UNCERTAIN')return {uncertain:true};throw Object.assign(new Error('Directory unavailable'),{code:error.internalCode||error.code||'SERVICE_UNAVAILABLE'})}
  finally{inputs.delete(input)}}
- return Object.freeze({async execute(method,raw,id,request){
+ return Object.freeze({
+  // Only a technician lacks the organization-wide read of private opportunities; the profile comes from the central authority record.
+  async canReadPrivateOpportunities(request){
+   const expectedOrg=uuid(request.headers?.['x-c4g-organization']);
+   return coordinator.withAuthority(async()=>{
+    const context=await authority.resolve(await authority.captureAuthenticatedRequest(request));
+    if(context.actor.organizationId!==expectedOrg)fail('CONTEXT_CHANGED');
+    const current=await data.authorizationDataPort.load(context.actor);
+    if(!current)fail('SERVICE_UNAVAILABLE');
+    return current.profileCode!=='CONTRIBUTOR';
+   });
+  },
+  async execute(method,raw,id,request){
   try{
    if(method==='registrationContacts'||method==='registrationProfile'){
    if(!registrationService)fail('RESOURCE_NOT_AVAILABLE');

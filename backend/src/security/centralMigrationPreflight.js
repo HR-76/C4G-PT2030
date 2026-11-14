@@ -1,7 +1,7 @@
 const { assertCentralMarker, validateAppliedMigrationLedger } = require("../../scripts/runCentralMigrations");
 const { assertCentralSchema } = require("./centralSchemaManifest");
 const { SUPPORTED_POSTGRES_MAJORS } = require('./postgresCatalogCompatibility');
-const { manifest, registeredManifest, writerManifest, reconciliationManifest, prearchiveManifest, knownManifest, centralImportManifest, catalogReadManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest } = require('./centralMigrationManifest');
+const { manifest, registeredManifest, writerManifest, reconciliationManifest, prearchiveManifest, knownManifest, centralRuntimeReadManifest, centralImportManifest, billingPdfManifest, catalogReadManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest } = require('./centralMigrationManifest');
 
 const SUPPORTED_POSTGRES_MAJOR = 17;
 
@@ -37,7 +37,7 @@ async function preflightCentral(pool) {
     // The package is atomic: intermediate schemas are known to its migrator,
     // but are not an admitted runtime state after an interrupted/manual install.
     if (!manifest.some(entry=>entry.version===currentVersion) && ![registeredManifest.at(-1).version,
-      writerManifest.at(-1).version,reconciliationManifest.at(-1).version,prearchiveManifest.at(-1).version,catalogReadManifest.at(-1).version,centralImportManifest.at(-1).version,knownManifest.at(-1).version,receiptManifest.at(-1).version,replayCapacityManifest.at(-1).version,failureCapacityManifest.at(-1).version].includes(currentVersion)) {
+      writerManifest.at(-1).version,reconciliationManifest.at(-1).version,prearchiveManifest.at(-1).version,catalogReadManifest.at(-1).version,centralImportManifest.at(-1).version,billingPdfManifest.at(-1).version,knownManifest.at(-1).version,centralRuntimeReadManifest.at(-1).version,receiptManifest.at(-1).version,replayCapacityManifest.at(-1).version,failureCapacityManifest.at(-1).version].includes(currentVersion)) {
       throw new Error('Central registered migration package is incomplete; preflight refused.');
     }
     const fingerprint = await assertCentralSchema(client, currentVersion);

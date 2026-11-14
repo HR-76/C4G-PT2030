@@ -1,5 +1,21 @@
 'use strict';
 
+const TEAM_WRITE = new Set(['APPLICATION_EDIT', 'APPLICATION_WORK_EDIT', 'APPLICATION_TRANSITION', 'APPLICATION_DOCUMENT_EDIT']);
+// A technician allowed to start applications may read opportunities at organization level (list and
+// capabilities only); individual opportunities stay limited to the teams they belong to. Pure: no database.
+function mayStartApplications({actor, snapshot, resource, operationCode}) {
+  return operationCode === 'OPPORTUNITY_READ' && resource.resourceType === 'OPPORTUNITY' && resource.id === actor.organizationId
+    && snapshot.profileCode === 'CONTRIBUTOR' && actor.type === 'HUMAN'
+    && snapshot.grants.some(g => g.permission === 'application.create' && g.scope?.type === 'ORGANIZATION'
+      && g.scope.organizationId === actor.organizationId && !g.resourceId);
+}
+const organizationReadGrant = (actor, resource) => ({permission: 'opportunity.read', resourceId: resource.id, resourceType: resource.resourceType,
+  scope: {type: 'ORGANIZATION', id: actor.organizationId, organizationId: actor.organizationId}});
+// Same derivation for modules that have no team query (the interests module computes canCreateApplication with it).
+function applicantOpportunityReadPolicy(input) {
+  return mayStartApplications(input) ? {...input.snapshot, grants: [...input.snapshot.grants, organizationReadGrant(input.actor, input.resource)]} : input.snapshot;
+}
+
 // Only installed in the application composition. Central membership/profile/version
 // remain authoritative. Effective read grants never leave this request/transaction.
 function createTeamAccessPolicy({currentClient, operationCatalog}) {
@@ -16,7 +32,8 @@ function createTeamAccessPolicy({currentClient, operationCatalog}) {
 
     // A collection read only opens the filtered list. Individual resources below
     // must still pass the current participant check, including broad old grants.
-    let participating = application && root && operation.permission === 'application.read';
+    const mayStart = mayStartApplications({actor, snapshot, resource, operationCode});
+    let participating = (application && root && operation.permission === 'application.read') || mayStart;
     if (application && root && operation.permission !== 'application.read') return snapshot;
     if (!participating) {
       const predicate = application ? 'a.application_id=$3'
@@ -32,6 +49,12 @@ function createTeamAccessPolicy({currentClient, operationCatalog}) {
     if (application && !participating) return {...snapshot, grants: snapshot.grants.filter(g => !g.permission.startsWith('application.'))};
     // The chat is writable by active participants. Other writes keep their
     // existing grants. Source reads are limited to accessible applications.
+    // A technician who takes part in an application runs it day to day: edits data, team and tasks, changes its state and
+    // edits its documents. Reviews and decisions keep their existing grants. Participation was checked above, on every write.
+    if (application && participating && !root && TEAM_WRITE.has(operationCode) && operation.effect === 'WRITE') {
+      return {...snapshot, grants: [...snapshot.grants, {permission: operation.permission, resourceId: resource.id,
+        resourceType: resource.resourceType, scope: {type: 'RESOURCE', id: resource.id, organizationId: actor.organizationId}}]};
+    }
     const chatSend = application && !root && operationCode === 'APPLICATION_CHAT_SEND';
     if (!participating || (operation.effect !== 'READ' && !chatSend) || !(source || operation.permission === 'application.read')) return snapshot;
     return {...snapshot, grants: [...snapshot.grants, {
@@ -43,4 +66,4 @@ function createTeamAccessPolicy({currentClient, operationCatalog}) {
     }]};
   };
 }
-module.exports = {createTeamAccessPolicy};
+module.exports = {createTeamAccessPolicy, applicantOpportunityReadPolicy};

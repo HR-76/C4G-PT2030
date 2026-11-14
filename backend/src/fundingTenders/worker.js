@@ -13,7 +13,10 @@ const { createTrustedObservability } = require('../async/envelope');
 const { createExecutionLineageProjection } = require('../async/executionLineageProjection');
 const { normalizeClaimedJob } = require('../async/adapters/pgBossQueueAdapter');
 const TYPE = 'funding_tenders.refresh';
-function createFundingWorker({ pool, queue, source, repository = createFundingRepository({ pool }), clock = () => new Date() }) {
+// A failed job is reported with its error code only: no message, no record, no identity. Without this the cause of a
+// permanent failure never reached the operator, only the generic FUNDING_PROCESSING_FAILED.
+const loggableCode = value => (typeof value === 'string' && /^[A-Za-z0-9_]{1,64}$/.test(value) ? value : 'UNKNOWN');
+function createFundingWorker({ pool, queue, source, repository = createFundingRepository({ pool }), clock = () => new Date(), log = () => {} }) {
   const workerId = `funding-${randomUUID()}`;
   const controlled=repository.euSourceControlEnabled===true;
   const deferPort=controlled?require('./sourceDeferral').createFundingSourceDeferral({transaction:repository.transaction}):null;
@@ -51,6 +54,7 @@ function createFundingWorker({ pool, queue, source, repository = createFundingRe
       }
       await repository.finish(run,null,execution); return result('SUCCESS');
     } catch (error) {
+      log({ event: 'FUNDING_JOB_FAILED', code: loggableCode(error?.code), attempt: envelope.attempt });
       if(controlled){
         // A pause can arrive while the source transport is in flight. Do not
         // finish/error the run or manufacture a new retry/deadline.

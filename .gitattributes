@@ -1,6 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 *.sql text eol=lf
+/deploy/staging/backup/* text eol=lf
 
 # Preserve the byte representation checked by the catalog and tenant fixtures.
 /context/references/opportunity-v2/contract.md text eol=lf

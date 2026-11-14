@@ -6,7 +6,7 @@ import ApplicationPreparationSummary from './ApplicationPreparationSummary'
 import ApplicationNextStep from './ApplicationNextStep'
 import ApplicationPartners from './ApplicationPartners'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { privateApplicationsApi as api, privateOpportunitiesApi, centralOpportunitiesApi, opportunityInterestsApi, pq1Api } from '../../api/api'
 import { applicationIntentKey, loadApplicationIntention, saveApplicationIntention } from './intentions'
@@ -21,7 +21,6 @@ import './applications.css'
 import './application-detail.css'
 import './application-create.css'
 import ApplicationBrowse from './ApplicationBrowse'
-import Interests from '../Interests/Interests'
 import CentralRevisionNotice from './CentralRevisionNotice'
 
 const message = error => error?.code==='APPLICATION_STORAGE_UNAVAILABLE'?error.message:error?.response?.data?.error?.code==='SCHEMA_UPGRADE_REQUIRED'?'A organização ainda precisa da atualização de candidaturas para guardar estes campos.':({ 400:'Verifique os campos.', 403:'Sem permissão para esta candidatura.', 404:'Candidatura ou oportunidade indisponível.', 409:'Os dados mudaram. Recarregue antes de editar.' }[error?.response?.status] || 'Resultado incerto. Repita o mesmo pedido sem alterar os campos.')
@@ -37,7 +36,7 @@ const FINAL_TRANSITION_MESSAGE = {
 
 export default function PrivateApplications() {
  const {id}=useParams(),[params]=useSearchParams(),{user,organization}=useAuth()
- if(!id&&params.get('nova')!=='1'&&params.get('ver')==='interesses')return <Interests/>
+ if(!id&&params.get('nova')!=='1'&&params.get('ver')==='interesses'){const rest=new URLSearchParams(params);rest.delete('ver');const query=rest.toString();return <Navigate to={`/interesses${query?`?${query}`:''}`} replace/>}
  return !id&&params.get('nova')!=='1'?<ApplicationBrowse key={user?.id+':'+organization?.id}/>:<ApplicationRecord key={`${user?.id}:${organization?.id}:${id||params.toString()}`}/>
 }
 function ApplicationRecord() {

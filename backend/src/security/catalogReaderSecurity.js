@@ -35,7 +35,7 @@ async function assertReaderLogin(client) {
 async function assertReaderSession(client,admission) {
   if(admission!==undefined&&!require('./catalogReaderSchema').isReaderSchemaAdmission(admission))throw Error('CATALOG_READER_SCHEMA_ADMISSION_REQUIRED');
   const v2=['042_opportunity_eu_source_control_v2','043_opportunity_eu_writer_v2',
-    '044_opportunity_eu_expired_reconciliation','045_opportunity_eu_legacy_prearchive','048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents'].includes(admission?.version);
+    '044_opportunity_eu_expired_reconciliation','045_opportunity_eu_legacy_prearchive','048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents','051_email_templates','052_central_runtime_read'].includes(admission?.version);
   const readable=v2?[...BASE_TABLES,...V2_TABLES]:BASE_TABLES;
   await assertReaderLogin(client);
   // Direct grants/ownership are forbidden as well as inherited administrative roles.

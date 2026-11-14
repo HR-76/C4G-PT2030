@@ -1,7 +1,7 @@
 // Recovered from the UBI detail's APPLICATION_STATUS_NEXT_ACTION guidance.
 // Current C4G terminal states remain read-only guidance, never transitions.
 export const NEXT_STEP = Object.freeze({
- IDENTIFIED:'Validar o interesse da organização e a documentação inicial.',
+ IDENTIFIED:'Decidir o responsável e o prazo e iniciar a preparação.',
  INTENTION:'Preparar os elementos da candidatura e definir a coordenação interna.',
  PREPARATION:'Completar equipa, parceiros e documentação antes de registar a submissão.',
  SUBMITTED:'Acompanhar a resposta do financiador e manter os documentos da submissão atualizados.',

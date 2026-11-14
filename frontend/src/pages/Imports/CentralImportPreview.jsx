@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import {platformImportsApi as api} from '../../api/api'
 import LoadingIndicator from '../../components/LoadingIndicator'
+import CentralImportCatalog, { RESUME_PARAM } from './CentralImportCatalog'
 
 const columns=[['A','Referência'],['D','Aviso'],['E','Programa'],['I','Início previsto'],['J','Fim previsto'],['H','Dotação (valor do ficheiro)']]
 const additional=[['B','Beneficiários'],['C','Natureza do aviso'],['F','Objetivo específico'],['G','Fundo'],['K','Quadrimestre'],['L','NUTS II'],['M','Modalidade de candidatura']]
@@ -15,8 +16,10 @@ const errors={
  C4G_ADMIN_REQUIRED:'Já não tem autorização para esta operação.'
 }
 const message=error=>errors[error?.response?.data?.error?.code]||(error?.response?.status===400?'O ficheiro ou os dados não são válidos. Confirme o formato do Excel oficial.':'Não foi possível confirmar a operação. Pode repetir o mesmo pedido.')
-export default function CentralImportPreview(){
+// catalog: the deployment can also save the candidates and accept the new ones into the Catálogo (mode STAGE_AND_ACCEPT).
+export default function CentralImportPreview({catalog=false}){
  const [file,setFile]=useState(null),[document,setDocument]=useState(null),[sheet,setSheet]=useState(''),[preview,setPreview]=useState(null),[page,setPage]=useState(0),[busy,setBusy]=useState(''),[error,setError]=useState('')
+ const [resume]=useState(()=>{const value=new URLSearchParams(window.location.search).get(RESUME_PARAM);return /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(value||'')?value:null})
  const alive=useRef(true),lock=useRef(false),uploadIntent=useRef(null),previewIntent=useRef(null)
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
  function choose(event){
@@ -43,7 +46,7 @@ export default function CentralImportPreview(){
  }
  const rows=preview?.rows||[],pages=Math.max(1,Math.ceil(rows.length/50))
  return <section aria-label="Carregamento e pré-visualização central">
-  <p>Valide o ficheiro e confira os avisos. Esta etapa não publica oportunidades no Catálogo.</p>
+  <p>{catalog?'Valide o ficheiro, confira os avisos e leve as oportunidades novas para o Catálogo. Nada é aceite sem a sua confirmação.':'Valide o ficheiro e confira os avisos. Esta etapa não publica oportunidades no Catálogo.'}</p>
   <div className="upload-zone"><label htmlFor="central-plan-file">Ficheiro Excel oficial</label><p>.xlsx · até 10 MiB · até 5.000 linhas</p><input id="central-plan-file" type="file" accept=".xlsx" disabled={!!busy} onChange={choose}/></div>
   {error&&<p role="alert">{error}</p>}
   {busy&&<LoadingIndicator>{busy==='upload'?'A guardar e verificar o ficheiro…':'A validar os avisos…'}</LoadingIndicator>}
@@ -53,5 +56,7 @@ export default function CentralImportPreview(){
    <div className="table-wrap"><table className="data-table"><thead><tr><th>Linha</th>{columns.map(([key,label])=><th key={key}>{label}</th>)}<th>Restantes campos</th><th>Validação</th></tr></thead><tbody>{rows.slice(page*50,(page+1)*50).map(row=><tr key={row.line}><td>{row.line}</td>{columns.map(([key])=><td key={key}>{display(key,row.values[key])}</td>)}<td><details><summary>Ver campos da linha {row.line}</summary><dl>{additional.map(([key,label])=><div key={key}><dt>{label}</dt><dd>{row.values[key]??'—'}</dd></div>)}</dl></details></td><td>{row.errors.length?<><span>Rever dados</span><details><summary>Detalhes</summary>{row.errors.map(code=><p key={code}>{errors[code]||'Verifique os dados desta linha.'} <small>{code}</small></p>)}</details></>:'Válida'}</td></tr>)}</tbody></table></div>
    {pages>1&&<nav aria-label="Páginas da pré-visualização"><button className="btn btn-secondary" disabled={page===0} onClick={()=>setPage(v=>v-1)}>Anterior</button><span> Página {page+1} de {pages} </span><button className="btn btn-secondary" disabled={page+1>=pages} onClick={()=>setPage(v=>v+1)}>Seguinte</button></nav>}
   </section>}
+  {catalog&&resume&&!preview&&!document&&<CentralImportCatalog key="resume" resumeImportId={resume}/>}
+  {catalog&&preview?.previewDigest&&preview.validRows>0&&<CentralImportCatalog key={preview.previewDigest} uploadId={document.requestId} sheetName={preview.sheetName} previewDigest={preview.previewDigest}/>}
  </section>
 }

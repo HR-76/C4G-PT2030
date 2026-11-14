@@ -42,7 +42,7 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
  return <section className="organization-matching">
   <header className="matching-header"><div><p>{organizationName}</p><div className="heading-with-info"><h1>Matching</h1><InfoTooltip label="Informação sobre o matching">As correspondências resultam das áreas temáticas e não determinam elegibilidade. Pode criar uma candidatura sem correspondência.</InfoTooltip></div></div>
    <Link className="btn btn-secondary" to={opportunityId ? `${origin==='CENTRAL'?'/catalogo':'/oportunidades'}/${opportunityId}` : '/catalogo'}>{opportunityId?'Voltar à oportunidade':'Consultar catálogo'}</Link></header>
-  <p className="matching-purpose">{opportunityId?'Consulte as pessoas da organização com áreas temáticas em comum com esta oportunidade.':'Escolha um perfil para consultar as oportunidades relacionadas com as suas áreas temáticas.'}</p>
+  {(opportunityId||people.length>0)&&<p className="matching-purpose">{opportunityId?'Consulte as pessoas da organização com áreas temáticas em comum com esta oportunidade.':'Escolha um perfil para consultar as oportunidades relacionadas com as suas áreas temáticas.'}</p>}
   {!opportunityId&&people.length>0&&<FilterBar aria-label="Filtros de matching"><label>Pessoa<select value={personId} onChange={e=>setParams(e.target.value?{pessoa:e.target.value}:{})}><option value="">O meu perfil</option>{people.map(p=><option key={p.personId} value={p.personId}>{p.name}</option>)}</select></label></FilterBar>}
   {loading&&<LoadingIndicator>A consultar áreas e oportunidades…</LoadingIndicator>}
   {error&&<div role="alert" className="alert alert-error">{error==='limit'?<>O cálculo completo das correspondências excede a capacidade atual. Não foram apresentados resultados. Pode <Link to="/catalogo">consultar o catálogo diretamente</Link>; esta consulta não apresenta correspondências calculadas.</>:'Não foi possível consultar as correspondências. Os resultados não foram calculados; tente novamente.'} {error==='retry'&&<button className="btn btn-outline" onClick={()=>setRetry(n=>n+1)}>Tentar novamente</button>}</div>}
@@ -69,8 +69,8 @@ function MatchingResult({row,personMode}){
   <div className="matching-result-header">
    <div>
     <h3><Link to={href}>{title}</Link></h3>
-    {!personMode&&<p className="matching-meta">
-     {row.origin==='CENTRAL'?'Catálogo C4G':'Privada'}{row.programmeName&&` · ${row.programmeName}`}
+    {!personMode&&(row.origin!=='CENTRAL'||row.programmeName)&&<p className="matching-meta">
+     {[row.origin==='CENTRAL'?null:'Privada',row.programmeName].filter(Boolean).join(' · ')}
     </p>}
    </div>
    {!personMode&&<OpportunityTiming row={row}/>}

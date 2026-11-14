@@ -11,6 +11,9 @@
     "test": "node test-harness/node_modules/vitest/vitest.mjs run --config test-harness/vitest.config.js"
   },
   "dependencies": {
+    "@tiptap/pm": "3.32.2",
+    "@tiptap/react": "3.32.2",
+    "@tiptap/starter-kit": "3.32.2",
     "axios": "^1.21.0",
     "lucide-react": "^0.446.0",
     "react": "^18.3.0",

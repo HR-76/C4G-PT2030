@@ -13,7 +13,7 @@ import { OpportunityReadModelDetails } from '../Opportunities/OpportunityReadMod
 import UnitSelector, { unitLabel } from './UnitSelector'
 import useInterestCommand, { interestError } from './useInterestCommand'
 import { safeInterestReturn } from './intentions'
-import ApplicationAreaNav, { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
+import { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
 import './interests.css'
 
 const date = value => value ? new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleDateString('pt-PT') : 'Não indicado'
@@ -70,9 +70,7 @@ function InterestList({ userId, organizationId, organization }) {
     setParams(copy)
   }
   function applyFilters(values) {
-    const next = new URLSearchParams(values)
-    if (location.pathname === '/candidaturas') next.set('ver', 'interesses')
-    setParams(next)
+    setParams(new URLSearchParams(values))
   }
   async function prepareApplication(item) {
     if (openingRequest.current || loading || commandLocked || !canPrepareApplication(item)) return
@@ -94,8 +92,7 @@ function InterestList({ userId, organizationId, organization }) {
       if (current()) setOpeningError([401, 403, 404].includes(error?.response?.status) ? interestError(error) : 'Não foi possível preparar a candidatura. Tente novamente para consultar os dados atuais.')
     } finally { if (current()) { openingRequest.current = null; setOpeningId(null) } }
   }
-  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses da organização"><Link className="btn btn-outline" to="/catalogo">Catálogo C4G</Link></ApplicationAreaHeader>
-    <ApplicationAreaNav/>
+  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses"><Link className="btn btn-outline" to="/catalogo">Oportunidades</Link><Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link></ApplicationAreaHeader>
     <Feedback command={command}/>
     <FilterBar as="form" onSubmit={event => { event.preventDefault(); applyFilters(Object.fromEntries(Object.entries(draft).filter(([,value]) => value))) }}>
       <label className="filter-search">Pesquisar<SearchInput maxLength={200} value={draft.q} onChange={event => setDraft(previous => ({ ...previous, q: event.target.value }))}/></label>
@@ -115,6 +112,7 @@ function InterestList({ userId, organizationId, organization }) {
   </main>
 }
 function InterestDetail({ id, userId, organizationId }) {
+  const { organization: sessionOrganization } = useAuth()
   const [params] = useSearchParams(), location = useLocation(), navigate = useNavigate(), alive = useRef(true), generation = useRef(0), openingMutex = useRef(false)
   const [opening, setOpening] = useState(false)
   const [record, setRecord] = useState(null), [history, setHistory] = useState([]), [historyNext, setHistoryNext] = useState(null), [historyBusy, setHistoryBusy] = useState(false)
@@ -180,7 +178,7 @@ function InterestDetail({ id, userId, organizationId }) {
       </form> : <><p className="pre-wrap">{record.notes || 'Sem notas.'}</p><Units transversal={record.transversal} unitIds={record.unitIds} units={record.units}/></>}</section>
       <section className="detail-section"><h2>Oportunidade</h2>{model ? <OpportunityReadModelDetails readModel={model} fields={snapshot}/> : <dl className="interest-source"><dt>Referência</dt><dd>{snapshot.callReference || 'Não indicada'}</dd><dt>Programa</dt><dd>{snapshot.programmeName || 'Não indicado'}</dd><dt>Financiador</dt><dd>{snapshot.funderName || 'Não indicado'}</dd><dt>Abertura</dt><dd>{date(snapshot.openingDate)}</dd><dt>Prazo oficial</dt><dd>{date(snapshot.closingDate)}</dd></dl>}
         {snapshot.sourceTemporal?.deadlines?.length > 1 && <><h3>Prazos publicados</h3><ul>{snapshot.sourceTemporal.deadlines.map(value => <li key={value}><time dateTime={value}>{value.length === 10 ? date(value) : new Date(value).toLocaleString('pt-PT')}</time></li>)}</ul></>}
-        <div className="form-actions"><Link className="btn btn-outline" to={`/catalogo/${record.opportunityId}`}>Consultar oportunidade</Link>{official && <a className="btn btn-outline" href={official} target="_blank" rel="noopener noreferrer">Fonte oficial</a>}<Link className="btn btn-outline" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link></div>
+        <div className="form-actions"><Link className="btn btn-outline" to={`/catalogo/${record.opportunityId}`}>Consultar oportunidade</Link>{official && <a className="btn btn-outline" href={official} target="_blank" rel="noopener noreferrer">Fonte oficial</a>}{sessionOrganization?.navigation?.people===true&&<Link className="btn btn-outline" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}</div>
       </section>
       <div id="candidaturas-do-interesse" tabIndex={-1}><OpportunityApplications organizationId={organizationId} opportunityId={record.opportunityId}/></div>
       <section className="detail-section"><h2>Histórico</h2><ol className="interest-history">{history.map(item => <li key={item.revision}>Revisão {item.revision} · {({ CREATE:'Interesse registado',REGISTER:'Interesse registado',EDIT:'Análise alterada',ARCHIVE:'Interesse arquivado' })[item.action || item.kind] || 'Alteração'} · {date(item.recordedAt || item.createdAt)}{item.reason && <p>{item.reason}</p>}<details><summary>Dados desta revisão</summary><p className="pre-wrap">{item.notes || 'Sem notas.'}</p><Units transversal={item.transversal} unitIds={item.unitIds} units={item.units}/></details></li>)}</ol>{historyNext && <button className="btn btn-secondary" disabled={historyBusy} onClick={moreHistory}>Mais histórico</button>}</section>

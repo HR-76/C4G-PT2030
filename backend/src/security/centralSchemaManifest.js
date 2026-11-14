@@ -146,7 +146,8 @@ function schemaFingerprint(snapshot) {
 async function validateCentralSchemaSnapshot(client, snapshot, version, observedFingerprint) {
   const expectedFingerprint = EXPECTED_CENTRAL_SCHEMA_SHA256_BY_VERSION[version];
   if (!expectedFingerprint) throw new Error(`Central schema fingerprint is not defined for ${version}.`);
-  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)) {
+  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)
+    && !require('./stagingCentralRuntimeAdmission').admits(version, 'schema', observedFingerprint)) {
     throw new Error(`Central schema drift detected for ${version} (observed fingerprint ${observedFingerprint}).`);
   }
   if(registeredManifest.find(entry=>entry.version===version)?.authoritySecurityFingerprint)
@@ -178,7 +179,7 @@ async function assertCentralSchemaForVersions(client, versions) {
   const snapshot = await centralSchemaSnapshot(client,{compactAuthority:true,includeF12Receipt:versions.includes('036_f12_service_authority'),
     includeF12ReplayCapacity:capacity && (await client.query("SELECT to_regclass('f12_replay_capacity.reservation') IS NOT NULL AS installed")).rows[0]?.installed === true});
   const fingerprint = schemaFingerprint(snapshot);
-  const entry = registeredManifest.find(item => versions.includes(item.version) && (item.schemaFingerprint === fingerprint || require('./memberEmailAdmission').admits(item.version, 'schema', fingerprint)));
+  const entry = registeredManifest.find(item => versions.includes(item.version) && (item.schemaFingerprint === fingerprint || require('./memberEmailAdmission').admits(item.version, 'schema', fingerprint) || require('./stagingCentralRuntimeAdmission').admits(item.version, 'schema', fingerprint)));
   if (!entry) throw Object.assign(new Error('CENTRAL_SCHEMA_VERSION_NOT_ADMITTED'), { code: 'CENTRAL_SCHEMA_VERSION_NOT_ADMITTED' });
   await validateCentralSchemaSnapshot(client, snapshot, entry.version, fingerprint);
   return Object.freeze({ version: entry.version, fingerprint });

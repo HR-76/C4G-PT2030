@@ -201,7 +201,7 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
    const projectionData=['get','calendar','workMine','workGet','taskDelete','documentGet','partnersGet','browse','browsePage','unitOptions','report','reportExport','dashboard'].includes(s.method)
     ?require('./protectedAuthoritySnapshot').createProtectedAuthoritySnapshot({actor:context.actor,data,withAuthority:coordinator.withAuthority,assertCurrent,clock}):data;
    const readAuthority=require('./readAuthority').createReadAuthority({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock,includeWork:['calendar','workMine'].includes(s.method)});
-   const capability=require('./browseAuthority').createTransitionCapability({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock});
+   const capability=require('./browseAuthority').createTransitionCapability({catalogs,policyVersion,recentMfaRequirement,data:projectionData,context,assertCurrent,clock,snapshotForResource});
    const uiCapabilities={get:['APPLICATION_EDIT','APPLICATION_TRANSITION'],workGet:['APPLICATION_WORK_EDIT'],documentGet:['APPLICATION_DOCUMENT_EDIT','APPLICATION_REVIEW_DECIDE','DOCUMENT_UPLOAD_INITIATE'],partnersGet:['APPLICATION_EDIT']};
    const isUiCapability=op=>uiCapabilities[s.method]?.includes(op)===true;
    const usesTaskDetails=['browsePage','calendar','workGet','workMine'].includes(s.method)||s.method.startsWith('task');
@@ -216,13 +216,18 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     const decision=await guard.protect(client,{handle:s.handle,operationCode:'APPLICATION_WORK_READ',resource:resource(org,org)});
     s.guard=decision.token;
     await drain();
-    if(!await isOrganizationAdmin())fail('NOT_AUTHORIZED');
+    // Same policy that tells the client whether to offer the calendar.
+    const profile=await projectionData.authorizationDataPort.load(context.actor);
+    if(!profile)fail('SERVICE_UNAVAILABLE');
+    if(require('../organizationDirectory/accessProfiles').navigationFor(profile.profileCode)?.calendar!==true)fail('NOT_AUTHORIZED');
     return organizationCalendar.read(client,{organizationId:org,authority:await readAuthority(),clock,taskDetailsAvailable},s.input);
    }
    const repository=createApplicationRepository({organizationId:org,organizationName:s.organizationName,actor:context.actor,cursor:tokens,centralOrigin,centralCurrent,notify:alerts.notify,
     taskDetailsAvailable,
     recordStatusEmail:statusEmailProducer||(statusEmailIsolatedCapture===true?require('./statusEmails/producer').createProducer({mode:'isolated',isolated:true,clock:()=>clock.now(),capture:require('./statusEmails/capture').createCapture({centralPool:{query:(sql,values)=>coordinator.withAuthority(()=>coordinator.pool.query(sql,values))},organizationId:org,actorUserId:context.actor.id,assertAuthorized:assertCurrent})}):undefined),
     readAuthority,transitionCapability:id=>capability(resource(id,org)),
+    // A Técnico only sees the applications of their teams, so the creator joins the one just created.
+    creatorJoinsTeam:async()=>{const current=await data.authorizationDataPort.load(context.actor);if(!current)fail('SERVICE_UNAVAILABLE');return current.profileCode==='CONTRIBUTOR'},
     responsibleDirectory:()=>readResponsibleDirectory({client,organizationId:org,responsibles,assertCurrent}),
     canReadStrategyAlignment:async()=>{
      if(s.method!=='dashboard'||!reportChecks.length)return false;
@@ -272,6 +277,7 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     audit:(c,entry)=>audit(c,s,entry),authorize:async(op,target)=>{if(isUiCapability(op))return capability(target,op);const decision=await authorization.authorize(op,context,target);await drain();return decision.allowed},
     protect:async args=>{const decision=await guard.protect(client,{handle:s.handle,...args});s.guard=decision.token;await drain();return decision}});
    const partnersRepository=createPartnersRepository({organizationId:org,actor:context.actor,cursor:tokens,audit:(c,entry)=>audit(c,s,entry),
+    browseAllowed:async()=>{const current=await data.authorizationDataPort.load(context.actor);if(!current)fail('SERVICE_UNAVAILABLE');return require('../organizationDirectory/accessProfiles').navigationFor(current.profileCode)?.partners===true},
     protect:async args=>{const decision=await guard.protect(client,{handle:s.handle,...args});s.guard=decision.token;await drain();return decision},
     authorize:async(op,target)=>{if(isUiCapability(op))return capability(target,op);const key=JSON.stringify([op,target]);if(decisions.has(key)){coordinator.assert(s.guard,client,preparedAuthorityBinding(client).transactionId);return decisions.get(key)}
      const decision=await authorization.authorize(op,context,target);await drain();if(!decision.allowed&&/AUDIT|UNAVAILABLE|STALE|MEMBERSHIP|POLICY_INVALID/.test(decision.reasonCode))fail('SERVICE_UNAVAILABLE');decisions.set(key,decision.allowed);return decision.allowed;}});

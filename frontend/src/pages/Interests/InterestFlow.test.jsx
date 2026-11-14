@@ -55,7 +55,7 @@ it('distinguishes a confirmed interest with a success label and keeps its catalo
  expect(status.classList.contains('catalog-interest-status-success')).toBe(true)
  expect(status.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
  const link=screen.getByRole('link',{name:'Consultar na lista de interesses'}),target=new URL(link.getAttribute('href'),'https://example.invalid')
- expect(target.pathname).toBe('/candidaturas');expect(target.searchParams.get('destaque')).toBe('interest')
+ expect(target.pathname).toBe('/interesses');expect(target.searchParams.get('destaque')).toBe('interest')
  expect(screen.queryByRole('button',{name:/Registar interesse/})).toBeNull();expect(api.create).not.toHaveBeenCalled()
 })
 it('shows success only after the save response and prevents duplicate submissions while saving',async()=>{

@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
   return rows.some(row => row.version === receiptManifest.at(-1).version) ? receiptManifest : knownManifest;
 }
 
@@ -288,9 +289,25 @@ module.exports.applyRegisteredCentralImportPackage=applyRegisteredCentralImportP
 async function applyRegisteredBillingPdfsPackage(pool,packageId){
  const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/billingPdfMigrationPackage');
  if(packageId!==PACKAGE_ID)throw Error('BILLING_PDF_PACKAGE_NOT_REGISTERED');
- return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+ // Its own manifest, not knownManifest: installing billing PDFs must never pull in a later package.
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').billingPdfManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
 }
 module.exports.applyRegisteredBillingPdfsPackage=applyRegisteredBillingPdfsPackage;
+
+// Email template installation is explicit; existing package entrypoints never apply it.
+async function applyRegisteredEmailTemplatesPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/emailTemplateMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('EMAIL_TEMPLATES_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+}
+module.exports.applyRegisteredEmailTemplatesPackage=applyRegisteredEmailTemplatesPackage;
+// Central runtime read grants are explicit too; they apply on top of the 051 chain and never through existing entrypoints.
+async function applyRegisteredCentralRuntimeReadPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/centralRuntimeReadPackage');
+ if(packageId!==PACKAGE_ID)throw Error('CENTRAL_RUNTIME_READ_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').centralRuntimeReadManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:require('../src/security/centralMigrationManifest').centralRuntimeReadManifest});
+}
+module.exports.applyRegisteredCentralRuntimeReadPackage=applyRegisteredCentralRuntimeReadPackage;
 
 async function applyRegisteredF12ReceiptPackage(pool) {
   const { receiptManifest } = require('../src/security/centralMigrationManifest');

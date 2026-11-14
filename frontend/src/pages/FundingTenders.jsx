@@ -52,7 +52,7 @@ export default function FundingTenders() {
   const visibleRuns=(data?.runs||[]).slice((currentHistoryPage-1)*HISTORY_PAGE_SIZE,currentHistoryPage*HISTORY_PAGE_SIZE)
   const workerUnavailable=Boolean(data?.worker&&!data.worker.ready)
   const run=data?.lastRun, running=['QUEUED','RUNNING'].includes(run?.status)
-  const configured=['fixture','live-demo','live-local','live-rehearsal'].includes(data?.sourceMode)
+  const configured=['fixture','live-demo','live-local','live-rehearsal','live-staging'].includes(data?.sourceMode)
   const enabled=data?.collection?.sources || ['EU_FUNDING_TENDERS']
   async function update(source) {
     const owner=session.current

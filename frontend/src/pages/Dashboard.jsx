@@ -16,6 +16,7 @@ import { getSourceName } from '../utils/sourceUi'
 import { catalogPeriodDates, catalogFilterParams } from './Opportunities/catalogFilters'
 import useOrganizationDashboard from '../hooks/useOrganizationDashboard'
 import TechnicianDashboard from './TechnicianDashboard'
+import { usesTechnicianDashboard } from '../utils/dashboardVariant'
 
 function Stat({ label, value, detail, to, action }) {
   const content = <><strong className="stat-num">{value ?? '—'}</strong><span className="stat-lbl">{label}</span>{detail && <small>{detail}</small>}{action && <span className="dashboard-stat-action">{action} <ArrowRight size={13} aria-hidden="true"/></span>}</>
@@ -39,7 +40,7 @@ function StatusRows({ values = {} }) {
 
 export default function Dashboard() {
   const { user, organization } = useAuth()
-  if (organization?.profileCode === 'CONTRIBUTOR') return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} />
+  if (usesTechnicianDashboard(organization)) return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} />
   return <OrganizationDashboard key={JSON.stringify([user?.id, organization?.id])} user={user} organization={organization} />
 }
 

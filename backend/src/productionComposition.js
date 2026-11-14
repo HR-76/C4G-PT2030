@@ -147,7 +147,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       generateCsrfToken: security.generateCsrfToken
     });
     composedRoutes = selectAuthRoutes(authConfig.mode, routes, oidcAuth);
-    const centralImports=dependencies.centralImportRuntime||require('./portugal2030/uploadRuntime').configuredCentralImport({pool:centralPool,env});
+    const centralImports=dependencies.centralImportRuntime||require('./portugal2030/uploadRuntime').configuredCentralImport({pool:centralPool,env,authorityPolicy:{policyVersion:authConfig.policyVersion,requirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}});
     if(centralImports)closeCentralImport=dependencies.ownResource?.(centralImports,()=>centralImports.close())||(()=>centralImports.close());
     composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,
       members:memberOnboarding,

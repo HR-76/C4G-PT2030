@@ -86,6 +86,8 @@
 .catalog-summary:not(.catalog-custom) .catalog-summary-programme { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .78rem; }
 .catalog-pilot .catalog-amount { display: block; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
 .catalog-pilot .catalog-amount-note { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .77rem; line-height: 1.35; }
+/* The catalogue table shows only the amount; scope and forecast stay on the opportunity page. */
+.catalog-pilot .habitual-catalog-table .catalog-amount-note { display: none; }
 .catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a { text-decoration: none; }
 .catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a:hover strong { text-decoration: underline; }
 @media (min-width:769px) {
@@ -124,7 +126,20 @@
 @media(min-width:769px) {
  .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:nth-child(n) { width:auto; }
  .catalog-custom .opportunity-analysis-table.habitual-catalog-table th:first-child { width:33%; }
- .catalog-custom.catalog-wide .opportunity-analysis-table.habitual-catalog-table { min-width:1200px; }
+ .catalog-custom.catalog-wide .opportunity-analysis-table.habitual-catalog-table { min-width:960px; width:100%; }
+ /* With all columns visible the text scales with the table's width (container query units),
+    so narrow columns get smaller text instead of breaking words mid-way. */
+ .catalog-custom.catalog-wide .opportunity-table-wrap { container-type:inline-size; }
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table :is(th,td) { font-size:clamp(.62rem, calc(.4rem + .28cqi), .8rem); }
+ /* Programme codes such as ALENTEJO2030 are single words: keep them on one line. */
+ .catalog-custom.catalog-wide .habitual-catalog-table td[data-label="Programa financiador"] { white-space:nowrap; }
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table thead th { font-size:clamp(.62rem, calc(.42rem + .28cqi), .8rem); }
+ .catalog-custom.catalog-wide .habitual-catalog-table .cr-status { white-space:nowrap; }
+ /* The amount must stay on one line; its size shrinks with the table so the number is never cut. */
+ .catalog-custom.catalog-wide .habitual-catalog-table .catalog-amount { white-space:nowrap; font-size:clamp(.6rem, calc(.4rem + .3cqi), .85rem); }
+ /* Badges never exceed their cell; a word is broken only if it cannot fit on its own line. */
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table .intervention-area-badges { min-width:0; }
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table .intervention-area-badge { max-width:100%; overflow-wrap:break-word; font-size:clamp(.6rem, calc(.4rem + .25cqi), .8rem); padding:2px 6px; }
 }
 @media(max-width:768px) {
  .catalog-custom .habitual-catalog-table td:not([hidden]) { display:block; }

@@ -2,6 +2,7 @@
 const http = require('node:http');
 const {createResourceDrain,trackPool,watchServer,trackExpress,deadline}=require('./resourceDrain');
 const {createResourceOwner}=require('./resourceOwner');
+const {configuredCoverage}=require('./fundingTenders/coverageConfig');
 
 function duration(env,name,fallback){const value=env[name]===undefined?fallback:Number(env[name]);if(!Number.isSafeInteger(value)||value<1||value>300000)throw new TypeError(`${name} must be an integer between 1 and 300000.`);return value;}
 
@@ -38,7 +39,7 @@ async function start({production=null,dependencies=null,env=process.env,host=und
       if((env.AUTH_MODE||'oidc')!=='oidc')throw new Error('C4G_API_OIDC_REQUIRED');
       const composition=require('./productionComposition');
       const loader=dependencyLoader||composition.loadProductionDependencies;
-      if(!dependencies){dependencies=loader({ownResource:owner.own});for(const pool of [...new Set([dependencies.centralPool,dependencies.authorityPool].filter(Boolean))]){trackPool(pool);ownedPools.push(pool);}}
+      if(!dependencies){dependencies=loader({ownResource:owner.own});for(const pool of [...new Set([dependencies.centralPool,dependencies.authorityPool].filter(Boolean))]){trackPool(pool);ownedPools.push(pool);}const coverage=await configuredCoverage({env,pool:dependencies.centralPool});if(coverage)dependencies.fundingCoverage=coverage;}
       production=(composer||composition.createProductionComposition)({dependencies,env});
     }
     await production.assertDatabaseReadiness();

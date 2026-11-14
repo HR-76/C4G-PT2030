@@ -1,0 +1,81 @@
+name: c4g-staging-api
+
+services:
+  # Dono da rede da API e do antivírus. A aplicação só aceita um antivírus em 127.0.0.1:3310, por isso a API e o ClamAV
+  # partilham uma rede. Se a API fosse a dona, cada reinício dela criaria uma rede nova e o antivírus ficava agarrado à
+  # antiga (a API entrava em ciclo de reinícios sem o encontrar). Este contentor não faz nada e nunca reinicia com a API.
+  # Se for recriado, recriar também api e clamav: `up -d --force-recreate pod api clamav`.
+  # A imagem é fixa e pequena, independente da versão da aplicação: se dependesse de C4G_RELEASE, cada atualização recriava o
+  # pod e o ClamAV ficava agarrado à rede antiga (a API não ficava pronta).
+  pod:
+    image: alpine:3.20
+    init: true
+    restart: unless-stopped
+    command: ["sleep", "infinity"]
+    ports:
+      - "127.0.0.1:8500:5000"
+    networks: [default, data]
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/staging/Dockerfile
+    image: c4g-staging-api:${C4G_RELEASE:?defina C4G_RELEASE com o SHA do commit}
+    init: true
+    restart: unless-stopped
+    network_mode: "service:pod"
+    depends_on: [pod]
+    env_file:
+      - path: /srv/c4g-staging/api-oidc.env
+        format: raw
+      - path: /srv/c4g-staging/api-private.env
+        format: raw
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.pem
+    volumes:
+      - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
+
+  # Antivírus dos ficheiros enviados (PDFs de faturação, carregamento PT2030). Partilha a rede do "pod" com a API e escuta em
+  # 127.0.0.1:3310 dentro dela; não tem porta publicada.
+  # Só arranca com o perfil "storage" (ver o runbook). Descarrega as assinaturas ao arrancar, o que demora alguns minutos.
+  clamav:
+    profiles: ["storage"]
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    network_mode: "service:pod"
+    depends_on: [pod]
+    volumes:
+      - clamav-db:/var/lib/clamav
+    healthcheck:
+      test: ["CMD-SHELL", "clamdcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+  # Recolha de oportunidades. Não arranca com o resto: só com o perfil "collection" (ver o runbook), porque
+  # faz chamadas à API pública da Comissão Europeia. Usa o mesmo ficheiro de variáveis que a API.
+  worker:
+    profiles: ["collection"]
+    image: c4g-staging-api:${C4G_RELEASE:?defina C4G_RELEASE com o SHA do commit}
+    init: true
+    restart: unless-stopped
+    command: ["node", "src/worker.js"]
+    env_file:
+      - path: /srv/c4g-staging/api-oidc.env
+        format: raw
+      - path: /srv/c4g-staging/api-private.env
+        format: raw
+    environment:
+      NODE_EXTRA_CA_CERTS: /certs/ca.pem
+    volumes:
+      - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
+    networks: [default, data]
+
+volumes:
+  clamav-db:
+
+networks:
+  data:
+    external: true
+    name: c4g-staging-data
