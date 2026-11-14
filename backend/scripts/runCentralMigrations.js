@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === billingValidationManifest.at(-1).version)) return billingValidationManifest;
   if (rows.some(row => row.version === opportunityComplementManifest.at(-1).version)) return opportunityComplementManifest;
   if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
   return rows.some(row => row.version === receiptManifest.at(-1).version) ? receiptManifest : knownManifest;
@@ -355,3 +356,11 @@ async function applyRegisteredF12FailureCapacityPackage(pool) {
   });
 }
 module.exports.applyRegisteredF12FailureCapacityPackage = applyRegisteredF12FailureCapacityPackage;
+
+async function applyRegisteredBillingValidationPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/billingValidationMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('BILLING_VALIDATION_PACKAGE_NOT_REGISTERED');
+ const {billingValidationManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,billingValidationManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:billingValidationManifest});
+}
+module.exports.applyRegisteredBillingValidationPackage=applyRegisteredBillingValidationPackage;

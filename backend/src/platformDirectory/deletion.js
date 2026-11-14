@@ -26,6 +26,7 @@ function createUserDeletion({coordinator,identity,projection,issuer,policyVersio
   return first(c,q.phase,[id,key,phase]);
  });}
  return Object.freeze({
+ async ready(){return coordinator.withAuthority(async()=>{await coordinator.pool.query(q.operation,['00000000-0000-4000-8000-000000000001']);return {ready:true};});},
  async status(id,req){
   id=uuid(id);return coordinator.withAuthority(async()=>{
    const c=coordinator.pool;await authorize(c,req);

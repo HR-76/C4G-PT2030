@@ -21,6 +21,7 @@ if(purpose==='MEMBERSHIP'&&process.env.USER_DELETION_RUNTIME==='central'){
  const deletionProjection=require('../platformDirectory/deletionProjection').createDeletionProjection({bindings:config.bindings,allowedResidency:config.allowedResidency});
  methods.deleteIdentity=x=>deletionIdentity.remove(x);
  methods.erasePerson=x=>deletionProjection.anonymize(x);
+ methods.deletionReady=()=>deletionProjection.ready();
 }
 if(purpose==='MEMBERSHIP'){
  const email=require('./activationEmail').createActivationEmail({key:config.ownershipKey,apiKey:process.env.RESEND_API_KEY,from:process.env.ACTIVATION_EMAIL_FROM,origin:process.env.ACTIVATION_PUBLIC_URL});

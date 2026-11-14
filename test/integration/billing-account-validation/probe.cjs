@@ -34,6 +34,8 @@ async function run({pool,port,base}) {
   await c.query('COMMIT');
  } catch(e) {await c.query('ROLLBACK');throw e} finally {c.release()}
  const runtime=new Pool({host:'127.0.0.1',port,user:'c4g_f12_admin',database:'postgres',options:'-c role=c4g_central_runtime'});
+ const deliveryPool=new Pool({host:'127.0.0.1',port,user:'c4g_f12_admin',database:'postgres',options:'-c role=c4g_billing_validation_worker'});
+ const claim=async()=> (await deliveryPool.query('SELECT public.billing_validation_email_claim() AS value')).rows[0].value;
  const request=(who='admin',org=ids.orgA,v=version,k=key)=>runtime.query('SELECT public.billing_validation_request($1,$2,$3,$4,$5,$6) AS id',[sessions[who],ids[who],org,v,k,requestId]);
  const confirm=(who='orgAdminA',org=ids.orgA,v=version)=>runtime.query('SELECT public.billing_validation_confirm($1,$2,$3,$4,$5) AS id',[sessions[who],ids[who],org,requestId,v]);
  try {
@@ -43,6 +45,20 @@ async function run({pool,port,base}) {
   assert.equal((await request()).rows[0].id,requestId);
   assert.equal((await request('admin',ids.orgA,version,randomUUID())).rows[0].id,requestId);
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM public.billing_account_validation_email')).rows[0].n,1);
+  const read=async(who,org,admin)=>(await runtime.query('SELECT public.billing_validation_read($1,$2,$3,$4) AS value',[sessions[who],ids[who],org,admin])).rows[0].value;
+  const visible=await read('orgAdminA',ids.orgA,false);
+  assert.equal(visible.status,'PENDING');assert.equal(visible.versionId,version);assert.equal(visible.account.notes,undefined);
+  await assert.rejects(()=>read('orgAdminB',ids.orgA,false),/NOT_AUTHORIZED/);
+  await assert.rejects(()=>read('contributorA',ids.orgA,false),/NOT_AUTHORIZED/);
+  await assert.rejects(()=>runtime.query('SELECT public.billing_validation_email_claim()'),/permission denied/);
+  const firstDelivery=await claim();assert.equal(firstDelivery.organizationId,ids.orgA);
+  assert.equal(await claim(),null,'leased delivery cannot be claimed twice');
+  assert.equal((await deliveryPool.query('SELECT public.billing_validation_email_finish($1,$2,false) AS ok',[firstDelivery.id,randomUUID()])).rows[0].ok,false);
+  await deliveryPool.query('SELECT public.billing_validation_email_finish($1,$2,false)',[firstDelivery.id,firstDelivery.token]);
+  await pool.query("UPDATE public.billing_account_validation_email SET available_at=clock_timestamp() WHERE id=$1",[firstDelivery.id]);
+  const retry=await claim();assert.equal(retry.id,firstDelivery.id);assert.notEqual(retry.token,firstDelivery.token);
+  await deliveryPool.query('SELECT public.billing_validation_email_finish($1,$2,true)',[retry.id,retry.token]);
+  assert.equal((await read('admin',ids.orgA,true)).email.accepted,1);
   await assert.rejects(()=>confirm('orgAdminB'),/NOT_AUTHORIZED/);
   await assert.rejects(()=>confirm('contributorA'),/NOT_AUTHORIZED/);
   await assert.rejects(()=>confirm('orgAdminB',ids.orgB),/RESOURCE_NOT_AVAILABLE/);
@@ -50,6 +66,7 @@ async function run({pool,port,base}) {
   assert.equal((await confirm()).rows[0].id,requestId);
   await confirm();
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM public.billing_account_validation_confirmation')).rows[0].n,1);
+  assert.equal((await read('admin',ids.orgA,true)).status,'CONFIRMED');
   await assert.rejects(()=>runtime.query('DELETE FROM public.billing_account_validation_confirmation'),/permission denied/);
   await pool.query("SET session_replication_role='replica'");
   await pool.query("INSERT INTO public.billing_account_version(id,billing_account_id,organization_id,version,legal_name,tax_country,tax_identifier,address_line_1,postal_code,locality,billing_email,payment_terms_days,created_by) SELECT $1,billing_account_id,organization_id,2,legal_name,tax_country,tax_identifier,'Nova rua',postal_code,locality,billing_email,payment_terms_days,created_by FROM public.billing_account_version WHERE id=$2",[nextVersion,version]);
@@ -59,10 +76,14 @@ async function run({pool,port,base}) {
   await assert.rejects(()=>confirm('orgAdminA',ids.orgA,nextVersion),/STALE_REVISION/);
   await assert.rejects(()=>request('admin',ids.orgA,nextVersion),/IDEMPOTENCY_CONFLICT/);
   await assert.rejects(()=>request('admin',ids.orgA,version,randomUUID()),/STALE_REVISION/);
+  assert.equal((await read('admin',ids.orgA,true)).status,'OUTDATED');
+  await runtime.query('SELECT public.billing_validation_request($1,$2,$3,$4,$5,$6)',[sessions.admin,ids.admin,ids.orgA,nextVersion,randomUUID(),randomUUID()]);
   await pool.query("SET session_replication_role='replica'");
   await pool.query("UPDATE public.organization_membership SET status='SUSPENDED',suspended_at=clock_timestamp() WHERE global_user_id=$1",[ids.orgAdminA]);
   await pool.query("SET session_replication_role='origin'");
   await assert.rejects(()=>confirm(),/NOT_AUTHORIZED/);
- } finally {await runtime.end()}
+  assert.deepEqual(await claim(),{skipped:true},'revoked recipient is cancelled before delivery');
+  assert.equal(await claim(),null);
+ } finally {await runtime.end();await deliveryPool.end()}
 }
 module.exports={run};

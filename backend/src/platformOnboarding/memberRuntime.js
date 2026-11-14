@@ -46,7 +46,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   const settings = readSettings(directory, env);
   const port = bridgePort(env);
   const worker = createWorker(path.join(directory, 'worker.json'));
-  let service = null, oidc = null, bridgeServer = null, started = null;
+  let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null;
 
   function createMemberOnboarding({ authorityCoordinator, authConfig }) {
     service = createService({ coordinator: authorityCoordinator, issuer: settings.issuer, policyVersion: authConfig.policyVersion,
@@ -63,6 +63,11 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   function start() {
     return started ||= (async () => {
       if (!service) throw invalid('MEMBER_ONBOARDING_NOT_COMPOSED');
+      if(env.USER_DELETION_RUNTIME==='central'){
+        if(!deletionService)throw invalid('DELETION_NOT_CONFIGURED');
+        await deletionService.ready();
+        if((await worker.call('deletionReady',{}))?.ready!==true)throw invalid('DELETION_NOT_CONFIGURED');
+      }
       oidc = await createOidc({ issuer: settings.issuer, origin: settings.origin, manualClientId: settings.manualClientId,
         existingClientId: settings.existingClientId, callbackPath: ACTIVATION_PATH + '/callback', service,
         passwordReady: subject => worker.call('passwordReady', { subject }) });
@@ -92,10 +97,11 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
 
   function createUserDeletion({authorityCoordinator,authConfig}){
     if(env.USER_DELETION_RUNTIME!=='central')return null;
-    return require('../platformDirectory/deletion').createUserDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
+    deletionService=require('../platformDirectory/deletion').createUserDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
       policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy['recent-mfa'],
       audit:require('./audit').createOnboardingAudit(),
       identity:{remove:value=>worker.call('deleteIdentity',value)},projection:{anonymize:value=>worker.call('erasePerson',value)}});
+    return deletionService;
   }
   return Object.freeze({ createMemberOnboarding, createUserDeletion, start, close });
 }

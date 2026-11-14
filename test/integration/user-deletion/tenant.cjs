@@ -10,9 +10,11 @@ module.exports=async function tenantProof({admin,connection,backend,base}){
   await pool.query('REVOKE ALL ON SCHEMA public FROM PUBLIC; REVOKE ALL ON DATABASE isolated_tenant FROM PUBLIC; GRANT CONNECT,CREATE ON DATABASE isolated_tenant TO c4g_tenant_owner; GRANT CONNECT ON DATABASE isolated_tenant TO c4g_tenant_migrator,c4g_tenant_runtime');
   await pool.query('ALTER ROLE c4g_tenant_runtime IN DATABASE isolated_tenant SET search_path TO pg_catalog,c4g_app');
   const manifest=load('src/security/tenantMigrationManifest');
-  await load('src/security/tenantMigrationRunner').createTenantMigrationRunner({pool,entries:manifest.chatRetentionManifest,observationPublisher:{async publish(){}},timeoutMs:120000,scheduler:{setTimeout,clearTimeout}}).migrate({tenantId:randomUUID(),databaseGenerationId:randomUUID(),expectedRevision:1,correlationId:'deletion-proof',idempotencyKey:'deletion-proof'});
+  const tenantId=randomUUID(),databaseGenerationId=randomUUID();
+  const runner=load('src/security/tenantMigrationRunner').createTenantMigrationRunner;
+  await runner({pool,entries:manifest.chatRetentionManifest,observationPublisher:{async publish(){}},timeoutMs:120000,scheduler:{setTimeout,clearTimeout}}).migrate({tenantId,databaseGenerationId,expectedRevision:1,correlationId:'deletion-proof',idempotencyKey:'deletion-proof'});
   const sql=fs.readFileSync(path.join(backend,'database/tenant/migrations/041_account_identity_erasure.up.sql'),'utf8');
-  await pool.query('BEGIN');try{await pool.query(sql);await pool.query('COMMIT');}catch(e){await pool.query('ROLLBACK');throw e;}
+  await runner({pool,entries:manifest.accountIdentityErasureManifest,requiredBaseVersion:manifest.CHAT_RETENTION_SCHEMA_VERSION,observationPublisher:{async publish(){}},timeoutMs:120000,scheduler:{setTimeout,clearTimeout}}).migrate({tenantId,databaseGenerationId,expectedRevision:2,correlationId:'deletion-proof',idempotencyKey:'deletion-proof-erasure'});
   const schema=load('src/security/tenantSchemaFingerprint');
   const evidence={schemaFingerprint:schema.tenantSchemaFingerprint(await schema.tenantSchemaSnapshot(pool)),sqlChecksum:manifest.checksumSql(sql)};
   fs.writeFileSync(path.join(base,'tenant-fingerprints.json'),JSON.stringify(evidence,null,2));console.log(JSON.stringify({tenant:evidence}));
