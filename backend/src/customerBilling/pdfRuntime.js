@@ -16,6 +16,6 @@ function configuredBillingPdfs({pool,customerService,env=process.env}) {
   }
   const service=createPdfService({repository:createPdfRepository(pool),storageFactory:org=>forOrg(org).storage,scannerFactory:org=>forOrg(org).scanner,
     customerAuthorize:async request=>(await customerService.execute('authorizePdf',{},null,request)).organizationId});
-  return {service,async ready(){await require('../security/centralSchemaManifest').assertCentralSchemaForVersions(pool,['050_billing_private_documents','051_email_templates']);const probe=forOrg('00000000-0000-4000-8000-000000000001');if(!(await probe.storage.health()).ready||!(await probe.scanner.health()).ready)throw Error('BILLING_PDF_INFRASTRUCTURE_UNAVAILABLE')},async close(){await Promise.all([...ports.values()].map(value=>value.storage.shutdown()))}};
+  return {service,async ready(){await require('../security/centralSchemaManifest').assertCentralSchemaForVersions(pool,['050_billing_private_documents','051_email_templates','052_central_runtime_read']);const probe=forOrg('00000000-0000-4000-8000-000000000001');if(!(await probe.storage.health()).ready||!(await probe.scanner.health()).ready)throw Error('BILLING_PDF_INFRASTRUCTURE_UNAVAILABLE')},async close(){await Promise.all([...ports.values()].map(value=>value.storage.shutdown()))}};
 }
 module.exports={configuredBillingPdfs};

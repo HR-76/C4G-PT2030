@@ -44,3 +44,17 @@ test('the explicit entrypoint refuses any other package id', async () => {
   await assert.rejects(() => runner.applyRegisteredCentralRuntimeReadPackage({}, 'email-templates-v1'), /CENTRAL_RUNTIME_READ_PACKAGE_NOT_REGISTERED/);
   assert.equal(PACKAGE_ID, 'central-runtime-read-v1');
 });
+
+// Found on the staging VPS on 14/11/2026: each of these lists stopped at 051, so the API refused to start (or to serve
+// storage) once the Central ledger reached 052. Every list of admitted Central versions must know the latest package.
+test('every runtime allowlist of Central versions admits 052', () => {
+  const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+  const latest = manifest.centralRuntimeReadManifest.at(-1).version;
+  assert.equal(latest, entry.version);
+  for (const file of ['src/security/catalogReaderSchema.js', 'src/security/catalogReaderSecurity.js', 'src/customerBilling/pdfRuntime.js']) {
+    assert.ok(read(file).includes(`'${latest}'`), `${file} does not admit ${latest}`);
+  }
+  for (const file of ['src/portugal2030/uploadRuntime.js', 'src/opportunities/catalogRead/ledgerContract.js']) {
+    assert.ok(read(file).includes('centralRuntimeReadPackage'), `${file} does not admit ${latest}`);
+  }
+});
