@@ -58,6 +58,12 @@ Passos de implementação: (1) variáveis do escritor v2 no `env --collection`; 
 
 Por verificar antes de (3): como o `activationComposition.js` compõe as portas `authorize`, `verifyApproval` e `audit` para o executor 11145, e se o estado inicial do controlo da fonte EU numa Central nova permite configurar o escritor.
 
+## Recolha desligada e Central 052 (14/11/2026)
+
+- **Sintoma:** no ecrã Fontes, a Funding & Tenders dizia «Configuração indisponível» e as outras quatro «Atualização indisponível». O `api-private.env` da VPS tinha sido regenerado sem `--collection` (o `env` não conserva a escolha; decisão do utilizador: fica assim, a opção repete-se em cada regeneração).
+- **Defeito encontrado ao religar (`--collection all-sources`):** API e worker em ciclo de reinícios (`C4G_API_START_FAILED`). Com a Central na 052, `supportsCentralVersion` só consultava a cadeia que termina na 051 e a cobertura durável era recusada (`FUNDING_COVERAGE_SCHEMA_REQUIRED`, reproduzido localmente); o preflight de oportunidades da Central também desconhecia a 052. Sem recolha ligada este caminho não corre.
+- **Correção:** `centralMigrationManifest.js` compara a 052 com a sua cadeia e `opportunities/preflight.js` reconhece-a. Regressões em `fundingCoverageConfigured.test.js` e `f12OpportunityPreflight.test.js`. Backend 3226: 3216 aprovados, 9 ignorados, 1 falha em `documentApiInfrastructure.test.js` que passa isolada; lint aprovado. Não provado contra uma Central 052 real; por aplicar na VPS.
+
 ## Critérios de aceitação
 
 - F1: `preflightCentral` e `preflightTenant` aprovados na 050 e na 040; Central e tenant registam a mesma versão; `/health/ready` com 200; páginas que dependem das migrações 034 a 040 abrem; nenhum dado existente alterado; repetir o comando não altera nada.
