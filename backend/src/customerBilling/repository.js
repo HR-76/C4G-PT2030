@@ -1,7 +1,7 @@
 'use strict';
 
 const { projectionCte } = require('../platformBilling/projectionSql');
-const { createPlatformBillingRepository } = require('../platformBilling/repository');
+const { createPlatformBillingRepository, civilDay } = require('../platformBilling/repository');
 const { query, uuid, fail } = require('../platformBilling/contracts');
 const PAGE_SIZE = 25;
 const pick = (value, keys) => Object.fromEntries(keys.map(key => [key, value[key]]));
@@ -52,7 +52,8 @@ function createCustomerBillingRepository({ billing = createPlatformBillingReposi
     async list(client, organizationId, raw, today) {
       const f=filters(raw), values=[organizationId,f.q,f.from,f.to,f.paymentStatus,f.currency];
       const total=(await client.query(statements.count,values)).rows[0].total;
-      const items=(await client.query(statements.list,[...values,today,(f.page-1)*PAGE_SIZE])).rows;
+      const items=(await client.query(statements.list,[...values,today,(f.page-1)*PAGE_SIZE])).rows
+        .map(row=>({...row,periodStart:civilDay(row.periodStart),periodEnd:civilDay(row.periodEnd),issueDate:civilDay(row.issueDate),dueDate:civilDay(row.dueDate)}));
       return {items,total,page:f.page,pageSize:PAGE_SIZE,origin:'MANUAL_C4G'};
     },
     async summary(client, organizationId, today) {

@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { platformBillingApi } from '../../api/api'
 import { useAuth } from '../../contexts/AuthContext'
 import BillingDialog from './BillingDialog'
-import { activityLabels, billingError, cycleStates, documentStates, documentTypes, formatDate, formatInstant, formatMoney, isConflict, nullable, paymentMethods, paymentStates, today } from './billingPresentation'
+import { activityLabels, billingError, cycleStates, documentSources, documentStates, documentTypes, formatDate, formatInstant, formatMoney, isConflict, nullable, paymentMethods, paymentStates, today } from './billingPresentation'
 import './platform-billing.css'
 
 export default function PlatformBillingDetail() {
@@ -27,7 +27,7 @@ export function BillingDetailView({ cycleId, api = platformBillingApi }) {
   const complete = message => { setAction(null); setNotice(message); load() }
   return <div className="page platform-billing billing-detail">
     <Link className="directory-back" to="/administracao/faturacao"><ArrowLeft size={16} aria-hidden="true"/>Voltar à faturação</Link>
-    <header className="billing-heading"><div><h1>{data?.organizationName || 'Detalhe do ciclo'}</h1>{data && <p>{data.serviceDescription} · {formatDate(data.periodStart)} a {formatDate(data.periodEnd)}</p>}</div><button className="btn btn-outline" disabled={busy} onClick={load}><RefreshCw size={16} aria-hidden="true"/>Atualizar</button></header>
+    <header className="billing-heading"><div><h1>{data?.organizationName || 'Detalhe do ciclo'}</h1>{data && <p>{data.serviceDescription} · {formatDate(data.periodStart)} a {formatDate(data.periodEnd)} · Valor do ciclo {formatMoney(data.cycleAmount, data.currency)}</p>}</div><button className="btn btn-outline" disabled={busy} onClick={load}><RefreshCw size={16} aria-hidden="true"/>Atualizar</button></header>
     {notice && <div className="alert alert-success" role="status">{notice}</div>}
     {error && <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={load}>Tentar novamente</button></div>}
     {busy && !data && <div className="billing-loading" role="status"><span/>A carregar o ciclo…</div>}
@@ -68,7 +68,7 @@ function ActionBar({ data, onAction }) {
 }
 
 function DocumentList({ data, onAction }) {
-  return <div className="billing-record-list">{data.documents.map(document => <article key={document.id}><div className="billing-record-mark">{document.type === 'CREDIT_NOTE' ? 'NC' : document.type === 'DEBIT_NOTE' ? 'ND' : 'FT'}</div><div><strong>{document.number}</strong><span>{documentTypes[document.type] || document.type} · {document.sourceCode}</span><small>Emitido em {formatDate(document.issueDate)} · vence {formatDate(document.dueDate)}</small><BillingPdf documentId={document.id} platform/></div><div className="billing-record-value"><strong>{formatMoney(document.total, document.currency)}</strong><Status type="document" value={document.state}/></div>{(document.allowedActions?.cancel || document.allowedActions?.credit) && <div className="billing-record-actions">{document.allowedActions.cancel && <button className="btn btn-danger btn-sm" onClick={() => onAction({ kind: 'documentTransition', document, toState: 'CANCELLED' })}>Cancelar</button>}{document.allowedActions.credit && <button className="btn btn-outline btn-sm" onClick={() => onAction({ kind: 'documentTransition', document, toState: 'CREDITED' })}>Marcar creditado</button>}</div>}</article>)}</div>
+  return <div className="billing-record-list">{data.documents.map(document => <article key={document.id}><div className="billing-record-mark">{document.type === 'CREDIT_NOTE' ? 'NC' : document.type === 'DEBIT_NOTE' ? 'ND' : 'FT'}</div><div><strong>{document.number}</strong><span>{documentTypes[document.type] || document.type} · {documentSources[document.sourceCode] || document.sourceCode}</span><small>Emitido em {formatDate(document.issueDate)} · vence {formatDate(document.dueDate)}</small><BillingPdf documentId={document.id} platform/></div><div className="billing-record-value"><strong>{formatMoney(document.total, document.currency)}</strong><Status type="document" value={document.state}/></div>{(document.allowedActions?.cancel || document.allowedActions?.credit) && <div className="billing-record-actions">{document.allowedActions.cancel && <button className="btn btn-danger btn-sm" onClick={() => onAction({ kind: 'documentTransition', document, toState: 'CANCELLED' })}>Cancelar</button>}{document.allowedActions.credit && <button className="btn btn-outline btn-sm" onClick={() => onAction({ kind: 'documentTransition', document, toState: 'CREDITED' })}>Marcar creditado</button>}</div>}</article>)}</div>
 }
 
 function PaymentList({ payments, onAction }) {
@@ -89,7 +89,7 @@ function BillingActionDialog({ action, data, api, onClose, onRefresh, onComplete
   const destructive = action.kind === 'cancelCycle' || action.kind === 'reversal' || (action.kind === 'documentTransition' && action.toState === 'CANCELLED')
   const field = (name, value) => { setForm(old => ({ ...old, [name]: value })); setReview(false) }
   const submit = async event => {
-    event.preventDefault(); if (requiresReview && !review) { setReview(true); return }
+    event.preventDefault(); if (requiresReview && !review) { setError(''); setConflict(false); setReview(true); return }
     setBusy(true); setError(''); setConflict(false)
     try { await executeAction(api, action, data, form, key.current); onComplete(successMessage(action)) }
     catch (reason) { setError(billingError(reason)); setConflict(isConflict(reason)); setReview(false) }

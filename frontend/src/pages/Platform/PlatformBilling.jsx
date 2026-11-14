@@ -8,7 +8,7 @@ import { platformBillingApi, platformDirectoryApi } from '../../api/api'
 import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { useAuth } from '../../contexts/AuthContext'
 import BillingDialog from './BillingDialog'
-import { billingError, cleanParams, cycleStates, formatDate, formatMoney, nullable, paymentStates } from './billingPresentation'
+import { billingError, cleanParams, cycleStates, documentTypes, formatDate, formatMoney, nullable, paymentStates } from './billingPresentation'
 import { accountLabels, accountLimits, overLimit, profileDifferences, profileSuggestions } from './billingAccountPrefill'
 import './platform-billing.css'
 
@@ -98,7 +98,7 @@ function CycleTable({ items }) {
   return <div className="table-wrap billing-table-wrap" role="region" aria-label="Tabela de ciclos de faturação" tabIndex={0}><table role="table" className="data-table mobile-card-table billing-table"><caption className="sr-only">Ciclos de faturação</caption><thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Entidade</th><th role="columnheader" scope="col">Período</th><th role="columnheader" scope="col">Documento</th><th role="columnheader" scope="col">Datas</th><th role="columnheader" scope="col">Total</th><th role="columnheader" scope="col">Pago</th><th role="columnheader" scope="col">Saldo</th><th role="columnheader" scope="col">Estados</th><th role="columnheader" scope="col"></th></tr></thead><tbody role="rowgroup">{items.map(item => <tr role="row" key={item.cycleId}>
     <td role="cell" data-label="Entidade"><strong>{item.organizationName}</strong><small>{item.organizationLegalName !== item.organizationName ? item.organizationLegalName : item.serviceDescription}</small></td>
     <td role="cell" data-label="Período">{formatDate(item.periodStart)}<small>até {formatDate(item.periodEnd)}</small></td>
-    <td role="cell" data-label="Documento">{item.document ? <>{item.document.number}<small>{item.document.type}</small></> : <span className="billing-muted">Por registar</span>}</td>
+    <td role="cell" data-label="Documento">{item.document ? <>{item.document.number}<small>{documentTypes[item.document.type] || item.document.type}</small></> : <span className="billing-muted">Por registar</span>}</td>
     <td role="cell" data-label="Datas"><span>{formatDate(item.document?.issueDate || item.plannedIssueDate)}</span><small>Vence {formatDate(item.document?.dueDate || item.dueDate)}</small></td>
     <td role="cell" data-label="Total" className="billing-money">{formatMoney(item.adjustedTotal, item.currency)}</td><td role="cell" data-label="Pago" className="billing-money">{formatMoney(item.paidAmount, item.currency)}</td><td role="cell" data-label="Saldo" className="billing-money billing-balance">{formatMoney(item.balanceAmount, item.currency)}</td>
     <td role="cell" data-label="Estados"><div className="billing-state-stack"><Status kind="cycle" value={item.cycleState}/><Status kind="payment" value={item.paymentState} overdue={item.overdue}/></div></td>
