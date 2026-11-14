@@ -11,8 +11,16 @@ async function run({pool,port,base}) {
  await runner.applyRegisteredBillingPdfsPackage(pool,'billing-private-documents-v1');
  await runner.applyRegisteredEmailTemplatesPackage(pool,'email-templates-v1');
  await runner.applyRegisteredCentralRuntimeReadPackage(pool,'central-runtime-read-v1');
+ if(process.argv.includes('--staging')) {
+  for(const login of ['c4g_central_staging_api','c4g_central_staging_worker']) {
+   await pool.query(`CREATE ROLE ${login} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD 'synthetic-gate-only'`);
+   await pool.query(`GRANT c4g_central_runtime TO ${login} WITH INHERIT TRUE, SET FALSE, ADMIN FALSE`);
+   await pool.query(`GRANT CONNECT ON DATABASE postgres TO ${login}`);
+  }
+  process.env.C4G_STAGING_CENTRAL_RUNTIME_LOGINS='admitted-v1';
+ }
  await runner.applyRegisteredOpportunityComplementPackage(pool,'opportunity-complement-v1');
- if(process.argv.includes('--calibrate')) await pool.query(fs.readFileSync(path.resolve(__dirname,'../../../backend/database/central/candidates/billing_account_validation.up.sql'),'utf8'));
+ if(process.argv.includes('--calibrate')) await pool.query(manifest.canonicalizeMigrationSql(fs.readFileSync(path.resolve(__dirname,'../../../backend/database/central/candidates/billing_account_validation.up.sql'),'utf8')));
  else {
   await runner.applyRegisteredBillingValidationPackage(pool,'billing-account-validation-v1');
   assert.deepEqual(await runner.applyRegisteredBillingValidationPackage(pool,'billing-account-validation-v1'),[]);
@@ -41,8 +49,8 @@ async function run({pool,port,base}) {
  try {
   await assert.rejects(()=>request('outsider'),/C4G_ADMIN_REQUIRED/);
   await assert.rejects(()=>request('orgAdminA'),/C4G_ADMIN_REQUIRED/);
-  assert.equal((await request()).rows[0].id,requestId);
-  assert.equal((await request()).rows[0].id,requestId);
+  const concurrent=await Promise.all([request(),request()]);
+  assert.deepEqual(concurrent.map(item=>item.rows[0].id),[requestId,requestId]);
   assert.equal((await request('admin',ids.orgA,version,randomUUID())).rows[0].id,requestId);
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM public.billing_account_validation_email')).rows[0].n,1);
   const read=async(who,org,admin)=>(await runtime.query('SELECT public.billing_validation_read($1,$2,$3,$4) AS value',[sessions[who],ids[who],org,admin])).rows[0].value;
@@ -64,7 +72,7 @@ async function run({pool,port,base}) {
   await assert.rejects(()=>confirm('orgAdminB',ids.orgB),/RESOURCE_NOT_AVAILABLE/);
   await assert.rejects(()=>confirm('admin'),/NOT_AUTHORIZED/);
   assert.equal((await confirm()).rows[0].id,requestId);
-  await confirm();
+  await Promise.all([confirm(),confirm()]);
   assert.equal((await pool.query('SELECT count(*)::int AS n FROM public.billing_account_validation_confirmation')).rows[0].n,1);
   assert.equal((await read('admin',ids.orgA,true)).status,'CONFIRMED');
   await assert.rejects(()=>runtime.query('DELETE FROM public.billing_account_validation_confirmation'),/permission denied/);

@@ -51,7 +51,7 @@ function selectAuthRoutes(mode, routes, oidcAuth = null) {
 function createProductionComposition({ dependencies, env, logger = null, isolatedCatalogAdmission = null, isolatedSessionReadConcurrency = false, observeSessionTiming = null, isolatedSessionTouchCoalescing = false }) {
   if(isolatedSessionTouchCoalescing&&!require('./opportunities/catalogRead/isolatedAdmission').isIsolatedAdmission(isolatedCatalogAdmission))throw new TypeError('Isolated admission required for session touch coalescing');
   const { express, cors, centralPool, routes = {} } = dependencies;
-  let closeBillingPdfs=async()=>{},readyBillingPdfs=async()=>{};
+  let closeBillingPdfs=async()=>{},readyBillingPdfs=async()=>{},readyBillingValidation=async()=>{};
   let closeReceiptRecovery = async () => {}, readyReceiptRecovery = async () => {};
   const authConfig = loadAuthConfig(env);
   require('./security/secretFormat').requireProductionSecret(env, 'AUTHORITY_COMMIT_PERMIT_SECRET');
@@ -166,6 +166,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]
     });
     const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:centralPool,customerService:customerBillingService}):null;
+    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation']);
     const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:centralPool,customerService:customerBillingService,env});
     if(billingPdfs)readyBillingPdfs=()=>billingPdfs.ready();
     if(billingPdfs)closeBillingPdfs=dependencies.ownResource?.(billingPdfs,()=>billingPdfs.close())||(()=>billingPdfs.close());
@@ -357,7 +358,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     app, authMode: authConfig.mode, importsRuntime,authorizationCatalogs, auditBootstrap, documentBootstrap,
     closeOpportunityRuntime:async()=>{try{if(ownsPlatformLogs)await platformLogs.flush();await closeCatalogReadConnection();}finally{await closeReceiptRecovery();await closeCentralImport();await closeBillingPdfs();await closeDocumentInfrastructure();await closeCatalogReader();await closeOwnedTenantPools();}},
     organizationalScopes, taxonomies, profileAuthoring,profileCompetencies,profileFinancial,profileOperational,profilePopulations,observability, featureTelemetry, logger, port: env.PORT || 5000,
-    assertDatabaseReadiness:async()=>{await databaseReadiness.assertReady();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
+    assertDatabaseReadiness:async()=>{await databaseReadiness.assertReady();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await readyBillingValidation();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
     logFrontendUrlHealth: () => logFrontendUrlHealth(env, logger)
   };
 }

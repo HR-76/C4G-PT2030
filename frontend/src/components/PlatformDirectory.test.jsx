@@ -10,6 +10,19 @@ const user={id:'u',name:'Conta C4G',email:'admin@example.invalid',status:'ACTIVE
 const profile={fields:{},revision:0,updatedAt:null,source:'CENTRAL',sourceRevision:0,complete:false}
 const response=items=>({data:{items,total:items.length,page:1,pageSize:50}})
 const api=()=>({entities:vi.fn().mockResolvedValue(response([entity])),users:vi.fn().mockResolvedValue(response([user])),entity:vi.fn().mockResolvedValue({data:entity}),entityProfile:vi.fn().mockResolvedValue({data:{organization:entity,registration:profile}}),saveEntityProfile:vi.fn().mockResolvedValue({data:profile})})
+it('offers deletion only when the server advertises it and opens a confirmation',async()=>{
+ const client=api();client.users.mockResolvedValue(response([{...user,canDelete:true}]));
+ client.userDeletionStatus=vi.fn().mockResolvedValue({data:{phase:'NOT_STARTED',expectedRevision:1}});
+ client.deleteUser=vi.fn();mount(client,'/administracao/entidades/utilizadores');
+ fireEvent.click(await screen.findByRole('button',{name:'Eliminar conta'}));
+ await screen.findByRole('dialog',{name:'Eliminar conta'});
+ expect((await screen.findByRole('button',{name:'Eliminar permanentemente'})).disabled).toBe(true);
+ expect(client.deleteUser).not.toHaveBeenCalled();
+});
+it('does not advertise deletion while the feature is unavailable',async()=>{
+ const client=api();mount(client,'/administracao/entidades/utilizadores');await screen.findByText(user.email);
+ expect(screen.queryByRole('button',{name:'Eliminar conta'})).toBeNull();
+});
 function mount(client,path='/administracao/entidades'){return render(<MemoryRouter initialEntries={[path]}><Routes><Route path="/administracao/entidades" element={<DirectoryView api={client}/>}/><Route path="/administracao/entidades/utilizadores" element={<DirectoryView api={client}/>}/><Route path="/administracao/entidades/:entityId" element={<DirectoryView api={client}/>}/></Routes></MemoryRouter>)}
 it('shows real entity data and opens its member list without selecting the organization',async()=>{
  const client=api();mount(client);await screen.findByText('Entidade A');fireEvent.click(screen.getByRole('link',{name:'Consultar Entidade A'}));await screen.findByRole('heading',{name:'Ficha da entidade'});

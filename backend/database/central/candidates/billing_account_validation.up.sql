@@ -1,4 +1,4 @@
--- Candidate only. Requires Central 051 or later. Not registered or applied.
+-- Central 054. Explicit installation after 053; never applied by API startup.
 -- Requests and confirmations are separate, append-only records. Email delivery
 -- is an outbox intent; no external side effect occurs inside these functions.
 CREATE TABLE public.billing_account_validation_request (

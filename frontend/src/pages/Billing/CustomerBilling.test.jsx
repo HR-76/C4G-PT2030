@@ -67,3 +67,9 @@ describe('faturação do cliente — reabertura', () => {
     finally{clearDirectoryCache()}
   })
 })
+
+it('keeps the entity hint from email out of invoice filters', async () => {
+ const a=api();a.validation=vi.fn(()=>response({enabled:false}));mount(a,'/faturacao?validarEntidade=other-org');
+ await screen.findByText('FT 2026/1');expect(a.invoices).toHaveBeenCalledWith({},expect.anything());expect(a.validation).not.toHaveBeenCalled();
+ expect(screen.getByText(/outra entidade/)).toBeTruthy()
+})

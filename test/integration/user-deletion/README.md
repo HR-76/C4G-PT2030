@@ -1,0 +1,11 @@
+# Account deletion gates
+
+`node test/integration/user-deletion/gate.cjs` creates a new PostgreSQL 18 cluster on an ephemeral localhost port under `.tmp/user-deletion-*`, bootstraps Central 053 plus the existing member-email patch and Tenant 040, then tests the new Central candidate and the registered Tenant 041 migration. It never reads application credentials or existing databases. It stops its own cluster in `finally`.
+
+The Central proof uses the real authority coordinator, runtime role, audit writer, commit permits and protocol. It checks revocation before external work, failed-provider recovery, replay, anonymization and preservation of a different account. The tenant proof checks migration via the runner, RLS rejection across organizations, redaction of identity fields in immutable receipts, preserved IDs, idempotence and rejection of identity restoration.
+
+`keycloak.cjs` is a separate integration proof for an empty Keycloak 26.8.0 instance. It creates a synthetic realm, a worker with the same three management roles as the member worker, and two synthetic users; deletes one, repeats the deletion and verifies the other still exists. It requires a **disposable container with network none, no ports and no mounted production data**, and a Node process sharing only that container's network namespace. Do not point it at the staging Keycloak. Docker is not available on the current Windows host, so this proof must run in the isolated VPS container before enabling the feature.
+
+Runtime selection is opt-in: `USER_DELETION_RUNTIME=central`, with the member runtime configured. Startup checks the Central candidate and every configured tenant binding for capability `ACCOUNT_IDENTITY_ERASURE`. Update all tenant binding snapshots to the registered 041 schema before enabling it. The frontend receives `canDelete` only when this runtime is selected. Never enable it on a legacy image or apply SQL without exact schema checks, a validated backup and the isolated proofs.
+
+Installing schemas does not delete any user. Real account deletion additionally requires an authenticated C4G administrator, recent MFA, typed confirmation, an idempotent request and last-administrator/self-account checks.

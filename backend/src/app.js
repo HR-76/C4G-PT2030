@@ -14,6 +14,7 @@ function billingEndpointCatalog() {
     'GET /api/admin/billing/summary', 'GET /api/admin/billing/cycles',
     'GET /api/admin/billing/cycles/:cycleId',
     'GET/PUT /api/admin/billing/organizations/:organizationId/account',
+    'GET/POST /api/admin/billing/organizations/:organizationId/account/validation',
     'POST /api/admin/billing/cycles', 'PUT /api/admin/billing/cycles/:cycleId',
     'POST /api/admin/billing/cycles/:cycleId/transitions',
     'POST /api/admin/billing/cycles/:cycleId/documents',
