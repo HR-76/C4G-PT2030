@@ -37,6 +37,18 @@ Keycloak 26.8.0 de imagem oficial, contentor `c4g-staging-keycloak-keycloak-1` (
 
 ## Limites conhecidos
 
+### Correção de entrega na Central 053 (14/11/2026, em curso)
+
+O staging está na Central `053_opportunity_complement`, variante genérica (flag de logins de staging desligada). O convite foi criado e a operação chegou a READY, mas falta na função `authority_api.execute` a consulta de `memberSql.emailDelivery`. O pacote aditivo existente só tem admissão de fingerprints até à 051. O resultado de entrega ainda não foi confirmado; não recriar o pedido nem o convite.
+
+Âmbito desta correção: ensaiar o pacote existente numa Central 053 descartável, fixar os fingerprints exatos, provar que apenas a definição da função muda, admitir a variante sem enfraquecer as recusas de drift e preparar instalação transacional/idempotente no staging. Preservar ledger, dados, contas, pedidos e convites. A imagem deve admitir o esquema anterior e o corrigido antes de aplicar SQL. Não alterar migrações históricas, conceder privilégios adicionais ou ativar manualmente a membership.
+
+Aceitação: preflight Central, autoridade e catálogo aprovados antes/depois; ensaio da consulta com o papel limitado; rejeição de outras variantes; dados existentes inalterados; repetição sem alterações; recuperação do mesmo pedido pela app e ativação pelo destinatário.
+
+Verificação local desta correção: regressão RED/GREEN da admissão 053; gate em PostgreSQL 18 descartável PASS (snapshot só difere na função, ledger idêntica, consulta admitida com session_user limitado, rollback, instalação e repetição sem alterações). Evidência `.tmp/member-email-053-1794695306853/fingerprints.json`. 20 testes focados PASS; backend 3285 PASS, 9 SKIP; frontend 1099 PASS e um timeout em ApplicationPartners, com os 16 testes desse ficheiro PASS na repetição isolada; lint e build PASS. Não houve aplicação à VPS nesta verificação.
+
+Pacote preparado: `memberEmailRollout.js` admite apenas a Central 053 genérica, verifica alvo, locks, fingerprints e igualdade das linhas de identidades, organizações, memberships, grants, pedidos, convites e ledger antes/depois. Modos `--check`, `--rehearse` (ROLLBACK) e `--apply` idempotente. A imagem derivada `deploy/staging/member-email-053.Dockerfile` contém só a admissão e o comando de rollout, sem atualizar dependências. A transferência SSH falhou; instalação e teste final de ativação continuam pendentes com o operador.
+
 - `worker.json` guarda o snapshot do tenant; depois de um `upgrade` do tenant é preciso regenerá-lo.
 - A ponte e a API de administração usam HTTP dentro da rede Docker privada do Keycloak, na mesma máquina.
 - As páginas de ativação limitam contextos por endereço; atrás do Caddy e da Cloudflare o endereço visto é o do último proxy de confiança.
