@@ -27,6 +27,7 @@ if(purpose==='MEMBERSHIP'){
  const email=require('./activationEmail').createActivationEmail({key:config.ownershipKey,apiKey:process.env.RESEND_API_KEY,from:process.env.ACTIVATION_EMAIL_FROM,origin:process.env.ACTIVATION_PUBLIC_URL});
  methods.activationSecret=x=>email.secret(x);
  methods.activationEmail=x=>email.send(x);
+ methods.testInvitationEmail=x=>email.test(x);
 }
 process.on('message',async m=>{try{if(!Object.hasOwn(methods,m.method))throw Error('WORKER_METHOD_DENIED');const result=await methods[m.method](m.value);process.send?.({id:m.id,result});}catch(e){process.send?.({id:m.id,error:/^[A-Z0-9_]+$/.test(e.code||'')?e.code:'ONBOARDING_STEP_UNCONFIRMED'});}});
 process.on('disconnect',()=>process.exit(0));process.send({ready:true});

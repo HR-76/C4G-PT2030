@@ -52,10 +52,9 @@ function translate(error) {
 }
 
 // Admin C4G API of the invitation template (increment 3 of the email plan).
-// Templates are read and written only here; sending still uses the fixed text.
 // publicBaseUrl is the HTTPS origin emails point at for the logo; without it the preview carries no image.
 function createEmailTemplateService({
-  centralPool, repository = createEmailTemplateRepository(), clock = () => new Date(), uuid = randomUUID, publicBaseUrl = null
+  centralPool, repository = createEmailTemplateRepository(), clock = () => new Date(), uuid = randomUUID, publicBaseUrl = null, testDelivery = null
 }) {
   if (typeof centralPool?.connect !== 'function' || typeof clock !== 'function' || typeof uuid !== 'function'
       || !['isPlatformAdmin', 'organization', 'latest', 'summary', 'write', 'latestLogo'].every(name => typeof repository?.[name] === 'function')) {
@@ -198,14 +197,30 @@ function createEmailTemplateService({
     });
   }
 
-  // Sending, including the test message, arrives with increment 4.
   async function test(typeValue, scopeValue, body, request) {
     templateType(typeValue);
-    await transaction('read', async client => {
-      await authorize(client, request);
-      await scope(client, scopeValue);
+    const payload = await transaction('read', async client => {
+      const who = await authorize(client, request);
+      const { organizationId, name } = await scope(client, scopeValue);
+      if (!testDelivery) fail('EMAIL_DELIVERY_UNAVAILABLE');
+      const input = plainObject(body, ['subject', 'html', 'idempotencyKey']);
+      const idempotencyKey = requestId(input.idempotencyKey);
+      const to = await repository.recipient(client, who.actorId);
+      if (typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) fail('EMAIL_DELIVERY_UNAVAILABLE');
+      const logo = publicOrigin ? await logoForScope(repository, client, organizationId) : null;
+      const message = renderTemplate(input, {
+        organizationName: name || EXAMPLE_ORGANIZATION,
+        // Example date stays stable when an HTTP request is retried.
+        expiresAt: new Date('2030-01-15T12:00:00Z'),
+        logoUrl: logo ? publicOrigin + (logo.url || BUILT_IN_LOGO_PATH) : null,
+        logoAlt: logo?.source === 'ORGANIZATION' ? name : 'C4G'
+      });
+      return { to, message, idempotencyKey };
     });
-    return fail('EMAIL_DELIVERY_UNAVAILABLE');
+    let delivery;
+    try { delivery = await testDelivery(payload); } catch { fail('EMAIL_DELIVERY_UNAVAILABLE'); }
+    if (delivery?.status === 'NOT_CONFIGURED') fail('EMAIL_DELIVERY_UNAVAILABLE');
+    return { to: payload.to, status: delivery?.status === 'ACCEPTED' ? 'ACCEPTED' : 'UNCONFIRMED' };
   }
 
   return Object.freeze({

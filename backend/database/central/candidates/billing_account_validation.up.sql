@@ -158,7 +158,7 @@ BEGIN
  ORDER BY available_at,id LIMIT 1 FOR UPDATE SKIP LOCKED;
  IF NOT FOUND THEN RETURN NULL; END IF;
  SELECT * INTO r FROM public.billing_account_validation_request WHERE id=e.request_id;
- SELECT u.primary_email,o.display_name INTO destination,org_name FROM public.global_user u
+ SELECT u.primary_email,v.legal_name INTO destination,org_name FROM public.global_user u
  JOIN public.organization o ON o.id=r.organization_id AND o.status='ACTIVE'
  JOIN public.billing_account a ON a.organization_id=o.id
  JOIN public.billing_account_version v ON v.billing_account_id=a.id AND v.organization_id=o.id AND v.version=a.current_version AND v.id=r.account_version_id

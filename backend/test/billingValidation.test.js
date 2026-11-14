@@ -60,3 +60,13 @@ test('worker records accepted versus uncertain sends with the leased identity',a
 test('worker never sends cancelled or absent deliveries',async()=>{
  for(const delivery of [null,{skipped:true}]){let sent=0;const worker=createValidationWorker({pool:{query:async()=>({rows:[{delivery}]})},send:async()=>{sent++;return true}});await worker.tick();assert.equal(sent,0)}
 });
+
+test('Central 054 is explicit, checksum-pinned, and follows 053 without changing old entrypoints',()=>{
+ const migration=require('../src/security/centralMigrationManifest');
+ const pack=require('../src/security/billingValidationMigrationPackage');
+ assert.equal(migration.knownManifest.at(-1).version,'051_email_templates');
+ assert.equal(migration.opportunityComplementManifest.at(-1).version,'053_opportunity_complement');
+ assert.equal(migration.billingValidationManifest.at(-1).version,pack.entry.version);
+ assert.equal(migration.supportsCentralVersion(pack.entry.version,'053_opportunity_complement'),true);
+ assert.equal(migration.migrationSql(pack.entry.version,'up').checksum,pack.entry.upChecksum);
+});

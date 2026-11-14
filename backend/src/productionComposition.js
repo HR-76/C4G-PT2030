@@ -122,7 +122,8 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   let closeOwnedTenantPools = async()=>{};
   let functionalRuntimeDependencies = null;
   let emailLogos = null;
-  const memberOnboarding=security&&dependencies.createMemberOnboarding?.({authorityCoordinator,authConfig});
+  const memberOnboarding=security&&dependencies.createMemberOnboarding?.({authorityCoordinator,authConfig,
+    prepareEmail:require('./emailTemplates/invitation').createInvitationTemplate({centralPool,publicBaseUrl:env.PUBLIC_APP_URL})});
   if (security) {
     security.credentialGuard = createCredentialGuard();
     const oidcClient = new OidcClient(authConfig);
@@ -173,11 +174,11 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes.platformBilling=require('./platformBilling/http').createPlatformBillingRouter({
       express,service:platformBillingService,authenticate,pdfs:billingPdfs?.service,validation:billingValidation
     });
-    // Invitation template of the Admin C4G (Central 051). Sending still uses the fixed text until the email plan's increment 4.
+    // Invitation templates (Central 051); provider credentials remain in the member worker.
     // Email logos (the email plan's increment 5): the C4G logo here, each entity's own in its directory, and the public read.
     emailLogos=require('./emailTemplates/logoService').createEmailLogoService({centralPool});
     composedRoutes.platformEmail=require('./emailTemplates/http').createPlatformEmailRouter({
-      express,authenticate,logos:emailLogos,service:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL})
+      express,authenticate,logos:emailLogos,service:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL,testDelivery:memberOnboarding?.testEmail})
     });
     composedRoutes.publicEmailLogos=require('./emailTemplates/logoHttp').createPublicEmailLogoRouter({express,logos:emailLogos});
     // Opportunity complement (Central 053): descriptive data beside a catalog opportunity. Collection from the public

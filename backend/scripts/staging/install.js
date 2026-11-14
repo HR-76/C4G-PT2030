@@ -259,14 +259,15 @@ const TENANT_STEPS = Object.freeze([
   ['037_organization_strategy', (runners, options) => runners.createOrganizationStrategyMigrationRunner(options)],
   ['038_application_task_details', (runners, options) => runners.createApplicationTaskDetailsMigrationRunner(options)],
   ['039_document_deletion', (runners, options) => runners.createDocumentDeletionMigrationRunner(options)],
-  ['040_application_chat_retention', (runners, options) => runners.createChatRetentionMigrationRunner(options)]
+  ['040_application_chat_retention', (runners, options) => runners.createChatRetentionMigrationRunner(options)],
+  ['041_account_identity_erasure', (runners, options) => runners.createAccountIdentityErasureMigrationRunner(options)]
 ]);
 
 async function ledgerHead(pool, sql) {
   return (await pool.query(sql)).rows[0]?.version;
 }
 
-// Brings Central to 053 and the tenant to 040. Without --apply it reports what is pending and changes nothing.
+// Brings Central to 053 and the tenant to 041. Without --apply it reports what is pending and changes nothing.
 // The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
 async function upgrade(env, args) {
   const { config, stateFile } = settings(env);

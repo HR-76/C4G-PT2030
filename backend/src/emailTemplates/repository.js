@@ -6,6 +6,9 @@ const sql = require('./sql');
 // write of a request shares that request's transaction.
 function createEmailTemplateRepository() {
   return Object.freeze({
+    async recipient(client, actorId) {
+      return (await client.query(sql.recipient, [actorId])).rows[0]?.primary_email || null;
+    },
     async isPlatformAdmin(client, sessionId, actorId) {
       return (await client.query(sql.admin, [sessionId, actorId])).rows[0]?.allowed === true;
     },

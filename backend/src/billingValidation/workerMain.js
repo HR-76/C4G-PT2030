@@ -7,7 +7,7 @@ async function start({env=process.env}={}) {
  const send=createValidationTransport({apiKey:env.RESEND_API_KEY,from:env.BILLING_EMAIL_FROM,origin:env.PUBLIC_APP_URL});
  const pool=new Pool({connectionString:env.BILLING_VALIDATION_DATABASE_URL,max:1,connectionTimeoutMillis:10000,statement_timeout:15000});
  try {
-  const result=await pool.query("SELECT NOT rolsuper AND NOT rolcreaterole AND NOT rolcreatedb AND NOT rolbypassrls AND pg_has_role(current_user,'c4g_billing_validation_worker','member') AND NOT pg_has_role(current_user,'c4g_central_runtime','member') AND NOT pg_has_role(current_user,'c4g_authority_owner','member') AS allowed FROM pg_roles WHERE rolname=current_user");
+  const result=await pool.query("SELECT NOT rolsuper AND NOT rolcreaterole AND NOT rolcreatedb AND NOT rolreplication AND NOT rolbypassrls AND pg_has_role(current_user,'c4g_billing_validation_worker','member') AND NOT pg_has_role(current_user,'c4g_central_runtime','member') AND NOT pg_has_role(current_user,'c4g_authority_owner','member') AND NOT pg_has_role(current_user,'c4g_authority_runtime','member') AS allowed FROM pg_roles WHERE rolname=current_user");
   if(result.rows[0]?.allowed!==true)throw Error('BILLING_WORKER_ROLE_REQUIRED');
  }catch(error){await pool.end();throw error}
  const worker=createValidationWorker({pool,send});

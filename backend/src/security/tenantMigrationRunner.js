@@ -371,6 +371,12 @@ function createChatRetentionMigrationRunner({pool,observationPublisher,timeoutMs
     entries:chatRetentionManifest,requiredBaseVersion:DOCUMENT_DELETION_SCHEMA_VERSION});
 }
 
+function createAccountIdentityErasureMigrationRunner({pool,observationPublisher,timeoutMs,scheduler}) {
+  const {accountIdentityErasureManifest,CHAT_RETENTION_SCHEMA_VERSION}=require('./tenantMigrationManifest');
+  return createTenantMigrationRunner({pool,observationPublisher,timeoutMs,scheduler,
+    entries:accountIdentityErasureManifest,requiredBaseVersion:CHAT_RETENTION_SCHEMA_VERSION});
+}
+
 module.exports = { TENANT_MIGRATION_LOCK, TENANT_MIGRATION_OWNERSHIP, boundedTask, createTenantMigrationRunner,
   createRegisteredTenantMigrationRunner, createF12ReceiptTenantMigrationRunner, createF12FailureReceiptTenantMigrationRunner, createAssignedReviewMigrationRunner,
-  createApplicationChatMigrationRunner, createOrganizationStrategyMigrationRunner, createApplicationTaskDetailsMigrationRunner, createDocumentDeletionMigrationRunner, createChatRetentionMigrationRunner };
+  createApplicationChatMigrationRunner, createOrganizationStrategyMigrationRunner, createApplicationTaskDetailsMigrationRunner, createDocumentDeletionMigrationRunner, createChatRetentionMigrationRunner, createAccountIdentityErasureMigrationRunner };

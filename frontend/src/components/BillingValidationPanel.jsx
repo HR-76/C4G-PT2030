@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import './billing-validation.css'
 
 const labels = { NOT_REQUESTED: 'Validação ainda não pedida', OUTDATED: 'Os dados foram alterados. É necessário um novo pedido de validação.', PENDING: 'A aguardar confirmação da entidade', CONFIRMED: 'Dados confirmados pela entidade' }
 const date = value => new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', dateStyle: 'short', timeStyle: 'short' }).format(new Date(value))
@@ -40,7 +41,7 @@ export default function BillingValidationPanel({ api, organizationId, admin = fa
   const account = state?.account
   const rows = account ? [['Denominação legal', account.legalName], ['NIF', account.taxIdentifier], ['País fiscal', account.taxCountry], ['Morada', [account.addressLine1, account.addressLine2].filter(Boolean).join(', ')], ['Código postal', account.postalCode], ['Localidade', account.locality], ['Região', account.region], ['Email de faturação', account.billingEmail], ['Contacto', account.contactName]].filter(([, value]) => value) : []
   const canAct = account && (admin ? ['NOT_REQUESTED', 'OUTDATED'].includes(state.status) : state.status === 'PENDING')
-  return <section className="billing-section" aria-label="Validação dos dados de faturação">
+  return <section className="billing-section billing-validation" aria-label="Validação dos dados de faturação">
     <header><h3>{admin ? 'Validação dos dados guardados' : 'Confirmação dos dados de faturação'}</h3></header>
     {error && <p role="alert">{error}</p>}
     {!state && !error && <p role="status">A consultar validação…</p>}

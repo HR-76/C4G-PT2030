@@ -46,21 +46,31 @@ entidade e pode pedir à entidade que valide os dados.
 - Não confirmar uma versão diferente da que foi apresentada, mesmo havendo edição
   concorrente pela C4G. Leitura e confirmação não dependem de dados em cache.
 
-## Implementação
+## Implementação (14/11/2026)
 
-Acesso direto às fichas implementado no frontend. Pedido, email e confirmação
-ainda por implementar. Exigem persistência Central, nova fronteira de escrita
-ORG_ADMIN e integração com o worker de emails. Não ativar por uma escrita direta
-nas tabelas existentes nem pelo envio de email dentro da transação HTTP.
+- Acesso direto às fichas, preservando escrita versionada, revisão e snapshots.
+- `GET/POST /api/admin/billing/organizations/:organizationId/account/validation`:
+  consulta e pedido C4G. `GET/POST /api/billing/account/validation`: consulta e
+  confirmação ORG_ADMIN da organização autenticada.
+- Revisão explícita dos dados guardados antes de pedir/confirmar. O servidor
+  recusa confirmação de versão desatualizada. A ligação do email não confirma
+  nada nem seleciona automaticamente uma entidade.
+- Central 054: pedido, confirmação imutável e outbox por destinatário; funções
+  fechadas com validação de sessão e locks de conta/membership. O role da API não
+  pode marcar emails como enviados nem modificar diretamente estas tabelas.
+- Worker separado, role dedicado, leases, revalidação do destinatário e retries
+  com a identidade persistida. Email sem dados fiscais nem notas internas.
+- Estado de aceitação pelo fornecedor separado da confirmação dos dados. Não há
+  webhooks de entrega nem botão de reenvio depois de falha definitiva.
+- Ativação explícita por `BILLING_VALIDATION_RUNTIME=central`, após migração e
+  provisionamento do worker. Nada foi ativado em Dev/staging/produção.
+- [Instalação e operação](../runbooks/billing-account-validation.md).
 
-### Estado de verificação
+## Verificação
 
-- Edição direta: 14 testes focados aprovados; lint e build concluídos sem erros.
-- Suite frontend: 1104 aprovados e um timeout em `ApplicationPartners.test.jsx`,
-  já documentado noutras alterações do repositório; repetição isolada: 16 aprovados.
-- SQL candidato preparado com pedido e intenção de email atómicos, confirmação
-  separada, histórico imutável e recusa de versão desatualizada. Não aplicado.
-- Gate PostgreSQL isolado preparado em `test/integration/billing-account-validation`;
-  sintaxe dos scripts verificada com `node --check`, execução aguarda autorização.
-- Ainda não existem endpoints, interface de confirmação, worker de envio nem
-  pacote de migração admitido. O pedido de validação ainda não está disponível.
+- Fronteira SQL provada em PostgreSQL 18 descartável, com dados sintéticos:
+  isolamento, permissões C4G/ORG_ADMIN, versão atual, idempotência, concorrência,
+  lease/retry e cancelamento antes do envio após suspensão do destinatário.
+- Testes focados de interface: 24 aprovados; unitários do serviço/HTTP/transport/
+  worker aprovados. Build concluído. Suites completas e gates finais em verificação.
+- Nenhum email real enviado; não verificado com sessão OIDC real no browser.

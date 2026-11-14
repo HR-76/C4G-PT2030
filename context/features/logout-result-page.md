@@ -1,4 +1,5 @@
 # Página de resultado da saída
+Identidade visual — 14/11/2026: apresentar o logótipo existente `/logo-c4g.png` no topo, em substituição do texto C4G, mantendo o subtítulo Funding Platform. Aceitação: imagem centrada, proporções preservadas, adaptação à largura disponível e texto alternativo C4G.
 Estado: Review — 11/11/2026.
 
 ## Contrato

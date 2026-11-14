@@ -73,6 +73,8 @@ Cada incremento fecha com `node --check`, testes focados, suites completas, lint
 
 ## Progresso
 
+- 14/11/2026 — Incremento 4 autorizado pelo utilizador, em implementação. Critérios: resolver template e logótipo pela entidade da operação autorizada; fixar mensagem sem segredo antes do contacto com o fornecedor, no recibo existente, sob o lock de escrita; reutilizar a mensagem nas repetições e resolver uma nova no reenvio explícito. Conservar metadados dos envios anteriores no recibo, sem os expor na API. Convites anteriores com resultado de envio registado conservam o formato antigo para não mudar o corpo associado à chave do fornecedor. O teste usa apenas o email do administrador lido da Central, marca de teste e ligação `.invalid`; credenciais continuam no worker. Sem migração, envio externo ou deploy nesta etapa. Validar isolamento, concorrência/repetição, recusa de gravação e de autorização, marcador obrigatório e resultado incerto do fornecedor.
+
 - 12/11/2026 — Incremento 1 em Review. `backend/src/emailTemplates/` (contratos, sanitização, texto, composição, template por defeito, validação de logótipo) e `backend/test/emailTemplates.test.js`. Ainda não é chamado por nenhuma rota nem pelo envio do convite: o email enviado continua a ser o atual.
   - Dependência: `sanitize-html` 2.18.1, versão fixa, MIT. A 2.18.2 tinha um dia à data da instalação e foi deixada para depois. `npm audit --omit=dev` sem vulnerabilidades.
   - Validação: 14 testes focados aprovados, `node --check` e lint aprovados. Suite backend: 3147 aprovados, 9 ignorados, 1 falha em `SEC-AC-01` (`test/security/f2Security.test.js`, lê `frontend/src/api/api.js`), fora deste incremento, que não altera o frontend.

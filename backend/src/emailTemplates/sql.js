@@ -5,6 +5,7 @@
 // comes next and who the author is are decided inside the database function.
 
 const admin = 'SELECT public.email_platform_admin($1,$2) AS allowed';
+const recipient = "SELECT primary_email FROM public.global_user WHERE id=$1 AND status='ACTIVE'";
 
 const organization = "SELECT id, display_name FROM public.organization WHERE id=$1 AND status='ACTIVE'";
 
@@ -36,4 +37,4 @@ const logoWrite = 'SELECT version, action, public_id FROM public.email_logo_writ
 
 const publicLogo = 'SELECT mime_type, content FROM public.email_logo_version WHERE public_id=$1';
 
-module.exports = Object.freeze({ admin, organization, latest, summary, write, organizationAdmin, latestLogo, logoWrite, publicLogo });
+module.exports = Object.freeze({ admin, recipient, organization, latest, summary, write, organizationAdmin, latestLogo, logoWrite, publicLogo });
