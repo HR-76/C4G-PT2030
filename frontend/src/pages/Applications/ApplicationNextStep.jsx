@@ -15,6 +15,11 @@ export const NEXT_STEP = Object.freeze({
 // perform it); otherwise the guidance stays plain text.
 const STEP_ACTIONS = Object.freeze({
  IDENTIFIED:[['responsável e o prazo','edit'],['iniciar a preparação','startPreparation']],
+ INTENTION:[['coordenação interna','team']],
+ PREPARATION:[['equipa','team'],['parceiros','partners'],['documentação','documents'],['registar a submissão','registerSubmission']],
+ SUBMITTED:[['documentos da submissão','documents']],
+ CANCELLED:[['motivos do cancelamento','history']],
+ ARCHIVED:[['histórico','history'],['documentos','documents']],
 })
 function guidance(status,actions){
  let parts=[NEXT_STEP[status]||'Acompanhar o histórico e manter a candidatura atualizada.']

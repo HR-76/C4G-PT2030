@@ -210,6 +210,13 @@ function ApplicationRecord() {
     function renderDetails() {
       const responsibleName=record.responsibleName||responsibles.find(item=>item.membershipId===record.responsibleMembershipId)?.name
         || (record.responsibleMembershipId?'Responsável associado':'Não identificado')
+      // Next-step guidance actions: reveal the tab (focus scrolls it into view).
+      const openTab=section=>{const tab=document.getElementById(`application-tab-${section}`);tab?.click();tab?.focus()}
+      const openStatusChange=()=>{
+        document.getElementById('application-tab-overview')?.click()
+        // Wait for the overview panel to be revealed before focusing inside it.
+        setTimeout(()=>{const panel=document.getElementById('alterar-estado');if(!panel)return;panel.open=true;panel.querySelector('input')?.focus()},0)
+      }
       return (<>
       <header className="application-record-header">
         <div><p className="application-client-context">{organization?.displayName || organization?.name || organization?.label || 'Organização selecionada'}</p>
@@ -224,11 +231,9 @@ function ApplicationRecord() {
       </header>
       <div className="application-priority"><ApplicationNextStep status={record.status} showNavigation={false} actions={{
         edit:record.canEdit!==false?()=>setEditOpen(true):null,
-        startPreparation:transitions.includes('PREPARATION')?()=>{
-          document.getElementById('application-tab-overview')?.click()
-          // Wait for the overview panel to be revealed before focusing inside it.
-          setTimeout(()=>{const panel=document.getElementById('alterar-estado');if(!panel)return;panel.open=true;panel.querySelector('input')?.focus()},0)
-        }:null,
+        startPreparation:transitions.includes('PREPARATION')?openStatusChange:null,
+        registerSubmission:transitions.includes('SUBMITTED')?openStatusChange:null,
+        team:()=>openTab('team'),partners:()=>openTab('partners'),documents:()=>openTab('documents'),history:()=>openTab('history'),
       }}/>
       {record.canEdit!==false&&!['CANCELLED','ARCHIVED'].includes(record.status)&&<><button type="button" className="btn btn-primary" onClick={()=>setEditOpen(true)}>Editar dados e orçamento</button>{editOpen&&<FormModal title="Editar dados e orçamento" locked={busy} onClose={()=>setEditOpen(false)}><div className="application-edit-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}<form className="edit-form" onSubmit={e=>submit(e,'edit')}>{fields}<div className="form-actions"><button className="btn btn-primary" type="submit" disabled={locked}>Guardar alterações</button></div></form></div></FormModal>}</>}
       </div>
