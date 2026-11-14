@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react'
 import {Globe, BookOpen, GraduationCap, Network, Map, RefreshCw} from 'lucide-react'
-import {fundingTendersApi as api} from '../api/api'
+import {fundingTendersApi as api, authApi} from '../api/api'
 import {useAuth} from '../contexts/AuthContext'
 import InfoTooltip from '../components/InfoTooltip'
 import {scheduleWhenVisible} from '../utils/visiblePolling'
@@ -24,11 +24,13 @@ export default function FundingTenders() {
   const [historyPage,setHistoryPage] = useState(1)
   const [snapshot,setSnapshot] = useState(null), [error,setError] = useState(''), [busy,setBusy] = useState(false)
   const [fresh,setFresh] = useState(false), [refresh,setRefresh] = useState(0), [pending,setPending] = useState(false)
+  // The update needs a recent authentication (403 MFA_REQUIRED): the page offers to renew it and comes back here.
+  const [needsAuth,setNeedsAuth] = useState(false)
   const session = useRef({userId:user?.id,alive:true,intention:null,sending:false})
   if (session.current.userId !== user?.id) session.current = {userId:user?.id,alive:true,intention:null,sending:false}
   useEffect(() => {
     const owner=session.current; owner.alive=true
-    setSnapshot(null);setError('');setBusy(false);setPending(false);setFresh(false);setHistoryPage(1)
+    setSnapshot(null);setError('');setBusy(false);setPending(false);setFresh(false);setHistoryPage(1);setNeedsAuth(false)
     return () => {owner.alive=false}
   },[user?.id])
   useEffect(() => {
@@ -38,7 +40,8 @@ export default function FundingTenders() {
       try {
         const response=await api.status()
         if (!active || !owner.alive || owner!==session.current) return
-        setSnapshot({owner,value:response.data});setFresh(true);setError('')
+        // A status read that follows a refused update keeps that refusal on screen, with the way to renew the authentication.
+        setSnapshot({owner,value:response.data});setFresh(true);if(!owner.authRequired)setError('')
         if (['QUEUED','RUNNING'].includes(response.data.lastRun?.status)) cancel=scheduleWhenVisible(load,1500)
         else if(response.data.worker) cancel=scheduleWhenVisible(load,15000)
       } catch(e) {if(active && owner.alive && owner===session.current){setFresh(false);setError(errorText(e))}}
@@ -57,7 +60,7 @@ export default function FundingTenders() {
   async function update(source) {
     const owner=session.current
     if(owner.sending || !fresh || !configured || (workerUnavailable&&!owner.intention) || !enabled.includes(source) || (owner.intention && owner.intention.source!==source) || (running && !owner.intention)) return
-    owner.sending=true;owner.intention ||= {requestId:crypto.randomUUID(),source};setBusy(true);setError('')
+    owner.sending=true;owner.intention ||= {requestId:crypto.randomUUID(),source};setBusy(true);setError('');owner.authRequired=false;setNeedsAuth(false)
     try {
       await api.update(owner.intention.requestId, owner.intention.source)
       if(!owner.alive || owner!==session.current) return
@@ -67,7 +70,16 @@ export default function FundingTenders() {
       if([400,401,403,409].includes(e?.response?.status)||['FUNDING_WORKER_UNAVAILABLE','FUNDING_WORKER_UPGRADE_REQUIRED'].includes(e?.response?.data?.error?.code)) {owner.intention=null;setPending(false);setFresh(false)}
       else setPending(true)
       setError(errorText(e))
+      // Nothing was requested: read the state again so the sources stay usable once the authentication is renewed.
+      if(e?.response?.data?.error?.code==='MFA_REQUIRED'){owner.authRequired=true;setNeedsAuth(true);setRefresh(value=>value+1)}
     } finally {owner.sending=false;if(owner.alive && owner===session.current)setBusy(false)}
+  }
+  async function renew() {
+    try {
+      const {data:policy}=await authApi.stepUpPolicy()
+      if(typeof policy?.mfaOptional!=='boolean') throw Error('POLICY')
+      authApi.stepUp(policy.mfaOptional ? 'recent-auth' : 'recent-mfa','/integracoes')
+    } catch {if(session.current.alive)setError('Não foi possível iniciar a renovação da autenticação. Termine a sessão e entre de novo.')}
   }
   return <div className="page funding-sources"><div className="funding-heading"><h1>Fontes de oportunidades</h1><button className="btn btn-outline" type="button" disabled={busy} onClick={()=>setRefresh(value=>value+1)}><RefreshCw size={14} aria-hidden="true"/>Consultar estado</button></div>
     {data?.worker&&<section className="funding-health" data-ready={data.worker.ready} aria-label="Saúde da recolha">
@@ -75,7 +87,7 @@ export default function FundingTenders() {
       {workerUnavailable&&<p>As novas atualizações estão suspensas. Os pedidos já registados e as oportunidades anteriores estão preservados.</p>}
       <details><summary>Detalhes do serviço</summary><p>Último sinal do serviço: {date(data.worker.lastHeartbeatAt)}</p><p>Última verificação da fila: {date(data.worker.lastPollAt)}</p></details>
     </section>}
-    {error && <div className="alert alert-error" role="alert">{error}{data && <p>Os dados abaixo correspondem à última consulta válida.</p>}</div>}
+    {error && <div className="alert alert-error" role="alert">{error}{needsAuth ? <p><button type="button" className="btn btn-primary" onClick={renew}>Confirmar autenticação</button></p> : data && <p>Os dados abaixo correspondem à última consulta válida.</p>}</div>}
     {data?.sourceMode==='fixture' && <p role="status">Modo de teste: dados sintéticos, sem oportunidades reais.</p>}
     <div className="funding-source-grid">{sources.map(source => {
       const available=enabled.includes(source.code)

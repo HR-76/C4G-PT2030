@@ -231,3 +231,44 @@ it('two command instances cannot overwrite an in-flight intention', async()=>{
  expect(readInterestIntention('user','org').id).toBe('interest')
  await act(async()=>{finish({data:record});await pending})
 })
+it('shows the interest without waiting for the units of the analysis form',async()=>{
+ let finishUnits;api.units.mockReturnValue(new Promise(resolve=>{finishUnits=resolve}))
+ page('/interesses/interest')
+ await screen.findByRole('heading',{name:'Aviso de ensaio'})
+ expect(screen.queryByText('A carregar interesse…')).toBeNull()
+ expect(screen.getByRole('button',{name:'Preparar candidatura'})).toBeTruthy()
+ await act(async()=>finishUnits({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}}))
+ expect(await screen.findByRole('button',{name:'Guardar análise'})).toBeTruthy()
+})
+it('reopens an interest with the confirmed record at once, reads it again and never shows it to another user',async()=>{
+ const first=page('/interesses/interest');await screen.findByRole('heading',{name:'Aviso de ensaio'});first.unmount()
+ const never=new Promise(()=>{});api.get.mockReturnValue(never);api.history.mockReturnValue(never)
+ const calls=api.get.mock.calls.length
+ const second=page('/interesses/interest')
+ expect(screen.getByRole('heading',{name:'Aviso de ensaio'})).toBeTruthy();expect(screen.queryByText('A carregar interesse…')).toBeNull()
+ expect(api.get.mock.calls.length).toBe(calls+1)
+ second.unmount();auth.user={id:'other'}
+ page('/interesses/interest');expect(screen.queryByRole('heading',{name:'Aviso de ensaio'})).toBeNull()
+})
+it('removes the confirmed interest when the new read is refused',async()=>{
+ const first=page('/interesses/interest');await screen.findByRole('heading',{name:'Aviso de ensaio'});first.unmount()
+ api.get.mockRejectedValue({response:{status:403}})
+ page('/interesses/interest');await screen.findByRole('alert')
+ expect(screen.queryByRole('heading',{name:'Aviso de ensaio'})).toBeNull()
+})
+it('hands the interest and the opportunity just read to the application form',async()=>{
+ let handed
+ const Form=()=>{handed=useLocation().state;return <p>Formulário de candidatura</p>}
+ const before=Date.now()
+ render(<MemoryRouter initialEntries={['/interesses/interest']}><Routes><Route path='/interesses/:id' element={<Interests/>}/><Route path='/candidaturas' element={<Form/>}/></Routes></MemoryRouter>)
+ fireEvent.click(await screen.findByRole('button',{name:'Preparar candidatura'}))
+ await screen.findByText('Formulário de candidatura')
+ expect(handed.centralOpportunity.record.revisionId).toBe('current-revision');expect(handed.centralOpportunity.readAt).toBeGreaterThanOrEqual(before)
+ expect(handed.sourceInterest.record.interestId).toBe('interest');expect(handed.sourceInterest.record.revision).toBe(1);expect(handed.sourceInterest.readAt).toBeGreaterThanOrEqual(before)
+})
+it('reopens the list with the confirmed unit filter at once',async()=>{
+ api.list.mockResolvedValue({data:{items:[],nextCursor:null,capabilities:{canRegister:true}}})
+ const first=page('/interesses');await screen.findByRole('option',{name:/Projetos/});first.unmount()
+ api.units.mockReturnValue(new Promise(()=>{}));api.list.mockReturnValue(new Promise(()=>{}))
+ page('/interesses');expect(screen.getByRole('option',{name:/Projetos/})).toBeTruthy()
+})

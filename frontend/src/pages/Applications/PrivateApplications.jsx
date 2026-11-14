@@ -87,7 +87,7 @@ export function ApplicationRecord() {
   },[org,userId,id])
   const navigationState = useLocation().state, alertQuery = navigationState?.alertQuery
   // A central opportunity read moments ago by «Iniciar candidatura» in the table.
-  const handed = navigationState?.centralOpportunity
+  const handed = navigationState?.centralOpportunity, handedInterest = navigationState?.sourceInterest
   const fromAlerts = Boolean(id) && typeof alertQuery === 'string'
   const returnTo=fromAlerts ? '/notificacoes' + (alertQuery ? '?' + alertQuery : '') : applicationReturnTarget(params.get('retorno'),id?'/candidaturas':sourceInterestId?`/interesses/${sourceInterestId}`:opportunityId?`${centralOrigin?'/catalogo':'/oportunidades'}/${opportunityId}`:centralOrigin?'/catalogo':'/oportunidades')
   useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
@@ -117,10 +117,12 @@ export function ApplicationRecord() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; the handed record is read at that moment.
   },[org,userId,creating,opportunityId,centralOrigin,centralRevisionId,sourceRefresh])
   useEffect(()=>{if(!org||!creating||!sourceInterestId)return;let active=true;const controller=new AbortController();setInterest(null)
-    opportunityInterestsApi.get(sourceInterestId,org,controller.signal).then(r=>{if(!active)return;const value=r.data
+    const known=sourceRefresh===0&&handedInterest?.record?.interestId===sourceInterestId&&handedInterest.record.revision===sourceInterestRevision&&Date.now()-handedInterest.readAt<60000?handedInterest.record:null
+    ;(known?Promise.resolve({data:known}):opportunityInterestsApi.get(sourceInterestId,org,controller.signal)).then(r=>{if(!active)return;const value=r.data
       if(!centralOrigin||value.opportunityId!==opportunityId||value.revision!==sourceInterestRevision||value.status!=='ACTIVE'||!value.capabilities?.canCreateApplication){setError('O interesse mudou ou já não permite abrir candidatura. Volte ao interesse para rever os dados.');return}
       setInterest(value);if(!loadApplicationIntention(userId,org)&&!unitsTouched.current)setUnitIds(value.unitIds||[])
     }).catch(()=>{if(active)setError('Não foi possível carregar o interesse. Tente novamente.')});return()=>{active=false;controller.abort()}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; the handed interest is read at that moment.
   },[org,userId,creating,sourceInterestId,sourceInterestRevision,centralOrigin,opportunityId,sourceRefresh])
   useEffect(()=>{if(!org||!wanted.units||(!creating&&(!id||!record||record.canEdit===false||['CANCELLED','ARCHIVED'].includes(record.status))))return;let active=true;const controller=new AbortController();setUnitsReady(false);setUnitsError('')
     opportunityInterestsApi.units({purpose:'ASSIGN'},org,controller.signal).then(r=>{if(active){if(!Array.isArray(r.data.items))throw Error('Incomplete units');setUnits(r.data.items);setUnitsReady(true)}}).catch(()=>{if(active)setUnitsError('Não foi possível carregar as unidades. Os dados da candidatura foram preservados.')})

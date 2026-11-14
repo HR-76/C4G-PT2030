@@ -1,7 +1,7 @@
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
-const mocks=vi.hoisted(()=>({status:vi.fn(),update:vi.fn(),auth:{user:{id:'admin'}}}))
-vi.mock('../api/api',()=>({fundingTendersApi:{status:mocks.status,update:mocks.update}}))
+const mocks=vi.hoisted(()=>({status:vi.fn(),update:vi.fn(),stepUpPolicy:vi.fn(),stepUp:vi.fn(),auth:{user:{id:'admin'}}}))
+vi.mock('../api/api',()=>({fundingTendersApi:{status:mocks.status,update:mocks.update},authApi:{stepUpPolicy:mocks.stepUpPolicy,stepUp:mocks.stepUp}}))
 vi.mock('../contexts/AuthContext',()=>({useAuth:()=>mocks.auth}))
 import FundingTenders from '../pages/FundingTenders'
 const run={runId:'r1',status:'SUCCESS',createdAt:'2026-10-17T12:00:00Z',startedAt:'2026-10-17T12:00:00Z',finishedAt:'2026-10-17T12:00:08Z',received:5,created:2,updated:1,failed:0,unchanged:2,limited:true}
@@ -91,6 +91,21 @@ it('does not enable updates for an unconfigured source or misrepresent fixture r
 })
 it('treats the staging collection mode as configured',async()=>{
  mocks.status.mockResolvedValue({data:{...value,sourceMode:'live-staging'}});render(<FundingTenders/>);await screen.findByText('8s');expect(screen.getByRole('button',{name:'Atualizar agora'}).disabled).toBe(false)
+})
+// Regression (staging, 14/11/2026): the update was refused with 403 MFA_REQUIRED and the page offered no way to renew the
+// authentication, leaving every source «Por confirmar» with the buttons disabled.
+it('offers to renew the authentication when the update requires a recent one and returns to this page',async()=>{
+ mocks.update.mockRejectedValueOnce({response:{status:403,data:{error:{code:'MFA_REQUIRED',message:'Confirme a autenticação reforçada para atualizar a fonte.'}}}})
+ mocks.stepUpPolicy.mockResolvedValue({data:{mfaOptional:true}})
+ render(<FundingTenders/>);await screen.findByText('8s')
+ expect(screen.queryByRole('button',{name:'Confirmar autenticação'})).toBeNull()
+ fireEvent.click(screen.getByRole('button',{name:'Atualizar agora'}))
+ const renew=await screen.findByRole('button',{name:'Confirmar autenticação'})
+ expect(screen.getByRole('alert').textContent).toContain('Confirme a autenticação reforçada')
+ await waitFor(()=>expect(mocks.status).toHaveBeenCalledTimes(2));await waitFor(()=>expect(screen.getByRole('button',{name:'Atualizar agora'}).disabled).toBe(false))
+ fireEvent.click(renew);await waitFor(()=>expect(mocks.stepUp).toHaveBeenCalledWith('recent-auth','/integracoes'))
+ mocks.stepUpPolicy.mockResolvedValue({data:{mfaOptional:false}});fireEvent.click(renew);await waitFor(()=>expect(mocks.stepUp).toHaveBeenLastCalledWith('recent-mfa','/integracoes'))
+ mocks.stepUpPolicy.mockRejectedValue(new Error('offline'));fireEvent.click(renew);await screen.findByText(/Termine a sessão e entre de novo/);expect(mocks.stepUp).toHaveBeenCalledTimes(2)
 })
 it('retains the same intention after an uncertain response and prevents double submission',async()=>{
  mocks.update.mockRejectedValueOnce({response:{status:503}});render(<FundingTenders/>);await screen.findByText('8s')

@@ -601,3 +601,16 @@ it('uses the central opportunity handed over by the table and reads it only when
  open(handed(id(20),Date.now()-61000));await screen.findByText('Oportunidade lida',{selector:'strong'})
  expect(central.get).toHaveBeenCalledTimes(2)
 })
+it('uses the interest handed over with the navigation and reads it only when it is another revision or no longer recent',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ central.get.mockResolvedValue({data:{opportunityId:opp,revisionId:id(20),snapshot:{title:'Oportunidade'}}})
+ const interest={interestId:id(30),opportunityId:opp,revision:4,status:'ACTIVE',unitIds:[],capabilities:{canManage:true,canCreateApplication:true}}
+ interests.get.mockResolvedValue({data:interest})
+ const search=`?nova=1&origem=CENTRAL&oportunidade=${opp}&revisao=${id(20)}&interesse=${id(30)}&interesseRevisao=4`
+ const open=state=>render(<MemoryRouter initialEntries={[{pathname:'/candidaturas',search,state}]}><Routes><Route path="/candidaturas" element={<PrivateApplications/>}/></Routes></MemoryRouter>)
+ const handed=(revision,readAt=Date.now())=>({sourceInterest:{record:{...interest,revision},readAt}})
+ open(handed(4));await screen.findByText('Oportunidade',{selector:'strong'})
+ expect(interests.get).not.toHaveBeenCalled();expect(screen.queryByText(/O interesse mudou/)).toBeNull();cleanup()
+ open(handed(3));await waitFor(()=>expect(interests.get).toHaveBeenCalledTimes(1));cleanup()
+ open(handed(4,Date.now()-61000));await waitFor(()=>expect(interests.get).toHaveBeenCalledTimes(2))
+})

@@ -64,6 +64,9 @@ Por verificar antes de (3): como o `activationComposition.js` compõe as portas 
 - **Defeito encontrado ao religar (`--collection all-sources`):** API e worker em ciclo de reinícios (`C4G_API_START_FAILED`). Com a Central na 052, `supportsCentralVersion` só consultava a cadeia que termina na 051 e a cobertura durável era recusada (`FUNDING_COVERAGE_SCHEMA_REQUIRED`, reproduzido localmente); o preflight de oportunidades da Central também desconhecia a 052. Sem recolha ligada este caminho não corre.
 - **Correção:** `centralMigrationManifest.js` compara a 052 com a sua cadeia e `opportunities/preflight.js` reconhece-a. Regressões em `fundingCoverageConfigured.test.js` e `f12OpportunityPreflight.test.js`. Backend 3226: 3216 aprovados, 9 ignorados, 1 falha em `documentApiInfrastructure.test.js` que passa isolada; lint aprovado. Não provado contra uma Central 052 real; por aplicar na VPS.
 
+- **Aplicado na VPS (14/11/2026):** API e worker arrancam com a Central 052 e as cinco fontes ficam com «Atualizar agora» ativo.
+- **403 ao atualizar:** o pedido exige autenticação recente (`MFA_REQUIRED`) e o ecrã não oferecia forma de a renovar; as fontes ficavam «Por confirmar». O ecrã passa a mostrar «Confirmar autenticação» (step-up com regresso a `/integracoes`) e volta a ler o estado. Regressão em `FundingIntegrations.test.jsx`; frontend 1050 aprovados, build e lint aprovados; sem browser nem sessão real.
+
 ## Critérios de aceitação
 
 - F1: `preflightCentral` e `preflightTenant` aprovados na 050 e na 040; Central e tenant registam a mesma versão; `/health/ready` com 200; páginas que dependem das migrações 034 a 040 abrem; nenhum dado existente alterado; repetir o comando não altera nada.
