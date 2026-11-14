@@ -76,3 +76,19 @@ describe('faturação administrativa',()=>{
  })
 })
 
+describe('faturação da plataforma — reabertura', () => {
+  const view = (api, scope) => render(<MemoryRouter initialEntries={['/administracao/faturacao']}><Routes><Route path="/administracao/faturacao" element={<BillingView api={api} directoryApi={{ entities: vi.fn(() => response({ items: [] })) }} scope={scope}/>}/></Routes></MemoryRouter>)
+  it('reopens with the confirmed position at once, reads it again and never shows it to another administrator', async () => {
+    const api = { summary: vi.fn(() => response(summary)), cycles: vi.fn(() => response(list)) }
+    view(api, 'admin:'); await screen.findAllByText('Município Exemplo'); cleanup()
+    api.summary.mockReturnValue(new Promise(() => {})); api.cycles.mockReturnValue(new Promise(() => {}))
+    view(api, 'admin:'); expect(screen.getAllByText('Município Exemplo').length).toBeGreaterThan(0); expect(api.cycles).toHaveBeenCalledTimes(2); cleanup()
+    view(api, 'other:'); expect(screen.queryByText('Município Exemplo')).toBeNull()
+  })
+  it('removes the confirmed position when the new read is refused', async () => {
+    const api = { summary: vi.fn(() => response(summary)), cycles: vi.fn(() => response(list)) }
+    view(api, 'admin:'); await screen.findAllByText('Município Exemplo'); cleanup()
+    api.cycles.mockReturnValue(Promise.reject({ response: { status: 403 } }))
+    view(api, 'admin:'); await screen.findByRole('alert'); expect(screen.queryByText('Município Exemplo')).toBeNull()
+  })
+})

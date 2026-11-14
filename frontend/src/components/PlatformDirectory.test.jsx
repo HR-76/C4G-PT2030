@@ -35,3 +35,20 @@ it('keeps the current search when moving to the next page',async()=>{
 it('mostra a data de registo no fuso de Lisboa independentemente do navegador',async()=>{
  const client=api();client.entity.mockResolvedValue({data:{...entity,createdAt:'2026-06-01T23:30:00.000Z'}});mount(client,'/administracao/entidades/a');await screen.findByText('02/06/2026')
 })
+it('reopens the list with the confirmed entities at once, reads them again and never shows them to another administrator',async()=>{
+ const client=api(),view=scope=>render(<MemoryRouter initialEntries={['/administracao/entidades']}><Routes><Route path="/administracao/entidades" element={<DirectoryView api={client} scope={scope}/>}/></Routes></MemoryRouter>)
+ view('admin:');await screen.findByText('Entidade A');cleanup()
+ client.entities.mockReturnValue(new Promise(()=>{}))
+ view('admin:');expect(screen.getByText('Entidade A')).toBeTruthy();expect(client.entities).toHaveBeenCalledTimes(2);cleanup()
+ view('other:');expect(screen.queryByText('Entidade A')).toBeNull()
+})
+it('keeps the previous rows on screen, dimmed and inactive, while another search is read and removes them when it fails',async()=>{
+ const client=api();mount(client);const row=await screen.findByText('Entidade A')
+ let fail;client.entities.mockReturnValue(new Promise((_,reject)=>{fail=reject}))
+ fireEvent.change(screen.getByRole('searchbox'),{target:{value:'outra'}});fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}))
+ await waitFor(()=>expect(client.entities).toHaveBeenCalledTimes(2))
+ const kept=screen.getByText('Entidade A').closest('.directory-stale')
+ expect(kept).toBeTruthy();expect(kept.hasAttribute('inert')).toBe(true);expect(row).toBeTruthy()
+ await act(async()=>fail({response:{status:503}}))
+ await screen.findByRole('alert');expect(screen.queryByText('Entidade A')).toBeNull()
+})

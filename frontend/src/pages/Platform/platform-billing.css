@@ -130,4 +130,4 @@
   .billing-review dl>div { grid-template-columns:1fr; gap:1px; }.billing-form-actions .btn { flex:1; justify-content:center; }
 }
 @media (prefers-reduced-motion:reduce) { .billing-loading span { animation:none; } }
-
+.billing-stale { opacity: .45; transition: opacity .15s; }

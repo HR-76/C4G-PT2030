@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarPlus, RefreshCw, SlidersHorizontal } from 'lucide-react'
 import { platformBillingApi, platformDirectoryApi } from '../../api/api'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { useAuth } from '../../contexts/AuthContext'
 import BillingDialog from './BillingDialog'
 import { billingError, cleanParams, cycleStates, formatDate, formatMoney, nullable, paymentStates } from './billingPresentation'
@@ -17,23 +18,27 @@ const cycleBlank = { periodStart: '', periodEnd: '', serviceDescription: 'Subscr
 
 export default function PlatformBilling() {
   const { user } = useAuth()
-  return <BillingView key={user?.id}/>
+  return <BillingView key={user?.id} scope={user?.id ? readScope(user.id, '') : null}/>
 }
 
-export function BillingView({ api = platformBillingApi, directoryApi = platformDirectoryApi }) {
+// The position this administrator last received for the same filters is shown at once and read again; while other
+// filters or another page are read, the previous position stays on screen, dimmed and inactive.
+export function BillingView({ api = platformBillingApi, directoryApi = platformDirectoryApi, scope = null }) {
   const [params, setParams] = useSearchParams(), navigate = useNavigate(), key = params.toString(), generation = useRef(0)
   const [filters, setFilters] = useState(() => ({ ...emptyFilters, ...Object.fromEntries(params) }))
-  const [snapshot, setSnapshot] = useState(null), [busy, setBusy] = useState(true), [error, setError] = useState(''), [reload, setReload] = useState(0)
+  const readName = `platform-billing:${key}`
+  const [snapshot, setSnapshot] = useState(() => { const held = startConfirmedRead(scope, readName).held; return held ? { key, ...held } : null }), [busy, setBusy] = useState(!snapshot), [error, setError] = useState(''), [reload, setReload] = useState(0)
   const [setup, setSetup] = useState(false)
-  const query = cleanParams(params), data = snapshot?.key === key ? snapshot : null
+  const query = cleanParams(params), exact = snapshot?.key === key ? snapshot : null, stale = !exact && busy && Boolean(snapshot), data = exact || (stale ? snapshot : null)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
   useEffect(() => setFilters({ ...emptyFilters, ...Object.fromEntries(params) }), [key])
   useEffect(() => {
-    const epoch = ++generation.current, controller = new AbortController(); setBusy(true); setError('')
+    const epoch = ++generation.current, controller = new AbortController(), read = startConfirmedRead(scope, readName); setBusy(!read.held); setError('')
+    if (read.held) setSnapshot({ key, ...read.held })
     const summaryQuery = Object.fromEntries(['from', 'to', 'currency'].flatMap(name => query[name] ? [[name, query[name]]] : []))
     Promise.all([api.summary(summaryQuery, controller.signal), api.cycles(query, controller.signal)])
-      .then(([summary, cycles]) => { if (epoch === generation.current) setSnapshot({ key, summary: summary.data, cycles: cycles.data }) })
-      .catch(reason => { if (epoch === generation.current && reason?.code !== 'ERR_CANCELED') setError(billingError(reason)) })
+      .then(([summary, cycles]) => { read.keep({ summary: summary.data, cycles: cycles.data }); if (epoch === generation.current) setSnapshot({ key, summary: summary.data, cycles: cycles.data }) })
+      .catch(reason => { if (epoch === generation.current && reason?.code !== 'ERR_CANCELED') { read.drop(); setSnapshot(null); setError(billingError(reason)) } })
       .finally(() => { if (epoch === generation.current) setBusy(false) })
     return () => { generation.current += 1; controller.abort() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; query is read at that moment.
@@ -53,7 +58,7 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
 
     {busy && !data && <LoadingIndicator>A carregar a posição financeira…</LoadingIndicator>}
     {error && <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={() => setReload(value => value + 1)}>Tentar novamente</button></div>}
-    {data && <>
+    {data && <div className={stale ? 'billing-stale' : undefined} inert={stale ? '' : undefined} aria-busy={stale || undefined}>
       <BillingSummary rows={data.summary.currencies}/>
       <section className="billing-register" aria-label="Ciclos de faturação">
       <div className="billing-register-heading"><h2>Ciclos de faturação</h2><p>Consulte documentos, pagamentos e saldos.</p></div>
@@ -72,7 +77,7 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
       {data.cycles.items.length ? <CycleTable items={data.cycles.items}/> : <section className="billing-empty"><h2>{hasFilters ? 'Nenhum ciclo corresponde aos filtros' : 'Ainda não existem ciclos de faturação'}</h2><p>{hasFilters ? 'Altere os critérios ou limpe os filtros.' : 'Prepare a conta da entidade e registe o primeiro período de faturação.'}</p>{!hasFilters && <button className="btn btn-primary" onClick={() => setSetup(true)}>Preparar primeiro ciclo</button>}</section>}
       <nav className="billing-pagination" aria-label="Paginação"><button className="btn btn-secondary" disabled={data.cycles.page <= 1} onClick={() => page(-1)}>Anterior</button><span>Página {data.cycles.page}{data.cycles.total ? ` de ${Math.ceil(data.cycles.total / data.cycles.pageSize)}` : ''}</span><button className="btn btn-secondary" disabled={data.cycles.page * data.cycles.pageSize >= data.cycles.total} onClick={() => page(1)}>Seguinte</button></nav>
       </section>
-    </>}
+    </div>}
     {setup && <BillingSetup api={api} directoryApi={directoryApi} onClose={() => setSetup(false)} onCreated={cycleId => { setSetup(false); navigate(`/administracao/faturacao/${cycleId}`) }} onChanged={() => setReload(value => value + 1)}/>}
   </div>
 }

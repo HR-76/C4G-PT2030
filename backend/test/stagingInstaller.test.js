@@ -136,8 +136,8 @@ test('upgrade: steps follow the registered chains, in order, up to the latest ve
   const tenant = require('../src/security/tenantMigrationManifest');
   const centralVersions = CENTRAL_STEPS.map(([to]) => to);
   assert.deepEqual(centralVersions, [...centralVersions].sort());
-  assert.equal(centralVersions.at(-1), central.centralRuntimeReadManifest.at(-1).version);
-  assert.ok(centralVersions.every(version => central.centralRuntimeReadManifest.some(entry => entry.version === version)));
+  assert.equal(centralVersions.at(-1), central.opportunityComplementManifest.at(-1).version);
+  assert.ok(centralVersions.every(version => central.opportunityComplementManifest.some(entry => entry.version === version)));
   const tenantVersions = TENANT_STEPS.map(([to]) => to);
   assert.deepEqual(tenantVersions, [...tenantVersions].sort());
   assert.equal(tenantVersions.at(-1), tenant.chatRetentionManifest.at(-1).version);

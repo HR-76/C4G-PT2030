@@ -5,6 +5,7 @@ import {useEffect,useRef,useState} from 'react'
 import {Link,useLocation,useParams,useSearchParams} from 'react-router-dom'
 import {RefreshCw,ArrowLeft,Building2,Users} from 'lucide-react'
 import {platformDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import {useAuth} from '../../contexts/AuthContext'
 import './platform-directory.css'
 import './directory-workspace.css'
@@ -19,21 +20,26 @@ const types={UNSPECIFIED:'Não indicado',COMPANY:'Empresa',RESEARCH:'Investigaç
 const status=value=><span className={`directory-status directory-status-${value?.toLowerCase()}`}>{states[value]||value}</span>
 const errors={C4G_ADMIN_REQUIRED:'Esta área está reservada à administração C4G. O seu acesso pode ter sido alterado.',RESOURCE_NOT_AVAILABLE:'A entidade não está disponível.',INVALID_INPUT:'Os filtros do endereço não são válidos. Limpe os filtros para voltar à lista.'}
 
-export default function PlatformDirectory(){const {user,admissions}=useAuth();return <DirectoryView key={user?.id} enableInvitations={Boolean(admissions)}/>}
-export function DirectoryView({api=platformDirectoryApi,enableInvitations=false}){
+export default function PlatformDirectory(){const {user,admissions}=useAuth();return <DirectoryView key={user?.id} enableInvitations={Boolean(admissions)} scope={user?.id?readScope(user.id,''):null}/>}
+// The lists this administrator last received are shown at once and read again; while another selection or page is
+// read, the previous rows stay on screen, dimmed and inactive. The entity record is always read from the server.
+export function DirectoryView({api=platformDirectoryApi,enableInvitations=false,scope=null}){
  const location=useLocation(),{entityId}=useParams(),[params,setParams]=useSearchParams()
  const users=location.pathname.endsWith('/utilizadores')||Boolean(entityId),key=location.pathname+'?'+params.toString(),generation=useRef(0)
- const [snapshot,setSnapshot]=useState(null),[error,setError]=useState(null),[busy,setBusy]=useState(true),[revision,setRevision]=useState(0)
+ const readName=entityId?null:`platform-directory:${key}`
+ const [snapshot,setSnapshot]=useState(()=>{const held=startConfirmedRead(scope,readName).held;return held?{key,list:held,users}:null}),[error,setError]=useState(null),[busy,setBusy]=useState(!snapshot),[revision,setRevision]=useState(0)
  const [q,setQ]=useState(params.get('q')||''),[state,setState]=useState(params.get('status')||'')
- const data=snapshot?.key===key?snapshot:null,visibleError=error?.key===key?error.message:null
+ const exact=snapshot?.key===key?snapshot:null,stale=!exact&&busy&&!entityId&&snapshot&&!snapshot.entity&&snapshot.users===users
+ const data=exact||(stale?snapshot:null),visibleError=error?.key===key?error.message:null
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
  useEffect(()=>{setQ(params.get('q')||'');setState(params.get('status')||'')},[key])
  useEffect(()=>{
-  const epoch=++generation.current,controller=new AbortController();setSnapshot(null);setError(null);setBusy(true)
+  const epoch=++generation.current,controller=new AbortController(),read=startConfirmedRead(scope,readName);setError(null);setBusy(!read.held)
+  if(read.held)setSnapshot({key,list:read.held,users});else if(entityId)setSnapshot(null)
   const input=Object.fromEntries(params);delete input.admission;if(entityId)input.organizationId=entityId
    Promise.all([users?api.users(input,controller.signal):api.entities(input,controller.signal),entityId?api.entity(entityId,controller.signal):Promise.resolve(null),entityId?api.entityProfile(entityId,controller.signal):Promise.resolve(null)])
-    .then(([list,entity,profile])=>{if(epoch===generation.current)setSnapshot({key,list:list.data,entity:entity?.data,profile:profile?.data?.registration})})
-   .catch(e=>{if(epoch===generation.current)setError({key,message:errors[e.response?.data?.error?.code]||'Não foi possível consultar os registos. Tente atualizar a lista.'})})
+    .then(([list,entity,profile])=>{read.keep(list.data);if(epoch===generation.current)setSnapshot({key,list:list.data,users,entity:entity?.data,profile:profile?.data?.registration})})
+   .catch(e=>{if(epoch===generation.current){read.drop();setSnapshot(null)}if(epoch===generation.current)setError({key,message:errors[e.response?.data?.error?.code]||'Não foi possível consultar os registos. Tente atualizar a lista.'})})
    .finally(()=>{if(epoch===generation.current)setBusy(false)})
   return()=>{generation.current += 1;controller.abort()}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; entityId, params, users are read at that moment.
@@ -64,14 +70,14 @@ export function DirectoryView({api=platformDirectoryApi,enableInvitations=false}
   </FilterBar>}
   {busy&&<LoadingIndicator>A consultar {users?'utilizadores':'entidades'}…</LoadingIndicator>}
   {visibleError&&<div role="alert" className="alert alert-error">{visibleError} <button className="btn btn-outline" onClick={()=>setRevision(r=>r+1)}>Tentar novamente</button></div>}
-  {data&&!entityId&&<>
+  {data&&!entityId&&<div className={stale?'directory-stale':undefined} inert={stale?'':undefined} aria-busy={stale||undefined}>
    <p className="directory-result" role="status">{data.list.total} {users?(data.list.total===1?'utilizador encontrado':'utilizadores encontrados'):(data.list.total===1?'entidade encontrada':'entidades encontradas')}</p>
    {data.list.items.length===0?<div className="directory-empty"><h2>Sem resultados</h2><p>{params.size?'Altere a pesquisa ou limpe os filtros.':users?'Ainda não existem contas nesta lista.':'Ainda não existem entidades registadas.'}</p></div>:
     users?<UsersTable items={data.list.items}/>:<EntitiesTable items={data.list.items}/>}
    <nav className="directory-pagination" aria-label="Paginação"><button className="btn btn-secondary" disabled={data.list.page<=1} onClick={()=>page(-1)}>Anterior</button>
     <span>Página {data.list.page}{data.list.total>0?` de ${Math.ceil(data.list.total/data.list.pageSize)}`:''}</span>
     <button className="btn btn-secondary" disabled={data.list.page*data.list.pageSize>=data.list.total} onClick={()=>page(1)}>Seguinte</button></nav>
-  </>}
+  </div>}
   </div>
  </div>
 }
