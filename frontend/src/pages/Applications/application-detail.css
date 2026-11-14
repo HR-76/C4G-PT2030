@@ -64,9 +64,9 @@
 .application-detail-workspace .preparation-card dt,
 .application-detail-workspace .preparation-card li span { font-size:.82rem; color:var(--color-text-secondary); }
 .application-detail-workspace .preparation-card a { color:var(--color-success); font-weight:600; text-decoration:underline; text-decoration-color:var(--color-text-muted); text-underline-offset:3px; }
-.application-detail-workspace .application-status-actions { border:1px solid var(--ficha-line); border-radius:5px; padding:0 16px; margin-top:20px; }
-.application-status-actions summary { cursor:pointer; font-weight:650; padding:14px 0; }
-.application-status-actions[open] { padding-bottom:16px; }
+.application-status-modal { display:grid; gap:14px; }
+.application-status-modal p { margin:0; }
+.application-status-modal label { display:grid; gap:6px; }
 /* Data-heavy sections: distinct rows, strong headings and quiet secondary text. */
 .application-detail-workspace .work-summary,
 .application-detail-workspace .document-summary { gap:0; border:1px solid var(--ficha-line); background:var(--ficha-stripe); border-radius:6px; overflow:hidden; }

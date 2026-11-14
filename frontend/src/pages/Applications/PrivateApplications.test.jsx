@@ -83,8 +83,8 @@ const openEdit=async()=>{
  return screen.findByRole('dialog',{name:'Editar dados e orçamento'})
 }
 const openTransitions=async()=>{
- const summary=await screen.findByText('Alterar estado',{selector:'summary'})
- if(!summary.closest('details').open)fireEvent.click(summary)
+ if(!screen.queryByRole('dialog',{name:'Alterar estado'}))fireEvent.click(await screen.findByRole('button',{name:'Alterar estado'}))
+ await screen.findByRole('dialog',{name:'Alterar estado'})
 }
 const fillCreation=async()=>{
  await screen.findByRole('option',{name:'Pessoa atual'})
@@ -447,12 +447,14 @@ it.each([['APPROVED','Aprovada'],['REJECTED','Reprovada'],['CANCELLED','Cancelad
  const dialog=await screen.findByRole('dialog',{name:`Confirmar alteração para ${label}?`})
  expect(dialog.textContent).toContain('Submetida');expect(dialog.textContent).toContain('Decisão validada');expect(dialog.textContent).toContain(record.title)
  expect(api.transition).not.toHaveBeenCalled();expect(sessionStorage.getItem(applicationIntentKey(userA,org))).toBeNull()
- fireEvent.click(within(dialog).getByRole('button',{name:'Voltar'}));await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull())
+ fireEvent.click(within(dialog).getByRole('button',{name:'Voltar'}));await waitFor(()=>expect(screen.queryByRole('dialog',{name:/Confirmar alteração/})).toBeNull())
+ // The status modal returns with the reason kept.
+ await screen.findByRole('dialog',{name:'Alterar estado'})
  expect(screen.getByLabelText('Motivo').value).toBe('Decisão validada');expect(api.transition).not.toHaveBeenCalled()
- fireEvent.click(screen.getByRole('button',{name:label,exact:true}));fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button',{name:'Confirmar alteração'}))
+ fireEvent.click(screen.getByRole('button',{name:label,exact:true}));fireEvent.click(within(await screen.findByRole('dialog',{name:/Confirmar alteração/})).getByRole('button',{name:'Confirmar alteração'}))
  await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(1));expect(api.transition.mock.calls[0][1]).toMatchObject({status,reason:'Decisão validada',expectedRevision:record.revision})
  const first=api.transition.mock.calls[0];fireEvent.click(await screen.findByRole('button',{name:'Repetir o mesmo envio'}))
- await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(2));expect(api.transition.mock.calls[1]).toEqual(first);expect(screen.queryByRole('dialog')).toBeNull()
+ await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(2));expect(api.transition.mock.calls[1]).toEqual(first);expect(screen.queryByRole('dialog',{name:/Confirmar alteração/})).toBeNull()
 })
 it('abandons an open final confirmation without persisting or sending',async()=>{
  api.get.mockResolvedValue({data:{...record,allowedTransitions:['ARCHIVED']}});api.responsibles.mockResolvedValue({data:{items:[]}})
@@ -526,7 +528,7 @@ it('keeps archived application details visible without offering edit or transiti
  mount(`/candidaturas/${application}`)
  expect(await screen.findByRole('heading',{name:'Antes'})).toBeTruthy()
  expect(screen.queryByRole('button',{name:'Editar dados e orçamento'})).toBeNull()
- expect(screen.queryByText('Alterar estado',{selector:'summary'})).toBeNull()
+ expect(screen.queryByRole('button',{name:'Alterar estado'})).toBeNull()
  expect(screen.getByRole('link',{name:'Oportunidade: Oportunidade'}).getAttribute('href')).toBe(`/oportunidades/${opp}`)
  expect(api.edit).not.toHaveBeenCalled()
 })

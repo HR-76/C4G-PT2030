@@ -59,6 +59,8 @@ function ApplicationRecord() {
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [pendingIntent,setPendingIntent]=useState(null)
   const [editOpen,setEditOpen]=useState(false)
+  // The status change opens in a modal; it steps aside while a final transition is being confirmed.
+  const [statusOpen,setStatusOpen]=useState(false),[confirming,setConfirming]=useState(false)
   const [refresh,setRefresh]=useState(0)
   const recordGeneration=useRef(0),confirmedRevision=useRef(0)
   const alive=useRef(false),inFlight=useRef(false),unitsTouched=useRef(false)
@@ -146,7 +148,7 @@ function ApplicationRecord() {
     if(!alive.current)return
     sessionStorage.removeItem(applicationIntentKey(userId,org));setPendingIntent(null);setReason('');setNotice('Alteração guardada.')
     if(method==='create')navigate(applicationDetailTarget(result.data.applicationId,returnTo))
-    else { confirmRecord(result.data,method); if(method==='edit')setEditOpen(false) }
+    else { confirmRecord(result.data,method); if(method==='edit')setEditOpen(false);else setStatusOpen(false) }
   }
   const handleSendFailure=e=>{
     if(!alive.current)return
@@ -161,9 +163,11 @@ function ApplicationRecord() {
       :{status,reason:reason.trim(),expectedRevision:record.revision}
     try{
       if(method==='transition'&&FINAL_TRANSITION_MESSAGE[status]){
+        setConfirming(true)
         const accepted=await confirm({tone:'warning',eyebrow:'Alteração de estado',title:`Confirmar alteração para ${LABEL[status]}?`,
           message:`${record.title}: ${LABEL[record.status]} → ${LABEL[status]}. ${FINAL_TRANSITION_MESSAGE[status]} Motivo: ${payload.reason}`,
           confirmLabel:'Confirmar alteração',cancelLabel:'Voltar'})
+        if(alive.current)setConfirming(false)
         if(!accepted||!alive.current)return
         if(currentRecord.current?.revision!==payload.expectedRevision||!Array.isArray(currentRecord.current?.allowedTransitions)||!currentRecord.current.allowedTransitions.includes(status)){
           setError('Os dados ou permissões mudaram. Consulte o estado atual antes de confirmar novamente.');return
@@ -212,11 +216,7 @@ function ApplicationRecord() {
         || (record.responsibleMembershipId?'Responsável associado':'Não identificado')
       // Next-step guidance actions: reveal the tab (focus scrolls it into view).
       const openTab=section=>{const tab=document.getElementById(`application-tab-${section}`);tab?.click();tab?.focus()}
-      const openStatusChange=()=>{
-        document.getElementById('application-tab-overview')?.click()
-        // Wait for the overview panel to be revealed before focusing inside it.
-        setTimeout(()=>{const panel=document.getElementById('alterar-estado');if(!panel)return;panel.open=true;panel.querySelector('input')?.focus()},0)
-      }
+      const openStatusChange=()=>setStatusOpen(true)
       return (<>
       <header className="application-record-header">
         <div><p className="application-client-context">{organization?.displayName || organization?.name || organization?.label || 'Organização selecionada'}</p>
@@ -236,6 +236,10 @@ function ApplicationRecord() {
         team:()=>openTab('team'),partners:()=>openTab('partners'),documents:()=>openTab('documents'),history:()=>openTab('history'),
       }}/>
       {record.canEdit!==false&&!['CANCELLED','ARCHIVED'].includes(record.status)&&<><button type="button" className="btn btn-primary" onClick={()=>setEditOpen(true)}>Editar dados e orçamento</button>{editOpen&&<FormModal title="Editar dados e orçamento" locked={busy} onClose={()=>setEditOpen(false)}><div className="application-edit-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}<form className="edit-form" onSubmit={e=>submit(e,'edit')}>{fields}<div className="form-actions"><button className="btn btn-primary" type="submit" disabled={locked}>Guardar alterações</button></div></form></div></FormModal>}</>}
+      {transitions.length>0&&<><button type="button" className="btn btn-outline" onClick={openStatusChange}>Alterar estado</button>{statusOpen&&<FormModal title="Alterar estado" locked={busy} active={!confirming} onClose={()=>setStatusOpen(false)}><div className="application-edit-modal application-status-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
+        <p>Estado atual: <span className={`chip ${CHIP[record.status]||'chip-grey'}`}>{LABEL[record.status]}</span></p>
+        <p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
+        <div className="pipeline-buttons">{transitions.map(s=><button className="btn btn-outline" type="button" key={s} disabled={locked||!reason.trim()} onClick={e=>submit(e,'transition',s)}>{LABEL[s]}</button>)}</div></div></FormModal>}</>}
       </div>
       <CentralRevisionNotice key={`${userId}:${org}:${id}`} record={record}/>
       <ApplicationSections sections={[
@@ -253,8 +257,6 @@ function ApplicationRecord() {
       {record.lastSubmittedAt&&<p>Último registo de submissão: {new Date(record.lastSubmittedAt).toLocaleString('pt-PT')}</p>}
       {record.evaluationId&&<p>Avaliação F14 associada: {record.evaluationId} (referência, sem prova de elegibilidade)</p>}
       {record.canEdit===false&&<p>Acesso de consulta à candidatura. A edição requer autorização do gestor.</p>}
-      {transitions.length>0&&<details id="alterar-estado" className="detail-section application-status-actions"><summary>Alterar estado</summary><p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
-        <div className="pipeline-buttons">{transitions.map(s=><button className="btn btn-outline" type="button" key={s} disabled={locked||!reason.trim()} onClick={e=>submit(e,'transition',s)}>{LABEL[s]}</button>)}</div></details>}
         </>},
         {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
         {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
@@ -265,9 +267,9 @@ function ApplicationRecord() {
     </>)
     }
     return <main className={`page detail-page ${id?'application-detail-workspace':creating?'application-create-workspace':''}`}>{dialog}<Link to={returnTo}>{fromAlerts ? "Voltar aos alertas" : "Voltar"}</Link>{!id&&(creating?<header className="application-create-header"><div><p>{organization?.displayName || organization?.name || 'Organização selecionada'}</p><h1>Nova candidatura</h1></div><div className="application-create-initial-state"><span>Estado inicial</span><strong>Identificada</strong></div></header>:<h1>Candidaturas</h1>)}
-    {error&&<p role="alert">{error}</p>}{id&&!record&&error&&<button type="button" className="btn btn-outline" onClick={()=>{setError('');setRefresh(v=>v+1)}}>Repetir consulta da candidatura</button>}{notice&&<p role="status">{notice}</p>}
+    {error&&!statusOpen&&<p role="alert">{error}</p>}{id&&!record&&error&&<button type="button" className="btn btn-outline" onClick={()=>{setError('');setRefresh(v=>v+1)}}>Repetir consulta da candidatura</button>}{notice&&<p role="status">{notice}</p>}
     {creating&&error&&(!opportunity||(sourceInterestId&&!interest))&&<button type="button" className="btn btn-outline" disabled={busy} onClick={()=>{setError('');setSourceRefresh(v=>v+1)}}>Repetir consulta da origem</button>}
-    {activePending&&<p role="status">Existe um envio por confirmar. <button type="button" className={creating?'btn btn-outline':undefined} disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
+    {activePending&&!statusOpen&&<p role="status">Existe um envio por confirmar. <button type="button" className={creating?'btn btn-outline':undefined} disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
     {creating&&renderCreation()}
     {!id&&!creating&&renderList()}
     {id&&record&&renderDetails()}
