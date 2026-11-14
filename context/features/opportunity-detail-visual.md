@@ -12,7 +12,7 @@ Pedido autorizado em 29/10/2026, após análise visual com frontend-design.
 - Manter leitura mobile, links, tooltips por teclado e expansão da descrição. Sem overflow a 390px.
 - Validar suite frontend, build e capturas Chrome sintéticas de ambas as fichas.
 
-Estado: Review — implementado em 29/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. As cinco falhas de suíte registadas em 29/10 noutros ficheiros já não existem. Não repetidas: as capturas no Chrome. Estado anterior: Review — implementado em 29/10/2026.
 
 ## Validação
 

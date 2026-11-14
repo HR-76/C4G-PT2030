@@ -33,7 +33,7 @@ Revisão do plano: a tarefa pede calibração da identidade existente. Consolida
 - Registar regressão visual antes da correção, repetir em Chrome isolado com respostas sintéticas, executar testes focados, suites locais completas e build. Registar falhas anteriores separadamente.
 - Preservar dados, permissões e trabalho existente; sem alterações de backend, infraestrutura, commit ou deploy.
 
-Estado: Review — implementação e validação concluídas em 31/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. SearchInput em uso em 12 ficheiros, como descrito. Não repetida: a verificação no Chrome. Estado anterior: Review — implementação e validação concluídas em 31/10/2026.
 
 ## Resultado
 

@@ -1,6 +1,6 @@
 # Logs simples da plataforma
 
-Estado: Review. Pedido e implementação inicial em 18/10/2026; apresentação revista em 21/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Não repetidos: o gate PostgreSQL e a revisão no Chrome. Estado anterior: Review. Pedido e implementação inicial em 18/10/2026; apresentação revista em 21/10/2026.
 
 ## Contrato
 

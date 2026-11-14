@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import LoadingIndicator from './LoadingIndicator'
 
 const navigate = destination => window.location.replace(destination)
 
@@ -16,10 +17,11 @@ export default function DirectLogin({ openLogin = navigate, returnTo = '/' }) {
     started.current = true
     try { openLogin(destination) } catch { setFailed(true) }
   }, [openLogin, destination, cancelled, expired])
+  // While the browser is being sent to the login, the shared loader continues the one AppRoutes showed for the session check.
+  if (!cancelled && !expired && !failed) return <LoadingIndicator className="page-loading">A abrir o login C4G…</LoadingIndicator>
   return <div className="page-loading">
     {cancelled ? <p role="status">Autenticação cancelada. Não foi iniciada uma nova sessão. <a href={destination}>Voltar a entrar</a></p>
       : expired ? <p role="status">Esta tentativa de autenticação terminou. <a href={destination}>Voltar a entrar</a></p>
-      : failed ? <p role="alert">Não foi possível abrir o login. <a href={destination}>Tentar novamente</a></p>
-      : <p role="status">A abrir o login C4G…</p>}
+      : <p role="alert">Não foi possível abrir o login. <a href={destination}>Tentar novamente</a></p>}
   </div>
 }

@@ -4,6 +4,7 @@ import '../dashboard-palette.css'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowRight, BarChart3, CalendarClock, FolderKanban, RefreshCw, Search } from 'lucide-react'
 import { exactMoney } from '../api/organizationDashboard'
+import { readScope } from '../api/confirmedReads'
 import ApprovalTimeline, { approvalSummary, emptyPeriod } from '../components/ApprovalTimeline'
 import DashboardCharts from '../components/DashboardCharts'
 import DashboardReport from '../components/DashboardReport'
@@ -40,7 +41,7 @@ function StatusRows({ values = {} }) {
 
 export default function Dashboard() {
   const { user, organization } = useAuth()
-  if (usesTechnicianDashboard(organization)) return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} />
+  if (usesTechnicianDashboard(organization)) return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} scope={user?.id ? readScope(user.id, organization.id) : null} />
   return <OrganizationDashboard key={JSON.stringify([user?.id, organization?.id])} user={user} organization={organization} />
 }
 

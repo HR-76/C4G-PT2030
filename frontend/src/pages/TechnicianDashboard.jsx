@@ -2,44 +2,55 @@ import {useEffect, useState} from 'react'
 import {Link} from 'react-router-dom'
 import {Bell, BriefcaseBusiness, CalendarClock, FileText, ListChecks, Search} from 'lucide-react'
 import {organizationNotificationsApi,privateApplicationsApi} from '../api/api'
+import {startConfirmedRead} from '../api/confirmedReads'
 import LoadingIndicator from '../components/LoadingIndicator'
 import './technician-dashboard.css'
 
 const labels={overdue:'Em atraso',today:'Hoje',upcoming:'Próximas'}
 const date=value=>value?.split('-').reverse().join('/') || 'Sem prazo'
 
-export default function TechnicianDashboard({organization}) {
- const [data,setData]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(false),[attempt,setAttempt]=useState(0)
- const [alerts,setAlerts]=useState(null),[reviews,setReviews]=useState(null),[alertError,setAlertError]=useState(false),[reviewError,setReviewError]=useState(false)
- const [reviewCursor,setReviewCursor]=useState(null),[reviewLoading,setReviewLoading]=useState(true),[reviewRetry,setReviewRetry]=useState(0)
+// Each panel shows at once what this user and organization last received and
+// reads it again on every entry; a refused read removes it. `scope` is absent
+// only where nothing may be kept.
+export default function TechnicianDashboard({organization,scope=null}) {
+ const [data,setData]=useState(()=>startConfirmedRead(scope,'technician:tasks').held),[loading,setLoading]=useState(!data),[error,setError]=useState(false),[attempt,setAttempt]=useState(0)
+ const [alerts,setAlerts]=useState(()=>startConfirmedRead(scope,'technician:alerts').held),[alertError,setAlertError]=useState(false),[reviewError,setReviewError]=useState(false)
+ const [reviews,setReviews]=useState(()=>startConfirmedRead(scope,'technician:reviews').held)
+ const [reviewCursor,setReviewCursor]=useState(null),[reviewLoading,setReviewLoading]=useState(!reviews),[reviewRetry,setReviewRetry]=useState(0)
  useEffect(()=>{
-  const controller=new AbortController()
-  setData(null);setError(false);setLoading(true)
+  const controller=new AbortController(),read=startConfirmedRead(scope,'technician:tasks')
+  setData(read.held);setError(false);setLoading(!read.held)
   privateApplicationsApi.myWork({q:'',applicationQ:'',status:'OPEN',period:'all'},organization.id,controller.signal)
-   .then(({data:result})=>{if(!Array.isArray(result?.items))throw new Error('Invalid tasks');if(!controller.signal.aborted)setData(result)})
-   .catch(()=>{if(!controller.signal.aborted)setError(true)})
+   .then(({data:result})=>{if(!Array.isArray(result?.items))throw new Error('Invalid tasks');read.keep(result);if(!controller.signal.aborted)setData(result)})
+   .catch(()=>{if(!controller.signal.aborted){read.drop();setData(null);setError(true)}})
    .finally(()=>{if(!controller.signal.aborted)setLoading(false)})
   return ()=>controller.abort()
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[organization.id,attempt])
  useEffect(()=>{
-  const controller=new AbortController()
-  setAlerts(null);setAlertError(false)
-  organizationNotificationsApi.list({},organization.id,controller.signal).then(({data:result})=>{
+  const controller=new AbortController(),read=startConfirmedRead(scope,'technician:alerts')
+  setAlerts(read.held);setAlertError(false)
+  // The server returns the most recent first; only the five shown are requested.
+  organizationNotificationsApi.list({limit:5},organization.id,controller.signal).then(({data:result})=>{
    const items=result?.notifications||result
    if(!Array.isArray(items))throw new Error('Invalid notifications')
-   if(!controller.signal.aborted)setAlerts([...items].sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0)).slice(0,5))
-  }).catch(()=>{if(!controller.signal.aborted)setAlertError(true)})
+   const recent=[...items].sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0)).slice(0,5)
+   read.keep(recent);if(!controller.signal.aborted)setAlerts(recent)
+  }).catch(()=>{if(!controller.signal.aborted){read.drop();setAlerts(null);setAlertError(true)}})
   return ()=>controller.abort()
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[organization.id,attempt])
  useEffect(()=>{
-  const controller=new AbortController()
-  setReviewLoading(true);setReviewError(false);setReviews(null)
+  // Only the first page is kept; further pages are bound to their cursor.
+  const controller=new AbortController(),read=startConfirmedRead(scope,reviewCursor?null:'technician:reviews')
+  setReviewLoading(!read.held);setReviewError(false);setReviews(read.held)
   privateApplicationsApi.assignedReviews(reviewCursor?{cursor:reviewCursor}:{},organization.id,controller.signal).then(({data:result})=>{
    if(!Array.isArray(result?.items))throw new Error('Invalid reviews')
-   if(!controller.signal.aborted)setReviews(result)
-  }).catch(()=>{if(!controller.signal.aborted)setReviewError(true)})
+   read.keep(result);if(!controller.signal.aborted)setReviews(result)
+  }).catch(()=>{if(!controller.signal.aborted){read.drop();setReviews(null);setReviewError(true)}})
    .finally(()=>{if(!controller.signal.aborted)setReviewLoading(false)})
   return ()=>controller.abort()
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[organization.id,reviewCursor,reviewRetry])
  return <div className="technician-dashboard">
   <header className="technician-header"><div><p>{organization.displayName||organization.name||'Organização'}</p><h1>O meu dashboard</h1><span>Prioridades e atalhos para o seu trabalho.</span></div><Link className="btn btn-primary" to="/meu-trabalho">Ver o meu trabalho</Link></header>
