@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
   return rows.some(row => row.version === receiptManifest.at(-1).version) ? receiptManifest : knownManifest;
 }
 
@@ -300,6 +301,13 @@ async function applyRegisteredEmailTemplatesPackage(pool,packageId){
  return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
 }
 module.exports.applyRegisteredEmailTemplatesPackage=applyRegisteredEmailTemplatesPackage;
+// Central runtime read grants are explicit too; they apply on top of the 051 chain and never through existing entrypoints.
+async function applyRegisteredCentralRuntimeReadPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/centralRuntimeReadPackage');
+ if(packageId!==PACKAGE_ID)throw Error('CENTRAL_RUNTIME_READ_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').centralRuntimeReadManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:require('../src/security/centralMigrationManifest').centralRuntimeReadManifest});
+}
+module.exports.applyRegisteredCentralRuntimeReadPackage=applyRegisteredCentralRuntimeReadPackage;
 
 async function applyRegisteredF12ReceiptPackage(pool) {
   const { receiptManifest } = require('../src/security/centralMigrationManifest');

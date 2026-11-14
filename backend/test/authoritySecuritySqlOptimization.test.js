@@ -96,6 +96,7 @@ function isolated(snapshot) {
   vm.runInNewContext(source, { module, exports: module.exports, require(name) {
     if (name === 'node:crypto') return require(name);
     if (name === './memberEmailAdmission') return require('../src/security/memberEmailAdmission');
+    if (name === './stagingCentralRuntimeAdmission') return require('../src/security/stagingCentralRuntimeAdmission');
     if (name === './centralMigrationManifest') return manifest;
     if (name === './catalogMetadataTransport') return require('../src/security/catalogMetadataTransport');
     // These cases run outside an HTTP request, where nothing is ever reused.

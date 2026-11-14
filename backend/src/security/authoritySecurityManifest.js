@@ -106,7 +106,7 @@ function authorityFingerprint(version) {
 }
 function assertAuthoritySecuritySnapshot(snapshot, version){
   const expected=authorityFingerprint(version);
-  if(!snapshot||!expected||(digest(snapshot)!==expected&&!require('./memberEmailAdmission').admits(version,'authority',digest(snapshot))))throw Object.assign(new Error('AUTHORITY_SECURITY_DRIFT'),{code:'AUTHORITY_SECURITY_DRIFT'});
+  if(!snapshot||!expected||(digest(snapshot)!==expected&&!require('./memberEmailAdmission').admits(version,'authority',digest(snapshot))&&!require('./stagingCentralRuntimeAdmission').admits(version,'authority',digest(snapshot))))throw Object.assign(new Error('AUTHORITY_SECURITY_DRIFT'),{code:'AUTHORITY_SECURITY_DRIFT'});
   return snapshot;
 }
 // Inside one HTTP request a successful read for the same database and schema

@@ -172,6 +172,16 @@ $RUN upgrade
 $RUN upgrade --apply
 ```
 
+**Logins de runtime da Central (depois do `upgrade`, nunca antes).** Os logins da API e do worker só podem ser criados depois de a cadeia Central estar completa, porque as suas pertenças mudam o fingerprint de cada versão a partir da 036. Depois do `upgrade --apply`, corre:
+
+```bash
+$RUN runtime-logins
+```
+
+Resultado esperado: `{"logins":["c4g_central_staging_api","c4g_central_staging_worker"],"centralVersion":"052_central_runtime_read"}`. O `env` seguinte inclui a ligação da API a esse login, e o ficheiro `worker-central.env.generated` é o do worker. Copia os dois ficheiros gerados para `/srv/c4g-staging/` (o do worker com o nome `worker-central.env`) antes de reiniciar.
+
+Para repetir o `upgrade` no futuro, primeiro é preciso remover as pertenças dos logins (`REVOKE c4g_central_runtime FROM c4g_central_staging_api, c4g_central_staging_worker`), aplicar as migrações novas e voltar a correr o `runtime-logins`. Qualquer migração nova depois da 052 exige medir de novo a variante de staging, porque a pertença entra no fingerprint.
+
 Depois reinicia a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate`) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
 
 ## Atualizar um staging já instalado

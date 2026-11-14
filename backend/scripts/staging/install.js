@@ -12,18 +12,21 @@
 //           | env [--out <file>] [--carry <previous private env>] [--collection <5|all>] [--storage <R2 values file>]
 //           | storage-check   (inside the API container: R2 buckets and the ClamAV scanner answer; prints only booleans)
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
+//           | runtime-logins      (after upgrade: creates the API and worker Central logins and checks the schema)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
 const fs = require('node:fs');
 const path = require('node:path');
 const { randomBytes, randomUUID } = require('node:crypto');
-const { Pool } = require('pg');
+const { Pool, escapeLiteral } = require('pg');
 const { connection, identifier, saveState } = require('../localPlatform/config');
 const { withInstallerAuthority, nativePool } = require('../localPlatform/installerAuthority');
 const { syncCentralObservation } = require('../localPlatform/centralObservation');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
-  CATALOG_LOGIN, AUTH_POLICY_VERSION } = require('./environment');
+  CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, workerCentralEnvironment, AUTH_POLICY_VERSION } = require('./environment');
+
+const STAGING_ADMISSION = require('../../src/security/stagingCentralRuntimeAdmission');
 
 const FUNDING_QUEUE = 'funding-tenders-refresh';
 
@@ -65,6 +68,27 @@ async function ensureCatalogReader(central, state, database) {
   await central.query(`GRANT CONNECT ON DATABASE ${identifier(database)} TO ${login}`);
 }
 
+// Runtime logins of the API and the worker (context/features/staging-central-runtime-login.md). Created here, by the
+// administrator, so the NOSUPERUSER role never needs CREATEROLE. Their only membership is c4g_central_runtime, and the
+// check below refuses anything else on every run, including a login that already exists.
+async function ensureCentralRuntimeLogin(central, login, password, database) {
+  if (!(await central.query("SELECT 1 FROM pg_roles WHERE rolname = 'c4g_central_runtime'")).rowCount) throw refuse('STAGING_CENTRAL_RUNTIME_ROLE_MISSING');
+  const name = identifier(login);
+  if ((await central.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [login])).rowCount) {
+    await central.query(`ALTER ROLE ${name} PASSWORD ${escapeLiteral(password)}`);
+  } else {
+    await central.query(`CREATE ROLE ${name} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD ${escapeLiteral(password)}`);
+  }
+  // Idempotent: restores the membership if it was removed; the check below refuses any other shape.
+  await central.query(`GRANT c4g_central_runtime TO ${name} WITH INHERIT TRUE, SET FALSE, ADMIN FALSE`);
+  await central.query(`GRANT CONNECT ON DATABASE ${identifier(database)} TO ${name}`);
+  const role = (await central.query(`SELECT r.rolcanlogin, r.rolsuper, r.rolcreatedb, r.rolcreaterole, r.rolreplication, r.rolbypassrls,
+    COALESCE((SELECT string_agg(g.rolname::text, ',' ORDER BY g.rolname::text) FROM pg_auth_members m JOIN pg_roles g ON g.oid = m.roleid WHERE m.member = r.oid), '') AS memberships
+    FROM pg_roles r WHERE r.rolname = $1`, [login])).rows[0];
+  if (!role || !role.rolcanlogin || role.rolsuper || role.rolcreatedb || role.rolcreaterole || role.rolreplication || role.rolbypassrls
+    || role.memberships !== 'c4g_central_runtime') throw refuse('STAGING_CENTRAL_LOGIN_INVALID');
+}
+
 // The queue the collection worker reads. The pgboss schema is not part of the Central migrations, so it is installed
 // here from the pinned pg-boss plan when missing; the plan digest is checked before anything runs.
 async function ensureFundingQueue(config, central) {
@@ -86,12 +110,29 @@ async function ensureFundingQueue(config, central) {
   } finally { await boss.stop({ graceful: true, close: true }); }
 }
 
+// Runtime logins are created only after the Central chain is complete (`upgrade`). Their memberships change the schema and
+// authority fingerprints of every version from 036 on, so they must not exist while migrations are still being applied.
+async function runtimeLogins(env) {
+  const { config, stateFile } = settings(env);
+  const state = readState(stateFile);
+  if (state?.phase !== 'READY' || !state.staging?.centralApiPassword || !state.staging?.centralWorkerPassword) throw refuse('STAGING_INSTALLATION_NOT_READY');
+  const central = new Pool(connection(config, config.centralDatabase));
+  try {
+    await ensureCentralRuntimeLogin(central, CENTRAL_API_LOGIN, state.staging.centralApiPassword, config.centralDatabase);
+    await ensureCentralRuntimeLogin(central, CENTRAL_WORKER_LOGIN, state.staging.centralWorkerPassword, config.centralDatabase);
+    const checked = await require('../../src/security/centralMigrationPreflight').preflightCentral(central);
+    return { logins: [CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN], centralVersion: checked.currentVersion };
+  } finally { await central.end(); }
+}
+
 async function install(env) {
   const { config, stateFile, apiHost, organization } = settings(env);
   fs.mkdirSync(path.dirname(stateFile), { recursive: true, mode: 0o700 });
   const state = readState(stateFile) ?? initialState(config);
   state.staging ??= {};
   state.staging.catalogPassword ??= randomBytes(32).toString('hex');
+  state.staging.centralApiPassword ??= randomBytes(32).toString('hex');
+  state.staging.centralWorkerPassword ??= randomBytes(32).toString('hex');
   const persist = value => saveState(value, stateFile);
   persist(state);
   await installSchemas(config, state, persist, stagingTarget({ apiHost }));
@@ -205,7 +246,8 @@ const CENTRAL_STEPS = Object.freeze([
   ['048_catalog_read_service_v1', (run, pool) => run.applyRegisteredCatalogReadPackage(pool, 'catalog-read-v1')],
   ['049_pt2030_document_upload', (run, pool) => run.applyRegisteredCentralImportPackage(pool, 'central-pt2030-upload-preview-v1')],
   ['050_billing_private_documents', (run, pool) => run.applyRegisteredBillingPdfsPackage(pool, 'billing-private-documents-v1')],
-  ['051_email_templates', (run, pool) => run.applyRegisteredEmailTemplatesPackage(pool, 'email-templates-v1')]
+  ['051_email_templates', (run, pool) => run.applyRegisteredEmailTemplatesPackage(pool, 'email-templates-v1')],
+  ['052_central_runtime_read', (run, pool) => run.applyRegisteredCentralRuntimeReadPackage(pool, 'central-runtime-read-v1')]
 ]);
 const TENANT_STEPS = Object.freeze([
   ['034_application_snapshot_v2', (runners, options) => runners.createRegisteredTenantMigrationRunner({ ...options, packageId: OPPORTUNITY_V2_PACKAGE })],
@@ -275,11 +317,15 @@ async function upgrade(env, args) {
 
 function writeEnvironment(env, destination, carryFile, collection, storageFile) {
   const { config, stateFile, apiHost } = settings(env);
-  const content = apiPrivateEnvironment(readState(stateFile), { host: apiHost, centralDatabase: config.centralDatabase, administratorPassword: config.password,
+  const state = readState(stateFile);
+  const content = apiPrivateEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase,
     carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection,
     storage: storageFile ? fs.readFileSync(storageFile, 'utf8') : undefined });
+  const workerDestination = path.join(path.dirname(destination), 'worker-central.env.generated');
+  const workerContent = workerCentralEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase });
   fs.writeFileSync(destination, content, { mode: 0o600 });
-  return { written: destination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
+  fs.writeFileSync(workerDestination, workerContent, { mode: 0o600 });
+  return { written: destination, workerWritten: workerDestination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
 }
 
 // Reachability only: each R2 bucket answers a HEAD request with these credentials and the scanner answers PING. No object is
@@ -298,12 +344,16 @@ async function storageCheck(env) {
 }
 
 async function main(argv = process.argv.slice(2), env = process.env) {
+  // This installer only serves staging, so it admits the staging runtime-login variant of Central 035 (exact pins only).
+  // The API receives the same flag in its private file; production never sets it.
+  process.env[STAGING_ADMISSION.FLAG] ??= STAGING_ADMISSION.VALUE;
   const [command, ...rest] = argv;
   if (command === 'install') { parseArguments(rest); return install(env); }
   if (command === 'person') {
     return person(env, parseArguments(rest, { values: ['--subject', '--name', '--email', '--profile'], flags: ['--platform-admin', '--org-admin'] }));
   }
   if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
+  if (command === 'runtime-logins') { parseArguments(rest); return runtimeLogins(env); }
   if (command === 'env') {
     const args = parseArguments(rest, { values: ['--out', '--carry', '--collection', '--storage'] });
     return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection, args.storage);

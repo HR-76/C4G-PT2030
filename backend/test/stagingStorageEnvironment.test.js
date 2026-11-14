@@ -15,7 +15,7 @@ const values = Object.freeze({
 });
 const file = (delta = {}) => Object.entries({ ...values, ...delta }).filter(([, v]) => v !== undefined).map(([k, v]) => `${k}=${v}`).join('\n') + '\n';
 const ready = Object.freeze({
-  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
+  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64), centralApiPassword: 'i'.repeat(64), centralWorkerPassword: 'k'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
   credentials: { tenantId: 't', credentialRef: 'x', connectionVersion: 1, host: 'c4g-postgres', port: 5432, database: 'c4g_tenant_staging', login: 'l', password: 'w'.repeat(64), ssl: true }
 });
 

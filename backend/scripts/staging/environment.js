@@ -6,6 +6,9 @@ const { RECOGNIZED_ASSURANCE_POLICIES } = require('../../src/security/authConfig
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PROFILES = Object.freeze(['ORG_ADMIN', 'FUNDING_MANAGER', 'CONTRIBUTOR', 'VIEWER']);
 const CATALOG_LOGIN = 'c4g_catalog_staging';
+const STAGING_ADMISSION = require('../../src/security/stagingCentralRuntimeAdmission');
+const CENTRAL_API_LOGIN = 'c4g_central_staging_api';
+const CENTRAL_WORKER_LOGIN = 'c4g_central_staging_worker';
 // MFA is each person's choice (decision of 2026-10-17); the older c4g-assurance-v1 requires it for privileged logins.
 const AUTH_POLICY_VERSION = 'c4g-user-mfa-v1';
 const ASSURANCE_POLICY = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
@@ -117,10 +120,10 @@ function storageEnvironment(text) {
 }
 
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
-// The Central pool connects as the PostgreSQL administrator, as the local profile does: the pinned Central
-// fingerprints do not admit a limited runtime login (its grants would count as schema drift).
-function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, carried = {}, collection, storage }) {
-  if (state?.phase !== 'READY' || !state.credentials || !administratorPassword || !state.staging?.catalogPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
+// The API and the worker reach the Central database through their own runtime logins, members only of c4g_central_runtime
+// (context/features/staging-central-runtime-login.md). Never the PostgreSQL administrator.
+function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, carried = {}, collection, storage }) {
+  if (state?.phase !== 'READY' || !state.credentials || !state.staging?.catalogPassword || !state.staging?.centralApiPassword || !state.staging?.centralWorkerPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
   const lines = {
     ...carried,
     AUTH_POLICY_VERSION,
@@ -137,11 +140,20 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, admi
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
     AUTHORITY_DATABASE_URL: databaseUrl({ login: 'c4g_authority_runtime', password: state.authorityPassword, host, port, database: centralDatabase }),
-    CENTRAL_DATABASE_URL: databaseUrl({ login: 'postgres', password: administratorPassword, host, port, database: centralDatabase }),
+    CENTRAL_DATABASE_URL: databaseUrl({ login: CENTRAL_API_LOGIN, password: state.staging.centralApiPassword, host, port, database: centralDatabase }),
+    // Staging only: admits the pinned runtime-login variant of Central 035 (src/security/stagingCentralRuntimeAdmission.js).
+    [STAGING_ADMISSION.FLAG]: STAGING_ADMISSION.VALUE,
     OPPORTUNITY_API_CREDENTIALS_JSON: JSON.stringify([state.credentials]),
     OPPORTUNITY_ALLOWED_RESIDENCY_JSON: JSON.stringify([{ regionCode: REGION.regionCode, policyVersion: REGION.residencyPolicyVersion }])
   };
   return Object.entries(lines).map(([key, value]) => `${key}=${value}`).join('\n') + '\n';
 }
 
-module.exports = Object.freeze({ STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment });
+// The worker reads the same CENTRAL_DATABASE_URL name, so its own file comes after the shared one in the compose file and overrides it.
+function workerCentralEnvironment(state, { host, port = 5432, centralDatabase }) {
+  if (state?.phase !== 'READY' || !state.staging?.centralWorkerPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
+  return `CENTRAL_DATABASE_URL=${databaseUrl({ login: CENTRAL_WORKER_LOGIN, password: state.staging.centralWorkerPassword, host, port, database: centralDatabase })}\n`
+    + `${STAGING_ADMISSION.FLAG}=${STAGING_ADMISSION.VALUE}\n`;
+}
+
+module.exports = Object.freeze({ STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });

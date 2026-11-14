@@ -13,7 +13,7 @@ const { grantsForProfile } = require('../src/organizationDirectory/accessProfile
 const { main, CENTRAL_STEPS, TENANT_STEPS } = require('../scripts/staging/install');
 
 const ready = Object.freeze({
-  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
+  phase: 'READY', staging: { catalogPassword: 'c'.repeat(64), centralApiPassword: 'i'.repeat(64), centralWorkerPassword: 'k'.repeat(64) }, permitSecret: 'p'.repeat(64), sessionSecret: 's'.repeat(96), authorityPassword: 'a'.repeat(64),
   credentials: { tenantId: 't', credentialRef: 'staging-api-x', connectionVersion: 1, host: 'c4g-postgres', port: 5432,
     database: 'c4g_tenant_staging', login: 'c4g_staging_api', password: 'w'.repeat(64), ssl: true }
 });
@@ -52,12 +52,12 @@ test('database URLs verify the server certificate and encode credentials', () =>
 
 test('private environment: generated values only, and only after a complete installation', () => {
   assert.throws(() => apiPrivateEnvironment({ ...ready, phase: 'INSTALLING' }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
-  assert.throws(() => apiPrivateEnvironment(ready, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
+  assert.throws(() => apiPrivateEnvironment({ ...ready, staging: { catalogPassword: 'c'.repeat(64), centralWorkerPassword: 'k'.repeat(64) } }, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => apiPrivateEnvironment({ ...ready, staging: {} }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc', AUTH_POLICY_VERSION: 'c4g-assurance-v1' } });
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
   assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_ASSURANCE_POLICY_JSON', 'AUTH_MODE',
-    'AUTH_POLICY_VERSION', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
+    'AUTH_POLICY_VERSION', 'C4G_STAGING_CENTRAL_RUNTIME_LOGINS', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
     'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY', 'SESSION_SECRET']);
   // MFA stays each person's choice: a policy carried over from an older release never overrides it.
   const policy = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];
@@ -136,8 +136,8 @@ test('upgrade: steps follow the registered chains, in order, up to the latest ve
   const tenant = require('../src/security/tenantMigrationManifest');
   const centralVersions = CENTRAL_STEPS.map(([to]) => to);
   assert.deepEqual(centralVersions, [...centralVersions].sort());
-  assert.equal(centralVersions.at(-1), central.knownManifest.at(-1).version);
-  assert.ok(centralVersions.every(version => central.knownManifest.some(entry => entry.version === version)));
+  assert.equal(centralVersions.at(-1), central.centralRuntimeReadManifest.at(-1).version);
+  assert.ok(centralVersions.every(version => central.centralRuntimeReadManifest.some(entry => entry.version === version)));
   const tenantVersions = TENANT_STEPS.map(([to]) => to);
   assert.deepEqual(tenantVersions, [...tenantVersions].sort());
   assert.equal(tenantVersions.at(-1), tenant.chatRetentionManifest.at(-1).version);

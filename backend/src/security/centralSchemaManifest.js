@@ -146,7 +146,8 @@ function schemaFingerprint(snapshot) {
 async function validateCentralSchemaSnapshot(client, snapshot, version, observedFingerprint) {
   const expectedFingerprint = EXPECTED_CENTRAL_SCHEMA_SHA256_BY_VERSION[version];
   if (!expectedFingerprint) throw new Error(`Central schema fingerprint is not defined for ${version}.`);
-  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)) {
+  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)
+    && !require('./stagingCentralRuntimeAdmission').admits(version, 'schema', observedFingerprint)) {
     throw new Error(`Central schema drift detected for ${version} (observed fingerprint ${observedFingerprint}).`);
   }
   if(registeredManifest.find(entry=>entry.version===version)?.authoritySecurityFingerprint)
