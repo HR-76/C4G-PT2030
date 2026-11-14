@@ -10,9 +10,28 @@ export const NEXT_STEP = Object.freeze({
  CANCELLED:'Consultar os motivos do cancelamento e preservar o histórico.',
  ARCHIVED:'Consultar o histórico e os documentos da candidatura arquivada.',
 })
-export default function ApplicationNextStep({status,showNavigation=true}){
+// Phrases of the guidance that lead to an existing action. Each one becomes a
+// button only when the caller supplies the matching handler (i.e. the user may
+// perform it); otherwise the guidance stays plain text.
+const STEP_ACTIONS = Object.freeze({
+ IDENTIFIED:[['responsável e o prazo','edit'],['iniciar a preparação','startPreparation']],
+})
+function guidance(status,actions){
+ let parts=[NEXT_STEP[status]||'Acompanhar o histórico e manter a candidatura atualizada.']
+ for(const [phrase,key] of STEP_ACTIONS[status]||[]){
+  const run=actions?.[key]
+  if(!run)continue
+  parts=parts.flatMap(part=>{
+   if(typeof part!=='string'||!part.includes(phrase))return [part]
+   const [before,after]=part.split(phrase)
+   return [before,<button key={key} type="button" className="next-step-action" onClick={run}>{phrase}</button>,after]
+  })
+ }
+ return parts
+}
+export default function ApplicationNextStep({status,showNavigation=true,actions}){
  return <section className="detail-section application-next-step" aria-label="Orientação da candidatura">
-  <h3>Próximo passo</h3><p>{NEXT_STEP[status]||'Acompanhar o histórico e manter a candidatura atualizada.'}</p>
+  <h3>Próximo passo</h3><p>{guidance(status,actions)}</p>
   {showNavigation&&<nav className="application-section-navigation" aria-label="Secções da candidatura">
    <a className="btn btn-outline" href="#dados-orcamento">Dados e orçamento</a>
    <a className="btn btn-outline" href="#equipa-tarefas">Equipa e tarefas</a>

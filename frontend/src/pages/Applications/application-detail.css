@@ -51,6 +51,9 @@
 .application-detail-workspace .application-next-step { display:flex; align-items:baseline; gap:18px; padding:15px 18px; margin:20px 0 26px; border:1px solid var(--color-warning); border-left:5px solid var(--color-warning); border-radius:4px; background:var(--color-warning-soft); color:var(--color-warning); }
 .application-detail-workspace .application-next-step h3 { margin:0; color:var(--color-warning); flex-shrink:0; font-size:.9rem; border:0; padding:0; }
 .application-detail-workspace .application-next-step p { margin:0; }
+.application-next-step .next-step-action { padding:0; border:0; background:none; color:inherit; font:inherit; font-weight:600; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.application-next-step .next-step-action:hover { text-decoration-thickness:2px; }
+.application-next-step .next-step-action:focus-visible { outline:2px solid currentColor; outline-offset:2px; border-radius:2px; }
 .application-detail-workspace .preparation-summary { margin:0 0 20px; }
 .application-detail-workspace .preparation-heading { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
 .application-detail-workspace .preparation-heading h2 { margin:0; }

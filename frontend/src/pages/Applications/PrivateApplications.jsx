@@ -222,7 +222,14 @@ function ApplicationRecord() {
           <div><dt>Prazo interno</dt><dd>{record.deadline?dateLabel(record.deadline):'Não definido'}</dd></div>
         </dl>
       </header>
-      <div className="application-priority"><ApplicationNextStep status={record.status} showNavigation={false}/>
+      <div className="application-priority"><ApplicationNextStep status={record.status} showNavigation={false} actions={{
+        edit:record.canEdit!==false?()=>setEditOpen(true):null,
+        startPreparation:transitions.includes('PREPARATION')?()=>{
+          document.getElementById('application-tab-overview')?.click()
+          // Wait for the overview panel to be revealed before focusing inside it.
+          setTimeout(()=>{const panel=document.getElementById('alterar-estado');if(!panel)return;panel.open=true;panel.querySelector('input')?.focus()},0)
+        }:null,
+      }}/>
       {record.canEdit!==false&&!['CANCELLED','ARCHIVED'].includes(record.status)&&<><button type="button" className="btn btn-primary" onClick={()=>setEditOpen(true)}>Editar dados e orçamento</button>{editOpen&&<FormModal title="Editar dados e orçamento" locked={busy} onClose={()=>setEditOpen(false)}><div className="application-edit-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}<form className="edit-form" onSubmit={e=>submit(e,'edit')}>{fields}<div className="form-actions"><button className="btn btn-primary" type="submit" disabled={locked}>Guardar alterações</button></div></form></div></FormModal>}</>}
       </div>
       <CentralRevisionNotice key={`${userId}:${org}:${id}`} record={record}/>
@@ -241,7 +248,7 @@ function ApplicationRecord() {
       {record.lastSubmittedAt&&<p>Último registo de submissão: {new Date(record.lastSubmittedAt).toLocaleString('pt-PT')}</p>}
       {record.evaluationId&&<p>Avaliação F14 associada: {record.evaluationId} (referência, sem prova de elegibilidade)</p>}
       {record.canEdit===false&&<p>Acesso de consulta à candidatura. A edição requer autorização do gestor.</p>}
-      {transitions.length>0&&<details className="detail-section application-status-actions"><summary>Alterar estado</summary><p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
+      {transitions.length>0&&<details id="alterar-estado" className="detail-section application-status-actions"><summary>Alterar estado</summary><p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
         <div className="pipeline-buttons">{transitions.map(s=><button className="btn btn-outline" type="button" key={s} disabled={locked||!reason.trim()} onClick={e=>submit(e,'transition',s)}>{LABEL[s]}</button>)}</div></details>}
         </>},
         {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
