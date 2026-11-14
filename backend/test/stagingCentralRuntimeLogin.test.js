@@ -1,7 +1,7 @@
 'use strict';
 
-// Context: context/features/staging-central-runtime-login.md. The API and the worker never connect to the Central
-// database as the PostgreSQL administrator.
+// Context: context/features/staging-central-runtime-login.md. The administrator is the default Central connection of
+// staging (decision of 14/11/2026: the limited login covers start-up but not the application). The runtime login is opt-in.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { apiPrivateEnvironment, workerCentralEnvironment, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN } = require('../scripts/staging/environment');
@@ -17,15 +17,32 @@ const where = { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging' };
 function loginOf(url) {
   return decodeURIComponent(new URL(url).username);
 }
-
-test('the API Central URL uses its runtime login and never the PostgreSQL administrator', () => {
-  const lines = Object.fromEntries(apiPrivateEnvironment(ready, where).trim().split('\n').map(line => {
+function linesOf(text) {
+  return Object.fromEntries(text.trim().split('\n').map(line => {
     const at = line.indexOf('=');
     return [line.slice(0, at), line.slice(at + 1)];
   }));
+}
+
+test('by default the API Central URL is the administrator and carries no staging admission flag', () => {
+  const lines = linesOf(apiPrivateEnvironment(ready, { ...where, administratorPassword: 'adm' }));
+  assert.equal(loginOf(lines.CENTRAL_DATABASE_URL), 'postgres');
+  assert.equal(new URL(lines.CENTRAL_DATABASE_URL).password, 'adm');
+  assert.equal(Object.hasOwn(lines, 'C4G_STAGING_CENTRAL_RUNTIME_LOGINS'), false);
+  // An installation made before the runtime logins existed still generates its environment.
+  const older = { ...ready, staging: { catalogPassword: 'c'.repeat(64) } };
+  assert.equal(loginOf(linesOf(apiPrivateEnvironment(older, { ...where, administratorPassword: 'adm' })).CENTRAL_DATABASE_URL), 'postgres');
+  assert.throws(() => apiPrivateEnvironment(ready, where), { code: 'STAGING_INSTALLATION_NOT_READY' });
+});
+
+test('opting in uses the API runtime login, never the administrator, and sets the admission flag', () => {
+  const lines = linesOf(apiPrivateEnvironment(ready, { ...where, centralRuntimeLogin: true }));
   assert.equal(loginOf(lines.CENTRAL_DATABASE_URL), CENTRAL_API_LOGIN);
   assert.notEqual(loginOf(lines.CENTRAL_DATABASE_URL), 'postgres');
   assert.equal(new URL(lines.CENTRAL_DATABASE_URL).password, 'i'.repeat(64));
+  assert.equal(lines.C4G_STAGING_CENTRAL_RUNTIME_LOGINS, 'admitted-v1');
+  const withoutApi = { ...ready, staging: { catalogPassword: 'c'.repeat(64), centralWorkerPassword: 'k'.repeat(64) } };
+  assert.throws(() => apiPrivateEnvironment(withoutApi, { ...where, centralRuntimeLogin: true, administratorPassword: 'adm' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
 });
 
 test('the worker file carries only its own runtime login', () => {
@@ -38,12 +55,7 @@ test('the worker file carries only its own runtime login', () => {
   assert.notEqual(CENTRAL_WORKER_LOGIN, CENTRAL_API_LOGIN);
   assert.equal(new URL(url).password, 'k'.repeat(64));
   assert.match(url, /sslmode=verify-full$/);
-});
-
-test('both runtime files refuse a state without their login password', () => {
-  const withoutApi = { ...ready, staging: { catalogPassword: 'c'.repeat(64), centralWorkerPassword: 'k'.repeat(64) } };
   const withoutWorker = { ...ready, staging: { catalogPassword: 'c'.repeat(64), centralApiPassword: 'i'.repeat(64) } };
-  assert.throws(() => apiPrivateEnvironment(withoutApi, where), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => workerCentralEnvironment(withoutWorker, where), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => workerCentralEnvironment({ ...ready, phase: 'INSTALLING' }, where), { code: 'STAGING_INSTALLATION_NOT_READY' });
 });

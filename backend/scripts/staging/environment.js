@@ -120,10 +120,17 @@ function storageEnvironment(text) {
 }
 
 // Lines for api-private.env (Docker Compose "raw" format). Only values the installer generated.
-// The API and the worker reach the Central database through their own runtime logins, members only of c4g_central_runtime
-// (context/features/staging-central-runtime-login.md). Never the PostgreSQL administrator.
-function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, carried = {}, collection, storage }) {
-  if (state?.phase !== 'READY' || !state.credentials || !state.staging?.catalogPassword || !state.staging?.centralApiPassword || !state.staging?.centralWorkerPassword) throw failure('STAGING_INSTALLATION_NOT_READY');
+// By default the Central pool connects as the PostgreSQL administrator, as the local profile does. The limited runtime
+// login is opt-in (centralRuntimeLogin): on 14/11/2026 it was measured to cover start-up but not the application, which
+// also reads and writes other Central tables (context/features/staging-central-runtime-login.md).
+function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, administratorPassword, centralRuntimeLogin = false, carried = {}, collection, storage }) {
+  if (state?.phase !== 'READY' || !state.credentials || !state.staging?.catalogPassword
+    || (centralRuntimeLogin ? !state.staging?.centralApiPassword : !administratorPassword)) throw failure('STAGING_INSTALLATION_NOT_READY');
+  const central = centralRuntimeLogin
+    ? { CENTRAL_DATABASE_URL: databaseUrl({ login: CENTRAL_API_LOGIN, password: state.staging.centralApiPassword, host, port, database: centralDatabase }),
+      // Admits the pinned runtime-login variant of Central 052 (src/security/stagingCentralRuntimeAdmission.js).
+      [STAGING_ADMISSION.FLAG]: STAGING_ADMISSION.VALUE }
+    : { CENTRAL_DATABASE_URL: databaseUrl({ login: 'postgres', password: administratorPassword, host, port, database: centralDatabase }) };
   const lines = {
     ...carried,
     AUTH_POLICY_VERSION,
@@ -140,9 +147,7 @@ function apiPrivateEnvironment(state, { host, port = 5432, centralDatabase, carr
     AUTHORITY_COMMIT_PERMIT_SECRET: state.permitSecret,
     SESSION_SECRET: state.sessionSecret,
     AUTHORITY_DATABASE_URL: databaseUrl({ login: 'c4g_authority_runtime', password: state.authorityPassword, host, port, database: centralDatabase }),
-    CENTRAL_DATABASE_URL: databaseUrl({ login: CENTRAL_API_LOGIN, password: state.staging.centralApiPassword, host, port, database: centralDatabase }),
-    // Staging only: admits the pinned runtime-login variant of Central 035 (src/security/stagingCentralRuntimeAdmission.js).
-    [STAGING_ADMISSION.FLAG]: STAGING_ADMISSION.VALUE,
+    ...central,
     OPPORTUNITY_API_CREDENTIALS_JSON: JSON.stringify([state.credentials]),
     OPPORTUNITY_ALLOWED_RESIDENCY_JSON: JSON.stringify([{ regionCode: REGION.regionCode, policyVersion: REGION.residencyPolicyVersion }])
   };

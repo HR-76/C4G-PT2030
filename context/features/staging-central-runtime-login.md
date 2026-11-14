@@ -1,6 +1,6 @@
 # Login de runtime da Central sem superutilizador (staging)
 
-Estado: Implementado e validado em base descartável — 14/11/2026. Commit e VPS pendentes de aprovação.
+Estado: Aplicado na VPS e ligação da API revertida — 14/11/2026. O SELECT restrito não chega para a aplicação; âmbito completo do perfil de runtime por decidir.
 
 Pedido: a auditoria global de 14/11/2026 classificou como prioridade alta a ligação da API e do worker à Central com o administrador do PostgreSQL. Esta especificação define o que muda, como se prova e o que fica fora.
 
@@ -162,3 +162,26 @@ Aprovado: G1 restrito, registado como 052 depois da 051 (candidata em Draft).
 - Nada foi commitado, nada foi levado à VPS. A VPS continua com a API a usar o administrador do PostgreSQL.
 - Testes de API completa com o login de runtime (além do preflight): as leituras das páginas ainda não foram medidas com este login. Se faltar algum `SELECT`, a lista aparece nos erros `permission denied` e é uma nova decisão de âmbito.
 - O worker de recolha, que também usa o login, só foi verificado ao nível do preflight.
+
+## Resultado na VPS (14/11/2026)
+
+- Aplicado no staging: `upgrade --apply` até `052_central_runtime_read` (inclui a 051), `install` repetido, `runtime-logins` e novo `api-private.env`. Commits `00ce8bf`, `0d7ae1f` e `ab9d343`.
+- Dois defeitos encontrados só na VPS e corrigidos: a lista de versões do leitor de catálogo e a lista `v2` das tabelas legíveis terminavam em 051. Com a 052, o arranque falhava com `CATALOG_READER_SCHEMA_DRIFT` e depois `CATALOG_READER_ROLE_EXCESS_PRIVILEGES`.
+- Com as correções, a API arrancou: `ready=200`, `CENTRAL_DATABASE_URL` com `c4g_central_staging_api` e TLS verificado.
+- **No navegador, as páginas que dependem do tenant falham com 503** (Pessoas, notificações, candidaturas, "O meu trabalho"). O log do PostgreSQL mostra a causa: `permission denied for table organization_provisioning`, 13 vezes. É a primeira tabela recusada; não é a lista completa.
+- Conclusão: o `SELECT` restrito chega para o arranque, mas não para a aplicação. A API lê e escreve noutras tabelas da Central pela mesma ligação, por isso um papel só de leitura em sete tabelas não a serve.
+- Reversão feita e confirmada (`ready=200`, páginas a abrir): pertenças dos dois logins revogadas, `api-private.env` anterior reposto e API recriada. As migrações 051 e 052 ficam aplicadas; a 052 deixa só `SELECT` num papel sem login e sem membros.
+
+## Decisão pendente: âmbito completo do perfil de runtime
+
+O perfil de runtime da Central precisa de uma lista aprovada de leituras e de escritas por capacidade, não só das sete leituras do arranque. As opções são manter o staging com o administrador do PostgreSQL e tratar o perfil completo como desenho de produção, ou fazer o inventário por ligação (central ou autoridade) e propor uma migração 053 com a matriz completa.
+
+## Decisão do utilizador (14/11/2026): parar aqui
+
+O staging mantém a ligação da API à Central com o administrador do PostgreSQL (só dados sintéticos). O perfil de runtime completo, com leituras e escritas por capacidade, passa a ser desenho de produção e exige a matriz aprovada antes de qualquer código. Este documento fica como registo do que foi medido.
+
+### Consequência no código
+
+- O gerador de ambiente volta a ligar a Central com o administrador por omissão ([environment.js](../../backend/scripts/staging/environment.js)). O login de runtime fica atrás da opção explícita `env --central-runtime-login`, que também escreve o ficheiro do worker.
+- O `compose.yaml` deixa de carregar `worker-central.env`.
+- Ficam no código, sem uso no staging: a migração 052 (aplicada na VPS), o comando `runtime-logins` e a admissão da variante de staging da 052.

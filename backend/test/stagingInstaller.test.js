@@ -52,12 +52,12 @@ test('database URLs verify the server certificate and encode credentials', () =>
 
 test('private environment: generated values only, and only after a complete installation', () => {
   assert.throws(() => apiPrivateEnvironment({ ...ready, phase: 'INSTALLING' }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
-  assert.throws(() => apiPrivateEnvironment({ ...ready, staging: { catalogPassword: 'c'.repeat(64), centralWorkerPassword: 'k'.repeat(64) } }, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
+  assert.throws(() => apiPrivateEnvironment(ready, { host: 'h', centralDatabase: 'c' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   assert.throws(() => apiPrivateEnvironment({ ...ready, staging: {} }, { host: 'h', centralDatabase: 'c', administratorPassword: 'x' }), { code: 'STAGING_INSTALLATION_NOT_READY' });
   const text = apiPrivateEnvironment(ready, { host: 'c4g-postgres', centralDatabase: 'c4g_central_staging', administratorPassword: 'adm', carried: { AUTH_MODE: 'oidc', AUTH_POLICY_VERSION: 'c4g-assurance-v1' } });
   const lines = Object.fromEntries(text.trim().split('\n').map(line => [line.slice(0, line.indexOf('=')), line.slice(line.indexOf('=') + 1)]));
   assert.deepEqual(Object.keys(lines).sort(), ['AUTHORITY_COMMIT_PERMIT_SECRET', 'AUTHORITY_DATABASE_URL', 'AUTH_ASSURANCE_POLICY_JSON', 'AUTH_MODE',
-    'AUTH_POLICY_VERSION', 'C4G_STAGING_CENTRAL_RUNTIME_LOGINS', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
+    'AUTH_POLICY_VERSION', 'CATALOG_DATABASE_URL', 'CENTRAL_DATABASE_URL', 'FUNDING_TENDERS_RUNTIME', 'FUNDING_TENDERS_SOURCE', 'NODE_ENV',
     'OPPORTUNITY_ALLOWED_RESIDENCY_JSON', 'OPPORTUNITY_API_CREDENTIALS_JSON', 'PRIVILEGED_LOGIN_ASSURANCE_CATEGORY', 'SESSION_SECRET']);
   // MFA stays each person's choice: a policy carried over from an older release never overrides it.
   const policy = RECOGNIZED_ASSURANCE_POLICIES[AUTH_POLICY_VERSION];

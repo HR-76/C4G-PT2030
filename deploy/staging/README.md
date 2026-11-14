@@ -172,15 +172,9 @@ $RUN upgrade
 $RUN upgrade --apply
 ```
 
-**Logins de runtime da Central (depois do `upgrade`, nunca antes).** Os logins da API e do worker só podem ser criados depois de a cadeia Central estar completa, porque as suas pertenças mudam o fingerprint de cada versão a partir da 036. Depois do `upgrade --apply`, corre:
+**Logins de runtime da Central: desligados por decisão de 14/11/2026.** A API e o worker ligam à Central com o administrador do PostgreSQL, e o `env` gera essa ligação por omissão. Não corras `runtime-logins` nem uses `env --central-runtime-login` no staging: medido na VPS, o login limitado chega para o arranque, mas as páginas que dependem do tenant respondem 503 ([registo](../../context/features/staging-central-runtime-login.md)).
 
-```bash
-$RUN runtime-logins
-```
-
-Resultado esperado: `{"logins":["c4g_central_staging_api","c4g_central_staging_worker"],"centralVersion":"052_central_runtime_read"}`. O `env` seguinte inclui a ligação da API a esse login, e o ficheiro `worker-central.env.generated` é o do worker. Copia os dois ficheiros gerados para `/srv/c4g-staging/` (o do worker com o nome `worker-central.env`) antes de reiniciar.
-
-Para repetir o `upgrade` no futuro, primeiro é preciso remover as pertenças dos logins (`REVOKE c4g_central_runtime FROM c4g_central_staging_api, c4g_central_staging_worker`), aplicar as migrações novas e voltar a correr o `runtime-logins`. Qualquer migração nova depois da 052 exige medir de novo a variante de staging, porque a pertença entra no fingerprint.
+Os comandos continuam no instalador para quando existir o perfil de runtime completo. Nessa altura a ordem é `upgrade --apply`, depois `runtime-logins`, depois `env --central-runtime-login`, e o `compose.yaml` tem de voltar a carregar o ficheiro do worker (`worker-central.env`) a seguir ao `api-private.env`. Os logins só podem existir como membros de `c4g_central_runtime` depois de a cadeia Central estar completa, porque as pertenças mudam o fingerprint de cada versão a partir da 036. Para aplicar uma migração nova com as pertenças ativas, revoga-as primeiro (`REVOKE c4g_central_runtime FROM c4g_central_staging_api, c4g_central_staging_worker`).
 
 Depois reinicia a API (`docker compose -f deploy/staging/compose.yaml up -d --force-recreate`) e repete o `person` de cada conta, para a pessoa ficar projetada no tenant já na 040.
 

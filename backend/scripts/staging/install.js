@@ -315,17 +315,19 @@ async function upgrade(env, args) {
   } finally { await central.end(); await tenant.end(); }
 }
 
-function writeEnvironment(env, destination, carryFile, collection, storageFile) {
+function writeEnvironment(env, destination, carryFile, collection, storageFile, centralRuntimeLogin = false) {
   const { config, stateFile, apiHost } = settings(env);
   const state = readState(stateFile);
-  const content = apiPrivateEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase,
-    carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection,
+  const content = apiPrivateEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase, administratorPassword: config.password,
+    centralRuntimeLogin, carried: carryFile ? carriedSettings(fs.readFileSync(carryFile, 'utf8')) : {}, collection,
     storage: storageFile ? fs.readFileSync(storageFile, 'utf8') : undefined });
-  const workerDestination = path.join(path.dirname(destination), 'worker-central.env.generated');
-  const workerContent = workerCentralEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase });
   fs.writeFileSync(destination, content, { mode: 0o600 });
-  fs.writeFileSync(workerDestination, workerContent, { mode: 0o600 });
-  return { written: destination, workerWritten: workerDestination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
+  const result = { written: destination, variables: content.split('\n').filter(Boolean).map(line => line.split('=')[0]) };
+  if (!centralRuntimeLogin) return result;
+  // Only with the opt-in runtime login: the worker's own Central URL, for a compose file that loads it after the shared one.
+  const workerDestination = path.join(path.dirname(destination), 'worker-central.env.generated');
+  fs.writeFileSync(workerDestination, workerCentralEnvironment(state, { host: apiHost, centralDatabase: config.centralDatabase }), { mode: 0o600 });
+  return { ...result, workerWritten: workerDestination };
 }
 
 // Reachability only: each R2 bucket answers a HEAD request with these credentials and the scanner answers PING. No object is
@@ -344,8 +346,8 @@ async function storageCheck(env) {
 }
 
 async function main(argv = process.argv.slice(2), env = process.env) {
-  // This installer only serves staging, so it admits the staging runtime-login variant of Central 035 (exact pins only).
-  // The API receives the same flag in its private file; production never sets it.
+  // This installer only serves staging, so it admits the staging runtime-login variant of Central 052 (exact pins only).
+  // The API receives the same flag only when its environment is generated with --central-runtime-login; production never sets it.
   process.env[STAGING_ADMISSION.FLAG] ??= STAGING_ADMISSION.VALUE;
   const [command, ...rest] = argv;
   if (command === 'install') { parseArguments(rest); return install(env); }
@@ -355,8 +357,8 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
   if (command === 'runtime-logins') { parseArguments(rest); return runtimeLogins(env); }
   if (command === 'env') {
-    const args = parseArguments(rest, { values: ['--out', '--carry', '--collection', '--storage'] });
-    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection, args.storage);
+    const args = parseArguments(rest, { values: ['--out', '--carry', '--collection', '--storage'], flags: ['--central-runtime-login'] });
+    return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection, args.storage, args['central-runtime-login'] === true);
   }
   if (command === 'storage-check') { parseArguments(rest); return storageCheck(env); }
   throw refuse('STAGING_COMMAND_INVALID');
