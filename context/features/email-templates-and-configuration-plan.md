@@ -1,6 +1,6 @@
 # Plano técnico — Emails, fase 1 (template do convite e logótipos)
 
-Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2 e 6 feitos; 3, 4, 5 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
+Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3 e 6 feitos; 4, 5 e 7 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
 
 Âmbito: só a fase 1. Emails do Keycloak, configuração e histórico têm plano próprio depois das respetivas perguntas.
 
@@ -108,10 +108,29 @@ Verificado no código e por execução das suítes. A frase "Nada implementado; 
 | --- | --- | --- | --- |
 | 1 | Núcleo puro | Feito | `backend/src/emailTemplates/` e 14 testes. Sanitização ensaiada a 14/11 com 23 entradas de ataque, 0 fugas ([registo](../reviews/email-html-sanitization-2026-11-14.md)). |
 | 2 | Pacote da Central | Feito, sem registo anterior neste plano | Migração `051_email_templates` (2 tabelas, funções de escrita com verificação de administrador, registos imutáveis), pacote e manifestos, gate em `test/integration/email-templates/`. Aplicada no staging a 14/11/2026, como predecessora da 052. Não existe `sql.js` com as consultas admitidas. |
-| 3 | Serviço e API do Admin C4G | Por fazer | Nenhuma rota `/api/admin/email` montada; não existem `service`, `repository`, `http` nem `audit`. |
+| 3 | Serviço e API do Admin C4G | Feito a 14/11/2026, em Review | Ver "Incremento 3" abaixo. |
 | 4 | Envio com o template guardado | Por fazer | `activationEmail.js` envia o texto fixo atual. |
 | 5 | Logótipos e rota pública | Por fazer | Só existe a validação de imagem do incremento 1. |
 | 6 | Interface Admin C4G | Feito contra API simulada | Página, editor e cliente. A entrada "Email" está no menu e a página dá erro na aplicação real, porque falta o incremento 3. |
 | 7 | Logótipo na ficha da entidade | Por fazer | Sem referências no frontend fora da página do Admin C4G. |
 
 Condicionantes: o staging não envia email, por isso o incremento 4 e o envio de teste só se provam com um fornecedor de email autorizado. As fases 2 e 3 do contrato dependem das perguntas 3, 4 e 5, ainda em aberto.
+
+### Incremento 3 (14/11/2026, em Review)
+
+- **Código:** `backend/src/emailTemplates/{sql,repository,service,http}.js`, ligado em `productionComposition.js` e montado em `/api/admin/email` (`app.js`).
+- **Rotas:** `GET /templates`; e, para o global e para cada organização, `GET`, `PUT`, `POST /reset`, `POST /preview` e `POST /test` de `member-invitation`.
+- **Autorização:** o serviço confirma o administrador C4G em cada pedido, antes de validar o que quer que seja. As escritas passam pela função `email_template_write`, que volta a confirmar a sessão dentro da base.
+- **Idempotência e concorrência:** `expectedRevision` e `idempotencyKey`, resolvidos pela função da base. Repetir o mesmo pedido não cria segunda versão.
+- **Erros públicos:** lista fechada de nove códigos; os motivos de um template inválido saem só com código e nome de variável. Tudo o resto sai como `SERVICE_UNAVAILABLE`.
+- **Testes:** `backend/test/emailTemplateApi.test.js`, 14 testes (serviço e HTTP). Suíte do backend: 3216 a passar, 0 falhas, 9 ignorados.
+- **Prova em PostgreSQL 18 descartável** (instalador de staging até à Central 052, serviço ligado com o papel limitado `c4g_central_runtime`): 12 passos, todos a passar. Cobre texto por defeito, recusa a quem não é administrador, gravação com limpeza, repetição, revisão desatualizada, isolamento entre a organização A e a B, organização desconhecida, template inválido sem versão criada, pré-visualização sem escrita, reposição com histórico, sessão revogada e escrita direta na tabela recusada.
+- **Frontend:** mensagens para os códigos novos em `emailTemplatePresentation.js`, com teste.
+
+Desvios e limites, por decidir ou por fazer:
+
+- **Auditoria (critério 8).** O registo de quem gravou ou repôs, quando e em que organização fica no histórico imutável `email_template_version`. Não foram acrescentados eventos de auditoria F7: os códigos de evento são uma lista fechada na base, e acrescentá-los exige uma migração nova, que este incremento não devia tocar. Decisão do utilizador a 14/11/2026: o histórico imutável basta como auditoria; não se acrescentam eventos F7.
+- **Envio de teste.** A rota existe e responde `EMAIL_DELIVERY_UNAVAILABLE` até ao incremento 4.
+- **Logótipos.** As rotas `/logo` não existem (incremento 5); respondem `OPERATION_NOT_AVAILABLE`, e a página mostra "Esta função ainda não está disponível." nessa secção.
+- **Leitura do autor.** A consulta lê `global_user`, que o papel `c4g_central_runtime` só pode ler a partir da Central 052.
+- **Não verificado:** a página dentro da aplicação com sessão real, e o staging.

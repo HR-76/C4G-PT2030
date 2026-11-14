@@ -166,6 +166,10 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes.platformBilling=require('./platformBilling/http').createPlatformBillingRouter({
       express,service:platformBillingService,authenticate,pdfs:billingPdfs?.service
     });
+    // Invitation template of the Admin C4G (Central 051). Sending still uses the fixed text until the email plan's increment 4.
+    composedRoutes.platformEmail=require('./emailTemplates/http').createPlatformEmailRouter({
+      express,authenticate,service:require('./emailTemplates/service').createEmailTemplateService({centralPool})
+    });
     composedRoutes.customerBilling=require('./customerBilling/http').createCustomerBillingRouter({
       express,authenticate,organizationMiddleware,service:customerBillingService,pdfs:billingPdfs?.service
     });

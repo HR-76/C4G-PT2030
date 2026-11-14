@@ -13,6 +13,7 @@ import CatalogInterestButton from '../Opportunities/CatalogInterestButton'
 import { OpportunityTable } from '../Opportunities/OpportunityPresentation'
 import { interestIntentionKey, safeInterestReturn, readInterestIntention, saveInterestIntention, clearInterestIntentions } from './intentions'
 import UnitSelector from './UnitSelector'
+import { clearConfirmedReads } from '../../api/confirmedReads'
 import eu from '../../../../context/references/opportunity-v2/examples/eu-11145.json'
 const opportunity={opportunityId:'opportunity',title:'Aviso de ensaio',lifecycleState:'ACTIVE'}
 const record={interestId:'interest',opportunityId:'opportunity',centralRevisionId:'revision',title:opportunity.title,snapshot:{title:opportunity.title,callReference:'CALL-1',closingDate:'2027-01-01'},revision:1,status:'ACTIVE',unitIds:[],units:[],notes:null,capabilities:{canManage:true,canCreateApplication:true}}
@@ -20,7 +21,7 @@ const catalogApi={get:vi.fn()}
 const catalog=()=>render(<MemoryRouter><CatalogInterests organization={auth.organization} items={[opportunity]} catalogApi={catalogApi}><CatalogInterestButton item={opportunity}/></CatalogInterests></MemoryRouter>)
 const Destination=()=>{const location=useLocation();return <p data-testid="destination">{location.search}</p>}
 const page=path=>render(<MemoryRouter initialEntries={[path]}><Routes><Route path='/interesses' element={<Interests/>}/><Route path='/interesses/:id' element={<Interests/>}/><Route path='/candidaturas' element={<Destination/>}/></Routes></MemoryRouter>)
-beforeEach(()=>{vi.resetAllMocks();sessionStorage.clear();auth.organization={id:'org'};auth.user={id:'user'};api.context.mockResolvedValue({data:{capabilities:{canRegister:true}}});api.summaries.mockImplementation(ids=>Promise.resolve({data:{items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}));api.units.mockResolvedValue({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}});api.create.mockResolvedValue({data:record});api.get.mockResolvedValue({data:record});api.list.mockResolvedValue({data:{items:[record],nextCursor:null}});api.history.mockResolvedValue({data:{items:[],nextCursor:null}});api.edit.mockResolvedValue({data:{...record,revision:2}});catalogApi.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'revision',snapshot:{title:opportunity.title,lifecycleState:'ACTIVE'}}});central.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}})})
+beforeEach(()=>{vi.resetAllMocks();clearConfirmedReads();sessionStorage.clear();auth.organization={id:'org'};auth.user={id:'user'};api.context.mockResolvedValue({data:{capabilities:{canRegister:true}}});api.summaries.mockImplementation(ids=>Promise.resolve({data:{items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}));api.units.mockResolvedValue({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}});api.create.mockResolvedValue({data:record});api.get.mockResolvedValue({data:record});api.list.mockResolvedValue({data:{items:[record],nextCursor:null}});api.history.mockResolvedValue({data:{items:[],nextCursor:null}});api.edit.mockResolvedValue({data:{...record,revision:2}});catalogApi.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'revision',snapshot:{title:opportunity.title,lifecycleState:'ACTIVE'}}});central.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}})})
 afterEach(cleanup)
 it('interest detail consumes preserved v2 facts including budget and all seven cutoffs',async()=>{
  const {identity,sourceRecords,provenance,quality,schemaVersion,contractVersion,...projection}=eu
@@ -121,12 +122,12 @@ it('shows the catalog rows at once and fills in each interest when the response 
  expect(screen.getByRole('link',{name:opportunity.title})).toBeTruthy()
  expect(screen.getByRole('link',{name:`Consultar na lista de interesses: ${opportunity.title}`})).toBeTruthy()
 })
-it('opens registration with the permission from summaries without a second context request',async()=>{
+it('asks for the permissions once, together with the list, and not again when opening registration',async()=>{
  api.summaries.mockResolvedValue({data:{capabilities:{canRegister:true},items:[{opportunityId:'opportunity',interestId:null}]}})
  catalog()
  fireEvent.click(await screen.findByRole('button',{name:/Registar interesse em/}))
  await screen.findByRole('dialog')
- expect(api.context).not.toHaveBeenCalled()
+ expect(api.context).toHaveBeenCalledTimes(1)
 })
 it('keeps recovery after an abandoned in-flight creation resolves',async()=>{
  let finish;api.create.mockImplementation(()=>new Promise(resolve=>{finish=resolve}));const first=catalog();fireEvent.click(await screen.findByRole('button',{name:/Registar interesse em/}));fireEvent.click(await screen.findByLabelText('Interesse transversal à C4G'));fireEvent.click(await screen.findByRole('button',{name:'Guardar interesse'}));await waitFor(()=>expect(api.create).toHaveBeenCalledTimes(1));const saved=sessionStorage.getItem(interestIntentionKey('user','org'));first.unmount();await act(async()=>finish({data:record}));expect(sessionStorage.getItem(interestIntentionKey('user','org'))).toBe(saved)

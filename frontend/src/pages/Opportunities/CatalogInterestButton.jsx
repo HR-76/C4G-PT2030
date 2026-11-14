@@ -4,7 +4,8 @@ import { useCatalogInterests } from '../Interests/CatalogInterests'
 
 export function CatalogApplicationButton({ item }) {
   const context = useCatalogInterests()
-  if (!context || context.state !== 'ready' || !context.capabilities?.canCreateApplication || item.lifecycleState === 'ARCHIVED') return null
+  // Shown as soon as the permission is known; it does not wait for the interests of the rows.
+  if (!context?.capabilities?.canCreateApplication || item.lifecycleState === 'ARCHIVED') return null
   return <button className="btn btn-primary btn-sm catalog-start-application" type="button" disabled={context.busy} onClick={() => context.startApplication(item)} aria-label={`Iniciar candidatura para ${item.title}`} title="Iniciar candidatura"><FilePlus2 size={16} aria-hidden="true"/></button>
 }
 

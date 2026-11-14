@@ -115,6 +115,7 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   if (routes.platformDirectory) app.use('/api/admin/directory',routes.platformDirectory);
   if (routes.customerBilling) app.use('/api/billing',routes.customerBilling);
   if (routes.platformBilling) app.use('/api/admin/billing',routes.platformBilling);
+  if (routes.platformEmail) app.use('/api/admin/email',routes.platformEmail);
   app.use('/api/admin/opportunity-activation',routes.opportunityActivation||((req,res)=>res.status(503).set('Cache-Control','no-store').json({error:{code:'OPPORTUNITY_V2_NOT_CONFIGURED'}})));
   if(routes.pq1Consumer)app.use('/api/opportunities',routes.pq1Consumer);
   app.use('/api/organizational-profile/pq1-activation',routes.pq1Activation||((req,res)=>res.status(503).json({error:{code:'SERVICE_UNAVAILABLE'}})));

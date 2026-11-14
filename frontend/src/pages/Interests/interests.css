@@ -50,14 +50,16 @@
 .interests-page .interest-table td:first-child a:hover { text-decoration:underline; }
 .interests-page .interest-row-actions { min-width:145px; }
 @media (min-width:769px) {
- .interests-page .interest-table { min-width:1250px; table-layout:fixed; }
- .interests-page .interest-table th:first-child { width:23%; }
+ /* A tabela acompanha a largura disponível; a coluna de ações tem largura fixa
+    para os botões nunca ficarem cortados. Só há scroll abaixo de 1000px. */
+ .interests-page .interest-table { width:100%; min-width:1000px; table-layout:fixed; }
+ .interests-page .interest-table th:first-child { width:26%; }
  .interests-page .interest-table th:nth-child(2) { width:13%; }
- .interests-page .interest-table th:nth-child(3) { width:9%; }
- .interests-page .interest-table th:nth-child(4) { width:16%; }
- .interests-page .interest-table th:nth-child(5) { width:15%; }
+ .interests-page .interest-table th:nth-child(3) { width:10%; }
+ .interests-page .interest-table th:nth-child(4) { width:17%; }
+ .interests-page .interest-table th:nth-child(5) { width:16%; }
  .interests-page .interest-table th:nth-child(6) { width:8%; }
- .interests-page .interest-table th:nth-child(7) { width:16%; }
+ .interests-page .interest-table th:nth-child(7) { width:190px; }
 }
 @media (max-width:768px) {
  .interests-page .interest-row-actions { min-width:0; }

@@ -111,7 +111,51 @@ it('shows Iniciar candidatura beside the heart when the summaries response carri
  render(view())
  const start=await screen.findByRole('button',{name:'Iniciar candidatura para Open call'})
  expect(within(start.closest('tr')).getByRole('button',{name:'Registar interesse em Open call'})).toBeTruthy()
- expect(interestApi.context).not.toHaveBeenCalled()
+ expect(interestApi.context).toHaveBeenCalledTimes(1)
+})
+it('shows Iniciar candidatura with the table while the interests of the rows are still being read',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'},{opportunityId:'old',title:'Archived call',lifecycleState:'ARCHIVED'}]))
+ interestApi.context.mockResolvedValue({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true}}})
+ interestApi.summaries.mockReturnValue(new Promise(()=>{}))
+ render(view())
+ const start=await screen.findByRole('button',{name:'Iniciar candidatura para Open call'})
+ expect(start.disabled).toBe(false)
+ expect(screen.queryByRole('button',{name:'Iniciar candidatura para Archived call'})).toBeNull()
+ expect(screen.queryByRole('button',{name:'Registar interesse em Open call'})).toBeNull()
+ // The permissions were asked for with the list, before any row was known.
+ expect(interestApi.context).toHaveBeenCalledTimes(1);expect(interestApi.summaries).toHaveBeenCalledTimes(1)
+})
+it('does not offer Iniciar candidatura when the permissions request fails or denies it',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ interestApi.context.mockResolvedValue({data:{capabilities:{canRegister:true,canManage:false,canCreateApplication:false}}})
+ interestApi.summaries.mockReturnValue(new Promise(()=>{}))
+ render(view());await screen.findByRole('link',{name:'Open call'});await waitFor(()=>expect(interestApi.context).toHaveBeenCalled())
+ expect(screen.queryByRole('button',{name:/Iniciar candidatura/})).toBeNull()
+})
+it('reopens with the confirmed page, interests and permissions at once and reads them again',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ interestApi.summaries.mockImplementation(ids=>Promise.resolve({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true},items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}))
+ render(view());await screen.findByRole('button',{name:'Registar interesse em Open call'});cleanup()
+ // Second entry: no answer arrives, yet the table, the heart and the button are on screen.
+ api.list.mockReturnValue(new Promise(()=>{}));interestApi.summaries.mockReturnValue(new Promise(()=>{}));interestApi.context.mockClear()
+ render(view())
+ expect(screen.getByRole('link',{name:'Open call'})).toBeTruthy()
+ expect(screen.getByRole('button',{name:'Iniciar candidatura para Open call'})).toBeTruthy()
+ expect(screen.getByRole('button',{name:'Registar interesse em Open call'})).toBeTruthy()
+ expect(api.list).toHaveBeenCalledTimes(2);expect(interestApi.summaries).toHaveBeenCalledTimes(2);expect(interestApi.context).not.toHaveBeenCalled()
+ cleanup()
+ // Another user never sees them.
+ const previous=state.user;state.user={id:'other'}
+ try{render(view());expect(screen.queryByRole('link',{name:'Open call'})).toBeNull();expect(screen.queryByRole('button',{name:/Iniciar candidatura/})).toBeNull()}finally{cleanup();state.user=previous}
+})
+it('removes confirmed interests and permissions when the new read of the interests is refused',async()=>{
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ interestApi.summaries.mockImplementation(ids=>Promise.resolve({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true},items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}))
+ render(view());await screen.findByRole('button',{name:'Iniciar candidatura para Open call'});cleanup()
+ interestApi.summaries.mockRejectedValue({response:{status:403}})
+ render(view())
+ await screen.findByText(/Não foi possível consultar os interesses/)
+ expect(screen.queryByRole('button',{name:/Iniciar candidatura/})).toBeNull();expect(screen.queryByRole('button',{name:/Registar interesse/})).toBeNull()
 })
 it('hides Iniciar candidatura when the profile cannot create applications and offers Interesses and Candidaturas',async()=>{
  api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))

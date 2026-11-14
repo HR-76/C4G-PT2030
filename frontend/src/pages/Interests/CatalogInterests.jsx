@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { opportunityInterestsApi as api } from '../../api/api'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import FormModal from '../../components/FormModal'
 import { opportunityDisplay } from '../Opportunities/opportunityReadModel'
 import UnitSelector from './UnitSelector'
@@ -17,20 +18,45 @@ export default function CatalogInterests({ organization, items, catalogApi, chil
   return <CatalogContext key={`${user?.id}:${organization.id}`} userId={user?.id} organizationId={organization.id} items={items} catalogApi={catalogApi}>{children}</CatalogContext>
 }
 function CatalogContext({ userId, organizationId, items, catalogApi, children }) {
-  const [summaries, setSummaries] = useState({}), [capabilities, setCapabilities] = useState(null), [state, setState] = useState('loading'), [refresh, setRefresh] = useState(0)
+  // What this user and organization last received is shown at once and read again.
+  const scope = userId ? readScope(userId, organizationId) : null
+  const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
+  const summariesName = ids ? `interest-summaries:${ids}` : null
+  const [heldSummaries] = useState(() => startConfirmedRead(scope, summariesName).held)
+  const [summaries, setSummaries] = useState(heldSummaries || {}), [capabilities, setCapabilities] = useState(() => startConfirmedRead(scope, 'interest-capabilities').held), [state, setState] = useState(heldSummaries ? 'ready' : 'loading'), [refresh, setRefresh] = useState(0)
+  // True once the server answered the permissions during this entry.
+  const confirmed = useRef(false), contextRequest = useRef(null)
   const [selection, setSelection] = useState(null), [units, setUnits] = useState([]), [unitIds, setUnitIds] = useState([]), [opening, setOpening] = useState(false), [openError, setOpenError] = useState('')
   const [transversal,setTransversal]=useState(false), [notes,setNotes]=useState('')
   const scopeChosen=transversal || unitIds.length>0
   const alive = useRef(true), epoch = useRef(0), openMutex = useRef(false), location = useLocation(), navigate = useNavigate()
   const returnFocusRef = useRef(null)
-  const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
   const command = useInterestCommand(userId, organizationId, data => { setSelection(null); setSummaries(previous => ({ ...previous, [data.opportunityId]: data })) })
   useEffect(() => { alive.current = true; return () => { alive.current = false; epoch.current += 1 } }, [])
   useEffect(() => { epoch.current += 1; openMutex.current = false; setOpening(false); setSelection(null); setOpenError('') }, [ids, location.pathname, location.search])
+  // The permissions do not depend on the rows, so they are asked for together
+  // with the list and «Iniciar candidatura» appears with the table. Permissions
+  // already confirmed are shown at once; the summaries answer confirms them again.
   useEffect(() => {
-    let active = true; const controller = new AbortController(); setState('loading'); setSummaries({}); setCapabilities(null)
+    const read = startConfirmedRead(scope, 'interest-capabilities')
+    if (read.held) { setCapabilities(read.held); return }
+    let active = true; const controller = new AbortController()
+    const request = Promise.resolve().then(() => api.context(organizationId, controller.signal)).then(({ data }) => {
+      const value = data?.capabilities || data
+      if (typeof value?.canRegister !== 'boolean') return null
+      read.keep(value)
+      if (active && !confirmed.current) { confirmed.current = true; setCapabilities(value) }
+      return value
+    }).catch(() => null)
+    contextRequest.current = request
+    return () => { active = false; controller.abort(); if (contextRequest.current === request) contextRequest.current = null }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
+  }, [organizationId, refresh])
+  useEffect(() => {
+    let active = true; const controller = new AbortController(), read = startConfirmedRead(scope, summariesName), known = startConfirmedRead(scope, 'interest-capabilities')
+    setState(read.held ? 'ready' : 'loading'); setSummaries(read.held || {})
     if (!ids) return
-    async function read() {
+    async function load() {
       try {
         let permissions
         const expected = ids ? ids.split(',') : [], result = {}
@@ -48,18 +74,27 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
           }
         }
         // Older API versions return only the items in a summaries response.
+        if (!permissions) permissions = await contextRequest.current
         if (!permissions) {
           const context = (await api.context(organizationId, controller.signal)).data
           permissions = context.capabilities || context
         }
-        if (active) { setCapabilities(permissions); setSummaries(result); setState('ready') }
-      } catch { if (active) setState('error') }
+        known.keep(permissions); read.keep(result)
+        if (active) { confirmed.current = true; setCapabilities(permissions); setSummaries(result); setState('ready') }
+      } catch {
+        if (!active) return
+        // Permissions the server did not confirm in this entry are not kept.
+        read.drop(); setSummaries({})
+        if (!confirmed.current) { known.drop(); setCapabilities(null) }
+        setState('error')
+      }
     }
-    read(); return () => { active = false; controller.abort() }
+    load(); return () => { active = false; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the read name follow ids.
   }, [ids, organizationId, refresh])
   // Starts an application straight from the opportunities table, without a registered interest.
   async function startApplication(item) {
-    if (openMutex.current || command.pending || command.blocked || !capabilities?.canCreateApplication || state !== 'ready') return
+    if (openMutex.current || command.pending || command.blocked || !capabilities?.canCreateApplication) return
     openMutex.current = true; setOpening(true); setOpenError(''); const token = ++epoch.current
     try {
       const { data } = await catalogApi.get(item.opportunityId)

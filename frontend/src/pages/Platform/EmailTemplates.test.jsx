@@ -192,3 +192,14 @@ it('the development simulation enforces the same save rules as the contract', as
   expect(preview.subject).toBe('Olá Associação Exemplo A')
   expect(preview.text).toContain('Ativar: https://exemplo.invalid/ativacao-de-exemplo')
 })
+
+// The real API (email plan, increment 3) answers these codes while sending and logos are not built yet.
+it('words the codes of the real API, including the functions that are not available yet', async () => {
+  const { emailError } = await import('./emailTemplatePresentation')
+  const coded = (code, status = 409) => ({ response: { status, data: { error: { code } } } })
+  expect(emailError(coded('EMAIL_DELIVERY_UNAVAILABLE', 503))).toBe('O envio de teste ainda não está disponível.')
+  expect(emailError(coded('OPERATION_NOT_AVAILABLE', 405))).toBe('Esta função ainda não está disponível.')
+  expect(emailError(coded('EMAIL_TEMPLATE_NOT_CUSTOMIZED'))).toBe('Este template já não tem alterações próprias para repor.')
+  expect(emailError(coded('STATE_CONFLICT'))).toBe('O template foi alterado entretanto. Recarregue e repita.')
+  expect(emailError(coded('SERVICE_UNAVAILABLE', 503))).toBe('Não foi possível concluir. Tente novamente.')
+})

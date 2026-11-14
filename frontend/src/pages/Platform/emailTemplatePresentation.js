@@ -52,6 +52,11 @@ export function emailError(error) {
     RESOURCE_NOT_AVAILABLE: 'A entidade já não está disponível.',
     STALE_REVISION: 'O template foi alterado entretanto. Recarregue antes de guardar.',
     IDEMPOTENCY_CONFLICT: 'Este pedido já foi usado com dados diferentes. Repita a ação.',
+    EMAIL_TEMPLATE_NOT_CUSTOMIZED: 'Este template já não tem alterações próprias para repor.',
+    STATE_CONFLICT: 'O template foi alterado entretanto. Recarregue e repita.',
+    // The server answers these while sending and logos are not built yet.
+    EMAIL_DELIVERY_UNAVAILABLE: 'O envio de teste ainda não está disponível.',
+    OPERATION_NOT_AVAILABLE: 'Esta função ainda não está disponível.',
     EMAIL_LOGO_INVALID: 'O ficheiro não é uma imagem PNG ou JPEG válida.',
     EMAIL_LOGO_TOO_LARGE: 'A imagem excede 512 KB.',
     EMAIL_LOGO_DIMENSIONS: 'A imagem excede 1200 × 600 píxeis.',
