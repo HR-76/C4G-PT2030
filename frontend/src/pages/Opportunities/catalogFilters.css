@@ -130,7 +130,9 @@
  /* With all columns visible the text scales with the table's width (container query units),
     so narrow columns get smaller text instead of breaking words mid-way. */
  .catalog-custom.catalog-wide .opportunity-table-wrap { container-type:inline-size; }
- .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table :is(th,td) { font-size:clamp(.7rem, calc(.5rem + .33cqi), .9rem); }
+ .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table :is(th,td) { font-size:clamp(.62rem, calc(.4rem + .28cqi), .8rem); }
+ /* Programme codes such as ALENTEJO2030 are single words: keep them on one line. */
+ .catalog-custom.catalog-wide .habitual-catalog-table td[data-label="Programa financiador"] { white-space:nowrap; }
  .c4g-shell #main-content .catalog-custom.catalog-wide .habitual-catalog-table thead th { font-size:clamp(.62rem, calc(.42rem + .28cqi), .8rem); }
  .catalog-custom.catalog-wide .habitual-catalog-table .cr-status { white-space:nowrap; }
  /* The amount must stay on one line; its size shrinks with the table so the number is never cut. */
