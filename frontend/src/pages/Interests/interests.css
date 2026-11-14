@@ -64,12 +64,12 @@
  .interests-page .interest-table td { padding:12px 14px; }
  .c4g-shell #main-content .interest-row-actions .btn { min-height:var(--control-h-touch); }
 }
-.catalog-row-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; max-width: 100%; }
+.catalog-row-actions { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
 .catalog-row-actions .catalog-start-application,
 .c4g-shell #main-content .catalog-row-actions .catalog-start-application { display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px; max-width: 100%; min-width: 0; box-sizing: border-box; white-space: normal; text-align: left; line-height: 1.25; padding: 5px 8px; }
 .catalog-row-actions .catalog-start-application svg { flex: none; }
 .catalog-row-actions .catalog-start-application { position: relative; width: 36px; height: 36px; min-height: 36px; padding: 0; justify-content: center; }
-.catalog-row-actions .catalog-start-application::after { content: attr(data-tooltip); position: absolute; left: 0; bottom: calc(100% + 6px); z-index: 20; padding: 4px 8px; border-radius: 4px; background: var(--color-text-primary, #1f2937); color: var(--color-surface, #fff); font-size: 12px; font-weight: 500; line-height: 1.3; white-space: nowrap; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s ease; }
+.catalog-row-actions .catalog-start-application::after { content: attr(data-tooltip); position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); z-index: 20; padding: 4px 8px; border-radius: 4px; background: var(--color-text-primary, #1f2937); color: var(--color-surface, #fff); font-size: 12px; font-weight: 500; line-height: 1.3; white-space: nowrap; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .15s ease; }
 .catalog-row-actions .catalog-start-application:hover:not(:disabled)::after,
 .catalog-row-actions .catalog-start-application:focus-visible::after { opacity: 1; visibility: visible; }
 @media (max-width:768px) { .catalog-row-actions .catalog-start-application { width: 44px; height: 44px; min-height: 44px; } }
