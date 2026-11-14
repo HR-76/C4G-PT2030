@@ -86,6 +86,8 @@
 .catalog-summary:not(.catalog-custom) .catalog-summary-programme { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .78rem; }
 .catalog-pilot .catalog-amount { display: block; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
 .catalog-pilot .catalog-amount-note { display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: .77rem; line-height: 1.35; }
+/* The catalogue table shows only the amount; scope and forecast stay on the opportunity page. */
+.catalog-pilot .habitual-catalog-table .catalog-amount-note { display: none; }
 .catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a { text-decoration: none; }
 .catalog-summary .habitual-catalog-table td[data-label="Dotação da call"] a:hover strong { text-decoration: underline; }
 @media (min-width:769px) {
