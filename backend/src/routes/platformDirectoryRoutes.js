@@ -2,9 +2,14 @@
 const {randomUUID}=require('node:crypto');
 const {currentContext}=require('../observability/context');
 const correlationId=()=>currentContext()?.correlationId||randomUUID();
-function createPlatformDirectoryRouter({express,service,authenticate,access,members,registration,centralImports=null,multer=require('multer')}){
+function createPlatformDirectoryRouter({express,service,authenticate,access,members,registration,userDeletion=null,centralImports=null,multer=require('multer')}){
  const router=express.Router();
  router.use((req,res,next)=>{res.set('Cache-Control','no-store');next();},authenticate);
+ for(const verb of ['get','post'])router[verb]('/users/:id/deletion',async(req,res)=>{try{
+  if(Object.keys(req.query).length||(verb==='get'&&req.body&&Object.keys(req.body).length))throw Object.assign(Error(),{code:'INVALID_INPUT'});
+  if(!userDeletion)throw Object.assign(Error(),{code:'DELETION_NOT_CONFIGURED'});
+  res.json(await(verb==='get'?userDeletion.status(req.params.id,req):userDeletion.remove(req.params.id,req.body,req)));
+ }catch(error){const statuses={C4G_ADMIN_REQUIRED:403,MFA_REQUIRED:403,INVALID_INPUT:400,ONBOARDING_INPUT_INVALID:400,RESOURCE_NOT_AVAILABLE:404,SELF_ACCESS_PROTECTED:409,LAST_ADMIN_PROTECTED:409,ONBOARDING_IN_PROGRESS:409,STALE_REVISION:409,DELETION_CONFLICT:409,IDENTITY_RECONCILIATION_REQUIRED:409,DELETION_NOT_CONFIGURED:503};const code=Object.hasOwn(statuses,error.code)?error.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}});
  router.use('/entities/:entityId/users',require('./memberOnboardingRoutes').createMemberRoutes({express,service:members,resolveOrganization:req=>req.params.entityId,before:(req,org)=>service.entity(org,req)}));
  router.get('/entities/:id/registration',async(req,res)=>{try{if(Object.keys(req.query).length||(req.body&&Object.keys(req.body).length))throw Object.assign(Error(),{code:'INVALID_INPUT'});await service.entity(req.params.id,req);if(!registration)throw Error('Unconfigured');res.json(await registration.profile(req.params.id));}catch(e){const statuses={C4G_ADMIN_REQUIRED:403,INVALID_INPUT:400,RESOURCE_NOT_AVAILABLE:404};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}});
  router.put('/entities/:id/registration',async(req,res)=>{try{if(Object.keys(req.query).length)throw Object.assign(Error(),{code:'INVALID_INPUT'});await service.entity(req.params.id,req);if(!registration)throw Error('Unconfigured');res.json(await registration.saveForPlatform(req.params.id,req.body,req));}catch(e){const statuses={C4G_ADMIN_REQUIRED:403,INVALID_INPUT:400,ONBOARDING_INPUT_INVALID:400,REGISTRATION_FIELDS_INVALID:400,RESOURCE_NOT_AVAILABLE:404,ONBOARDING_CONFLICT:409,ONBOARDING_STALE:409,FISCAL_IDENTITY_LOCKED:409,FISCAL_IDENTITY_REVIEW_REQUIRED:409};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code,...(code==='REGISTRATION_FIELDS_INVALID'?{fields:e.fields}:{})},correlationId:correlationId()});}});

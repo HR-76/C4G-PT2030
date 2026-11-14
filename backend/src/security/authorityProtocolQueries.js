@@ -15,6 +15,7 @@ const queries=Object.freeze([...new Set([
   ...Object.values(require('../entityAdmission/registrationSql')),
   ...Object.values(require('../entityAdmission/completionSql')),
   ...Object.values(require('../platformOnboarding/memberSql')),
+  ...Object.values(require('../platformDirectory/deletionSql')),
   ...Object.values(require('../platformOnboarding/sql')),
   ...Object.values(require('../organizationDirectory/accessSql')),
   ...Object.values(require('../platformBilling/sql')),

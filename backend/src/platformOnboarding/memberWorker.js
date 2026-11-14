@@ -16,6 +16,12 @@ if(local&&config.adminOrigin)throw Error('LOCAL_IDENTITY_REQUIRED');
 const identity=require('./keycloakAdapter').createKeycloakAdapter({issuer:config.issuer,accessToken,ownershipKey:config.ownershipKey,usernameMode:'email',purpose,adminOrigin:config.adminOrigin||null});
 const projection=purpose==='MEMBERSHIP'?require('./memberProjection').createMemberProjection({bindings:config.bindings,allowedResidency:config.allowedResidency}):null;
 const methods={identity:x=>identity.ensure(x),...(projection?{projection:x=>projection.ensure(x)}:{}),passwordReady:x=>identity.passwordReady(x.subject)};
+if(purpose==='MEMBERSHIP'&&process.env.USER_DELETION_RUNTIME==='central'){
+ const deletionIdentity=require('../platformDirectory/deletionIdentity').createDeletionIdentity({issuer:config.issuer,accessToken,adminOrigin:config.adminOrigin||null});
+ const deletionProjection=require('../platformDirectory/deletionProjection').createDeletionProjection({bindings:config.bindings,allowedResidency:config.allowedResidency});
+ methods.deleteIdentity=x=>deletionIdentity.remove(x);
+ methods.erasePerson=x=>deletionProjection.anonymize(x);
+}
 if(purpose==='MEMBERSHIP'){
  const email=require('./activationEmail').createActivationEmail({key:config.ownershipKey,apiKey:process.env.RESEND_API_KEY,from:process.env.ACTIVATION_EMAIL_FROM,origin:process.env.ACTIVATION_PUBLIC_URL});
  methods.activationSecret=x=>email.secret(x);

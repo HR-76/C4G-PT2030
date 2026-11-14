@@ -153,10 +153,11 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes = selectAuthRoutes(authConfig.mode, routes, oidcAuth);
     const centralImports=dependencies.centralImportRuntime||require('./portugal2030/uploadRuntime').configuredCentralImport({pool:centralPool,env,authorityPolicy:{policyVersion:authConfig.policyVersion,requirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}});
     if(centralImports)closeCentralImport=dependencies.ownResource?.(centralImports,()=>centralImports.close())||(()=>centralImports.close());
-    composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,
+    const userDeletion=dependencies.createUserDeletion?.({authorityCoordinator,authConfig})||null;
+    composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,userDeletion,
       members:memberOnboarding,
       access:env.PLATFORM_ACCESS_RUNTIME==='central'?require('./platformDirectory/access').createPlatformAccess({coordinator:authorityCoordinator,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],recentMfaRequirement:authConfig.assurancePolicy['recent-mfa']}):null,
-      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health})});
+      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health,deletionAvailable:Boolean(userDeletion)})});
     const platformBillingService=require('./platformBilling/service').createPlatformBillingService({
       coordinator:authorityCoordinator,centralPool
     });
@@ -164,11 +165,12 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       sessionStore:security.sessionStore,sessionRegistry,authorityCoordinator,authorizationCatalogs,centralPool,
       assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]
     });
+    const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:centralPool,customerService:customerBillingService}):null;
     const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:centralPool,customerService:customerBillingService,env});
     if(billingPdfs)readyBillingPdfs=()=>billingPdfs.ready();
     if(billingPdfs)closeBillingPdfs=dependencies.ownResource?.(billingPdfs,()=>billingPdfs.close())||(()=>billingPdfs.close());
     composedRoutes.platformBilling=require('./platformBilling/http').createPlatformBillingRouter({
-      express,service:platformBillingService,authenticate,pdfs:billingPdfs?.service
+      express,service:platformBillingService,authenticate,pdfs:billingPdfs?.service,validation:billingValidation
     });
     // Invitation template of the Admin C4G (Central 051). Sending still uses the fixed text until the email plan's increment 4.
     // Email logos (the email plan's increment 5): the C4G logo here, each entity's own in its directory, and the public read.
@@ -182,7 +184,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     const opportunityComplements=require('./opportunities/complementService').createOpportunityComplementService({centralPool,collectionMode:env.OPPORTUNITY_COMPLEMENT_COLLECTION||'disabled'});
     composedRoutes.opportunityComplements=require('./opportunities/complementService').createOpportunityComplementRouter({express,authenticate,service:opportunityComplements});
     composedRoutes.customerBilling=require('./customerBilling/http').createCustomerBillingRouter({
-      express,authenticate,organizationMiddleware,service:customerBillingService,pdfs:billingPdfs?.service
+      express,authenticate,organizationMiddleware,service:customerBillingService,pdfs:billingPdfs?.service,validation:billingValidation
     });
     if(activationEnabled){
       opportunityActivation=require('./opportunities/v2/activationHttp').createOpportunityActivationHttpRuntime({

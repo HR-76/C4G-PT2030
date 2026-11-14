@@ -123,6 +123,8 @@ export const platformDirectoryApi = {
   entityProfile: (id, signal) => api.get(`/admin/directory/entities/${id}/registration`, { signal, timeout: 15000 }),
   saveEntityProfile: (id, body) => api.put(`/admin/directory/entities/${id}/registration`, body, { timeout: 20000 }),
   users: (params, signal) => api.get('/admin/directory/users', { params, signal, timeout: 15000 }),
+  userDeletionStatus: id => api.get(`/admin/directory/users/${encodeURIComponent(id)}/deletion`, { timeout: 15000 }),
+  deleteUser: (id, body) => api.post(`/admin/directory/users/${encodeURIComponent(id)}/deletion`, body, { timeout: 120000 }),
 }
 
 const billingRoot = '/admin/billing'
@@ -131,6 +133,8 @@ export const platformBillingApi = {
   cycles: (params, signal) => api.get(billingRoot + '/cycles', { params, signal, timeout: 15000 }),
   cycle: (id, signal) => api.get(`${billingRoot}/cycles/${id}`, { signal, timeout: 15000 }),
   account: (organizationId, signal) => api.get(`${billingRoot}/organizations/${organizationId}/account`, { signal, timeout: 15000 }),
+  validation: (organizationId, signal) => api.get(`${billingRoot}/organizations/${organizationId}/account/validation`, { signal }),
+  requestValidation: (organizationId, body) => api.post(`${billingRoot}/organizations/${organizationId}/account/validation`, body),
   accountWrite: (organizationId, body) => api.put(`${billingRoot}/organizations/${organizationId}/account`, body, { timeout: 20000 }),
   cycleCreate: body => api.post(billingRoot + '/cycles', body, { timeout: 20000 }),
   cycleEdit: (id, body) => api.put(`${billingRoot}/cycles/${id}`, body, { timeout: 20000 }),
@@ -174,7 +178,7 @@ export function entityAccessApi(organizationId,platform=false){
  }
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────
+// â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const authApi = {
   login: (returnTo = '/') => {
     window.location.assign(`/api/auth/oidc/login?returnTo=${encodeURIComponent(returnTo)}`)
@@ -215,7 +219,7 @@ export const editorialApi = {
   stepUp: (category, returnTo) => authApi.stepUp(category, returnTo),
 }
 
-// ── Dashboard ─────────────────────────────────────────────────────────────
+// â”€â”€ Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const dashboardApi = {
   organization: async ({ organizationId, isCurrent, signal }) => {
     if (!organizationId || !isCurrent()) throw new Error('Organization required')
@@ -229,13 +233,13 @@ export const dashboardApi = {
   organizationReport: ({ organizationId, digest, signal }) => api.get('/applications/report.xlsx', withSignal({ params: { digest }, headers: { 'X-C4G-Organization': organizationId }, responseType: 'blob', timeout: 30000 }, signal)),
 }
 
-// ── Opportunities ─────────────────────────────────────────────────────────
+// â”€â”€ Opportunities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const privateOpportunitiesApi = {
   list: (params, signal) => api.get('/opportunities', { params, signal }),
   get: id => api.get(`/opportunities/${id}`),
 }
 
-// ── Applications ──────────────────────────────────────────────────────────
+// â”€â”€ Applications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function organizationDirectoryApi(organizationId) {
   const options={headers:{'X-C4G-Organization':organizationId},timeout:10000},root='/organization-directory'
   const read=(path,config={},signal)=>api.get(root+path,withSignal({...options,...config},signal))
@@ -296,7 +300,7 @@ export const privateApplicationsApi = {
   edit: (id, body, organizationId) => api.put(`/applications/${id}`, body, applicationContext(organizationId)),
   transition: (id, body, organizationId) => api.post(`/applications/${id}/transitions`, body, applicationContext(organizationId)),
   myWork: (params, organizationId, signal) => api.get('/applications/my-work', { params, ...applicationContext(organizationId, signal) }),
-  // Tasks, alerts and assigned reviews of the Técnico dashboard in one request; a part that failed carries `error`.
+  // Tasks, alerts and assigned reviews of the TÃ©cnico dashboard in one request; a part that failed carries `error`.
   technicianDashboard: (organizationId, signal) => api.get('/applications/technician-dashboard', { ...applicationContext(organizationId, signal), timeout: 30000 }),
   calendar: (params, organizationId, signal) => api.get('/applications/calendar', { params, ...applicationContext(organizationId, signal) }),
   work: (id, params, signal) => inSessionContext(() => api.get(`/applications/${id}/work`, withSignal({ params }, signal))),
@@ -325,7 +329,7 @@ export const privateApplicationsApi = {
   documentDownload: (id, versionId) => documentDownloadPath(id, versionId, apiBaseUrl),
 }
 
-// ── Partners ───────────────────────────────────────────────────────────────
+// â”€â”€ Partners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // The expected organization prevents a request crossing a context switch.
 // It is a precondition only; authority remains resolved by the server.
 export const organizationNotificationsApi = {
@@ -340,7 +344,7 @@ export const organizationNotificationsApi = {
   markAllRead: organizationId => api.patch('/notifications/read-all', {}, applicationContext(organizationId)),
 }
 
-// ── Imports ───────────────────────────────────────────────────────────────
+// â”€â”€ Imports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const platformImportsApi = {
   availability: signal => api.get('/admin/directory/imports/portugal2030', { timeout: 15000, signal }),
   upload: body => api.post('/admin/directory/imports/portugal2030/xlsx', body, { timeout: 180000 }),
@@ -461,6 +465,8 @@ export function customerBillingApi(organizationId) {
     access: signal => get('/access',undefined,signal),
     summary: signal => get('/summary',undefined,signal),
     account: signal => get('/account',undefined,signal),
+    validation: signal => get('/account/validation',undefined,signal),
+    confirmValidation: body => api.post('/billing/account/validation', body, { headers: { 'X-C4G-Organization': organizationId } }),
     invoices: (params,signal) => get('/invoices',params,signal),
     invoice: (id,signal) => get('/invoices/'+encodeURIComponent(id),undefined,signal),
   }

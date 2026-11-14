@@ -1,9 +1,10 @@
 'use strict';
 const statuses={INVALID_INPUT:400,AUTHORITY_REQUIRED:401,SESSION_REQUIRED:401,NOT_AUTHORIZED:403,RESOURCE_NOT_AVAILABLE:404,CONTEXT_CHANGED:409,AUTHORITY_STALE:409,AUTHORITY_WRITE_PENDING:409};
-function createCustomerBillingRouter({express,service,authenticate,organizationMiddleware,pdfs=null}) {
+function createCustomerBillingRouter({express,service,authenticate,organizationMiddleware,pdfs=null,validation=null}) {
   const router=express.Router();
   router.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer'});next()},authenticate,
     organizationMiddleware.requireServerSession,organizationMiddleware.resolveOrganizationContext,organizationMiddleware.requireOrganizationContext);
+  require('../billingValidation/http').mountValidationRoutes(router,{service:validation});
   router.use((req,res,next)=>req.method!=='GET'?res.status(405).json({error:{code:'OPERATION_NOT_AVAILABLE'}}):next());
   require('./pdfHttp').mountPdfRoutes(router,{express,service:pdfs,customer:true});
   for(const [path,method] of [['/access','access'],['/summary','summary'],['/account','account'],['/invoices','list'],['/invoices/:id','detail']]) {

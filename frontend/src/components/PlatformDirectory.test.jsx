@@ -12,8 +12,26 @@ const response=items=>({data:{items,total:items.length,page:1,pageSize:50}})
 const api=()=>({entities:vi.fn().mockResolvedValue(response([entity])),users:vi.fn().mockResolvedValue(response([user])),entity:vi.fn().mockResolvedValue({data:entity}),entityProfile:vi.fn().mockResolvedValue({data:{organization:entity,registration:profile}}),saveEntityProfile:vi.fn().mockResolvedValue({data:profile})})
 function mount(client,path='/administracao/entidades'){return render(<MemoryRouter initialEntries={[path]}><Routes><Route path="/administracao/entidades" element={<DirectoryView api={client}/>}/><Route path="/administracao/entidades/utilizadores" element={<DirectoryView api={client}/>}/><Route path="/administracao/entidades/:entityId" element={<DirectoryView api={client}/>}/></Routes></MemoryRouter>)}
 it('shows real entity data and opens its member list without selecting the organization',async()=>{
- const client=api();mount(client);await screen.findByText('Entidade A');fireEvent.click(screen.getByRole('link',{name:'Consultar Entidade A'}));await screen.findByRole('heading',{name:'Utilizadores de Entidade A'});
+ const client=api();mount(client);await screen.findByText('Entidade A');fireEvent.click(screen.getByRole('link',{name:'Consultar Entidade A'}));await screen.findByRole('heading',{name:'Ficha da entidade'});
  expect(client.users).toHaveBeenCalledWith({organizationId:'a'},expect.any(AbortSignal));expect(client.entityProfile).toHaveBeenCalledWith('a',expect.any(AbortSignal));expect(screen.getAllByText('Empresa').length).toBeGreaterThan(0);expect(screen.getByText('Por completar')).toBeTruthy();expect(screen.queryByRole('button',{name:'Nova entidade'})).toBeNull();
+});
+it('separates the entity record from access management and preserves edits when switching sections',async()=>{
+ const client=api();mount(client,'/administracao/entidades/a');await screen.findByRole('heading',{name:'Ficha da entidade'});
+ expect(screen.queryByRole('heading',{name:'Utilizadores de Entidade A'})).toBeNull();
+ expect(screen.getByRole('link',{name:'Ficha da entidade'}).getAttribute('aria-current')).toBe('location');
+ fireEvent.click(screen.getByRole('button',{name:'Preencher ficha'}));
+ const input=screen.getByLabelText(/Sigla/);fireEvent.change(input,{target:{value:'NOVA'}});
+ fireEvent.click(screen.getByRole('link',{name:'Utilizadores e acessos'}));
+ expect(screen.getByRole('heading',{name:'Utilizadores de Entidade A'})).toBeTruthy();
+ expect(screen.queryByRole('heading',{name:'Ficha da entidade'})).toBeNull();
+ fireEvent.click(screen.getByRole('link',{name:'Ficha da entidade'}));
+ expect(screen.getByLabelText(/Sigla/).value).toBe('NOVA');
+ expect(client.entity).toHaveBeenCalledTimes(1);expect(client.entityProfile).toHaveBeenCalledTimes(1);
+});
+it('opens the users and access section from a direct link',async()=>{
+ mount(api(),'/administracao/entidades/a#utilizadores');await screen.findByRole('heading',{name:'Utilizadores de Entidade A'});
+ expect(screen.getByRole('link',{name:'Utilizadores e acessos'}).getAttribute('aria-current')).toBe('location');
+ expect(screen.queryByRole('heading',{name:'Ficha da entidade'})).toBeNull();
 });
 it('shows a platform-only account without inventing an entity membership',async()=>{
  mount(api(),'/administracao/entidades/utilizadores');await screen.findByText('admin@example.invalid');expect(screen.getByText('Administrador C4G')).toBeTruthy();expect(screen.getByText('Sem vínculo a entidades')).toBeTruthy();

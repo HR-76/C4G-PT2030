@@ -169,8 +169,8 @@ function createTenantMigrationRunner({
             SELECT migration_id, ordinal, checksum_sha256, irreversible, resulting_fingerprint
               FROM c4g_system.schema_migration
              ORDER BY ordinal`);
-          const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest } = require('./tenantMigrationManifest');
-          const observedEntries = (entries === manifest && [chatRetentionManifest, documentDeletionManifest, applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
+          const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest, accountIdentityErasureManifest } = require('./tenantMigrationManifest');
+          const observedEntries = (entries === manifest && [accountIdentityErasureManifest, chatRetentionManifest, documentDeletionManifest, applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
             .find(candidate => candidate.at(-1).version === existing.currentVersion)) || knownEntries;
           let ledger;
           try { ledger = validateTenantLedger(ledgerRows.rows, observedEntries, loadMigration); }

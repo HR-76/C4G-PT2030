@@ -17,10 +17,10 @@ const accountReady = { ...accountEmpty, account: { id: 'aaaaaaaa-aaaa-4aaa-8aaa-
 function billingApi(account) {
   return { summary: vi.fn(() => response({ currencies: [] })), cycles: vi.fn(() => response({ items: [], total: 0, page: 1, pageSize: 25 })), account: vi.fn(() => response(account)), accountWrite: vi.fn(() => response({ revision: 1 })) }
 }
-async function open(api, entityProfile) {
+async function open(api, entityProfile, action = 'Preparar faturação') {
   const directoryApi = { entities: vi.fn(() => response({ items: [organization] })), entityProfile }
   render(<MemoryRouter initialEntries={['/administracao/faturacao']}><Routes><Route path="/administracao/faturacao" element={<BillingView api={api} directoryApi={directoryApi}/>}/></Routes></MemoryRouter>)
-  fireEvent.click(await screen.findByRole('button', { name: 'Preparar faturação' }))
+  fireEvent.click(await screen.findByRole('button', { name: action }))
   fireEvent.change(await screen.findByLabelText('Entidade'), { target: { value: organization.id } })
   return directoryApi
 }
@@ -101,5 +101,27 @@ describe('regras de correspondência entre ficha e conta', () => {
     expect(profileDifferences(same, profile.registration, organization.legalName)).toEqual([])
     expect(profileDifferences(same, profile.registration, 'Outra Denominação, S.A.').map(item => item.field)).toEqual(['legalName'])
     expect(profileDifferences({ ...same, addressLine2: null }, profile.registration, organization.legalName).map(item => item.field)).toEqual(['addressLine2'])
+  })
+})
+
+
+describe('fichas de faturação independentes dos ciclos', () => {
+  it('edita e guarda a ficha e permite outra gravação com a revisão atual', async () => {
+    const api = billingApi(accountReady)
+    await open(api, vi.fn(() => response(profile)), 'Fichas de faturação')
+    await screen.findByRole('group', { name: 'Editar dados de faturação' })
+    expect(screen.queryByRole('group', { name: 'Novo ciclo' })).toBeNull()
+    fireEvent.change(screen.getByLabelText('Morada'), { target: { value: 'Rua Nova' } })
+    api.account.mockImplementation(() => response({ ...accountReady, account: { ...accountReady.account, revision: 2, version: { ...version, addressLine1: 'Rua Nova' } } }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar dados de faturação' }))
+    await screen.findByText('Dados de faturação guardados.')
+    await screen.findByRole('group', { name: 'Editar dados de faturação' })
+    expect(api.accountWrite.mock.calls[0][1]).toMatchObject({ expectedRevision: 1, addressLine1: 'Rua Nova' })
+    expect(screen.queryByRole('group', { name: 'Novo ciclo' })).toBeNull()
+    fireEvent.change(screen.getByLabelText('Morada'), { target: { value: 'Outra Rua' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar dados de faturação' }))
+    await waitFor(() => expect(api.accountWrite).toHaveBeenCalledTimes(2))
+    expect(api.accountWrite.mock.calls[1][1]).toMatchObject({ expectedRevision: 2, addressLine1: 'Outra Rua' })
+    expect(api.accountWrite.mock.calls[1][1].idempotencyKey).not.toBe(api.accountWrite.mock.calls[0][1].idempotencyKey)
   })
 })

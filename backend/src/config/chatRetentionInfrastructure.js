@@ -6,7 +6,7 @@
 const { Pool } = require('pg');
 const { guardPool, runtimePoolTimeouts } = require('./poolResilience');
 const { MIN_RETENTION_DAYS } = require('../applications/chatRetention');
-const { CHAT_RETENTION_SCHEMA_VERSION } = require('../security/tenantMigrationManifest');
+const { CHAT_RETENTION_SCHEMA_VERSION, ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION } = require('../security/tenantMigrationManifest');
 
 const ROLE = 'c4g_chat_retention_runtime';
 const CAPABILITY = 'APPLICATION_CHAT_RETENTION';
@@ -91,7 +91,7 @@ async function createChatRetentionInfrastructure({ env = process.env, deps = {} 
             || login.rolcreatedb || login.rolcreaterole || login.rolreplication) throw fail('CHAT_RETENTION_LIMITED_LOGIN_REQUIRED');
         await ports.validateRoleChain(client, { login: login.session_user, workload: 'WORKER', functionalRoles: [ROLE], optionalFunctionalRoles: [...OTHER_WORKER_ROLES] });
         const observed = await ports.observeMetadata(client, { tenantId: credential.tenantId, databaseGenerationId: credential.databaseGenerationId });
-        if (observed.currentVersion !== CHAT_RETENTION_SCHEMA_VERSION || !observed.capabilities.includes(CAPABILITY)) throw fail('CHAT_RETENTION_SCHEMA_INCOMPATIBLE');
+        if (![CHAT_RETENTION_SCHEMA_VERSION,ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION].includes(observed.currentVersion) || !observed.capabilities.includes(CAPABILITY)) throw fail('CHAT_RETENTION_SCHEMA_INCOMPATIBLE');
         await client.query('COMMIT');
       } catch (error) {
         await client.query('ROLLBACK').catch(() => {});

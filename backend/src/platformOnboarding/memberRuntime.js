@@ -42,6 +42,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   if (selection === 'disabled') return null;
   if (selection !== 'central') throw invalid('MEMBER_ONBOARDING_RUNTIME_INVALID');
   const directory = env.MEMBER_ONBOARDING_DIRECTORY;
+  if(!['disabled','central'].includes(env.USER_DELETION_RUNTIME||'disabled'))throw invalid('USER_DELETION_RUNTIME_INVALID');
   const settings = readSettings(directory, env);
   const port = bridgePort(env);
   const worker = createWorker(path.join(directory, 'worker.json'));
@@ -89,7 +90,14 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
     })();
   }
 
-  return Object.freeze({ createMemberOnboarding, start, close });
+  function createUserDeletion({authorityCoordinator,authConfig}){
+    if(env.USER_DELETION_RUNTIME!=='central')return null;
+    return require('../platformDirectory/deletion').createUserDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
+      policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy['recent-mfa'],
+      audit:require('./audit').createOnboardingAudit(),
+      identity:{remove:value=>worker.call('deleteIdentity',value)},projection:{anonymize:value=>worker.call('erasePerson',value)}});
+  }
+  return Object.freeze({ createMemberOnboarding, createUserDeletion, start, close });
 }
 
 module.exports = { configuredMemberOnboarding, ACTIVATION_PATH, BRIDGE_PORT };
