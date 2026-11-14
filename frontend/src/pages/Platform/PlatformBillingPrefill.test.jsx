@@ -119,6 +119,7 @@ describe('fichas de faturação independentes dos ciclos', () => {
     expect(api.accountWrite.mock.calls[0][1]).toMatchObject({ expectedRevision: 1, addressLine1: 'Rua Nova' })
     expect(screen.queryByRole('group', { name: 'Novo ciclo' })).toBeNull()
     fireEvent.change(screen.getByLabelText('Morada'), { target: { value: 'Outra Rua' } })
+    expect(screen.queryByText('Dados de faturação guardados.')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Guardar dados de faturação' }))
     await waitFor(() => expect(api.accountWrite).toHaveBeenCalledTimes(2))
     expect(api.accountWrite.mock.calls[1][1]).toMatchObject({ expectedRevision: 2, addressLine1: 'Outra Rua' })

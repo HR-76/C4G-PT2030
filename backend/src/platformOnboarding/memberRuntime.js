@@ -99,7 +99,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   function createUserDeletion({authorityCoordinator,authConfig}){
     if(env.USER_DELETION_RUNTIME!=='central')return null;
     deletionService=require('../platformDirectory/deletion').createUserDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
-      policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy['recent-mfa'],
+      policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory || 'recent-mfa'],
       audit:require('./audit').createOnboardingAudit(),
       identity:{remove:value=>worker.call('deleteIdentity',value)},projection:{anonymize:value=>worker.call('erasePerson',value)}});
     return deletionService;

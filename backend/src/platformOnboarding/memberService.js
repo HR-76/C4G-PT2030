@@ -145,7 +145,10 @@ function createMemberOnboardingService({coordinator,identity,projection,verifica
     const row=await operation(c,id);await admin(c,request,row.organization_id,row.profile_code);
     const prior=row.receipt?.activationEmail;
     if(prior?.invitationId===invitation.id)return prior;
-    const content=prepareEmail?await prepareEmail({organizationId:row.organization_id,expiresAt:invitation.expiresAt}):{};
+    // An already-issued invitation without a receipt may have been sent by an
+    // older process that crashed before recording its result. Keep its old body.
+    const existingUnpinned=value.invitations.some(item=>item.id===invitation.id);
+    const content=prepareEmail&&!existingUnpinned?await prepareEmail({organizationId:row.organization_id,expiresAt:invitation.expiresAt}):{};
     const previous=prior?[...(prior.previous||[]),{...deliveryView(prior),logo:prior.logo||null}]:[];
     const record={invitationId:invitation.id,status:'UNCONFIRMED',...content,previous};
     const saved=await c.query(q.emailDelivery,[id,JSON.stringify(record),invitation.id]);

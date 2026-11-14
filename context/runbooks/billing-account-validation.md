@@ -21,7 +21,9 @@ pedir a validação da nova versão. Pedidos e confirmações anteriores são im
 Não aplicada a Dev, staging ou produção neste trabalho. A Central 054 é aditiva e
 irreversível; exige Central 053 e um preflight válido. Efetuar a cópia de segurança
 prevista para o ambiente antes de instalar. Não usar SQL avulso para contornar o
-manifesto. Variantes adicionais de schema precisam de admissão própria; o pacote
+manifesto. A variante com os dois logins de staging foi ensaiada e usa a flag
+`C4G_STAGING_CENTRAL_RUNTIME_LOGINS=admitted-v1` já prevista para esse ambiente.
+Variantes adicionais de schema precisam de admissão própria; o pacote
 não aceita silenciosamente outras extensões da Central.
 
 1. Disponibilizar `CENTRAL_MIGRATION_DATABASE_URL` ao processo de migração por meio

@@ -2,7 +2,7 @@ import {afterEach,expect,it,vi} from 'vitest'
 import {cleanup,render,screen,fireEvent,waitFor,act} from '@testing-library/react'
 import {MemoryRouter,Routes,Route} from 'react-router-dom'
 import {DirectoryView} from '../pages/Platform/PlatformDirectory'
-vi.mock('../api/api',()=>({platformDirectoryApi:{},admissionApi:{}}))
+vi.mock('../api/api',()=>({platformDirectoryApi:{},admissionApi:{},authApi:{}}))
 vi.mock('../pages/Platform/EntityUsers',()=>({default:({organizationName})=><h2>Utilizadores de {organizationName}</h2>}))
 afterEach(cleanup)
 const entity={id:'a',name:'Entidade A',legalName:'Entidade A',slug:'entidade-a',status:'ACTIVE',activeAccounts:1,administrators:[],typeCode:'COMPANY',currency:'EUR',createdAt:'2026-10-18'}

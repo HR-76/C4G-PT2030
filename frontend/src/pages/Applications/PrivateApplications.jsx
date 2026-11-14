@@ -4,6 +4,7 @@ import ApplicationSections from './ApplicationSections'
 import { useConfirmDialog } from '../../components/ConfirmDialog'
 import ApplicationPreparationSummary from './ApplicationPreparationSummary'
 import ApplicationNextStep from './ApplicationNextStep'
+import useNextStepCompletion from './useNextStepCompletion'
 import ApplicationPartners from './ApplicationPartners'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -49,6 +50,7 @@ export function ApplicationRecord() {
   const [record,setRecord]=useState(()=>startConfirmedRead(scope,recordName).held),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
   const [historyLoading,setHistoryLoading]=useState(false),[historyError,setHistoryError]=useState(''),[historyRefresh,setHistoryRefresh]=useState(0)
   const currentRecord=useRef(record);currentRecord.current=record
+  const nextStep=useNextStepCompletion(userId,org,id,record?.status,record?.statusChangedAt)
   const [responsibles,setResponsibles]=useState([]),[responsiblesNext,setResponsiblesNext]=useState(null),[loadingResponsibles,setLoadingResponsibles]=useState(false),[opportunity,setOpportunity]=useState(null)
   const [responsiblesLoadFailed,setResponsiblesLoadFailed]=useState(false)
   const responsibleOrg=useRef(org)
@@ -158,6 +160,7 @@ export function ApplicationRecord() {
     ++recordGeneration.current
     // A pending intention may belong to another record in the same organization.
     if(data.applicationId!==id){setRefresh(v=>v+1);return}
+    nextStep.complete(method)
     confirmedRevision.current=Math.max(confirmedRevision.current,data.revision)
     setRecord(previous=>!previous||data.revision<previous.revision?previous:{...previous,...data,...(method==='transition'?{allowedTransitions:[]}: {})})
     setRefresh(v=>v+1)
@@ -257,12 +260,12 @@ export function ApplicationRecord() {
           <div><dt>Prazo interno</dt><dd>{record.deadline?dateLabel(record.deadline):'Não definido'}</dd></div>
         </dl>
       </header>
-      <div className="application-priority"><ApplicationNextStep status={record.status} showNavigation={false} actions={{
+      <div className="application-priority">{!nextStep.completed&&<ApplicationNextStep status={record.status} showNavigation={false} actions={{
         edit:record.canEdit!==false?()=>setEditOpen(true):null,
         startPreparation:transitions.includes('PREPARATION')?openStatusChange:null,
         registerSubmission:transitions.includes('SUBMITTED')?openStatusChange:null,
         team:()=>openTab('team'),partners:()=>openTab('partners'),documents:()=>openTab('documents'),history:()=>openTab('history'),
-      }}/>
+      }}/>}
       {record.canEdit!==false&&!['CANCELLED','ARCHIVED'].includes(record.status)&&<><button type="button" className="btn btn-primary" onClick={()=>setEditOpen(true)}>Editar dados e orçamento</button>{editOpen&&<FormModal title="Editar dados e orçamento" locked={busy} onClose={()=>setEditOpen(false)}><div className="application-edit-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}<form className="edit-form" onSubmit={e=>submit(e,'edit')}>{fields}<div className="form-actions"><button className="btn btn-primary" type="submit" disabled={locked}>Guardar alterações</button></div></form></div></FormModal>}</>}
       {transitions.length>0&&<><button type="button" className="btn btn-outline" onClick={openStatusChange}>Alterar estado</button>{statusOpen&&<FormModal title="Alterar estado" locked={busy} active={!confirming} onClose={()=>setStatusOpen(false)}><div className="application-edit-modal application-status-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
         <p>Estado atual: <span className={`chip ${CHIP[record.status]||'chip-grey'}`}>{LABEL[record.status]}</span></p>
@@ -286,9 +289,9 @@ export function ApplicationRecord() {
       {record.evaluationId&&<p>Avaliação F14 associada: {record.evaluationId} (referência, sem prova de elegibilidade)</p>}
       {record.canEdit===false&&<p>Acesso de consulta à candidatura. A edição requer autorização do gestor.</p>}
         </>},
-        {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
-        {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
-        {id:'partners',label:'Parceiros',render:visited=>visited&&<ApplicationPartners applicationId={id} userId={userId} organizationId={org}/>},
+        {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview onActionCompleted={()=>nextStep.complete('documents')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
+        {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork onActionCompleted={()=>nextStep.complete('team')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
+        {id:'partners',label:'Parceiros',render:visited=>visited&&<ApplicationPartners onActionCompleted={()=>nextStep.complete('partners')} applicationId={id} userId={userId} organizationId={org}/>},
         {id:'history',label:'Histórico',content:<>      <section id="historico-candidatura" tabIndex={-1} className="detail-section"><h2>Histórico</h2><p>Revisão atual: {record.revision} · Data do estado: {dateLabel(record.statusChangedAt)}</p>{historyLoading?<p role="status">A carregar histórico…</p>:historyError?<p role="alert">{historyError} <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>:<ApplicationTimeline history={history} record={record} responsibles={responsibles}/>}
         {historyNext&&<button type="button" onClick={async()=>{try{const r=await api.history(id,{cursor:historyNext});if(!alive.current)return;setHistory(h=>[...h,...r.data.items]);setHistoryNext(r.data.nextCursor)}catch(e){if(alive.current)setError(message(e))}}}>Mais histórico</button>}</section></>}
       ]}/>

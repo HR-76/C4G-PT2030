@@ -19,6 +19,7 @@ test('closed protocol query catalog exactly matches the pinned SQL function',()=
   const {queries}=require('../src/security/authorityProtocolQueries');
   const billing=require('../src/platformBilling/sql');
   const extensions=[
+    {version:'platform_user_deletion',queries:Object.values(require('../src/platformDirectory/deletionSql')),count:24,sql:require('node:fs').readFileSync(require('node:path').join(__dirname,'../database/central/candidates/platform_user_deletion.up.sql'),'utf8')},
     {version:'member_email_delivery',queries:[require('../src/platformOnboarding/memberSql').emailDelivery],count:1,sql:require('../src/platformOnboarding/memberEmailSecurityPackage').load().sql},
     {version:'application_status_capture',queries:[require('../src/applications/statusEmails/capture').SQL],count:1,sql:require('../src/applications/statusEmails/securityPackage').load('central').sql},
     {version:'027_platform_billing',functionName:'authority_api.execute_platform_billing',delimiter:'$billing_authority$',queries:Object.values(billing),count:36},

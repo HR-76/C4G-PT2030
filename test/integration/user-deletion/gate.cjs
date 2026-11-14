@@ -18,7 +18,16 @@ async function proof(pool,connection){
  await runner.applyRegisteredOpportunityComplementPackage(pool,'opportunity-complement-v1');
  await pool.query(load('src/platformOnboarding/memberEmailSecurityPackage').load().sql);
  const ledger=(await pool.query('SELECT * FROM public.c4g_schema_migration ORDER BY version')).rows;
- await pool.query(fs.readFileSync(path.join(backend,'database/central/candidates/platform_user_deletion.up.sql'),'utf8'));
+ if(process.env.USER_DELETION_CALIBRATE==='1')await pool.query(fs.readFileSync(path.join(backend,'database/central/candidates/platform_user_deletion.up.sql'),'utf8'));
+ else{
+  const {rollout}=load('scripts/staging/userDeletionRollout');
+  await assert.rejects(rollout(pool,{mode:'apply',expectedDatabase:'wrong'}),/USER_DELETION_TARGET_MISMATCH/);
+  assert.equal((await rollout(pool,{mode:'check',expectedDatabase:'postgres'})).installed,false);
+  assert.equal((await rollout(pool,{mode:'rehearse',expectedDatabase:'postgres'})).rehearsalPassed,true);
+  assert.equal((await rollout(pool,{mode:'check',expectedDatabase:'postgres'})).installed,false);
+  assert.equal((await rollout(pool,{mode:'apply',expectedDatabase:'postgres'})).installed,true);
+  assert.equal((await rollout(pool,{mode:'apply',expectedDatabase:'postgres'})).alreadyInstalled,true);
+ }
  const schema=load('src/security/centralSchemaManifest'),authority=load('src/security/authoritySecurityManifest');
  const snapshot=await schema.centralSchemaSnapshot(pool,{compactAuthority:true});
  const pins={schema:schema.schemaFingerprint(snapshot),authority:authority.digest(snapshot.authoritySecurity)};

@@ -9,7 +9,7 @@ function createUserDeletion({coordinator,identity,projection,issuer,policyVersio
  async function authorize(c,req){
   const id=req.user?.id,sid=req.authContext?.sessionId;
   if(!sid||sid!==req.sessionID||!id||!await first(c,adminSql,[sid,uuid(id)]))fail('C4G_ADMIN_REQUIRED');
-  if(recentMfaRequirement?.mfa!==true||!evaluateAssurance({evidence:req.authContext?.evidence,requirement:recentMfaRequirement,nowSeconds:clock()/1000,expectedPolicyVersion:policyVersion}).allowed)fail('MFA_REQUIRED');
+  if(!evaluateAssurance({evidence:req.authContext?.evidence,requirement:recentMfaRequirement,nowSeconds:clock()/1000,expectedPolicyVersion:policyVersion}).allowed)fail(recentMfaRequirement?.mfa===false?'REAUTH_REQUIRED':'MFA_REQUIRED');
   return uuid(id);
  }
  const transaction=async(id,work)=>{

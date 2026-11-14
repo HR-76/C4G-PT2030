@@ -1,6 +1,6 @@
 # Plano técnico — Emails, fase 1 (template do convite e logótipos)
 
-Estado: In Progress — ponto de situação de 14/11/2026 no fim deste documento. Incrementos 1, 2, 3, 5, 6 e 7 feitos; 4 por fazer. Por aprovar pelo utilizador. Estado anterior: Draft — 12/11/2026, por aprovar. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Nada implementado; nenhuma dependência instalada; nenhuma base alterada.
+Estado: Review da implementação da fase 1 — incremento 4 autorizado e implementado em 14/11/2026; validação e limites na secção respetiva abaixo. Contrato em [Emails: templates e configuração](email-templates-and-configuration.md). Os registos de progresso anteriores são históricos.
 
 Âmbito: só a fase 1. Emails do Keycloak, configuração e histórico têm plano próprio depois das respetivas perguntas.
 
@@ -73,6 +73,22 @@ Cada incremento fecha com `node --check`, testes focados, suites completas, lint
 
 ## Progresso
 
+### Incremento 4 — resultado de 14/11/2026
+
+Implementado em `emailTemplates/invitation.js`, no serviço de templates, no serviço/worker de convites e nas composições habitual e de staging. Em Review, sem implantação ou envio externo executado nesta tarefa.
+
+- O template é resolvido pela organização da operação autorizada: próprio, global ou por defeito. O logótipo segue a organização independentemente do template. Leitura coerente em transação da Central e sanitização ao compor.
+- Antes de contactar o fornecedor, a mensagem sem segredo e as referências de versão são fixadas no recibo existente sob o lock de escrita. Falha dessa gravação impede o envio. Concorrência e repetição reutilizam a mensagem; aceitação já registada evita novo contacto. Reenvio explícito cria convite novo e conserva os metadados anteriores.
+- Uma ligação já emitida sem mensagem fixada conserva o formato antigo, incluindo quando um processo antigo possa ter falhado entre enviar e registar o resultado. Evita mudar o corpo associado à chave de idempotência antiga.
+- O worker insere a ligação nas partes HTML e texto e recusa uma mensagem sem o marcador. A API pública só devolve o resultado e a referência do template, nunca a mensagem fixada nem o segredo.
+- O envio de teste lê o endereço do administrador autenticado na Central, valida o template, usa a marca `[TESTE]` e uma ligação `.invalid`. Estado não configurado e resultado incerto nunca são apresentados como aceitação.
+- Validação final focada: **40 testes backend aprovados** (incluindo HTTP e runtime), e os **18 testes frontend de EmailTypes/EmailTemplates aprovados**. Lint, `node --check` e build aprovados. As primeiras execuções HTTP no sandbox falharam; a repetição com loopback disponível passou.
+- Suite backend: **3312 aprovados, 9 ignorados, 5 falhas fora do email**: duas em `authorityMetadataDedup`, uma em `documentApiInfrastructure`, duas em `verifiedDocumentDownload` (incluindo timeout do PowerShell). As duas primeiras suites repetidas isoladamente mantêm as três falhas. Não se alteraram esses módulos para obter uma execução verde.
+- Suite frontend: **1115 aprovados, 1 timeout em ApplicationPartners**, que também falha na repetição focada com o limite original de 5 s. Nenhuma alteração ao frontend nesta entrega. Há alterações concorrentes no checkout, pelo que estes totais descrevem a árvore observada durante a execução, não uma revisão congelada.
+- Limites: sem gate PostgreSQL real, sem email recebido numa caixa, sem verificação em browser e sem deploy. Credenciais existentes e configuração do fornecedor continuam a determinar a disponibilidade efetiva.
+
+As decisões das fases 2 e 3 foram entretanto confirmadas: recuperação ativa, histórico dos três tipos e retenção de endereços de 90 dias. Continuação em [Emails de autenticação, configuração e histórico](email-authentication-and-history-plan.md).
+
 - 14/11/2026 — Incremento 4 autorizado pelo utilizador, em implementação. Critérios: resolver template e logótipo pela entidade da operação autorizada; fixar mensagem sem segredo antes do contacto com o fornecedor, no recibo existente, sob o lock de escrita; reutilizar a mensagem nas repetições e resolver uma nova no reenvio explícito. Conservar metadados dos envios anteriores no recibo, sem os expor na API. Convites anteriores com resultado de envio registado conservam o formato antigo para não mudar o corpo associado à chave do fornecedor. O teste usa apenas o email do administrador lido da Central, marca de teste e ligação `.invalid`; credenciais continuam no worker. Sem migração, envio externo ou deploy nesta etapa. Validar isolamento, concorrência/repetição, recusa de gravação e de autorização, marcador obrigatório e resultado incerto do fornecedor.
 
 - 12/11/2026 — Incremento 1 em Review. `backend/src/emailTemplates/` (contratos, sanitização, texto, composição, template por defeito, validação de logótipo) e `backend/test/emailTemplates.test.js`. Ainda não é chamado por nenhuma rota nem pelo envio do convite: o email enviado continua a ser o atual.
@@ -111,7 +127,7 @@ Verificado no código e por execução das suítes. A frase "Nada implementado; 
 | 1 | Núcleo puro | Feito | `backend/src/emailTemplates/` e 14 testes. Sanitização ensaiada a 14/11 com 23 entradas de ataque, 0 fugas ([registo](../reviews/email-html-sanitization-2026-11-14.md)). |
 | 2 | Pacote da Central | Feito, sem registo anterior neste plano | Migração `051_email_templates` (2 tabelas, funções de escrita com verificação de administrador, registos imutáveis), pacote e manifestos, gate em `test/integration/email-templates/`. Aplicada no staging a 14/11/2026, como predecessora da 052. Não existe `sql.js` com as consultas admitidas. |
 | 3 | Serviço e API do Admin C4G | Feito a 14/11/2026, em Review | Ver "Incremento 3" abaixo. |
-| 4 | Envio com o template guardado | Por fazer | `activationEmail.js` envia o texto fixo atual. |
+| 4 | Envio com o template guardado | Implementado em 14/11/2026, em Review | Resolução por entidade, mensagem fixada antes do envio, partes HTML/texto e teste pelo worker. Ver secção abaixo. |
 | 5 | Logótipos e rota pública | Feito a 14/11/2026, em Review | Ver "Incremento 5" abaixo. |
 | 6 | Interface Admin C4G | Feito contra API simulada | Página, editor e cliente. A entrada "Email" está no menu e a página dá erro na aplicação real, porque falta o incremento 3. |
 | 7 | Logótipo na ficha da entidade | Feito a 14/11/2026, em Review | Ver "Incremento 7" abaixo. |

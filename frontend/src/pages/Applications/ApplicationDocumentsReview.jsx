@@ -49,7 +49,7 @@ function DocumentReviewActivity({item,requests,events,historyReady,historyNext,r
  </details>
 }
 
-export default function ApplicationDocumentsReview({applicationId,userId,organizationId,onPreparationChange,loadDetails=true,takeEarlyRead}){
+export default function ApplicationDocumentsReview({applicationId,userId,organizationId,onPreparationChange,onActionCompleted,loadDetails=true,takeEarlyRead}){
  // The documents this user and organization last received are shown at once and read again; actions wait for the new answer.
  const scope=userId&&organizationId?readScope(userId,organizationId):null,readName=`application-documents:${applicationId}`
  const [snapshot,setSnapshot]=useState(()=>startConfirmedRead(scope,readName).held),[candidates,setCandidates]=useState([]),[candidateNext,setCandidateNext]=useState(null),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
@@ -142,7 +142,7 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   try{const body={...intent.payload,idempotencyKey:intent.idempotencyKey}
    if(intent.method==='reviewRequest')await api.reviewRequest(intent.applicationId,body,intent.organizationId)
    else await api[intent.method](intent.applicationId,body)
-   sessionStorage.removeItem(intentKey);setPending(null);setNotice('Alteração confirmada.');if(intent.method==='reviewDecide')setReviewDrafts(previous=>{const next={...previous};delete next[intent.payload.requestId];return next})
+   sessionStorage.removeItem(intentKey);onActionCompleted?.();setPending(null);setNotice('Alteração confirmada.');if(intent.method==='reviewDecide')setReviewDrafts(previous=>{const next={...previous};delete next[intent.payload.requestId];return next})
    try{const s=await api.documents(applicationId);setSnapshot(s.data);const h=await api.documentHistory(applicationId);setHistory(h.data.items||[]);setHistoryNext(h.data.nextCursor);setHistoryReady(true)}
    catch{setSnapshot(null);setError('Alteração confirmada, mas a releitura falhou. Recarregue documentos e revisão.')}
   }catch(e){if(definitive(e)){sessionStorage.removeItem(intentKey);setPending(null);setSnapshot(null);setRefresh(v=>v+1)}setAccessBlocked(accessDenied(e));setError(intent.method==='reviewDecide'&&e?.response?.status===404?'Decisão indisponível: confirme o acesso à candidatura e ao conjunto documental.':message(e))}

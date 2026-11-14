@@ -12,7 +12,7 @@ const clean=p=>Object.fromEntries(Object.keys(EMPTY_PARTNER).map(k=>[k,k==='peop
 const accessDenied=e=>[401,403,404].includes(e?.response?.status)
 const message=e=>e?.response?.status===401?'A sessão terminou. Recupere a sessão e volte a consultar os parceiros.':e?.response?.status===403?'Sem permissão atual para esta ação. Volte a consultar os parceiros.':e?.response?.data?.error?.code==='SCHEMA_UPGRADE_REQUIRED'?'Os parceiros aguardam a atualização local.':e?.response?.status===409?'Os dados mudaram ou foi atingido um limite. Recarregue os parceiros.':e?.response?.status===400?'Verifique os campos ou recarregue a paginação.':e?.response?.status===404?'Candidatura indisponível ou sem permissão.':'Não foi possível confirmar o resultado. Pode repetir o mesmo envio.'
 
-export default function ApplicationPartners({applicationId,userId,organizationId}) {
+export default function ApplicationPartners({applicationId,userId,organizationId,onActionCompleted}) {
   const [data,setData]=useState(null),[history,setHistory]=useState({items:[],nextCursor:null}),[form,setForm]=useState(EMPTY_PARTNER),[editing,setEditing]=useState(null)
   const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[refresh,setRefresh]=useState(0),[cursor,setCursor]=useState(null)
   const [historyLoading,setHistoryLoading]=useState(true),[historyError,setHistoryError]=useState(false)
@@ -50,7 +50,7 @@ export default function ApplicationPartners({applicationId,userId,organizationId
       if(!retry){if(pending)throw Error('PENDING');intent={userId,organizationId,applicationId,method,payload:{...fields,expectedRevision:data.revision,idempotencyKey:crypto.randomUUID()}};sessionStorage.setItem(key,JSON.stringify(intent));setPending(intent)}
       await api[intent.method](applicationId,intent.payload,organizationId)
       sessionStorage.removeItem(key)
-      if(alive.current){setPending(null);setForm(EMPTY_PARTNER);setEditing(null);setEditorOpen(false);setNotice('Parceiros atualizados.');setCursor(null);setRefresh(v=>v+1)}
+      if(alive.current){onActionCompleted?.();setPending(null);setForm(EMPTY_PARTNER);setEditing(null);setEditorOpen(false);setNotice('Parceiros atualizados.');setCursor(null);setRefresh(v=>v+1)}
     }catch(e){if(alive.current){if(e?.response?.status===400||['STALE_REVISION','STATE_CONFLICT','LIMIT_EXCEEDED'].includes(e?.response?.data?.error?.code)){sessionStorage.removeItem(key);setPending(null);setData(null)}reject(e)}}
     finally{sending.current=false;if(alive.current)setBusy(false)}
   }

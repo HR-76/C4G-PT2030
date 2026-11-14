@@ -10,6 +10,7 @@ async function start({env=process.env}={}) {
   const result=await pool.query("SELECT NOT rolsuper AND NOT rolcreaterole AND NOT rolcreatedb AND NOT rolreplication AND NOT rolbypassrls AND pg_has_role(current_user,'c4g_billing_validation_worker','member') AND NOT pg_has_role(current_user,'c4g_central_runtime','member') AND NOT pg_has_role(current_user,'c4g_authority_owner','member') AND NOT pg_has_role(current_user,'c4g_authority_runtime','member') AS allowed FROM pg_roles WHERE rolname=current_user");
   if(result.rows[0]?.allowed!==true)throw Error('BILLING_WORKER_ROLE_REQUIRED');
  }catch(error){await pool.end();throw error}
+ pool.on('error',()=>process.stderr.write('BILLING_VALIDATION_DATABASE_UNAVAILABLE\n'));
  const worker=createValidationWorker({pool,send});
  let stopped=false,timer=null,inflight=Promise.resolve();
  const schedule=()=>{if(!stopped)timer=setTimeout(()=>{inflight=loop()},5000)};

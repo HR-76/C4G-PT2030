@@ -33,7 +33,8 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     Object.freeze({...entries[0], version:'050_billing_private_documents',schemaFingerprint:hash(schemaFor('billing-pdf-package'))}),
     Object.freeze({...entries[0], version:'051_email_templates',schemaFingerprint:hash(schemaFor('email-template-package'))}),
     Object.freeze({...entries[0], version:'052_central_runtime_read',schemaFingerprint:hash(schemaFor('central-runtime-read-package'))}),
-    Object.freeze({...entries[0], version:'053_opportunity_complement',schemaFingerprint:hash(schemaFor('opportunity-complement-package'))})]);
+    Object.freeze({...entries[0], version:'053_opportunity_complement',schemaFingerprint:hash(schemaFor('opportunity-complement-package'))}),
+    Object.freeze({...entries[0], version:'054_billing_account_validation',schemaFingerprint:hash(schemaFor('billing-validation-package'))})]);
   const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}]]);
   function load(name) {
     const filename = path.resolve(__dirname, '../src/security', name + '.js');
@@ -230,4 +231,10 @@ test('the reader adapter preserves authority, catalog ACL and unrelated database
   const unrelatedFailure = fixture(), sentinel = Object.assign(new Error('synthetic database failure'), {code: 'XX000'});
   unrelatedFailure.client.query = async () => { throw sentinel; };
   await assert.rejects(() => unrelatedFailure.load('catalogReaderSchema').assertCatalogReaderSchema(unrelatedFailure.client), error => error === sentinel);
+});
+
+test('reader admits the billing validation package through its exact schema snapshot', async () => {
+  const f = fixture();
+  f.state.table = 'billing-validation-package';
+  assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client), '054_billing_account_validation');
 });

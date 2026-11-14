@@ -137,9 +137,9 @@ Depende das perguntas 4 e 5.
 
 1. Resolvida em 12/11/2026: só o Admin C4G edita templates, incluindo o de convite de cada organização.
 2. Resolvida em 12/11/2026: HTML com logótipo.
-3. A reposição de palavra-passe é ligada no âmbito desta feature? Implica SMTP externo no Keycloak e revê a decisão de a manter desligada.
-4. O histórico deve incluir os emails do Keycloak? A aplicação não os vê hoje; exigiria ler eventos do Keycloak.
-5. Prazo de retenção dos endereços no histórico.
+3. Resolvida em 14/11/2026: ativar a recuperação por email, além de configurar o texto. Implica SMTP externo no Keycloak; substitui a decisão anterior de a manter desligada.
+4. Resolvida em 14/11/2026: o histórico inclui os três tipos, incluindo os emails do Keycloak.
+5. Resolvida em 14/11/2026: conservar os endereços dos destinatários no histórico durante 90 dias.
 6. Resolvida em 12/11/2026: C4G carrega o seu; cada entidade carrega o seu, apenas o Admin da entidade.
 6a. Armazenamento e endereço público do logótipo: proposta no [plano técnico](email-templates-and-configuration-plan.md) (guardado na Central, servido por rota pública dedicada). Confirmado pelo utilizador em 12/11/2026.
 7. Resolvida em 12/11/2026: aprovados Tiptap no frontend (editor, extensões limitadas à formatação admitida) e `sanitize-html` no backend (lista fechada de elementos e atributos). Versões e licenças a confirmar na instalação.

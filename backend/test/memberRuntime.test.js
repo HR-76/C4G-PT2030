@@ -50,6 +50,31 @@ test('the runtime stays off unless it is selected, and refuses an unknown select
   assert.throws(() => configuredMemberOnboarding({ env: { MEMBER_ONBOARDING_RUNTIME: 'local' }, express }), { code: 'MEMBER_ONBOARDING_RUNTIME_INVALID' });
 });
 
+test('deletion uses the recognized privileged category, including the optional MFA policy', async t => {
+  const policies = require('../src/security/authConfig').RECOGNIZED_ASSURANCE_POLICIES;
+  const queries = require('../src/platformDirectory/deletionSql');
+  const admin = require('../src/platformOnboarding/sql').admin;
+  const actor = '10000000-0000-4000-8000-000000000001';
+  const target = '10000000-0000-4000-8000-000000000002';
+  const coordinator = { withAuthority: work => work(), pool: { async query(sql) {
+    if (sql === admin) return { rows: [{ id: actor }] };
+    if (sql === queries.target) return { rows: [{ id: target, session_revocation_version: 1 }] };
+    if (sql === queries.operation) return { rows: [] };
+    throw Error('UNEXPECTED_QUERY');
+  } } };
+  for (const version of ['c4g-user-mfa-v1', 'c4g-assurance-v1']) {
+    const members = configuredMemberOnboarding({ env: { ...environment(directory(t)), USER_DELETION_RUNTIME: 'central' }, express, ...fakes() });
+    t.after(() => members.close());
+    const policy = policies[version];
+    const service = members.createUserDeletion({ authorityCoordinator: coordinator,
+      authConfig: { policyVersion: version, privilegedLoginCategory: policy.privilegedCategory, assurancePolicy: policy.policy } });
+    const request = { user: { id: actor }, sessionID: 'sid', authContext: { sessionId: 'sid',
+      evidence: { policyVersion: version, authTime: Date.now() / 1000, acr: 'c4g-loa1', amr: ['pwd'] } } };
+    if (version === 'c4g-user-mfa-v1') assert.equal((await service.status(target, request)).phase, 'NOT_STARTED');
+    else await assert.rejects(service.status(target, request), { code: 'MFA_REQUIRED' });
+  }
+});
+
 test('configuration that does not match the API identity or origin prevents start-up', t => {
   const f = fakes(), options = { express, ...f };
   const good = directory(t);

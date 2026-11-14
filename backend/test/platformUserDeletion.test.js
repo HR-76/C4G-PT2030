@@ -29,7 +29,7 @@ function setup(options={}){
  const coordinator={pool:c,withAuthority:fn=>fn(),async write(scopes,fn){assert.ok(scopes.includes('POLICY'));assert.ok(scopes.includes('MEMBER:'+memberships[0].membershipId));const before=structuredClone(operation),length=writes.length;try{return await fn(c);}catch(e){operation=before;writes.length=length;throw e;}}};
  const identity={async remove(reference){external.push('identity');if(options.failIdentity)throw Error('unavailable');return {...reference,deleted:true};}};
  const projection={async anonymize(value){external.push('projection');if(options.failProjection)throw Error('unavailable');return {...value,anonymized:true};}};
- const service=createUserDeletion({coordinator,identity,projection,issuer,policyVersion:'v1',recentMfaRequirement:{mfa:true,maxAgeSeconds:300,acceptedAcr:['mfa'],acceptedAmr:['otp'],amrMode:'all'},clock:()=>110000,audit:async(c,event)=>auditEvents.push(event)});
+ const service=createUserDeletion({coordinator,identity,projection,issuer,policyVersion:'v1',recentMfaRequirement:options.requirement===null?null:options.requirement||{mfa:true,maxAgeSeconds:300,acceptedAcr:['mfa'],acceptedAmr:['otp'],amrMode:'all'},clock:()=>110000,audit:async(c,event)=>auditEvents.push(event)});
  return {service,writes,external,auditEvents,operation:()=>operation};
 }
 test('blocks access before external deletion, anonymizes and preserves technical history',async()=>{
@@ -60,4 +60,19 @@ test('a different retry key and a foreign issuer cannot delete another identity'
  await assert.rejects(h.service.remove(target,{...input,requestId:actor},request),{code:'DELETION_CONFLICT'});
  const foreign=setup({identities:[{issuer:'https://foreign.invalid',subject:target}]});
  await assert.rejects(foreign.service.remove(target,input,request),{code:'IDENTITY_RECONCILIATION_REQUIRED'});assert.equal(foreign.writes.length,0);
+});
+
+test('optional MFA policy accepts recent password authentication but refuses missing, stale and foreign evidence',async()=>{
+ const requirement={mfa:false,maxAgeSeconds:300,acceptedAcr:['c4g-loa1'],acceptedAmr:['pwd'],amrMode:'any'};
+ const evidence={policyVersion:'v1',authTime:100,acr:'c4g-loa1',amr:['pwd']};
+ const req={...request,authContext:{sessionId:'sid',evidence}};
+ assert.equal((await setup({requirement}).service.remove(target,input,req)).phase,'COMPLETE');
+ for(const value of [undefined,{...evidence,authTime:-300},{...evidence,policyVersion:'another-policy'}]){
+  const h=setup({requirement});
+  await assert.rejects(h.service.remove(target,input,{...req,authContext:{sessionId:'sid',evidence:value}}),{code:'REAUTH_REQUIRED'});
+  assert.equal(h.writes.length,0);assert.equal(h.external.length,0);
+ }
+ const absent=setup({requirement:null});
+ await assert.rejects(absent.service.remove(target,input,req),{code:'MFA_REQUIRED'});
+ assert.equal(absent.writes.length,0);
 });

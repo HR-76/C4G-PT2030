@@ -19,3 +19,13 @@ it('reuses exactly the original command after an uncertain response',async()=>{
  const retry=await screen.findByRole('button',{name:'Repetir o mesmo pedido'});expect(screen.queryByText(/Conta eliminada/)).toBeNull();fireEvent.click(retry);
  await waitFor(()=>expect(api.deleteUser).toHaveBeenCalledTimes(2));expect(api.deleteUser.mock.calls[1]).toEqual(api.deleteUser.mock.calls[0]);
 });
+
+it.each([[true,'recent-auth'],[false,'recent-mfa']])('offers session confirmation using the configured policy (optional MFA: %s)',async(optional,category)=>{
+ const api={userDeletionStatus:vi.fn().mockRejectedValue({response:{status:403,data:{error:{code:optional?'REAUTH_REQUIRED':'MFA_REQUIRED'}}}}),deleteUser:vi.fn()};
+ const auth={stepUpPolicy:vi.fn().mockResolvedValue({data:{mfaOptional:optional}}),stepUp:vi.fn()};
+ render(<UserDeletionDialog user={user} api={api} auth={auth} onClose={()=>{}} onCompleted={()=>{}}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Confirmar sessão'}));
+ await waitFor(()=>expect(auth.stepUp).toHaveBeenCalledWith(category,'/administracao/entidades/utilizadores'));
+ expect(api.deleteUser).not.toHaveBeenCalled();
+ expect(screen.queryByRole('button',{name:'Eliminar permanentemente'})).toBeNull();
+});

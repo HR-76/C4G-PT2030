@@ -71,6 +71,20 @@ entidade e pode pedir à entidade que valide os dados.
 - Fronteira SQL provada em PostgreSQL 18 descartável, com dados sintéticos:
   isolamento, permissões C4G/ORG_ADMIN, versão atual, idempotência, concorrência,
   lease/retry e cancelamento antes do envio após suspensão do destinatário.
-- Testes focados de interface: 24 aprovados; unitários do serviço/HTTP/transport/
-  worker aprovados. Build concluído. Suites completas e gates finais em verificação.
+- Gates finais registados: PASS genérico (`.tmp/billing-validation-pg-1794699008887`)
+  e variante de staging (`.tmp/billing-validation-pg-1794699085908`), com instalação
+  idempotente e preflight após a migração.
+- Backend focado: 49 PASS, incluindo o novo pacote, serviço/HTTP/transporte/worker
+  e os testes de metadados/autorização. O fixture de versões foi atualizado para 054.
+- Suite backend: 3302 PASS, 11 FAIL e 9 SKIP. Dez falhas passaram no foco posterior
+  (duas exigiam a atualização do fixture; as outras foram transitórias durante
+  alterações paralelas). A restante é `SEC-AC-01` de `f2Security.test.js`, sobre
+  `sessionStorage` noutra funcionalidade; não foi alterada por este trabalho.
+- Interface focada: 24 PASS. Suite frontend: 1120 PASS e um timeout em
+  `ApplicationPartners.test.jsx`; repetição isolada: 16 PASS, sem mudar o timeout.
+- Lint completo: zero erros/avisos. Build final PASS (1928 módulos). `node --check`
+  nos módulos de backend alterados e `git diff --check` aprovados.
+- As primeiras execuções de HTTP na sandbox falharam com EACCES em loopback; a
+  suite backend relatada acima foi repetida fora dessa restrição. Execuções
+  interrompidas por esse problema não são apresentadas como verificações aprovadas.
 - Nenhum email real enviado; não verificado com sessão OIDC real no browser.

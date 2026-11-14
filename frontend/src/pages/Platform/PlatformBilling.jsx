@@ -128,7 +128,7 @@ function BillingSetup({ api, directoryApi, onClose, onCreated, onChanged, accoun
     {busy && <p role="status">A consultar…</p>}
     {saved && <p role="status">Dados de faturação guardados.</p>}
     {accountLoaded && mode === 'account' && (
-      <AccountForm key={`${entityId}:${account.account?.revision || 0}`} organizationId={entityId} record={account} profile={profile} api={api} onSaved={async () => { onChanged(); await refreshAccount(); setSaved(true) }}/>
+      <AccountForm key={`${entityId}:${account.account?.revision || 0}`} organizationId={entityId} record={account} profile={profile} api={api} onDirty={() => setSaved(false)} onSaved={async () => { onChanged(); await refreshAccount(); setSaved(true) }}/>
     )}
     {accountLoaded && mode === 'account' && account.account && <BillingValidationPanel key={`validation:${entityId}:${account.account.revision}`} api={api} organizationId={entityId} admin onBusy={setBusy}/>}
     {accountLoaded && mode === 'cycle' && <>{differences.length > 0 && <ProfileDifferences items={differences} action="Rever diferenças" onAction={() => setMode('account')}/>}<div className="billing-account-strip"><div><span>Dados de faturação</span><strong>{account.account.version.legalName}</strong><small>{account.account.version.taxIdentifier} · {account.account.version.billingEmail}</small></div><button type="button" className="btn btn-outline" onClick={() => setMode('account')}>Editar dados</button></div><CycleCreateForm organizationId={entityId} accountVersionId={account.account.version.id} api={api} onCreated={onCreated}/></>}
@@ -141,13 +141,13 @@ function ProfileDifferences({ items, action, onAction }) {
   return <div className="alert alert-info billing-profile-note" data-testid="billing-profile-difference"><div><strong>A ficha da entidade difere dos dados de faturação.</strong><ul>{items.map(item => <li key={item.field}>{item.label}: conta «{item.account || 'vazio'}» · ficha «{item.profile || 'vazio'}»</li>)}</ul></div><button type="button" className="btn btn-outline" onClick={onAction}>{action}</button></div>
 }
 
-function AccountForm({ organizationId, record, profile = { registration: null, failed: false }, api, onSaved }) {
+function AccountForm({ organizationId, record, profile = { registration: null, failed: false }, api, onSaved, onDirty = () => {} }) {
   const version = record.account?.version, suggestions = version ? null : profileSuggestions(profile.registration)
   const [form, setForm] = useState(() => version ? { ...accountBlank, ...version, externalSource: version.externalSource || '', externalCustomerRef: version.externalCustomerRef || '', addressLine2: version.addressLine2 || '', region: version.region || '', contactName: version.contactName || '', notes: version.notes || '', paymentTermsDays: String(version.paymentTermsDays) } : { ...accountBlank, legalName: record.organizationLegalName || '', ...suggestions?.values })
   const differences = version ? profileDifferences(form, profile.registration, record.organizationLegalName) : [], tooLong = overLimit(form)
-  const applyProfile = () => setForm(old => ({ ...old, ...Object.fromEntries(differences.map(item => [item.field, item.profile])) }))
+  const applyProfile = () => { onDirty(); setForm(old => ({ ...old, ...Object.fromEntries(differences.map(item => [item.field, item.profile])) })) }
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [conflict, setConflict] = useState(false), key = useRef(crypto.randomUUID())
-  const field = (name, value) => setForm(old => ({ ...old, [name]: value }))
+  const field = (name, value) => { onDirty(); setForm(old => ({ ...old, [name]: value })) }
   const submit = async event => { event.preventDefault(); setBusy(true); setError(''); setConflict(false); try { await api.accountWrite(organizationId, { ...form, addressLine2: nullable(form.addressLine2), region: nullable(form.region), contactName: nullable(form.contactName), externalSource: nullable(form.externalSource), externalCustomerRef: nullable(form.externalCustomerRef), notes: nullable(form.notes), paymentTermsDays: Number(form.paymentTermsDays), expectedRevision: record.account?.revision || 0, idempotencyKey: key.current }); await onSaved() } catch (reason) { setError(billingError(reason)); setConflict(reason?.response?.status === 409) } finally { setBusy(false) } }
   return <form className="billing-command-form" onSubmit={submit}>
     {suggestions && <div className="alert alert-info billing-profile-note" data-testid="billing-profile-note"><div>{suggestions.fromProfile.length > 0 && <p>Preenchido a partir da ficha da entidade: {names(suggestions.fromProfile)}.</p>}{suggestions.suggested.length > 0 && <p>Sugestões da ficha a confirmar: {names(suggestions.suggested)}.</p>}<p>Nada é guardado até confirmar.</p></div></div>}

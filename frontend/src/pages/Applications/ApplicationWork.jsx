@@ -21,7 +21,7 @@ const initials = name => {
 const message = error => ({401:'A sessão terminou. Recupere a sessão e volte a consultar a equipa.',400:'Verifique os campos.',403:'Sem permissão.',404:'Candidatura ou tarefa indisponível.',409:'Os dados mudaram. Recarregue antes de editar.'}[error?.response?.status] || 'Resultado incerto. Repita o mesmo envio para confirmar o resultado.')
 const definitive = error => error?.response?.status===400 || (error?.response?.status===409 && ['STALE_REVISION','STATE_CONFLICT','RESPONSIBLE_UNAVAILABLE'].includes(error?.response?.data?.error?.code))
 
-export default function ApplicationWork({ applicationId, userId, organizationId, responsibles, responsiblesNext, loadingResponsibles, responsiblesLoadFailed = false, loadMoreResponsibles, applicationResponsibleId, applicationDeadline, onPreparationChange, canEdit = true, loadDetails = true, takeEarlyRead }) {
+export default function ApplicationWork({ applicationId, userId, organizationId, responsibles, responsiblesNext, loadingResponsibles, responsiblesLoadFailed = false, loadMoreResponsibles, applicationResponsibleId, applicationDeadline, onPreparationChange, onActionCompleted, canEdit = true, loadDetails = true, takeEarlyRead }) {
   // The team this user and organization last received is shown at once and read again; changes wait for the new answer.
   const scope=userId&&organizationId?readScope(userId,organizationId):null,readName=`application-work:${applicationId}`
   const [work,setWork]=useState(()=>startConfirmedRead(scope,readName).held),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
@@ -91,7 +91,7 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
     }
     try{
       const result=await api[intent.method](intent.applicationId,{...intent.payload,idempotencyKey:intent.idempotencyKey})
-      if(epoch!==generation.current)return;sessionStorage.removeItem(intentKey);setPending(null);setNotice(intent.method==='taskDelete'?'Tarefa eliminada.':'Alteração confirmada.');setEditing(null);setTaskForm(emptyTask);setParticipant('');setEditor(null)
+      if(epoch!==generation.current)return;sessionStorage.removeItem(intentKey);onActionCompleted?.();setPending(null);setNotice(intent.method==='taskDelete'?'Tarefa eliminada.':'Alteração confirmada.');setEditing(null);setTaskForm(emptyTask);setParticipant('');setEditor(null)
       try{const w=await api.work(applicationId)
         if(epoch!==generation.current)return;setWork(w.data);setHistoryRefresh(n=>n+1)
       }catch{if(epoch!==generation.current)return;setWork(null);setError('Alteração confirmada, mas a consulta falhou. Recarregue a equipa e tarefas.')}

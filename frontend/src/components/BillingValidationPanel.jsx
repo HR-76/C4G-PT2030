@@ -53,6 +53,7 @@ export default function BillingValidationPanel({ api, organizationId, admin = fa
     </>}
     {canAct && !preview && <button type="button" className="btn btn-outline" disabled={busy} onClick={review}>{admin ? 'Rever dados e pedir validação' : 'Rever dados para confirmar'}</button>}
     {preview && canAct && <div>
+      {!admin && <p>Se encontrar dados incorretos, peça a correção à C4G antes de confirmar.</p>}
       {admin && <p>Serão pedidos aos administradores da entidade a confirmação destes dados guardados. Guarde primeiro quaisquer alterações no formulário.</p>}
       <dl>{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
       <button type="button" className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? 'A processar…' : admin ? 'Pedir validação' : 'Confirmar dados'}</button>

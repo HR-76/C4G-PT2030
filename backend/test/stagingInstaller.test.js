@@ -141,8 +141,8 @@ test('upgrade: steps follow the registered chains, in order, up to the latest ve
   assert.ok(centralVersions.every(version => central.opportunityComplementManifest.some(entry => entry.version === version)));
   const tenantVersions = TENANT_STEPS.map(([to]) => to);
   assert.deepEqual(tenantVersions, [...tenantVersions].sort());
-  assert.equal(tenantVersions.at(-1), tenant.chatRetentionManifest.at(-1).version);
-  assert.ok(tenantVersions.every(version => tenant.chatRetentionManifest.some(entry => entry.version === version)));
+  assert.equal(tenantVersions.at(-1), tenant.accountIdentityErasureManifest.at(-1).version);
+  assert.ok(tenantVersions.every(version => tenant.accountIdentityErasureManifest.some(entry => entry.version === version)));
   // Every step calls an operation that exists in the migrators it relies on.
   const recorder = calls => new Proxy({}, { get: (_, name) => (...args) => { calls.push(name); return args[0]; } });
   const centralOperations = Object.keys(require('../scripts/runCentralMigrations'));
