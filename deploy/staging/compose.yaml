@@ -14,7 +14,14 @@ services:
     command: ["sleep", "infinity"]
     ports:
       - "127.0.0.1:8500:5000"
-    networks: [default, data]
+    # "identity" é a rede do Keycloak de staging (convites de utilizadores, ver o runbook): o módulo de ativação do Keycloak
+    # chama a ponte da API em http://c4g-activation-bridge:5285 e o worker de identidade chama a API de administração do
+    # Keycloak, que o Caddy não expõe. Mudar as redes recria o pod: recriar também api e clamav.
+    networks:
+      default:
+      data:
+      identity:
+        aliases: [c4g-activation-bridge]
 
   api:
     build:
@@ -30,10 +37,17 @@ services:
         format: raw
       - path: /srv/c4g-staging/api-private.env
         format: raw
+      # Envio do email de ativação (Resend). Opcional: sem o ficheiro, os convites ficam criados mas nenhum email sai.
+      - path: /srv/c4g-staging/activation-email.env
+        format: raw
+        required: false
     environment:
       NODE_EXTRA_CA_CERTS: /certs/ca.pem
     volumes:
       - /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro
+      # Configuração dos convites (http.json e worker.json), escrita pelo comando "members". Só é lida com
+      # MEMBER_ONBOARDING_RUNTIME=central.
+      - /srv/c4g-staging/members:/members:ro
 
   # Antivírus dos ficheiros enviados (PDFs de faturação, carregamento PT2030). Partilha a rede do "pod" com a API e escuta em
   # 127.0.0.1:3310 dentro dela; não tem porta publicada.
@@ -79,3 +93,6 @@ networks:
   data:
     external: true
     name: c4g-staging-data
+  identity:
+    external: true
+    name: c4g-staging-keycloak_default

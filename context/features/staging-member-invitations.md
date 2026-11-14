@@ -15,23 +15,32 @@ O serviço de convites só era composto pelo instalador local (`backend/scripts/
 - O ambiente local não muda de comportamento.
 - Nenhum segredo entra no Git, em logs ou na saída de comandos.
 
+## Levantamento da VPS (14/11/2026)
+
+Keycloak 26.8.0 de imagem oficial, contentor `c4g-staging-keycloak-keycloak-1` (projeto compose `c4g-staging-keycloak` em `/srv/c4g-staging`, rede `c4g-staging-keycloak_default`, comando `start`), sem providers instalados. O Caddy só expõe `/realms/c4g-staging` e `/resources`: a API de administração não é pública.
+
 ## Implementação
 
-- Feito: `src/platformOnboarding/memberRuntime.js` (composição fora do instalador local), ligação em `src/server.js`, worker a admitir o emissor da API.
-- Por fazer, dependente do levantamento do Keycloak na VPS: comando `members` do instalador de staging (clientes, fluxo e conta técnica no realm; escrita de `http.json` e `worker.json`), montagem da pasta e da ponte no `compose.yaml`, e o módulo Keycloak `dev/keycloak/manual-activation`, cujo `Bridge.java` só admite hoje `http://host.docker.internal:5285/bridge/check`.
+- `src/platformOnboarding/memberRuntime.js` (composição fora do instalador local) e ligação em `src/server.js`.
+- Worker de identidade: admite o emissor da API e, fora do ambiente local, um `adminOrigin` privado para a API de administração do Keycloak (`keycloakAdapter.js`). O token continua a ser pedido ao emissor público; isto exige o `hostname` do Keycloak fixo, que o instalador verifica.
+- Comando `members` do instalador de staging (`scripts/staging/install.js`): `--prepare` escreve `http.json` e as propriedades do módulo; sem a opção, corre na rede do contentor do Keycloak, cria clientes, fluxo e conta técnica e escreve `worker.json`. Segredos gerados uma vez e mantidos ao repetir.
+- `compose.yaml`: o `pod` junta-se à rede do Keycloak com o alias `c4g-activation-bridge`; a API monta `/srv/c4g-staging/members` e lê, se existir, `activation-email.env`.
+- Módulo Keycloak (`dev/keycloak/manual-activation`): `Bridge.java` admite também `http://c4g-activation-bridge:5285/bridge/check`. O JAR é montado na imagem oficial; a imagem não muda.
+- Runbook: [deploy/staging/README.md](../../deploy/staging/README.md), secção «Convites e ativação de utilizadores».
 
 ## Verificação (14/11/2026)
 
 - `backend/test/memberRuntime.test.js`: seleção e recusas de configuração, portas do worker, páginas de ativação, ponte com e sem segredo, encaminhamento em `server.js`, fecho, e o worker a recusar um emissor que não seja o da API.
-- Backend: 3283 testes, 3274 aprovados, 9 ignorados, 0 falhas; lint limpo.
-- Não verificado: nada correu contra um Keycloak real nem na VPS; sem a variável, o staging continua a responder 503 nestas rotas.
+- `backend/test/stagingMembers.test.js`: ficheiros gerados, segredos mantidos ao repetir, recusas do comando `members` (emissor não fixo, administração recusada, alvo inválido) e a API de administração chamada na origem privada.
+- Backend: 3290 testes, 3281 aprovados, 9 ignorados, 0 falhas; lint limpo.
+- Não verificado: nada correu contra um Keycloak real nem na VPS. O módulo Java não foi compilado nesta máquina (sem Maven nem Docker); a criação dos clientes e do fluxo pelo comando `members` só foi exercitada no ambiente local, pelo instalador local. O nome do serviço e a porta interna do Keycloak (`http://keycloak:8080`) são presumidos.
 
 ## Limites conhecidos
 
 - `worker.json` guarda o snapshot do tenant; depois de um `upgrade` do tenant é preciso regenerá-lo.
+- A ponte e a API de administração usam HTTP dentro da rede Docker privada do Keycloak, na mesma máquina.
 - As páginas de ativação limitam contextos por endereço; atrás do Caddy e da Cloudflare o endereço visto é o do último proxy de confiança.
 
 ## Por decidir
 
 - Remetente e domínio verificado no Resend para o staging; enviar só para endereços de teste.
-- Como o Keycloak da VPS recebe o módulo (imagem reconstruída ou JAR montado) e por que rede chega à ponte.

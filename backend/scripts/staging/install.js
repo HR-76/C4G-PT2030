@@ -13,6 +13,7 @@
 //           | storage-check   (inside the API container: R2 buckets and the ClamAV scanner answer; prints only booleans)
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
 //           | runtime-logins      (after upgrade: creates the API and worker Central logins and checks the schema)
+//           | members [--prepare] [--out <folder>] [--keycloak-internal <origin>]   (member invitations; see below)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
 const fs = require('node:fs');
@@ -24,6 +25,7 @@ const { withInstallerAuthority, nativePool } = require('../localPlatform/install
 const { syncCentralObservation } = require('../localPlatform/centralObservation');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
+  memberHttpConfiguration, memberWorkerConfiguration,
   CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, workerCentralEnvironment, AUTH_POLICY_VERSION } = require('./environment');
 
 const STAGING_ADMISSION = require('../../src/security/stagingCentralRuntimeAdmission');
@@ -316,6 +318,79 @@ async function upgrade(env, args) {
   } finally { await central.end(); await tenant.end(); }
 }
 
+// Keycloak administration API for one realm, as the installer sees it from inside the Keycloak container's network.
+async function keycloakAdministration({ baseUrl, realm, username, password, fetchImpl = fetch }) {
+  if (!username || !password) throw refuse('STAGING_KEYCLOAK_ADMIN_REQUIRED');
+  let token;
+  try {
+    const response = await fetchImpl(baseUrl + '/realms/master/protocol/openid-connect/token', { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(15000),
+      body: new URLSearchParams({ grant_type: 'password', client_id: 'admin-cli', username, password }) });
+    if (!response.ok) throw refuse('STAGING_KEYCLOAK_ADMIN_REFUSED');
+    token = (await response.json()).access_token;
+  } catch (error) { throw error.code ? error : refuse('STAGING_KEYCLOAK_UNAVAILABLE'); }
+  if (!token) throw refuse('STAGING_KEYCLOAK_ADMIN_REFUSED');
+  return async (route, method = 'GET', body) => {
+    const response = await fetchImpl(`${baseUrl}/admin/realms/${realm}${route ? '/' + route : ''}`, { method, redirect: 'error', signal: AbortSignal.timeout(15000),
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}) });
+    // Provider messages may carry identifiers; only the status leaves this function.
+    if (!response.ok) throw refuse('STAGING_KEYCLOAK_REQUEST_FAILED_' + response.status);
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  };
+}
+
+const readJson = file => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null);
+// The API and Keycloak containers both run as uid 1000; the files stay unreadable to anyone else.
+function writePrivate(file, content, owner) {
+  fs.writeFileSync(file, content, { mode: 0o600 });
+  fs.chmodSync(file, 0o600);
+  if (Number.isSafeInteger(owner) && process.getuid?.() === 0) fs.chownSync(file, owner, owner);
+}
+
+// Member invitations (context/features/staging-member-invitations.md), in two steps because the Keycloak module must be
+// loaded before its authentication flow can be created:
+//   members --prepare   writes http.json and c4g-activation.properties (bridge secret); touches nothing else.
+//   members             runs in the Keycloak container's network: checks that Keycloak answers internally with the public
+//                       issuer, creates the activation clients, flow and technical client, and writes worker.json.
+// Repeating either step keeps the secrets already written. Nothing is printed except names and booleans.
+async function members(env, args, { fetchImpl = fetch } = {}) {
+  const { stateFile } = settings({ POSTGRES_PASSWORD: 'unused', ...env });
+  const state = readState(stateFile);
+  if (state?.phase !== 'READY') throw refuse('STAGING_INSTALLATION_NOT_READY');
+  const issuer = env.OIDC_ISSUER, origin = env.PUBLIC_APP_URL;
+  if (!issuer || !origin) throw refuse('STAGING_MEMBER_TARGET_REQUIRED');
+  const folder = args.out || '/members';
+  if (!fs.existsSync(folder)) throw refuse('STAGING_MEMBER_FOLDER_MISSING');
+  const owner = env.C4G_STAGING_RUNTIME_UID === undefined ? 1000 : Number(env.C4G_STAGING_RUNTIME_UID);
+  const generateSecret = () => randomBytes(32).toString('hex');
+  const httpFile = path.join(folder, 'http.json'), workerFile = path.join(folder, 'worker.json'), propertiesFile = path.join(folder, 'c4g-activation.properties');
+  const { realm, http, properties } = memberHttpConfiguration(state, { issuer, origin, prior: readJson(httpFile), generateSecret });
+  writePrivate(httpFile, JSON.stringify(http), owner);
+  writePrivate(propertiesFile, properties, owner);
+  if (args.prepare) return { prepared: true, realm, files: ['http.json', 'c4g-activation.properties'] };
+
+  const baseUrl = env.C4G_KEYCLOAK_ADMIN_URL || 'http://localhost:8080';
+  const adminOrigin = args['keycloak-internal'];
+  if (!adminOrigin) throw refuse('STAGING_KEYCLOAK_INTERNAL_URL_REQUIRED');
+  // The worker calls the administration API on the private network with a token issued for the public issuer. That only
+  // works when Keycloak's hostname is fixed, which this proves: an internal request must still announce the public issuer.
+  let announced;
+  try {
+    const discovery = await fetchImpl(`${baseUrl}/realms/${realm}/.well-known/openid-configuration`, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+    announced = discovery.ok ? (await discovery.json()).issuer : null;
+  } catch { throw refuse('STAGING_KEYCLOAK_UNAVAILABLE'); }
+  if (announced !== issuer) throw refuse('STAGING_KEYCLOAK_ISSUER_NOT_FIXED');
+  const kc = await keycloakAdministration({ baseUrl, realm, username: env.C4G_KEYCLOAK_ADMIN_USER, password: env.C4G_KEYCLOAK_ADMIN_PASSWORD, fetchImpl });
+  const realmSettings = await kc('');
+  const browser = (await kc('authentication/flows')).find(flow => flow.alias === realmSettings.browserFlow);
+  if (!browser) throw refuse('STAGING_KEYCLOAK_BROWSER_FLOW_MISSING');
+  const clients = await require('../../src/platformOnboarding/configureMemberIdentity')
+    .configureMemberIdentity({ kc, origin, installationId: state.installationId, browserFlowId: browser.id });
+  const worker = memberWorkerConfiguration(state, { issuer, adminOrigin, clients, prior: readJson(workerFile), generateSecret });
+  writePrivate(workerFile, JSON.stringify(worker), owner);
+  return { configured: true, realm, clients: [clients.manualClientId, clients.existingClientId, clients.clientId], files: ['http.json', 'c4g-activation.properties', 'worker.json'] };
+}
+
 function writeEnvironment(env, destination, carryFile, collection, storageFile, centralRuntimeLogin = false) {
   const { config, stateFile, apiHost } = settings(env);
   const state = readState(stateFile);
@@ -362,6 +437,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
     return writeEnvironment(env, args.out || '/state/api-private.env.generated', args.carry, args.collection, args.storage, args['central-runtime-login'] === true);
   }
   if (command === 'storage-check') { parseArguments(rest); return storageCheck(env); }
+  if (command === 'members') return members(env, parseArguments(rest, { values: ['--out', '--keycloak-internal'], flags: ['--prepare'] }));
   throw refuse('STAGING_COMMAND_INVALID');
 }
 
@@ -378,4 +454,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-module.exports = { main, CENTRAL_STEPS, TENANT_STEPS };
+module.exports = { main, members, CENTRAL_STEPS, TENANT_STEPS };

@@ -228,9 +228,85 @@ TECNICO_SUBJECT=$(python3 /tmp/criar-tecnico.py); echo "$TECNICO_SUBJECT"; rm -f
 $RUN person --subject "$TECNICO_SUBJECT" --name "Tecnico Staging" --email tecnico.staging@c4g.invalid --profile CONTRIBUTOR
 ```
 
+## Convites e ativação de utilizadores
+
+Liga «Adicionar utilizador» (Acessos, e Utilizadores de uma entidade na Administração C4G), as páginas `/api/activation` e o email de ativação. Contrato: [staging-member-invitations.md](../../context/features/staging-member-invitations.md). Sem estes passos, essas páginas respondem 503.
+
+São quatro peças: o módulo de ativação no Keycloak, a configuração que o comando `members` escreve em `/srv/c4g-staging/members`, o envio de email (Resend) e a rede entre a API e o Keycloak. O Keycloak reinicia uma vez (o login fica indisponível durante esse arranque) e o `pod` da API é recriado uma vez, por causa da rede nova.
+
+**1. Pasta e segredo da ponte.** Não contacta o Keycloak; repetir mantém o segredo:
+
+```bash
+cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD)
+install -d -m 700 -o 1000 -g 1000 /srv/c4g-staging/members
+MEMBERS="docker run --rm --user 0:0 --env-file /srv/c4g-staging/api-oidc.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/members:/members"
+$MEMBERS c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js members --prepare
+```
+
+Esperado: `{"prepared":true,"realm":"c4g-staging",...}`. `STAGING_MEMBER_TARGET_REQUIRED` significa que `OIDC_ISSUER` ou `PUBLIC_APP_URL` não estão no `api-oidc.env`; acrescenta ao comando o `--env-file` onde estiverem.
+
+**2. Módulo no Keycloak.** Constrói o JAR a partir do repositório (a imagem do Keycloak não muda):
+
+```bash
+install -d -m 755 /srv/c4g-staging/keycloak-providers
+docker build --target build -t c4g-activation-build dev/keycloak/manual-activation
+ID=$(docker create c4g-activation-build) && docker cp $ID:/proof/target/c4g-manual-activation-1.0.jar /srv/c4g-staging/keycloak-providers/c4g-manual-activation.jar && docker rm $ID
+chmod 644 /srv/c4g-staging/keycloak-providers/c4g-manual-activation.jar
+```
+
+No compose do Keycloak (projeto `c4g-staging-keycloak`, em `/srv/c4g-staging`), acrescenta ao serviço `keycloak`, em `volumes`:
+
+```yaml
+      - /srv/c4g-staging/keycloak-providers/c4g-manual-activation.jar:/opt/keycloak/providers/c4g-manual-activation.jar:ro
+      - /srv/c4g-staging/members/c4g-activation.properties:/opt/keycloak/conf/c4g-activation.properties:ro
+```
+
+Recria só o Keycloak com esse compose (`up -d keycloak`) e confirma que entra em `https://login-teste.c4g.ai` como antes. O Keycloak arranca com `start`, por isso deteta o JAR novo e reconstrói-se sozinho no arranque.
+
+**3. Clientes, fluxo e conta técnica no Keycloak.** O comando corre na rede do contentor do Keycloak, porque o Caddy não expõe a API de administração. As credenciais de administração ficam num ficheiro só do root, pedido sem as mostrar, e são apagadas no fim:
+
+```bash
+install -m 600 /dev/null /srv/c4g-staging/keycloak-admin.env
+read -rp 'Administrador do Keycloak: ' V1; read -rsp 'Palavra-passe (não aparece): ' V2; echo
+printf 'C4G_KEYCLOAK_ADMIN_USER=%s\nC4G_KEYCLOAK_ADMIN_PASSWORD=%s\n' "$V1" "$V2" > /srv/c4g-staging/keycloak-admin.env; unset V1 V2
+$MEMBERS --network container:c4g-staging-keycloak-keycloak-1 --env-file /srv/c4g-staging/keycloak-admin.env c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js members --keycloak-internal http://keycloak:8080
+rm -f /srv/c4g-staging/keycloak-admin.env
+```
+
+Esperado: `{"configured":true,...}` com os três clientes. Códigos de recusa:
+
+- `STAGING_KEYCLOAK_UNAVAILABLE`: o Keycloak não responde em `http://localhost:8080` dentro do seu contentor. Indica a porta certa com `-e C4G_KEYCLOAK_ADMIN_URL=http://localhost:<porta>` e usa a mesma porta em `--keycloak-internal`.
+- `STAGING_KEYCLOAK_ISSUER_NOT_FIXED`: um pedido interno não anuncia `https://login-teste.c4g.ai/realms/c4g-staging`. O worker não conseguiria usar a API de administração; o Keycloak precisa do `hostname` fixo.
+- `STAGING_KEYCLOAK_REQUEST_FAILED_<estado>` ao criar o fluxo: o módulo do passo 2 não está carregado.
+
+`--keycloak-internal` é o endereço por que a API chega ao Keycloak na rede `c4g-staging-keycloak_default` (nome do serviço e porta interna).
+
+**4. Email de ativação (Resend).** O remetente tem de ser de um domínio verificado no Resend. Em staging, convida só endereços de teste:
+
+```bash
+install -m 600 /dev/null /srv/c4g-staging/activation-email.env
+read -rsp 'Chave de API do Resend (não aparece): ' V1; echo; read -rp 'Remetente (ex.: C4G <acessos@dominio>): ' V2
+printf 'RESEND_API_KEY=%s\nACTIVATION_EMAIL_FROM=%s\nACTIVATION_PUBLIC_URL=https://app-teste.c4g.ai\n' "$V1" "$V2" > /srv/c4g-staging/activation-email.env; unset V1 V2
+```
+
+**5. Ativar.** As duas linhas ficam no `api-private.env` e o `env --carry` mantém-nas. O `pod` é recriado (rede nova), por isso a API e o antivírus são recriados com ele; a API pode reiniciar até o antivírus responder:
+
+```bash
+F=/srv/c4g-staging/api-private.env; grep -q '^MEMBER_ONBOARDING_RUNTIME=' $F || printf 'MEMBER_ONBOARDING_RUNTIME=central\nMEMBER_ONBOARDING_DIRECTORY=/members\n' >> $F
+docker compose -f deploy/staging/compose.yaml --profile storage rm -sf api clamav
+docker compose -f deploy/staging/compose.yaml --profile storage up -d pod api clamav
+sleep 90; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
+```
+
+**6. Ensaio (tu, no navegador).** Em Acessos, «Adicionar utilizador» com um endereço teu; abrir o email, definir a palavra-passe e entrar.
+
+Depois de um `upgrade` do tenant, repete o passo 3: o `worker.json` guarda o estado do esquema do tenant. Não apagues `/srv/c4g-staging/members`: a chave que lá está identifica as contas criadas e deriva as ligações de ativação ainda válidas.
+
+**Voltar atrás:** retira as duas linhas `MEMBER_ONBOARDING_` do `api-private.env` e recria a API (`up -d --force-recreate api`). As páginas voltam a 503; as contas e os clientes criados no Keycloak ficam.
+
 ## Limites conhecidos
 
 - O catálogo e o Dashboard ficam ativos mas **vazios**: a recolha de oportunidades (worker e fontes) ainda não está ligada.
 - Sem o `upgrade`, o tenant fica na 033 e as páginas que dependem das migrações 034 a 040 (chat, estratégia, detalhe de tarefas, eliminação de documentos) ficam indisponíveis.
 - A ligação da API à Central usa o administrador do PostgreSQL, como o perfil local. Um login limitado alteraria os fingerprints fixados da Central e exige um perfil de runtime próprio.
-- Sem e-mail. R2 e ClamAV só depois do passo «Armazenamento privado»; os documentos das candidaturas continuam por ligar.
+- Sem e-mail além do de ativação de utilizadores (passo «Convites e ativação de utilizadores»). R2 e ClamAV só depois do passo «Armazenamento privado»; os documentos das candidaturas continuam por ligar.

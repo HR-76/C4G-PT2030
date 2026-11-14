@@ -1,11 +1,13 @@
 'use strict';
 const {createHmac}=require('node:crypto');
 const {uuid,fail}=require('./contracts');
-function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,usernameMode='generated',purpose='MEMBERSHIP'}){
+// adminOrigin: where the administration API answers when the public issuer does not expose it (a private container network).
+function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,usernameMode='generated',purpose='MEMBERSHIP',adminOrigin=null}){
  if(!['MEMBERSHIP','ADMISSION'].includes(purpose))fail('KEYCLOAK_CONFIGURATION_INVALID');
  if(!['generated','email'].includes(usernameMode))fail('KEYCLOAK_CONFIGURATION_INVALID');
  const url=new URL(issuer);if(url.protocol!=='https:'||!/^\/realms\/[a-zA-Z0-9_-]+$/.test(url.pathname)||typeof accessToken!=='function'||!ownershipKey||ownershipKey.length<32)fail('KEYCLOAK_CONFIGURATION_INVALID');
- const base=url.origin+'/admin'+url.pathname;
+ if(adminOrigin!==null){let admin;try{admin=new URL(adminOrigin);}catch{fail('KEYCLOAK_CONFIGURATION_INVALID');}if(!['http:','https:'].includes(admin.protocol)||admin.origin!==adminOrigin||admin.username||admin.password)fail('KEYCLOAK_CONFIGURATION_INVALID');}
+ const base=(adminOrigin||url.origin)+'/admin'+url.pathname;
  async function request(path,method='GET',body){
   const response=await fetchImpl(base+path,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+await accessToken(),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
   if(!response.ok){if(response.status===409)fail('IDENTITY_RECONCILIATION_REQUIRED');fail('KEYCLOAK_UNAVAILABLE');}

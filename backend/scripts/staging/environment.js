@@ -60,6 +60,8 @@ function stagingTarget({ apiHost, port = 5432 }) {
 
 // Non-secret settings the previous release already carries. Only these names are ever copied from it.
 const CARRIED_KEYS = Object.freeze(['AUTH_MODE',
+  // Member invitations (context/features/staging-member-invitations.md): the selection and the mounted folder, never secrets.
+  'MEMBER_ONBOARDING_RUNTIME', 'MEMBER_ONBOARDING_DIRECTORY',
   'OIDC_REDIRECT_URI', 'OIDC_POST_LOGOUT_REDIRECT_URI', 'OIDC_TRANSACTION_MS', 'SESSION_COOKIE_NAME', 'SESSION_IDLE_MS', 'SESSION_ABSOLUTE_MS',
   // What the collection from portugal2030.pt may copy (decision of 14/11/2026: facts); kept when the file is regenerated.
   'OPPORTUNITY_COMPLEMENT_COLLECTION']);
@@ -165,4 +167,47 @@ function workerCentralEnvironment(state, { host, port = 5432, centralDatabase })
     + `${STAGING_ADMISSION.FLAG}=${STAGING_ADMISSION.VALUE}\n`;
 }
 
-module.exports = Object.freeze({ STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });
+// Member invitations (context/features/staging-member-invitations.md). The Keycloak module reaches the API bridge by this
+// container network alias (compose "pod" service); the module's allowlist names the same host.
+const ACTIVATION_BRIDGE_ENDPOINT = 'http://c4g-activation-bridge:5285/bridge/check';
+const MEMBER_CLIENTS = Object.freeze({ manualClientId: 'c4g-member-activation', existingClientId: 'c4g-member-existing' });
+const SECRET_HEX = /^[a-f0-9]{64}$/;
+
+function memberTarget({ issuer, origin }) {
+  let issuerUrl, originUrl;
+  try { issuerUrl = new URL(issuer); originUrl = new URL(origin); } catch { throw failure('STAGING_MEMBER_TARGET_INVALID'); }
+  const realm = /^\/realms\/([a-zA-Z0-9_-]+)$/.exec(issuerUrl.pathname)?.[1];
+  if (issuerUrl.protocol !== 'https:' || !realm || issuerUrl.href !== issuer || originUrl.protocol !== 'https:' || originUrl.origin !== origin) throw failure('STAGING_MEMBER_TARGET_INVALID');
+  return { realm };
+}
+
+// http.json (read by the API) and the Keycloak module's properties. The bridge secret is generated once and kept: both
+// sides must hold the same value, so a prior file for the same installation is reused.
+function memberHttpConfiguration(state, { issuer, origin, prior = null, generateSecret }) {
+  if (state?.phase !== 'READY' || !state.installationId) throw failure('STAGING_INSTALLATION_NOT_READY');
+  const { realm } = memberTarget({ issuer, origin });
+  if (prior && (prior.installationId !== state.installationId || prior.issuer !== issuer || prior.origin !== origin)) throw failure('STAGING_MEMBER_CONFIGURATION_CONFLICT');
+  const bridgeSecret = prior?.bridgeSecret ?? generateSecret();
+  if (!SECRET_HEX.test(bridgeSecret)) throw failure('STAGING_MEMBER_SECRET_INVALID');
+  const http = { installationId: state.installationId, issuer, origin, ...MEMBER_CLIENTS, bridgeSecret, dataResidencyCode: REGION.regionCode };
+  const properties = `realm=${realm}\nclient=${MEMBER_CLIENTS.manualClientId}\nendpoint=${ACTIVATION_BRIDGE_ENDPOINT}\nsecret=${bridgeSecret}\n`;
+  return { realm, http, properties };
+}
+
+// worker.json (read only by the identity worker): the technical Keycloak client, the ownership key and how to reach the tenant.
+// The ownership key marks the accounts the worker created and derives activation links, so it is never regenerated.
+function memberWorkerConfiguration(state, { issuer, adminOrigin, clients, prior = null, generateSecret }) {
+  if (state?.phase !== 'READY' || !state.credentials || !state.snapshot || !state.organizationId) throw failure('STAGING_INSTALLATION_NOT_READY');
+  let admin;
+  try { admin = new URL(adminOrigin); } catch { throw failure('STAGING_KEYCLOAK_INTERNAL_URL_INVALID'); }
+  if (!['http:', 'https:'].includes(admin.protocol) || admin.origin !== adminOrigin) throw failure('STAGING_KEYCLOAK_INTERNAL_URL_INVALID');
+  if (clients?.manualClientId !== MEMBER_CLIENTS.manualClientId || clients.existingClientId !== MEMBER_CLIENTS.existingClientId
+    || typeof clients.clientId !== 'string' || !clients.clientId || typeof clients.clientSecret !== 'string' || !clients.clientSecret) throw failure('STAGING_MEMBER_CLIENTS_INVALID');
+  const ownershipKey = prior?.ownershipKey ?? generateSecret();
+  if (!SECRET_HEX.test(ownershipKey)) throw failure('STAGING_MEMBER_SECRET_INVALID');
+  return { issuer, adminOrigin, clientId: clients.clientId, clientSecret: clients.clientSecret, ownershipKey,
+    allowedResidency: [{ regionCode: REGION.regionCode, policyVersion: REGION.residencyPolicyVersion }],
+    bindings: [{ organizationId: state.organizationId, credentials: state.credentials, snapshot: state.snapshot }] };
+}
+
+module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });

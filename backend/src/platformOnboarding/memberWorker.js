@@ -11,7 +11,9 @@ if(local||config.certificate)tls.setDefaultCACertificates([...tls.getCACertifica
 let token,until=0;
 async function accessToken(){if(token&&Date.now()<until)return token;const r=await fetch(config.issuer+'/protocol/openid-connect/token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),body:new URLSearchParams({grant_type:'client_credentials',client_id:config.clientId,client_secret:config.clientSecret})});if(!r.ok)throw Error('KEYCLOAK_UNAVAILABLE');const b=await r.json();token=b.access_token;until=Date.now()+Math.max(1,b.expires_in-20)*1000;return token;}
 const purpose=config.purpose||'MEMBERSHIP';
-const identity=require('./keycloakAdapter').createKeycloakAdapter({issuer:config.issuer,accessToken,ownershipKey:config.ownershipKey,usernameMode:'email',purpose});
+// The local identity provider answers its administration API on the issuer itself; elsewhere it may be private (adminOrigin).
+if(local&&config.adminOrigin)throw Error('LOCAL_IDENTITY_REQUIRED');
+const identity=require('./keycloakAdapter').createKeycloakAdapter({issuer:config.issuer,accessToken,ownershipKey:config.ownershipKey,usernameMode:'email',purpose,adminOrigin:config.adminOrigin||null});
 const projection=purpose==='MEMBERSHIP'?require('./memberProjection').createMemberProjection({bindings:config.bindings,allowedResidency:config.allowedResidency}):null;
 const methods={identity:x=>identity.ensure(x),...(projection?{projection:x=>projection.ensure(x)}:{}),passwordReady:x=>identity.passwordReady(x.subject)};
 if(purpose==='MEMBERSHIP'){
