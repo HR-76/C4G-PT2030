@@ -12,7 +12,25 @@ async function pages(read){
   if(cursor&&pageCount>=1001)fail('LIMIT_EXCEEDED');
  }while(cursor);return all;
 }
-function createOrganizationMatching({directory,opportunities,central,clock=()=>new Date()}){
+// The central catalogue is public catalogue data, the same for every
+// organization and user. Its pages are read once and reused for a short period,
+// and simultaneous matchings share one read, so each calculation does not read
+// the whole catalogue again. A failed read is never kept. The person, the
+// private opportunities and the final authority revalidation are never reused.
+function reuseCentralPages(read,reuseMs,now){
+ if(!(reuseMs>0))return read;
+ let held=null,pending=null;
+ return ()=>{
+  if(held&&now()-held.at<reuseMs)return Promise.resolve(held.items);
+  if(pending)return pending;
+  const request=Promise.resolve().then(read).then(items=>{held={items:Object.freeze(items),at:now()};return held.items;})
+   .finally(()=>{if(pending===request)pending=null;});
+  pending=request;
+  return request;
+ };
+}
+function createOrganizationMatching({directory,opportunities,central,clock=()=>new Date(),centralPagesReuseMs=0,centralPagesNow=()=>Date.now()}){
+ const centralPages=reuseCentralPages(()=>pages(q=>central.list(q)),centralPagesReuseMs,centralPagesNow);
  return {async execute(query,request){
   if(Object.keys(query).some(k=>!['personId','opportunityId','origin'].includes(k)))fail('INVALID_INPUT');
   const byOpportunity=Boolean(query.opportunityId);
@@ -50,7 +68,7 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    // A technician has no organization-wide read of private opportunities: match against the catalog only.
    privateIncluded=typeof directory.canReadPrivateOpportunities==='function'?await directory.canReadPrivateOpportunities(request)===true:true;
    const privateList=typeof opportunities.listForMatching==='function'?opportunities.listForMatching.bind(opportunities):opportunities.list.bind(opportunities);
-   const [publicItems,privateItems]=await Promise.all([pages(q=>central.list(q)),privateIncluded?pages(q=>privateList(q,request)):Promise.resolve([])]),all=[];
+   const [publicItems,privateItems]=await Promise.all([centralPages(),privateIncluded?pages(q=>privateList(q,request)):Promise.resolve([])]),all=[];
    for(const [origin,list] of [['CENTRAL',publicItems],['PRIVATE',privateItems]]){
     for(const item of list){if(currentForMatching(item,today))all.push(item.snapshot||item.readModel?
       projectMatchOpportunity(item,{origin,opportunityId:item.opportunityId,asOf}):await load(origin,item.opportunityId));}

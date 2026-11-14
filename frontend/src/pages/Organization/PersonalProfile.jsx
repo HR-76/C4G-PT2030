@@ -3,6 +3,7 @@ import {useEffect,useMemo,useRef,useState} from 'react'
 import {Link,useParams,useLocation} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {organizationDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import {clearDirectoryCache} from './directoryCache'
 import {AreaOptions} from './OrganizationStrategy'
 import './organization-people.css'
@@ -12,25 +13,24 @@ const clean=value=>value.trim().normalize('NFC')
 export default function PersonalProfile(){
  const {organization,user}=useAuth(),{personId}=useParams()
  if(!organization?.id)return <p>Esta conta não tem uma entidade associada para consultar o perfil pessoal.</p>
- return <ProfileForm key={`${user?.id}:${organization.id}:${personId||'me'}`} organizationId={organization.id} personId={personId}/>
+ return <ProfileForm key={`${user?.id}:${organization.id}:${personId||'me'}`} organizationId={organization.id} personId={personId} scope={user?.id?readScope(user.id,organization.id):null}/>
 }
-export function ProfileForm({organizationId,personId,api:providedApi}){
+const formOf=profile=>profile?{biography:profile.biography,keywords:profile.keywords,thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])]}:null
+// The profile this user and organization last received is shown at once and read again. `scope` is absent where nothing may be kept.
+export function ProfileForm({organizationId,personId,api:providedApi,scope=null}){
+ const readName=`person:${personId||'me'}`,[held]=useState(()=>startConfirmedRead(scope,readName).held)
  const {search}=useLocation()
  const api=useMemo(()=>providedApi||organizationDirectoryApi(organizationId),[organizationId,providedApi])
- const [data,setData]=useState(null),[form,setForm]=useState(null),[members,setMembers]=useState(null),[membershipId,setMembershipId]=useState('')
- const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[pending,setPending]=useState(null)
+ const [data,setData]=useState(held),[form,setForm]=useState(()=>formOf(held?.profile)),[members,setMembers]=useState(null),[membershipId,setMembershipId]=useState(held?.profile?.membershipId||'')
+ const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(!held),[pending,setPending]=useState(null)
  const alive=useRef(true),generation=useRef(0)
- async function load(){const gen=++generation.current;setLoading(true);setError('');try{
-  const {data:value}=await (personId?api.person(personId):api.self());if(!alive.current||gen!==generation.current)return
+ async function load(){const gen=++generation.current,read=startConfirmedRead(scope,readName),shown=read.held;setLoading(!shown);setError('');try{
+  const {data:value}=await (personId?api.person(personId):api.self());read.keep(value);if(!alive.current||gen!==generation.current)return
   const profile=value.profile
   setData(value)
-  setForm(profile?{
-   biography:profile.biography,
-   keywords:profile.keywords,
-   thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])]
-  }:null)
-  setMembershipId(profile?.membershipId||'')
- }catch{if(alive.current&&gen===generation.current){setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
+  // A form being edited is not replaced when the answer is the profile already on screen.
+  if(!shown||JSON.stringify(shown.profile)!==JSON.stringify(profile)){setForm(formOf(profile));setMembershipId(profile?.membershipId||'')}
+ }catch{if(alive.current&&gen===generation.current){read.drop();setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
  useEffect(()=>{alive.current=true;let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current += 1}},[api,personId])
  async function send(command){setBusy(true);setError('');setNotice('');setPending(command);try{

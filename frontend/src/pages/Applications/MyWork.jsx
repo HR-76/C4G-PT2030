@@ -22,31 +22,41 @@ function Work({ organization, scope }) {
   // The first page of a query already confirmed is shown at once and read again.
   const readName = (query, next) => next ? null : `my-work:${JSON.stringify(query)}`
   const [draft, setDraft] = useState(initial), [filters, setFilters] = useState(initial)
-  const [cursor, setCursor] = useState(null), [reload, setReload] = useState(0)
+  const [cursor, setCursor] = useState(null), [reload, setReload] = useState(0), cursorNow = useRef(null)
+  cursorNow.current = cursor
   const [data, setData] = useState(() => startConfirmedRead(scope, readName(initial, null)).held), [loading, setLoading] = useState(!data), [error, setError] = useState('')
   const [selected, setSelected] = useState(null), trigger = useRef(null)
-  const reset = next => { setSelected(null); setData(null); setCursor(null); setFilters(next); setReload(n => n + 1) }
+  // True while the next read is the silent one made when the window regains focus.
+  const quiet = useRef(false)
+  // Another selection keeps the previous tasks on screen, dimmed and inactive, until its answer arrives.
+  const reset = next => { setSelected(null); setCursor(null); setFilters(next); setReload(n => n + 1) }
   useEffect(() => {
-    const controller = new AbortController(), read = startConfirmedRead(scope, readName(filters, cursor))
-    setLoading(!read.held); setError(''); setSelected(null)
-    if (read.held) setData(read.held)
+    const controller = new AbortController(), read = startConfirmedRead(scope, readName(filters, cursor)), silent = quiet.current
+    quiet.current = false
+    setLoading(!silent && !read.held); setError('')
+    if (!silent) { setSelected(null); if (read.held) setData(read.held) }
     privateApplicationsApi.myWork({ ...filters, ...(cursor ? { cursor } : {}) }, organization.id, controller.signal).then(({ data: result }) => {
       read.keep(result)
       if (controller.signal.aborted) return
       setData(previous => ({ ...result, items: cursor ? [...new Map([...(previous?.items || []), ...result.items].map(task => [task.taskId, task])).values()] : result.items }))
+      // A task left open follows the new answer and closes only if it is no longer there.
+      if (silent) setSelected(previous => previous ? result.items.find(item => item.taskId === previous.taskId) || null : null)
     }).catch(failure => {
       if (controller.signal.aborted) return
-      read.drop(); setData(null)
+      read.drop(); setData(null); setSelected(null)
       setError([401, 403, 404].includes(failure.response?.status) ? 'Não foi possível autorizar a consulta. Confirme o acesso à organização.' : 'Não foi possível carregar as tarefas. Repita a consulta.')
     }).finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   }, [filters, cursor, reload, organization.id])
   useEffect(() => {
-    const refresh = () => { setSelected(null); setData(null); setCursor(null); setReload(n => n + 1) }
+    // Coming back to the window reads the first page again without clearing the list or closing an open task.
+    // With further pages loaded nothing is read: «Atualizar» starts again from the first page.
+    const refresh = () => { if (cursorNow.current) return; quiet.current = true; setReload(n => n + 1) }
     window.addEventListener('focus', refresh)
     return () => window.removeEventListener('focus', refresh)
   }, [])
+  const stale = loading && Boolean(data) && !cursor
   const open = (task, event) => { trigger.current = event.currentTarget; setSelected(task) }
   const change = event => setDraft(value => ({ ...value, [event.target.name]: event.target.value }))
   return <div className="page my-work">
@@ -64,7 +74,7 @@ function Work({ organization, scope }) {
     {data?.total === 0 && <div className="my-work-empty"><ListChecks size={32} aria-hidden="true" data-icon-tone="violet" /><h2>Sem tarefas com estes filtros</h2><p>Esta vista apresenta apenas tarefas atribuídas a si nas candidaturas a que tem acesso.</p></div>}
     {data && data.total > 0 && groups.filter(([key]) => data.counts[key] > 0).map(([key, label]) => {
       const tasks = data.items.filter(task => task.group === key)
-      return <section className={`my-work-group my-work-${key}`} key={key} aria-label={label}>
+      return <section className={`my-work-group my-work-${key}${stale ? ' my-work-stale' : ''}`} key={key} aria-label={label} inert={stale ? '' : undefined} aria-busy={stale || undefined}>
         <header><h2>{label} <span>{data.counts[key]}</span></h2><small>{tasks.length} carregadas</small></header>
         {tasks.length ? <ul>{tasks.map(task => <li key={task.taskId}><button className="my-work-task" onClick={event => open(task, event)} aria-label={`Ver tarefa ${task.title}`}>
           <span className="my-work-task-copy"><strong>{task.title}</strong><span>{task.applicationTitle}</span></span>

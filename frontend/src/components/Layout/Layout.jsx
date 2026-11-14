@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { organizationDirectoryApi } from '../../api/api'
 import { directoryCacheKey, readDirectoryCache, writeDirectoryCache } from '../../pages/Organization/directoryCache'
 import { afterPageRequests } from '../../api/pageRequests'
+import { confirmedReadsEpoch, keepConfirmedRead, readScope } from '../../api/confirmedReads'
 
 const titles = {
   '/meu-trabalho': 'O meu trabalho',
@@ -34,6 +35,7 @@ const titles = {
   '/administracao/entidades': 'Entidades e utilizadores',
   '/administracao/faturacao': 'Faturação',
   '/administracao/logs': 'Logs',
+  '/administracao/email': 'Email',
   '/administracao/importar': 'Importar Portugal 2030',
   '/administracao/aprovacoes-eu': 'Pré-aprovações EU',
   '/administracao/aceitacoes-eu': 'Aceitações EU',
@@ -50,12 +52,14 @@ export default function Layout() {
     const controller = new AbortController(), orgId = organization.id, userId = user.id
     setDirectoryAccess(null)
     const api = organizationDirectoryApi(orgId)
-    afterPageRequests(controller.signal, () => Promise.allSettled([api.context(controller.signal), api.access(controller.signal)]).then(([directory, access]) => {
+    afterPageRequests(controller.signal, () => { const since = confirmedReadsEpoch(); return Promise.allSettled([api.context(controller.signal), api.access(controller.signal)]).then(([directory, access]) => {
       if (controller.signal.aborted) return
+      // The answer that decides the menu also lets the Acessos page open at once; that page reads it again on entry.
+      if (access.status === 'fulfilled' && Array.isArray(access.value.data?.items)) keepConfirmedRead(readScope(userId, orgId), 'organization-access', access.value.data, since)
       // Lets the organization pages open at once; they read the context again on entry.
       if (directory.status === 'fulfilled' && directory.value.data?.permissions && !readDirectoryCache(directoryCacheKey(userId, orgId))) writeDirectoryCache(directoryCacheKey(userId, orgId), {context: directory.value.data})
       setDirectoryAccess({orgId, userId, directory: directory.status === 'fulfilled', units: directory.status === 'fulfilled' && directory.value.data?.permissions?.units === true, access: access.status === 'fulfilled'})
-    }))
+    }) })
     return () => controller.abort()
   }, [organization?.id, user?.id])
   const navigationAccess = directoryAccess?.orgId === organization?.id && directoryAccess?.userId === user?.id ? directoryAccess : {directory:false, units:false, access:false}
@@ -72,7 +76,7 @@ export default function Layout() {
   const base  = '/' + pathname.split('/')[1]
   const sectionPath = '/' + pathname.split('/').slice(1, 3).join('/')
   const title = titles[pathname] || titles[sectionPath] || titles[base] || ''
-  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
+  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/email' || pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
   const needsOrganization = !organization && !platformDirectory && !['/catalogo', '/integracoes', '/conta'].includes(base)
   const closeMenu = () => { setSidebarOpen(false); if (!mobile) setDesktopCollapsed(true); menuButton.current?.focus() }
 

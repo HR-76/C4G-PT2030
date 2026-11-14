@@ -6,3 +6,4 @@
 @media(max-width:600px){.my-work-heading{align-items:start;flex-direction:column;gap:14px}.my-work-heading h1{font-size:24px}.my-work-filters{padding:15px;gap:12px}.my-work-filters label{flex-basis:100%}.my-work-filter-actions{width:100%}.my-work-filter-actions .btn{flex:1}.my-work-task{position:relative;flex-wrap:wrap;padding:16px;gap:12px}.my-work-task-copy{flex-basis:calc(100% - 25px);padding-right:16px}.my-work-task-meta{width:100%;justify-content:space-between;gap:10px}.my-work-task>svg{position:absolute;right:12px;top:20px}.my-work-group>header{padding:14px 12px}.my-work-group small{font-size:10px}.my-work-modal .btn{width:100%;justify-content:center}}
 
 .my-work-modal .task-description { white-space:pre-wrap; overflow-wrap:anywhere; }
+.my-work-stale{opacity:.45;transition:opacity .15s}

@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { organizationNotificationsApi } from '../api/api'
 import { useAuth } from '../contexts/AuthContext'
 import { readScope, startConfirmedRead } from '../api/confirmedReads'
+import { markAlertsGenerated } from '../api/alertGeneration'
 import { Bell, CalendarClock, FileText, CheckCheck, ArrowRight } from 'lucide-react'
 import { useToast } from '../components/ToastProvider'
 import LoadingIndicator from '../components/LoadingIndicator'
@@ -86,7 +87,7 @@ export function NotificationsWorkspace({ organizationId, organizationName, scope
     setLoading(!read.held); setError(''); setRefreshWarning(false)
     if (read.held) { setRows(read.held.values); setTruncated(read.held.truncated) }
     const params = unreadOnly ? { unread: true } : {}
-    return Promise.resolve(api.refreshList(params, organizationId))
+    return Promise.resolve(api.refreshList(params, organizationId)).then(r => { markAlertsGenerated(scope); return r })
       .catch(e => {
         if (e.response?.status && e.response.status < 500) throw e
         if (!alive.current || current !== requestId.current) return null

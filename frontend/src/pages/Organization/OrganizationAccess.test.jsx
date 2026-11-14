@@ -51,3 +51,15 @@ it('reviews a financial grant separately from the profile',async()=>{
  const api=apiFor({...member,canChangeBilling:true,billingRead:false});api.membershipBilling=vi.fn().mockResolvedValue({});render(<AccessTable organizationId="a" api={api}/>);
  fireEvent.click(await screen.findByRole('button',{name:'Dar acesso financeiro a Ana'}));expect(api.membershipBilling).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('button',{name:'Confirmar alteração',exact:true}));await waitFor(()=>expect(api.membershipBilling).toHaveBeenCalledWith('member',{billingRead:true,expectedRevision:4,idempotencyKey:expect.any(String)}));expect(api.membershipProfile).not.toHaveBeenCalled();
 });
+it('opens at once with the accesses the shell already confirmed, reads them again and never shows them without a scope',async()=>{
+ const {keepConfirmedRead}=await import('../../api/confirmedReads')
+ const api=apiFor();api.access.mockResolvedValue({data:{items:[],profiles}})
+ render(<AccessTable organizationId="a" api={api} scope="user:a"/>);await waitFor(()=>expect(api.access).toHaveBeenCalledTimes(1));cleanup()
+ const held={items:[],profiles,marker:'held'}
+ keepConfirmedRead('user:a','organization-access',held)
+ api.access.mockReturnValue(new Promise(()=>{}))
+ const first=render(<AccessTable organizationId="a" api={api} scope="user:a"/>)
+ expect(first.container.textContent).not.toBe('');expect(api.access).toHaveBeenCalledTimes(2);cleanup()
+ const second=render(<AccessTable organizationId="a" api={api}/>)
+ expect(second.container.querySelector('table')).toBeNull()
+})

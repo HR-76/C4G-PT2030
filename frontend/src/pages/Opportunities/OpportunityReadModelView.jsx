@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import { commonTemporalLabels, formatOpportunityTemporal, safeOpportunityUrl } from './opportunityReadModel'
 import { allocationLabel, firstAnalysis } from './opportunityFirstAnalysis'
 import ManualCallInformation from './ManualCallInformation'
+import OpportunityDescription from './OpportunityDescription'
 import './OpportunityEnrichment.css'
 
 function Field({ label, children }) { return <div className="dl-row"><dt>{label}</dt><dd>{children}</dd></div> }
@@ -75,7 +76,9 @@ export default function OpportunityReadModelOverview({ fields = {}, readModel, s
     </section>
     <section ref={description} id="descricao-oportunidade" tabIndex={-1} className="detail-section shell-scroll-target" aria-label="Descrição da fonte">
       <h2 className="opportunity-section-title">Descrição da call</h2>
-      <p id="opportunity-description-text" className="catalog-description">{data.description ? expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800)}…` : data.descriptionFallback}</p>
+      {data.description
+        ? <OpportunityDescription id="opportunity-description-text" text={expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800)}…`} />
+        : <p id="opportunity-description-text" className="catalog-description">{data.descriptionFallback}</p>}
       {data.description?.length > 800 && <button className="btn btn-outline btn-sm" aria-expanded={expanded} aria-controls="opportunity-description-text" onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher descrição' : 'Ler descrição completa'}</button>}
     </section>
     <SourceResolution resolution={fields.sourceResolution} sourceReview={data.sourceReview} />

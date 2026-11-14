@@ -8,6 +8,7 @@ import InfoTooltip from '../../components/InfoTooltip'
 import {useAuth} from '../../contexts/AuthContext'
 import {organizationDirectoryApi} from '../../api/api'
 import {readScope,startConfirmedRead} from '../../api/confirmedReads'
+import {afterPageRequests} from '../../api/pageRequests'
 import {collectPages} from '../../api/organizationDashboard'
 import {formatOpportunityTemporal,commonTemporalLabels} from '../Opportunities/opportunityReadModel'
 import './matching-workspace.css'
@@ -25,7 +26,9 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
  // read again; another user or organization never sees it.
  const resultName=`matching:${JSON.stringify([opportunityId||'',origin||'',personId])}`
  const [people,setPeople]=useState(()=>startConfirmedRead(scope,'matching-people').held||[]),[result,setResult]=useState(()=>startConfirmedRead(scope,resultName).held),[loading,setLoading]=useState(!result),[error,setError]=useState(''),[retry,setRetry]=useState(0)
- useEffect(()=>{let current=true;const controller=new AbortController(),read=startConfirmedRead(scope,resultName);setLoading(!read.held);setError('');setResult(read.held)
+ useEffect(()=>{let current=true;const controller=new AbortController(),read=startConfirmedRead(scope,resultName);setLoading(!read.held);setError('')
+  // Without a confirmed answer for the new selection, the previous result stays on screen, dimmed and inactive.
+  if(read.held)setResult(read.held)
   // StrictMode replays effects; cancel abandoned starts before entering the
   // shared authority queue. Never cache or reuse a previous context's result.
   Promise.resolve().then(()=>current?api.matching(opportunityId?{opportunityId,origin}:personId?{personId}:{},controller.signal):null).then(response=>{if(response)read.keep(response.data);if(current&&response)setResult(response.data)}).catch(error=>{if(current){read.drop();setResult(null);setError(error?.response?.status===409&&error?.response?.data?.error?.code==='LIMIT_EXCEEDED'?'limit':'retry')}} ).finally(()=>{if(current)setLoading(false)})
@@ -35,11 +38,12 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
  // Queue the primary result before the auxiliary selector. Opportunity mode
  // does not display this selector and already receives people from Matching.
  useEffect(()=>{let current=true;const controller=new AbortController(),read=startConfirmedRead(scope,'matching-people');setPeople(read.held||[])
-  if(!opportunityId&&canReadPeople)Promise.resolve().then(()=>current?collectPages(q=>api.people(q,controller.signal),()=>current):null).then(items=>{if(items)read.keep(items);if(current&&items)setPeople(items)}).catch(()=>{if(current){read.drop();setPeople([])}})
+  // The selector is secondary: its pages are asked for once the matching itself has answered.
+  if(!opportunityId&&canReadPeople)afterPageRequests(controller.signal,()=>Promise.resolve().then(()=>current?collectPages(q=>api.people(q,controller.signal),()=>current):null).then(items=>{if(items)read.keep(items);if(current&&items)setPeople(items)}).catch(()=>{if(current){read.drop();setPeople([])}}))
   return()=>{current=false;controller.abort()}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[api,opportunityId,canReadPeople])
- const rows=result?.items||[]
+ const rows=result?.items||[],stale=loading&&Boolean(result)
  return <section className="organization-matching">
   <header className="matching-header"><div><p>{organizationName}</p><div className="heading-with-info"><h1>Matching</h1><InfoTooltip label="Informação sobre o matching">As correspondências resultam das áreas temáticas e não determinam elegibilidade. Pode criar uma candidatura sem correspondência.</InfoTooltip></div></div>
    <Link className="btn btn-secondary" to={opportunityId ? `${origin==='CENTRAL'?'/catalogo':'/oportunidades'}/${opportunityId}` : '/catalogo'}>{opportunityId?'Voltar à oportunidade':'Consultar catálogo'}</Link></header>
@@ -50,7 +54,7 @@ export function MatchingTable({organizationId,organizationName,api:providedApi,s
   {!loading&&result?.state==='PROFILE_NOT_LINKED'&&<EmptyStatePanel title="Perfil ainda não associado" description="O gestor pode associar a sua conta à ficha da pessoa nesta organização." actionLabel="Consultar perfil pessoal" actionTo="/perfil"/>}
   {!loading&&result?.state==='NO_AREAS'&&<EmptyStatePanel title="Perfil sem áreas temáticas" description="Selecione as competências da pessoa para encontrar áreas coincidentes." actionLabel="Completar áreas do perfil" actionTo={personId?`/perfil-organizacao/pessoas/${personId}`:'/perfil'}/>}
   {!loading&&result?.state==='READY'&&rows.length===0&&<EmptyStatePanel title="Sem correspondências" description={opportunityId?'Nenhuma pessoa acessível tem áreas coincidentes com esta oportunidade.':'Não foram encontradas oportunidades acessíveis com áreas coincidentes e prazo atual ou não indicado.'}/>}
-  {rows.length>0&&<section className="matching-results" aria-labelledby="matching-results-title">
+  {rows.length>0&&<section className={`matching-results${stale?' matching-stale':''}`} aria-labelledby="matching-results-title" inert={stale?'':undefined} aria-busy={stale||undefined}>
    <h2 id="matching-results-title" className="matching-results-title">
     {opportunityId?<UsersRound size={16} aria-hidden="true"/>:<Files size={16} aria-hidden="true"/>}
     <span>{rows.length} {opportunityId?(rows.length===1?'pessoa':'pessoas'):(rows.length===1?'oportunidade':'oportunidades')} com correspondência{result.person?' — '+result.person.name:''}</span>

@@ -144,3 +144,26 @@ it('still requests the people list by default and when the account has the peopl
   await screen.findByRole('combobox',{name:'Pessoa'});expect(api.people).toHaveBeenCalledTimes(1);view.unmount()
  }
 })
+it('keeps the previous result on screen, dimmed and inactive, while another person is calculated',async()=>{
+ let finish
+ const api={matching:vi.fn().mockResolvedValueOnce(ready('Resultado anterior')).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve})),
+  people:vi.fn().mockResolvedValue({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}})}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado anterior'})
+ fireEvent.change(await screen.findByLabelText('Pessoa'),{target:{value:'pessoa-a'}})
+ await waitFor(()=>expect(api.matching).toHaveBeenCalledTimes(2))
+ const results=screen.getByRole('link',{name:'Resultado anterior'}).closest('section')
+ expect(results.classList.contains('matching-stale')).toBe(true);expect(results.hasAttribute('inert')).toBe(true)
+ await act(async()=>finish(ready('Resultado novo')))
+ expect(screen.queryByRole('link',{name:'Resultado anterior'})).toBeNull()
+ expect(screen.getByRole('link',{name:'Resultado novo'}).closest('section').hasAttribute('inert')).toBe(false)
+})
+it('removes the previous result when the new calculation fails',async()=>{
+ const api={matching:vi.fn().mockResolvedValueOnce(ready('Resultado anterior')).mockRejectedValue({response:{status:503}}),
+  people:vi.fn().mockResolvedValue({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}})}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado anterior'})
+ fireEvent.change(await screen.findByLabelText('Pessoa'),{target:{value:'pessoa-a'}})
+ await screen.findByRole('alert')
+ expect(screen.queryByRole('link',{name:'Resultado anterior'})).toBeNull()
+})

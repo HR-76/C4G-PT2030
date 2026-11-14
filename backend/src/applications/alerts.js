@@ -14,8 +14,21 @@ function parse(method,value={}){
  return {unread:value.unread===true||value.unread==='true',limit};
 }
 function milestone(days){return Number.isInteger(days)&&days>=0?[30,7,1].find(n=>days<=n&&days>=n-2)||null:null}
-function createAlertsRepository({organizationId:org,actor,protect,authorize,activeRecipients,audit}){
+function createAlertsRepository({organizationId:org,actor,protect,authorize,activeRecipients,audit,onDecisionReuse=()=>{}}){
  const membership=actor.membershipId;
+ // This repository serves one protected operation. Alerts of the same
+ // application ask the same questions, so each is decided once and the answer
+ // is reused for the other alerts; `onDecisionReuse` lets the operation confirm
+ // its authority is still current. A decision that could not be made throws and
+ // is never kept.
+ const decisions=new Map();
+ async function decide(operation,target){
+  const key=JSON.stringify([operation,target]);
+  if(decisions.has(key)){onDecisionReuse();return decisions.get(key);}
+  const allowed=await authorize(operation,target);
+  decisions.set(key,allowed===true);
+  return allowed===true;
+ }
  async function available(client){return Boolean((await client.query("SELECT to_regclass('opportunity_catalog.application_alert') IS NOT NULL AS ready")).rows[0].ready)}
  async function insert(client,app,recipient,type,key,title,message,deadline=null){
   const result=await client.query(`INSERT INTO opportunity_catalog.application_alert(organization_id,alert_id,recipient_membership_id,application_id,event_key,type,title,message,deadline)
@@ -39,9 +52,9 @@ function createAlertsRepository({organizationId:org,actor,protect,authorize,acti
   if(!await available(client))fail('SCHEMA_UPGRADE_REQUIRED');
  }
  async function canRead(row){
-  return await authorize('APPLICATION_READ',resource(row.application_id,org))&&
-   await authorize('OPPORTUNITY_READ',resource(row.opportunity_id||org,org,'OPPORTUNITY'))&&
-   (!row.evaluation_id||await authorize('F14_PREQUALIFICATION_READ',resource(row.evaluation_id,org,'PREQUALIFICATION_EVALUATION')));
+  return await decide('APPLICATION_READ',resource(row.application_id,org))&&
+   await decide('OPPORTUNITY_READ',resource(row.opportunity_id||org,org,'OPPORTUNITY'))&&
+   (!row.evaluation_id||await decide('F14_PREQUALIFICATION_READ',resource(row.evaluation_id,org,'PREQUALIFICATION_EVALUATION')));
  }
  async function visible(client){
   const frozen=frozenSnapshotExpressions('a.central_snapshot');

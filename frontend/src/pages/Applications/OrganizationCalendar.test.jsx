@@ -5,7 +5,8 @@ import OrganizationCalendar from './OrganizationCalendar'
 
 const read = vi.hoisted(() => vi.fn())
 vi.mock('../../api/api', () => ({ privateApplicationsApi: { calendar: read } }))
-vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ organization: { id: 'org' } }) }))
+const auth = vi.hoisted(() => ({ organization: { id: 'org' } }))
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 
 const date = '2026-11-12'
 const project = { id: '00000000-0000-4000-8000-000000000001', title: 'Projeto Norte' }
@@ -17,6 +18,7 @@ const data = {
 }
 
 beforeEach(() => {
+  delete auth.user
   read.mockReset()
   read.mockResolvedValue({ data })
 })
@@ -96,4 +98,37 @@ it('drops an old response when changing month and shows a denied read without st
   await act(async () => resolve({ data }))
   expect(read.mock.calls[0][2].aborted).toBe(true)
   expect(screen.queryByRole('link', { name: task.title })).toBeNull()
+})
+
+it('reopens with the confirmed month and agenda at once, reads them again and never shows them to another user', async () => {
+  auth.user = { id: 'user' }
+  show(); await screen.findAllByText('Rever orçamento'); cleanup()
+  read.mockReturnValue(new Promise(() => {}))
+  show()
+  expect(screen.getAllByText('Rever orçamento').length).toBeGreaterThan(0); expect(screen.queryByText('A carregar prazos…')).toBeNull()
+  expect(read).toHaveBeenCalledTimes(2)
+  cleanup(); auth.user = { id: 'other' }
+  show(); expect(screen.queryByText('Rever orçamento')).toBeNull(); expect(screen.getByText('A carregar prazos…')).toBeTruthy()
+})
+
+it('removes the confirmed month when the new read is refused', async () => {
+  auth.user = { id: 'user' }
+  show(); await screen.findAllByText('Rever orçamento'); cleanup()
+  read.mockRejectedValue({ response: { status: 403 } })
+  show(); await screen.findByRole('alert')
+  expect(screen.queryByText('Rever orçamento')).toBeNull()
+})
+
+it('names the chosen day at once and keeps the previous deadlines dimmed and inactive until the answer arrives', async () => {
+  show(); const agenda = await screen.findByRole('region', { name: 'Próximos prazos' })
+  await within(agenda).findByText('Rever orçamento')
+  let answer; read.mockReturnValue(new Promise(resolve => { answer = resolve }))
+  fireEvent.click(screen.getByRole('button', { name: /12 de novembro/ }))
+  const chosen = screen.getByRole('region', { name: /Prazos de .*12 de novembro/ })
+  const list = within(chosen).getByText('Rever orçamento').closest('ol')
+  expect(list.classList.contains('organization-calendar-stale')).toBe(true); expect(list.hasAttribute('inert')).toBe(true)
+  expect(chosen.getAttribute('aria-busy')).toBe('true'); expect(screen.getByText('A carregar prazos…')).toBeTruthy()
+  await act(async () => answer({ data: { ...data, agenda: [task] } }))
+  const fresh = within(screen.getByRole('region', { name: /Prazos de .*12 de novembro/ })).getByText('Rever orçamento').closest('ol')
+  expect(fresh.hasAttribute('inert')).toBe(false); expect(fresh.classList.contains('organization-calendar-stale')).toBe(false)
 })

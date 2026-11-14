@@ -142,6 +142,12 @@ it('renders manual opportunity authoring in the shell without a client membershi
  expect(screen.getByText('Manual central form')).toBeTruthy()
  expect(screen.queryByRole('heading',{name:'Área da organização'})).toBeNull()
 })
+it('renders the C4G email templates page without a client membership',()=>{
+ state.auth.user.platformRoles=['C4G_ADMIN'];state.auth.organization=null
+ page('/administracao/email',<p>Email templates</p>)
+ expect(screen.getByText('Email templates')).toBeTruthy()
+ expect(screen.queryByRole('heading',{name:'Área da organização'})).toBeNull()
+})
 it('returns focus to the original action when a filtered list finishes loading', async () => {
   function List() {
     const [ready, setReady] = React.useState(false)

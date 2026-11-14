@@ -83,3 +83,11 @@ it('does not mislabel invalid or future dates as older notifications',()=>{
  const groups=notificationGroups([{created_at:'invalid'},{created_at:'2027-01-01T00:00:00Z'}],new Date('2026-11-11T12:00:00Z'))
  expect(groups.map(g=>g.label)).toEqual(['Outras datas'])
 })
+
+it('records that the alerts page generated the deadline alerts so the header bell only reads', async () => {
+  const { alertGenerationDue } = await import('../api/alertGeneration')
+  expect(alertGenerationDue('a:org-a')).toBe(true)
+  render(ui())
+  await screen.findAllByText('Candidatura em preparação')
+  expect(api.refreshList).toHaveBeenCalled(); expect(alertGenerationDue('a:org-a')).toBe(false)
+})

@@ -166,6 +166,8 @@ function createApplicationComposition({sessionStore,sessionRegistry,authorityCoo
     activeRecipients:createAlertRecipientReader({pool:centralPool,organizationId:org}),
     audit:(c,e)=>audit(c,s,e),
     authorize:authorizeNotification,
+    // A reused decision of a protected read still confirms the guard is current.
+    onDecisionReuse:()=>{if(['alertsList','alertsRefresh','alertsRefreshList'].includes(s.method))coordinator.assert(s.guard,client,preparedAuthorityBinding(client).transactionId)},
     protect:async args=>{const d=await guard.protect(client,{handle:s.handle,...args});s.guard=d.token;await drain();return d}});
    if(s.method.startsWith('notices')){
     const notices=createNoticesRepository({organizationId:org,actor:context.actor,cursor:tokens,audit:(c,e)=>audit(c,s,e),

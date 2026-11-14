@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { privateApplicationsApi } from '../../api/api'
 import { lisbonDay } from '../../api/organizationDashboard'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { useAuth } from '../../contexts/AuthContext'
 import { applicationDetailTarget } from './navigation'
 import { atNoon, dayLabel, monthLabel, monthWeeks, shiftMonth, weekdays } from './calendarMonth'
@@ -34,16 +35,17 @@ function CalendarGrid({ month, today, selectedDay, days, onSelect }) {
   </table>
 }
 
-function Agenda({ result, selectedDay, page, heading, returnTo, onPage, onClearDay }) {
+// With `stale` the title already names the new selection while the previous deadlines stay below it, dimmed and inactive.
+function Agenda({ result, selectedDay, page, heading, returnTo, onPage, onClearDay, stale = false }) {
   const data = result?.data
   const title = selectedDay ? `Prazos de ${dayLabel.format(atNoon(selectedDay))}` : 'Próximos prazos'
-  return <section className="organization-calendar-agenda" id="organization-calendar-agenda" aria-labelledby="organization-calendar-agenda-title">
+  return <section className="organization-calendar-agenda" id="organization-calendar-agenda" aria-labelledby="organization-calendar-agenda-title" aria-busy={stale || undefined}>
     <header>
       <h2 id="organization-calendar-agenda-title" ref={heading} tabIndex={-1}>{title}</h2>
       {selectedDay && <button type="button" className="btn btn-outline btn-sm" onClick={onClearDay}>Ver próximos prazos</button>}
     </header>
-    {data?.agenda.length === 0 && <p className="organization-calendar-empty">{selectedDay ? 'Sem prazos neste dia.' : 'Sem próximos prazos.'}</p>}
-    {data?.agenda.length > 0 && <ol className="organization-calendar-events">
+    {!stale && data?.agenda.length === 0 && <p className="organization-calendar-empty">{selectedDay ? 'Sem prazos neste dia.' : 'Sem próximos prazos.'}</p>}
+    {data?.agenda.length > 0 && <ol className={`organization-calendar-events${stale ? ' organization-calendar-stale' : ''}`} inert={stale ? '' : undefined}>
       {data.agenda.map(event => <li key={event.id}>
         <div className="organization-calendar-event-date">
           <time dateTime={event.date}>{agendaDate.format(atNoon(event.date))}</time>
@@ -54,7 +56,7 @@ function Agenda({ result, selectedDay, page, heading, returnTo, onPage, onClearD
         <span className={`chip ${CHIP[event.status]}`}>{LABEL[event.status]}</span>
       </li>)}
     </ol>}
-    {data && (page > 1 || data.hasNextPage) && <nav className="organization-calendar-pagination" aria-label="Páginas de prazos">
+    {data && !stale && (page > 1 || data.hasNextPage) && <nav className="organization-calendar-pagination" aria-label="Páginas de prazos">
       <button type="button" className="btn btn-outline btn-sm" disabled={page === 1} onClick={() => onPage(page - 1)}>Anterior</button>
       <span>Página {page}</span>
       <button type="button" className="btn btn-outline btn-sm" disabled={!data.hasNextPage} onClick={() => onPage(page + 1)}>Seguinte</button>
@@ -63,7 +65,7 @@ function Agenda({ result, selectedDay, page, heading, returnTo, onPage, onClearD
 }
 
 export default function OrganizationCalendar() {
-  const { organization } = useAuth()
+  const { organization, user } = useAuth()
   const { pathname, search } = useLocation()
   const [params, setParams] = useSearchParams()
   const today = lisbonDay()
@@ -77,27 +79,36 @@ export default function OrganizationCalendar() {
   const page = Number.isInteger(requestedPage) && requestedPage >= 1 && requestedPage <= 1000 ? requestedPage : 1
   const [draft, setDraft] = useState('')
   const [applicationQ, setApplicationQ] = useState('')
-  const [response, setResponse] = useState(null)
   const [retry, setRetry] = useState(0)
   const agendaHeading = useRef(null)
   const focusAgenda = useRef(false)
   const monthKey = JSON.stringify([organization.id, month, applicationId, status])
   const requestKey = JSON.stringify([monthKey, applicationQ, selectedDay, page, retry])
+  // What this user and organization last received for the same view is shown at once and read again.
+  const scope = user?.id ? readScope(user.id, organization.id) : null
+  const readName = `calendar:${JSON.stringify([month, applicationId, status, applicationQ, selectedDay, page])}`
+  const confirmed = data => ({ key: requestKey, monthKey, data })
+  const [response, setResponse] = useState(() => { const held = startConfirmedRead(scope, readName).held; return held ? confirmed(held) : null })
   const result = response?.key === requestKey ? response : null
   const monthData = response?.monthKey === monthKey ? response.data : null
+  // While another day or page of the same month is read, the previous agenda stays on screen, dimmed and inactive.
+  const staleAgenda = !result && response?.data && response.monthKey === monthKey ? response : null
 
   useEffect(() => {
-    const controller = new AbortController()
+    const controller = new AbortController(), read = startConfirmedRead(scope, readName)
+    if (read.held) setResponse(confirmed(read.held))
     privateApplicationsApi.calendar({
       month, applicationId: applicationId || undefined, applicationQ: applicationQ || undefined,
       status: status || undefined,
       day: selectedDay || undefined, page: page > 1 ? page : undefined,
     }, organization.id, controller.signal).then(({ data }) => {
-      if (!controller.signal.aborted) setResponse({ key: requestKey, monthKey, data })
+      read.keep(data)
+      if (!controller.signal.aborted) setResponse(confirmed(data))
     }).catch(error => {
-      if (!controller.signal.aborted) setResponse({ key: requestKey, error: error?.response?.status || 503 })
+      if (!controller.signal.aborted) { read.drop(); setResponse({ key: requestKey, error: error?.response?.status || 503 }) }
     })
     return () => controller.abort()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the read name follow them.
   }, [requestKey, monthKey, organization.id, month, applicationId, applicationQ, status, selectedDay, page])
 
   useEffect(() => {
@@ -173,7 +184,7 @@ export default function OrganizationCalendar() {
         <CalendarGrid month={month} today={monthData?.today || today} days={monthData?.days || []} selectedDay={selectedDay} onSelect={chooseDay} />
         {monthData?.days.length === 0 && <p className="organization-calendar-empty">Sem prazos neste mês.</p>}
       </section>
-      <Agenda result={result} selectedDay={selectedDay} page={page} heading={agendaHeading} returnTo={pathname + search}
+      <Agenda result={result || staleAgenda} stale={Boolean(staleAgenda)} selectedDay={selectedDay} page={page} heading={agendaHeading} returnTo={pathname + search}
         onPage={value => { focusAgenda.current = true; update({ pagina: value > 1 ? value : null }) }}
         onClearDay={() => chooseDay(selectedDay)} />
     </div>

@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react'
 import {useAuth} from '../../contexts/AuthContext'
 import {organizationDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import FormModal from '../../components/FormModal'
 import './organization-access.css'
 import EntityUsers from '../Platform/EntityUsers'
@@ -9,15 +10,16 @@ const messages={MFA_REQUIRED:'Confirme novamente a autenticação multifator ant
 export default function OrganizationAccess(){
  const {user,organization}=useAuth()
  if(!organization)return <p>Esta conta não tem uma entidade associada para consultar acessos.</p>
- return <EntityUsers key={`${user.id}:${organization.id}`} organizationId={organization.id} organizationName={organization.name||organization.displayName||'Organização selecionada'}/>
+ return <EntityUsers key={`${user.id}:${organization.id}`} organizationId={organization.id} organizationName={organization.name||organization.displayName||'Organização selecionada'} scope={readScope(user.id,organization.id)}/>
 }
-export function AccessTable({organizationId,api:providedApi}){
+// With a `scope` (the organization's own page) the accesses this user last received are shown at once and read again.
+export function AccessTable({organizationId,api:providedApi,scope=null}){
  const api=useMemo(()=>providedApi||organizationDirectoryApi(organizationId),[providedApi,organizationId]),generation=useRef(0)
- const [data,setData]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[review,setReview]=useState(null),[selected,setSelected]=useState({})
+ const [data,setData]=useState(()=>startConfirmedRead(scope,'organization-access').held),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[review,setReview]=useState(null),[selected,setSelected]=useState({})
  const reviewTrigger=useRef(null)
- async function load(epoch=generation.current){setBusy(true);setError('');try{const r=await api.access();if(epoch===generation.current){setData(r.data);setSelected({})}}catch(e){if(epoch===generation.current){setData(null);setError(e.response?.status===403?'O seu perfil não permite consultar os acessos desta organização.':e.response?.status===409?'A organização ou a sessão mudou. Atualize a lista.':'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.')}}finally{if(epoch===generation.current)setBusy(false)}}
+ async function load(epoch=generation.current){const read=startConfirmedRead(scope,'organization-access');setBusy(true);setError('');try{const r=await api.access();read.keep(r.data);if(epoch===generation.current){setData(r.data);if(JSON.stringify(read.held)!==JSON.stringify(r.data))setSelected({})}}catch(e){if(epoch===generation.current){read.drop();setData(null);setError(e.response?.status===403?'O seu perfil não permite consultar os acessos desta organização.':e.response?.status===409?'A organização ou a sessão mudou. Atualize a lista.':'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.')}}finally{if(epoch===generation.current)setBusy(false)}}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
- useEffect(()=>{const epoch=++generation.current;setData(null);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current += 1}},[api])
+ useEffect(()=>{const epoch=++generation.current;setData(startConfirmedRead(scope,'organization-access').held);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current += 1}},[api])
  async function send(command){const epoch=generation.current;setBusy(true);setPending(command);setReview(null);setError('');setNotice('');try{
   await (command.kind==='billing'?api.membershipBilling:command.kind==='profile'?api.membershipProfile:api.membershipStatus)(command.id,command.body)
   if(epoch!==generation.current)return

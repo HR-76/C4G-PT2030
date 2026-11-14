@@ -49,3 +49,21 @@ describe('faturação do cliente',()=>{
   })
   it('shows effective dates separately from registration and never fakes PDF',async()=>{const a=api();a.invoice=vi.fn(()=>response({...row,adjustedTotal:'1000',account:{legalName:'Cliente',taxIdentifier:'123456789'},documents:[{id:'doc',type:'INVOICE',number:row.number,state:'ISSUED',total:'1000',currency:'EUR'}],payments:[{id:'payment',recordType:'PAYMENT',methodCode:'BANK_TRANSFER',effectiveOn:'2026-11-01',createdAt:'2026-11-02T10:00:00Z',amount:'700',currency:'EUR'},{id:'reversal',recordType:'REVERSAL',effectiveOn:'2026-11-03',createdAt:'2026-11-04T10:00:00Z',amount:'100',currency:'EUR'}]}));mount(a,'/faturacao/cycle');await screen.findByText('Data efetiva: 01/11/2026');expect(screen.getByText(/Registado pela C4G em 02\/11\/26/)).toBeTruthy();expect(screen.getByText('Estorno')).toBeTruthy();expect(screen.getByText('PDF ainda não disponibilizado.')).toBeTruthy();expect(screen.queryByRole('link',{name:/PDF/})).toBeNull()})
 })
+describe('faturação do cliente — reabertura', () => {
+  const view=(value,directoryApi,extra={})=>render(<MemoryRouter initialEntries={['/faturacao']}><Routes><Route path="/faturacao" element={<CustomerBillingView organizationId="org" api={value} directoryApi={directoryApi} scope="user:org" {...extra}/>}/></Routes></MemoryRouter>)
+  it('reopens with the confirmed invoices at once, reads them again and removes them when the read is refused',async()=>{
+    const a=api();view(a,noProfile);await screen.findByText('FT 2026/1');cleanup()
+    a.invoices.mockReturnValue(new Promise(()=>{}));a.summary.mockReturnValue(new Promise(()=>{}))
+    view(a,noProfile);expect(screen.getByText('FT 2026/1')).toBeTruthy();expect(a.invoices).toHaveBeenCalledTimes(2);cleanup()
+    a.invoices.mockRejectedValue({response:{status:403}})
+    view(a,noProfile);await screen.findByRole('alert');expect(screen.queryByText('FT 2026/1')).toBeNull()
+  })
+  it('compares with the entity profile already in memory instead of asking for it again',async()=>{
+    const {writeDirectoryCache,clearDirectoryCache,directoryCacheKey}=await import('../Organization/directoryCache')
+    clearDirectoryCache();const key=directoryCacheKey('user','org')
+    writeDirectoryCache(key,{context:{permissions:{},organization:{legalName:'Entidade'},registration:null}})
+    const context=vi.fn(()=>response({}))
+    try{const a=api();view(a,{context},{directoryKey:key});await screen.findByText('FT 2026/1');await waitFor(()=>expect(a.account).toHaveBeenCalled());expect(context).not.toHaveBeenCalled()}
+    finally{clearDirectoryCache()}
+  })
+})
