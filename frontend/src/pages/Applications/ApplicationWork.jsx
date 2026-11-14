@@ -2,6 +2,7 @@ import useTaskSelection from './useTaskSelection'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MessageSquare, UserPlus } from 'lucide-react'
 import { privateApplicationsApi as api } from '../../api/api'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import './application-work.css'
 import { dateLabel } from './lifecycle'
 import { applicationWorkIntentKey, loadWorkIntention } from './intentions'
@@ -20,8 +21,10 @@ const initials = name => {
 const message = error => ({401:'A sessão terminou. Recupere a sessão e volte a consultar a equipa.',400:'Verifique os campos.',403:'Sem permissão.',404:'Candidatura ou tarefa indisponível.',409:'Os dados mudaram. Recarregue antes de editar.'}[error?.response?.status] || 'Resultado incerto. Repita o mesmo envio para confirmar o resultado.')
 const definitive = error => error?.response?.status===400 || (error?.response?.status===409 && ['STALE_REVISION','STATE_CONFLICT','RESPONSIBLE_UNAVAILABLE'].includes(error?.response?.data?.error?.code))
 
-export default function ApplicationWork({ applicationId, userId, organizationId, responsibles, responsiblesNext, loadingResponsibles, responsiblesLoadFailed = false, loadMoreResponsibles, applicationResponsibleId, applicationDeadline, onPreparationChange, canEdit = true, loadDetails = true }) {
-  const [work,setWork]=useState(null),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
+export default function ApplicationWork({ applicationId, userId, organizationId, responsibles, responsiblesNext, loadingResponsibles, responsiblesLoadFailed = false, loadMoreResponsibles, applicationResponsibleId, applicationDeadline, onPreparationChange, canEdit = true, loadDetails = true, takeEarlyRead }) {
+  // The team this user and organization last received is shown at once and read again; changes wait for the new answer.
+  const scope=userId&&organizationId?readScope(userId,organizationId):null,readName=`application-work:${applicationId}`
+  const [work,setWork]=useState(()=>startConfirmedRead(scope,readName).held),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
   const [participant,setParticipant]=useState(''),[taskForm,setTaskForm]=useState(emptyTask),[editing,setEditing]=useState(null)
   const [editor,setEditor]=useState(null)
   const { confirm, dialog } = useConfirmDialog()
@@ -56,11 +59,14 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
     setWork(null);setHistory([]);setHistoryNext(null);setError('');setNotice('');setEditing(null);setTaskForm(emptyTask);setParticipant('');setEditor(null);setChatOpen(false);setStorageBlocked(false)
     try{setPending(loadWorkIntention(userId,organizationId,applicationId))}catch{setPending(null);setStorageBlocked(true);setError('Não foi possível recuperar o envio guardado. Os dados foram preservados; volte a consultar a equipa.')}
   },[applicationId,userId,organizationId,intentKey,refresh])
-  useEffect(()=>{let active=true;generation.current += 1;setReading(true);setWork(null)
-    const controller=new AbortController()
-    api.work(applicationId,undefined,controller.signal).then(w=>{if(active)setWork(w.data)})
-      .catch(e=>{if(active){reject(e);if(!e?.response?.status||e.response.status>=500)setError('Não foi possível carregar a equipa e tarefas. Repita a consulta.')}}).finally(()=>{if(active)setReading(false)})
+  useEffect(()=>{let active=true;generation.current += 1;setReading(true)
+    const controller=new AbortController(),read=startConfirmedRead(scope,readName)
+    setWork(read.held)
+    // The page may already have asked for the team together with the record.
+    ;((refresh===0&&takeEarlyRead?.('work'))||api.work(applicationId,undefined,controller.signal)).then(w=>{read.keep(w.data);if(active)setWork(w.data)})
+      .catch(e=>{if(active){read.drop();if(read.held)setWork(null);reject(e);if(!e?.response?.status||e.response.status>=500)setError('Não foi possível carregar a equipa e tarefas. Repita a consulta.')}}).finally(()=>{if(active)setReading(false)})
     return()=>{active=false;controller.abort();generation.current += 1}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the early read are taken at that moment.
   },[applicationId,userId,organizationId,refresh])
   const workReady=Boolean(work)&&!reading
   useEffect(()=>{

@@ -289,7 +289,9 @@ function requiredCentralMigrations(entries = manifest) {
 function supportsCentralVersion(currentVersion, introducedVersion) {
   const branch = currentVersion === failureCapacityEntry.version ? failureCapacityManifest
     : currentVersion === replayCapacityEntry.version ? replayCapacityManifest
-    : currentVersion === receiptEntry.version ? receiptManifest : knownManifest;
+    : currentVersion === receiptEntry.version ? receiptManifest
+    // 052 lives in its own chain (the 051 chain never ends at 052), so a Central at 052 is compared against that chain.
+    : currentVersion === centralRuntimeReadEntry.version ? centralRuntimeReadManifest : knownManifest;
   const current = branch.findIndex(entry => entry.version === currentVersion);
   const introduced = branch.findIndex(entry => entry.version === introducedVersion);
   return current >= 0 && introduced >= 0 && current >= introduced;

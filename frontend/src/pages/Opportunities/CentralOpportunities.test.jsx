@@ -421,3 +421,16 @@ it('requests ordering from the catalog and resets the page cursor when the order
   await waitFor(() => expect(api.list.mock.lastCall[0]).toEqual({sort:'amount_desc'}))
   await screen.findByText('Página 1')
 })
+it('hands the record just read to the application form when starting from the table',async()=>{
+ const record={opportunityId:'one',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}
+ api.list.mockResolvedValue(response([{opportunityId:'one',title:'Open call',lifecycleState:'ACTIVE'}]))
+ api.get.mockResolvedValue({data:record})
+ interestApi.context.mockResolvedValue({data:{capabilities:{canRegister:true,canManage:true,canCreateApplication:true}}})
+ let handed
+ const Probe=()=>{handed=useLocation().state;return <p>Formulário de candidatura</p>}
+ const before=Date.now()
+ render(<MemoryRouter><Routes><Route path="/" element={<CentralOpportunities/>}/><Route path="/candidaturas" element={<Probe/>}/></Routes></MemoryRouter>)
+ fireEvent.click(await screen.findByRole('button',{name:'Iniciar candidatura para Open call'}))
+ await screen.findByText('Formulário de candidatura')
+ expect(handed.centralOpportunity.record).toEqual(record);expect(handed.centralOpportunity.readAt).toBeGreaterThanOrEqual(before)
+})

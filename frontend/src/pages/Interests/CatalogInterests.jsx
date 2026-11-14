@@ -12,12 +12,12 @@ import './interests.css'
 
 const InterestContext = createContext(null)
 export const useCatalogInterests = () => useContext(InterestContext)
-export default function CatalogInterests({ organization, items, catalogApi, children }) {
+export default function CatalogInterests({ organization, items, catalogApi, handOver = false, children }) {
   const { user } = useAuth()
   if (!organization) return children
-  return <CatalogContext key={`${user?.id}:${organization.id}`} userId={user?.id} organizationId={organization.id} items={items} catalogApi={catalogApi}>{children}</CatalogContext>
+  return <CatalogContext key={`${user?.id}:${organization.id}`} userId={user?.id} organizationId={organization.id} items={items} catalogApi={catalogApi} handOver={handOver}>{children}</CatalogContext>
 }
-function CatalogContext({ userId, organizationId, items, catalogApi, children }) {
+function CatalogContext({ userId, organizationId, items, catalogApi, handOver, children }) {
   // What this user and organization last received is shown at once and read again.
   const scope = userId ? readScope(userId, organizationId) : null
   const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
@@ -100,7 +100,9 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
       const { data } = await catalogApi.get(item.opportunityId)
       if (!alive.current || token !== epoch.current) return
       if (data.opportunityId !== item.opportunityId || !data.revisionId || (data.lifecycleState || data.snapshot?.lifecycleState) === 'ARCHIVED') throw Error('Unavailable')
-      navigate('/candidaturas?' + new URLSearchParams({ nova: '1', origem: 'CENTRAL', oportunidade: item.opportunityId, revisao: data.revisionId, retorno: safeInterestReturn(location.pathname + location.search, '/catalogo') }))
+      navigate('/candidaturas?' + new URLSearchParams({ nova: '1', origem: 'CENTRAL', oportunidade: item.opportunityId, revisao: data.revisionId, retorno: safeInterestReturn(location.pathname + location.search, '/catalogo') }),
+        // The form shows the record just read instead of reading it again; the server still checks the revision on creation.
+        handOver ? { state: { centralOpportunity: { record: data, readAt: Date.now() } } } : undefined)
     } catch { if (alive.current && token === epoch.current) setOpenError('Não foi possível preparar a candidatura. Tente novamente.') }
     finally { openMutex.current = false; if (alive.current && token === epoch.current) setOpening(false) }
   }

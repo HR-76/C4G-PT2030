@@ -15,7 +15,7 @@ const OrganizationCalendar = routePage(() => import('./pages/Applications/Organi
 const Dashboard = routePage(() => import('./pages/Dashboard'))
 const OpportunitiesList = routePage(() => import('./pages/Opportunities/OpportunitiesList'))
 const OpportunityDetail = routePage(() => import('./pages/Opportunities/OpportunityDetail'))
-const PrivateApplications = routePage(() => import('./pages/Applications/PrivateApplications'))
+const PrivateApplications = routePage(() => import('./pages/Applications/ApplicationsPage'))
 const Matching = routePage(() => import('./pages/Matching'))
 const Partners = routePage(() => import('./pages/Partners'))
 const Profile = routePage(() => import('./pages/Profile'))

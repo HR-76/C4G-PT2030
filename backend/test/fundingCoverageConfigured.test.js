@@ -27,6 +27,19 @@ test('durable-v1 coverage is enabled with the abilities the Central version supp
   assert.equal(disabled.supported, true);
 });
 
+// Regression (staging, 14/11/2026): with the Central at 052 the API and the collection worker refused to start with
+// durable coverage, because 052 lives in its own chain and the version comparison only looked at the chain ending at 051.
+test('a Central at 052 supports everything the earlier versions introduced', async () => {
+  const { supportsCentralVersion } = require('../src/security/centralMigrationManifest');
+  for (const introduced of ['015_funding_tenders_central', '018_official_programme_sources', '033_funding_coverage', '035_funding_source_resolution',
+    '049_pt2030_document_upload', '051_email_templates', '052_central_runtime_read']) {
+    assert.equal(supportsCentralVersion('052_central_runtime_read', introduced), true, introduced);
+  }
+  assert.equal(supportsCentralVersion('051_email_templates', '052_central_runtime_read'), false);
+  const coverage = await configuredCoverage({ env: central, pool: {}, preflight: at('052_central_runtime_read') });
+  assert.deepEqual(coverage, { supported: true, enabled: true, temporalSupported: true, resolutionSupported: true });
+});
+
 test('coverage that the Central cannot support or that is misconfigured is refused', async () => {
   await assert.rejects(() => configuredCoverage({ env: central, pool: {}, preflight: at('032_single_organization_membership') }), /FUNDING_COVERAGE_SCHEMA_REQUIRED/);
   await assert.rejects(() => configuredCoverage({ env: { ...central, FUNDING_TENDERS_COVERAGE: 'always' }, pool: {}, preflight: at('050_billing_private_documents') }), /FUNDING_COVERAGE_CONFIG_INVALID/);

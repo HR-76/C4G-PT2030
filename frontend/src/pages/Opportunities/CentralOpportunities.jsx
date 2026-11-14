@@ -105,7 +105,7 @@ function Catalog({ id, organization, platformAdmin, scope = null }) {
   }
   const pendingFilters = Object.keys(emptyFilters).some(key => draft[key] !== filters[key])
   const invalidDates = draft.closingFrom && draft.closingTo && draft.closingFrom > draft.closingTo
-  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Oportunidades</h1>}</div>
+  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api} handOver={api === centralOpportunitiesApi}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Oportunidades</h1>}</div>
     {organization && <Link className="btn btn-outline" to="/interesses">Interesses</Link>}
     {organization && <Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link>}
     {platformAdmin && <Link className="btn btn-primary" to="/administracao/oportunidades/nova"><Plus size={16} /> Criar oportunidade</Link>}

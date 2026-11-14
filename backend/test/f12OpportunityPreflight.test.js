@@ -80,7 +80,8 @@ test('Central packages after the last opportunity package expect their catalog t
   'funding_observation','funding_cycle','funding_batch','funding_cycle_seen','funding_refresh_target','funding_resolution'];
  const last=centralAdditionsIndex('045_opportunity_eu_legacy_prearchive');
  assert.equal(last,CENTRAL_ADDITIONS.length-1);
- for(const version of ['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents']){
+ // 051 and 052 (staging Central since 14/11/2026) add nothing to opportunity_catalog; 052 was unknown here and stopped the worker.
+ for(const version of ['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents','051_email_templates','052_central_runtime_read']){
   assert.equal(centralAdditionsIndex(version),last);
   for(const drift of [null,'missing','extra']){
    // 049 adds the PT2030 upload table to opportunity_catalog; 048 and 050 add none.
