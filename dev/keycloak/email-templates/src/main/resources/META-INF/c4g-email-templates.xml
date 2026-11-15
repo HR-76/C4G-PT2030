@@ -10,6 +10,7 @@
    <column name="REQUEST_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
    <column name="REQUEST_SHA256" type="VARCHAR(64)"><constraints nullable="false"/></column>
    <column name="ACTOR_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
+   <column name="SERVICE_ACTOR_ID" type="VARCHAR(255)"><constraints nullable="false"/></column>
    <column name="CREATED_AT" type="BIGINT"><constraints nullable="false"/></column>
    <column name="PAYLOAD_JSON" type="NCLOB"><constraints nullable="false"/></column>
    <column name="LOCALES_JSON" type="NCLOB"><constraints nullable="false"/></column>

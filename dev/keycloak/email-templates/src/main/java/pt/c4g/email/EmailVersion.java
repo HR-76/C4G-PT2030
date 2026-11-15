@@ -24,6 +24,8 @@ public class EmailVersion {
     String requestSha256;
     @Column(name = "ACTOR_ID", length = 36, nullable = false)
     String actorId;
+    @Column(name = "SERVICE_ACTOR_ID", length = 255, nullable = false)
+    String serviceActorId;
     @Column(name = "CREATED_AT", nullable = false)
     long createdAt;
     @Nationalized @Column(name = "PAYLOAD_JSON", nullable = false)

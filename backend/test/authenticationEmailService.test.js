@@ -171,7 +171,7 @@ test('provider failure is bounded and never reports a saved template or retries 
 test('mismatched upstream state and source/message drift fail closed', async () => {
   const f = fixture();
   await f.service.save('password-reset', null, input(), request());
-  f.state().messages.passwordResetBody = 'tampered';
+  f.setState({ ...f.state(), messages: { ...f.state().messages, passwordResetBody: 'tampered' } });
   await assert.rejects(f.service.template('password-reset', null, request()), { code: 'EMAIL_PUBLICATION_DRIFT' });
   assert.equal((await f.service.types(request())).items.at(-1).configurable, false);
   const other = fixture();

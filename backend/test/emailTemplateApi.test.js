@@ -261,7 +261,7 @@ test('errors leave the server as a closed code, with sanitized reasons and no in
     const unavailable = await http.call('POST', '/templates/member-invitation/test', {});
     assert.equal(unavailable.status, 503); assert.deepEqual(unavailable.body.error, { code: 'EMAIL_DELIVERY_UNAVAILABLE' });
   } finally { await http.close(); }
-  assert.deepEqual(Object.keys(STATUS).sort(), ['C4G_ADMIN_REQUIRED', 'EMAIL_DELIVERY_UNAVAILABLE', 'EMAIL_TEMPLATE_INVALID', 'EMAIL_TEMPLATE_NOT_CUSTOMIZED',
+  assert.deepEqual(Object.keys(STATUS).sort(), ['C4G_ADMIN_REQUIRED', 'EMAIL_DELIVERY_UNAVAILABLE', 'EMAIL_PUBLICATION_DRIFT', 'EMAIL_PUBLISH_UNAVAILABLE', 'EMAIL_TEMPLATE_INVALID', 'EMAIL_TEMPLATE_NOT_CUSTOMIZED',
     'IDEMPOTENCY_CONFLICT', 'INVALID_INPUT', 'RESOURCE_NOT_AVAILABLE', 'STALE_REVISION', 'STATE_CONFLICT']);
 });
 

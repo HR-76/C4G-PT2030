@@ -218,10 +218,14 @@ def compile_template(template=None, logo=None):
 def run():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--authorized-local', action='store_true')
+    parser.add_argument('--restricted-publisher', action='store_true')
     args = parser.parse_args()
     require(args.authorized_local, 'EXPLICIT_LOCAL_AUTHORIZATION_REQUIRED')
     require(JAVA.is_file(), 'JDK_MISSING')
     require(ZIP.is_file() and hashlib.file_digest(ZIP.open('rb'), 'sha256').hexdigest() == SHA256, 'DISTRIBUTION_CHECKSUM')
+    extension_jar = ROOT / '.tmp/email-templates-build/c4g-email-templates-26.8.0.jar'
+    if args.restricted_publisher:
+        require(extension_jar.is_file(), 'RESTRICTED_PROVIDER_NOT_BUILT')
     base = ROOT / '.tmp' / ('email-keycloak-' + secrets.token_hex(8))
     base.mkdir()
     evidence = {'keycloak': '26.8.0', 'distributionSha256': SHA256, 'database': 'isolated H2 dev-file',
@@ -239,6 +243,10 @@ def run():
             require(all((base / name).resolve().is_relative_to(base.resolve()) for name in archive.namelist()), 'ARCHIVE_PATH')
             archive.extractall(base)
         home = base / 'keycloak-26.8.0'
+        if args.restricted_publisher:
+            shutil.copyfile(extension_jar, home / 'providers/c4g-email-templates.jar')
+            with extension_jar.open('rb') as artifact:
+                evidence['restrictedProviderSha256'] = hashlib.file_digest(artifact, 'sha256').hexdigest()
         capture = Capture()
         smtp_thread = threading.Thread(target=capture.serve_forever, daemon=True)
         smtp_thread.start()
@@ -455,6 +463,10 @@ def run():
         status, _, _ = api.request(prefix + '/localization/pt', {'passwordResetSubject': 'forbidden'}, 'POST', token=service_token)
         check('unprivileged_service_cannot_publish', status == 403)
         check('failed_publication_preserves_template', admin('/localization/pt')['passwordResetSubject'] == compiled['messages']['passwordResetSubject'])
+        if args.restricted_publisher:
+            step = 'restricted_publisher'
+            from restricted_probe import run_probe
+            run_probe(api, admin, origin, realm, check, reset, captured, lambda: len(capture.messages))
         evidence['capturedMessages'] = len(capture.messages)
         evidence['passed'] = not evidence['failedChecks']
     except Exception as error:

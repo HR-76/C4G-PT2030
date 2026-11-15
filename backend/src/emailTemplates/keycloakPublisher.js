@@ -76,6 +76,7 @@ function issuerUrl(issuer, allowLoopbackHttp) {
   const local = ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
   if (typeof issuer !== 'string' || url.href !== issuer || url.username || url.password || url.search || url.hash
       || !/^\/(?:[A-Za-z0-9_-]+\/)*realms\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(url.pathname)
+      || url.pathname.split('/').includes('admin')
       || !(url.protocol === 'https:' || (allowLoopbackHttp === true && local && url.protocol === 'http:'))) {
     throw new TypeError('Email publisher issuer is invalid.');
   }
@@ -103,7 +104,7 @@ async function jsonBody(response, limit) {
       }
       chunks.push(Buffer.from(value));
     }
-    return JSON.parse(Buffer.concat(chunks, bytes).toString('utf8'));
+    return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks, bytes)));
   } finally {
     reader.releaseLock();
   }
@@ -154,13 +155,14 @@ function createKeycloakPublisher({ issuer, clientSecret, allowLoopbackHttp = fal
     read: () => request('GET'),
     async publish(payload) {
       const body = validateInput(payload);
+      const intention = JSON.parse(body);
       // A lost PUT response is ambiguous. Never retry it automatically or
       // announce success; the same persisted intention can be retried by caller.
       const state = await request('PUT', body);
-      if (!state.configured || state.revision !== payload.expectedRevision + 1 || state.action !== payload.action
-          || state.actorId.toLowerCase() !== payload.actorId.toLowerCase() || state.logoUrl !== payload.logoUrl
-          || state.template.subject !== payload.template.subject || state.template.html !== payload.template.html
-          || MESSAGE_KEYS.some(key => state.messages[key] !== payload.messages[key])) fail();
+      if (!state.configured || state.revision !== intention.expectedRevision + 1 || state.action !== intention.action
+          || state.actorId.toLowerCase() !== intention.actorId.toLowerCase() || state.logoUrl !== intention.logoUrl
+          || state.template.subject !== intention.template.subject || state.template.html !== intention.template.html
+          || MESSAGE_KEYS.some(key => state.messages[key] !== intention.messages[key])) fail();
       return state;
     }
   });

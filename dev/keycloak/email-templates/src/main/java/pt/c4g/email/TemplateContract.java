@@ -35,6 +35,13 @@ final class TemplateContract {
     static final Pattern TAG = Pattern.compile("<(/?)([a-z][a-z0-9]*)([^<>]*)>");
     static final Pattern HREF = Pattern.compile("\\s+href=\"([^\"]*)\"\\s*");
     static final Pattern CONTROL = Pattern.compile("[\\x00-\\x1f\\x7f]");
+    // ECMAScript whitespace, including NBSP/BOM but excluding Unicode NEL.
+    static final String JS_SPACE = "[\\u0009-\\u000d\\u0020\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]";
+    static final String DEFAULT_SUBJECT = "Recupere o acesso à C4G";
+    static final String DEFAULT_HTML = "<p>{Logotipo}</p><p>Recebemos um pedido para alterar a palavra-passe da sua conta C4G.</p>"
+        + "<p><a href=\"{LigacaoRecuperacao}\">Definir uma nova palavra-passe</a></p>"
+        + "<p>Esta ligação é de uso único e é válida durante {Validade}.</p>"
+        + "<p>Se não fez este pedido, ignore este email. A sua palavra-passe mantém-se.</p>";
 
     record Input(JsonNode json, String action, long expectedRevision, String requestId, String actorId,
                  String subject, String html, Map<String, String> messages, String logoUrl, String digest) { }
@@ -46,14 +53,18 @@ final class TemplateContract {
         String action = string(node.get("action"), 5);
         require(action.equals("SAVE") || action.equals("RESET"));
         JsonNode revision = node.get("expectedRevision");
-        require(revision.isIntegralNumber() && revision.canConvertToInt() && revision.intValue() >= 0 && revision.intValue() < Integer.MAX_VALUE);
+        require(revision.isIntegralNumber() && revision.canConvertToInt() && revision.intValue() >= 0 && revision.intValue() <= Integer.MAX_VALUE - 2);
         String requestId = string(node.get("idempotencyKey"), 36);
         String actorId = string(node.get("actorId"), 36);
         require(UUID.matcher(requestId).matches() && UUID.matcher(actorId).matches());
+        requestId = requestId.toLowerCase(java.util.Locale.ROOT);
+        actorId = actorId.toLowerCase(java.util.Locale.ROOT);
+        ((ObjectNode) node).put("idempotencyKey", requestId).put("actorId", actorId);
         keys(node.get("template"), Set.of("subject", "html"));
         String subject = string(node.get("template").get("subject"), 200);
         String html = string(node.get("template").get("html"), 20000);
-        require(subject.equals(subject.strip()) && !CONTROL.matcher(subject).find());
+        require(subject.equals(trim(subject)) && !CONTROL.matcher(subject).find());
+        if (action.equals("RESET")) require(subject.equals(DEFAULT_SUBJECT) && html.equals(DEFAULT_HTML));
         require(!subject.contains("[[C4G_ACTIVATION_LINK]]") && !html.contains("[[C4G_ACTIVATION_LINK]]"));
         require(!VARIABLE.matcher(subject).find());
         Matcher variables = VARIABLE.matcher(html);
@@ -64,14 +75,14 @@ final class TemplateContract {
         String logoUrl = null;
         if (!node.get("logoUrl").isNull()) {
             logoUrl = string(node.get("logoUrl"), 2048);
-            require(https(logoUrl) && !new URI(logoUrl).getRawPath().isEmpty());
+            require(https(logoUrl) && !new URI(logoUrl).getRawPath().isEmpty() && new URI(logoUrl).getRawFragment() == null);
         }
         keys(node.get("messages"), MESSAGE_KEYS);
         Map<String, String> messages = new TreeMap<>();
         for (String key : MESSAGE_KEYS) messages.put(key, string(node.get("messages").get(key), key.equals("passwordResetSubject") ? 450 : 100000));
         String logo = logoUrl == null ? "" : "<img src=\"" + escape(logoUrl) + "\" alt=\"C4G\">";
         require(messages.get("passwordResetSubject").equals(literal(subject)));
-        require(messages.get("passwordResetBody").equals(compile(text.replace("{Logotipo}", "").strip(), "")));
+        require(messages.get("passwordResetBody").equals(compile(trim(text.replace("{Logotipo}", "")), "")));
         require(messages.get("passwordResetBodyHtml").equals(compile(html, logo)));
         for (String key : MESSAGE_KEYS) {
             MessageFormat format = new MessageFormat(messages.get(key));
@@ -81,7 +92,7 @@ final class TemplateContract {
         }
         String canonical = JSON.writeValueAsString(sorted(node));
         String digest = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8)));
-        return new Input(node, action, revision.longValue(), requestId.toLowerCase(), actorId.toLowerCase(), subject, html, messages, logoUrl, digest);
+        return new Input(node, action, revision.longValue(), requestId, actorId, subject, html, messages, logoUrl, digest);
     }
 
     static void require(boolean value) {
@@ -106,7 +117,7 @@ final class TemplateContract {
     static boolean https(String value) {
         try {
             URI uri = new URI(value);
-            return "https".equals(uri.getScheme()) && uri.getHost() != null && uri.getRawUserInfo() == null && uri.getRawFragment() == null;
+            return "https".equals(uri.getScheme()) && uri.getHost() != null && uri.getRawUserInfo() == null;
         } catch (Exception ignored) { return false; }
     }
     static String decode(String value) {
@@ -116,6 +127,7 @@ final class TemplateContract {
         return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
     }
     static String literal(String value) { return value.isEmpty() ? "" : "'" + value.replace("'", "''") + "'"; }
+    static String trim(String value) { return value.replaceAll("^" + JS_SPACE + "+|" + JS_SPACE + "+$", ""); }
     static String compile(String value, String logo) {
         Matcher matcher = COMPILE_VARIABLE.matcher(value);
         StringBuilder result = new StringBuilder(), pending = new StringBuilder();
@@ -172,7 +184,7 @@ final class TemplateContract {
         if (!value.isEmpty() && !value.toString().endsWith("\n")) value.append('\n');
     }
     private static void appendText(StringBuilder result, String value) {
-        String chunk = decode(value).replaceAll("(?U)\\s+", " ");
+        String chunk = decode(value).replaceAll(JS_SPACE + "+", " ");
         if (result.isEmpty() || result.toString().endsWith("\n") || result.toString().endsWith(" ")) chunk = chunk.replaceFirst("^ ", "");
         result.append(chunk);
     }
@@ -197,7 +209,7 @@ final class TemplateContract {
                 } else {
                     Link link = links.pop();
                     if (link.href() != null) {
-                        String label = result.substring(link.start()).strip();
+                        String label = trim(result.substring(link.start()));
                         if (label.isEmpty()) result.append(link.href());
                         else if (!label.equals(link.href())) result.append(": ").append(link.href());
                     }
@@ -211,6 +223,8 @@ final class TemplateContract {
             }
         }
         appendText(result, html.substring(position));
-        return result.toString().replaceAll("(?m)[ \\t]+$", "").replaceAll("\\n{3,}", "\n\n").strip();
+        String[] rows = result.toString().split("\n", -1);
+        for (int i = 0; i < rows.length; i++) rows[i] = rows[i].replaceAll(JS_SPACE + "+$", "");
+        return trim(String.join("\n", rows).replaceAll("\\n{3,}", "\n\n"));
     }
 }

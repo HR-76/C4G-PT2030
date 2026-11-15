@@ -46,7 +46,7 @@ function createAuthenticationEmailService({ baseService, centralPool, publisher 
       const logo = await logoForScope(repository, client, null);
       const updatedBy = authorId && repository.recipient ? await repository.recipient(client, authorId) : null;
       await client.query('COMMIT');
-      return { actorId, logo, updatedBy, logoUrl: origin ? origin + (logo.url || '/logo-c4g.png') : null };
+      return { actorId: actorId.toLowerCase(), logo, updatedBy, logoUrl: origin ? origin + (logo.url || '/logo-c4g.png') : null };
     } catch (error) {
       try { await client.query('ROLLBACK'); } catch { /* Original failure wins. */ }
       throw error;
@@ -115,7 +115,7 @@ function createAuthenticationEmailService({ baseService, centralPool, publisher 
     let context = await authorized(request);
     globalOnly(scope);
     exact(body, action === 'SAVE' ? ['subject', 'html', 'expectedRevision', 'idempotencyKey'] : ['expectedRevision', 'idempotencyKey']);
-    if (!Number.isInteger(body.expectedRevision) || body.expectedRevision < 0 || body.expectedRevision > 2147483646
+    if (!Number.isInteger(body.expectedRevision) || body.expectedRevision < 0 || body.expectedRevision > 2147483645
         || !UUID.test(body.idempotencyKey || '')) fail('INVALID_INPUT');
     const checked = validateTemplate(action === 'SAVE' ? body : DEFAULT_PASSWORD_RESET, TYPE);
     // Recheck current authority immediately before the external mutation, and

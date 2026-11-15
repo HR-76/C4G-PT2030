@@ -61,6 +61,15 @@ test('publishes a closed intent and verifies the returned version and every publ
   assert.ok(Object.isFrozen(actual) && Object.isFrozen(actual.template) && Object.isFrozen(actual.messages));
 });
 
+test('publication validation is bound to the serialized intent even if the caller later changes its object', async () => {
+  const payload = input();
+  const { service } = transport([() => {
+    payload.template.subject = 'Changed while authenticating';
+    return token();
+  }, json(state())]);
+  assert.equal((await service.publish(payload)).template.subject, DEFAULT_PASSWORD_RESET.subject);
+});
+
 test('refuses malformed intents before fetching, including arbitrary fields or a client-selected realm', async () => {
   for (const payload of [null, {}, input({ realm: 'foreign' }), input({ locale: 'en' }), input({ smtpServer: {} }),
     input({ expectedRevision: -1 }), input({ actorId: 'invented' }), input({ idempotencyKey: 'not-a-uuid' }),
@@ -144,6 +153,8 @@ test('unknown, oversized and streaming responses are bounded and cancelled', asy
   await assert.rejects(advertised.service.read(), errorCode('EMAIL_PUBLISH_UNAVAILABLE'));
   const malformed = transport([token(), new Response('{invalid', { headers: { 'content-type': 'application/json' } })]);
   await assert.rejects(malformed.service.read(), errorCode('EMAIL_PUBLISH_UNAVAILABLE'));
+  const invalidUtf8 = transport([token(), new Response(new Uint8Array([0x7b, 0x22, 0xff, 0x22, 0x3a, 0x31, 0x7d]), { headers: { 'content-type': 'application/json' } })]);
+  await assert.rejects(invalidUtf8.service.read(), errorCode('EMAIL_PUBLISH_UNAVAILABLE'));
 });
 
 test('a lost publication response is never automatically retried, nor are transport errors trusted as conflict codes', async () => {
@@ -181,7 +192,6 @@ test('composition is disabled by default and cannot silently accept unknown mode
   for (const issuer of ['http://host.invalid/realms/x', 'https://user:password@host.invalid/realms/x',
     'https://host.invalid/realms/x?arbitrary=1', 'https://host.invalid/realms/x#fragment',
     'https://host.invalid/admin/realms/x', 'https://host.invalid/realms/x/', 'https://host.invalid/realms/x%2Fy']) {
-    if (issuer.includes('/admin/realms/')) continue; // A fixed deployment context prefix is valid; it is never an Admin API call.
     assert.throws(() => createKeycloakPublisher({ issuer, clientSecret: SECRET }), TypeError);
   }
 });
