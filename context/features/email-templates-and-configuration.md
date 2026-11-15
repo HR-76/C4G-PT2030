@@ -1,5 +1,7 @@
 # Emails: templates e configuração
 
+Decisão de 15/11/2026: o utilizador retirou «Código por email» do âmbito. A lista de emails deve conter apenas convite de colaborador e reposição de palavra-passe. Cancelada a seleção/implantação da extensão de código por email; aplicação autenticadora TOTP e recuperação permanecem. As referências a três tipos abaixo são históricas e ficam substituídas por esta decisão.
+
 Estado: In Progress na fase 1 — ver o ponto de situação de 14/11/2026 no [plano técnico](email-templates-and-configuration-plan.md). Fases 2 e 3 em Draft, com perguntas em aberto. Estado anterior: Draft — contrato proposto em 12/11/2026, por aprovar. Nada implementado. Decisões de produto da fase 1 fechadas, com [plano técnico](email-templates-and-configuration-plan.md) por aprovar. Há perguntas em aberto que bloqueiam as fases 2 e 3.
 
 ## Pedido

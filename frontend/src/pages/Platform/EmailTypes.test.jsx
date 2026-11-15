@@ -12,19 +12,20 @@ afterEach(() => { cleanup(); vi.clearAllMocks() })
 const list = api => render(<MemoryRouter><EmailTypesView api={api}/></MemoryRouter>)
 const row = name => screen.getByRole('row', { name: new RegExp(name) })
 
-it('lists the three email types and lets only the invitation be configured', async () => {
+it('lists invitation and password reset without the discontinued email code', async () => {
   list({ types: vi.fn().mockResolvedValue({ data: { items: [{ type: 'member-invitation', globalCustomized: false, organizations: 0 }] } }) })
   const invitation = within(await screen.findByRole('row', { name: /Convite de colaborador/ }))
   expect(invitation.getByText('Texto original da plataforma')).toBeTruthy()
   expect(invitation.getByText('Global e por entidade')).toBeTruthy()
   expect(invitation.getByRole('link', { name: 'Configurar Convite de colaborador' }).getAttribute('href')).toBe('/administracao/email/member-invitation')
-  for (const name of ['Reposição de palavra-passe', 'Código por email']) {
+  for (const name of ['Reposição de palavra-passe']) {
     expect(within(row(name)).getByText('Ainda não configurável')).toBeTruthy()
     expect(within(row(name)).queryByRole('link')).toBeNull()
   }
   expect(within(row('Reposição de palavra-passe')).getByText('O texto é definido no serviço de autenticação.')).toBeTruthy()
   expect(screen.queryByText(/A reposição por email está (desligada|ativa)/)).toBeNull()
   expect(screen.getAllByRole('link')).toHaveLength(1)
+  expect(screen.queryByText('Código por email')).toBeNull()
 })
 
 it('reports a changed global template and how many entities have their own', async () => {
@@ -64,7 +65,7 @@ it('offers password reset only with an affirmative server capability and keeps e
   const reset = within(await screen.findByRole('row', { name: /Reposição de palavra-passe/ }))
   expect(reset.getByRole('link', { name: 'Configurar Reposição de palavra-passe' }).getAttribute('href')).toBe('/administracao/email/password-reset')
   expect(reset.getByText('Template global alterado')).toBeTruthy()
-  expect(within(row('Código por email')).queryByRole('link')).toBeNull()
+  expect(screen.queryByText('Código por email')).toBeNull()
 })
 
 const resetRoute = () => render(<MemoryRouter initialEntries={['/administracao/email/password-reset']}><Routes>

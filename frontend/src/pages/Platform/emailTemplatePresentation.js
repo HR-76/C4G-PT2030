@@ -8,7 +8,6 @@ export const emailTypes = {
 export const emailTypeCatalog = [
   { type: 'member-invitation', label: emailTypes['member-invitation'], sender: 'Aplicação', scope: 'Global e por entidade', configurable: true },
   { type: 'password-reset', label: emailTypes['password-reset'], sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
-  { type: 'email-code', label: 'Código por email', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
 ]
 
 export const isConfigurableType = (type, summary) => type === 'member-invitation'

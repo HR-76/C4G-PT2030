@@ -20,6 +20,28 @@ function fixture() {
   return { repository, calls, connections: () => connections };
 }
 
+test('archived opportunities are excluded before pagination and from programme choices', async () => {
+  for (const sort of [undefined, 'closing_asc', 'closing_desc', 'amount_asc', 'amount_desc']) {
+    const f = fixture();
+    await f.repository.list(sort ? {sort} : {});
+    const page = f.calls.find(call => call.sql.startsWith('SELECT o.opportunity_id') || call.sql.startsWith('WITH ranked AS'));
+    assert.match(page.sql, /o\.lifecycle_state\s*<>\s*'ARCHIVED'/);
+    assert.ok(page.sql.indexOf("o.lifecycle_state<>'ARCHIVED'") < page.sql.indexOf('LIMIT 26'));
+    const programmes = f.calls.find(call => call.sql.startsWith('SELECT DISTINCT programme'));
+    assert.match(programmes.sql, /o\.lifecycle_state\s*<>\s*'ARCHIVED'/);
+  }
+});
+
+test('central dashboard excludes archived opportunities from its source totals', async () => {
+  let sql;
+  await require('../src/applications/opportunitySummary').opportunitySummary({async query(value) {
+    sql = value;
+    return {rows:[{total:0, recent:[]}]};
+  }}, {central:true,today:'2026-11-15'});
+  assert.match(sql, /WHERE o\.lifecycle_state\s*<>\s*'ARCHIVED'/);
+  assert.ok(sql.indexOf("o.lifecycle_state<>'ARCHIVED'") < sql.indexOf('), current AS'));
+});
+
 test('catalog listing treats adversarial search text as literal positional parameters', async () => {
   const f = fixture();
   const q = "%' OR 1=1; SELECT pg_sleep(10); --";

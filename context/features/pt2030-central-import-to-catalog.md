@@ -1,6 +1,6 @@
 # Carregamento central PT2030: do ficheiro ao Catálogo
 
-Estado em 15/11/2026: **importação recuperada no staging; reimportação validada**. **Único teste pendente deste percurso: criação de oportunidades novas no staging.** Pedido pelo utilizador («carregar o ficheiro e levar para oportunidades e para o catálogo»). Decisões: (1) só candidatas novas, confirmada pelo utilizador; (2) Catálogo central comum e (3) o mesmo administrador C4G aceita, adotadas a partir das propostas deste contrato porque o utilizador respondeu «sim» sem as contrariar. Estende [central-import-upload-preview.md](central-import-upload-preview.md), que ficou deliberadamente em pré-visualização. Contexto: [staging completo](staging-completion-plan.md).
+Estado em 15/11/2026: **importação recuperada no staging; criação e reimportação validadas**. **Sem testes pendentes no percurso de recuperação acordado.** Pedido pelo utilizador («carregar o ficheiro e levar para oportunidades e para o catálogo»). Decisões: (1) só candidatas novas, confirmada pelo utilizador; (2) Catálogo central comum e (3) o mesmo administrador C4G aceita, adotadas a partir das propostas deste contrato porque o utilizador respondeu «sim» sem as contrariar. Estende [central-import-upload-preview.md](central-import-upload-preview.md), que ficou deliberadamente em pré-visualização. Contexto: [staging completo](staging-completion-plan.md).
 
 ## Recuperação e reimportação validadas no staging — 15/11/2026
 
@@ -8,9 +8,17 @@ Estado em 15/11/2026: **importação recuperada no staging; reimportação valid
 - Após a recriação, o contentor ficou em `created`; o arranque explícito devolveu `running`, zero reinícios, sem erro e readiness `READY`. O utilizador confirmou que o campo para carregar o Excel voltou a aparecer.
 - O ficheiro chegou à revisão. A captura fornecida mostra as linhas visíveis como «Já aceite» e o botão «Não há oportunidades novas». O utilizador confirmou que todas estavam aceites e pediu o registo da reimportação como validada: reconhecimento das oportunidades existentes, sem proposta de novas aceitações ou duplicados. Não foi fornecida uma contagem total nem feita uma auditoria SQL independente neste ensaio.
 - **Importação recuperada e reimportação validada**, com base nos resultados do terminal, captura da interface e confirmação do utilizador. Este ensaio não criou oportunidades novas.
-- **Pendente apenas o teste de criação de oportunidades novas no staging:** carregar um ficheiro com avisos ainda ausentes do catálogo, rever e aceitar as novas candidatas, confirmar a presença no Catálogo e Dashboard e repetir para verificar que passam a «Já aceite».
+- **Teste de criação de oportunidades novas validado em 15/11/2026.** Foi usado o ficheiro `PT2030_TESTE_SINTETICO_STAGING_1_OPORTUNIDADE.xlsx`, com a única referência `STAGING-TEST-20261115-065EE2E7` e título «TESTE SINTÉTICO — STAGING — NÃO É UM AVISO REAL». O parser local confirmou uma linha válida e zero erros. A captura do staging confirmou «1 oportunidades aceites», zero novas, uma já aceite, zero a rever e zero rejeitadas após a aceitação.
+- O utilizador confirmou a presença da oportunidade sintética no **Catálogo e Dashboard** e a reimportação do mesmo Excel com **0 novas e 1 já aceite**, sem duplicação. Esta confirmação fecha o último teste pendente deste percurso. Evidência: captura da interface e confirmação explícita do utilizador nesta conversa; não foi realizada auditoria SQL independente.
+- O registo sintético permanece identificado no staging. Não foi arquivado nem eliminado no âmbito deste fecho.
 
 As secções datadas abaixo preservam a evolução e as validações anteriores; as referências a implantação ou prova em staging pendentes descrevem esses momentos, não o estado atual.
+
+## Arquivo do teste sintético — pedido em 15/11/2026
+
+O utilizador autorizou arquivar exclusivamente `STAGING-TEST-20261115-065EE2E7`, oportunidade `5d00f752-d40d-46ea-9757-9194a2b10005`, preservando a validação acima. Consulta na VPS confirmou estado ACTIVE, versão de linha 1, esquema 2, revisão `8b81b819-9d3c-41fe-8b5c-510aa3a25c69`, uma revisão e um recibo.
+
+Aceitação: arquivo lógico em transação com auditoria, comparação da referência, título, ID e versão esperados; conservar revisão, recibo e identidade de origem; repetir sem novo efeito. Não apagar dados. A listagem normal e os filtros de programas do catálogo, bem como os totais do Dashboard central, devem excluir ARCHIVED, sem eliminar o acesso histórico autorizado à ficha. A inspeção encontrou ausência desses filtros no código atual. Estado: em preparação; ainda sem confirmação de arquivo na VPS.
 
 ## Estado inicial medido (código lido em 12/11/2026, antes da implementação)
 

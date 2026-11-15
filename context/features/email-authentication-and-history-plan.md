@@ -4,6 +4,11 @@ Estado: SMTP Resend e recuperação pública validados no staging pelo utilizado
 
 ## Decisões confirmadas
 
+- Decisão posterior em 15/11/2026: eliminar a componente de código por email. Retirar da lista de templates e da Segurança da conta; cancelar a procura de extensão e o futuro histórico deste tipo. Histórico pendente passa a abranger convites e recuperação, mantendo retenção dos destinatários por 90 dias. TOTP e recuperação de palavra-passe preservados.
+
+- 15/11/2026: utilizador reafirmou **não implementar autenticador próprio**. Código por email depende de extensão externa adequada; avaliação preliminar e bloqueios em [verificação adicional](optional-email-verification.md#decisão-reafirmada-em-15112026).
+- Implantação de recuperação confirmada pela consola do utilizador: extensão instalada, conta restrita leu revisão 0, API respondeu `PUBLICADOR_OK revisao=0`/`API_EMAIL_ATIVA` e frontend `FRONTEND_EMAIL_PUBLICADO`. Utilizador confirmou Configurar e modelo não publicado no navegador. Receção de email com personalização no staging ainda não confirmada; não confundir com a prova local ou a recuperação nativa já testada.
+
 - Ativar a recuperação de palavra-passe por email, além de disponibilizar a edição do texto.
 - Histórico dos três tipos: convite, reposição de palavra-passe e código por email.
 - Endereços dos destinatários no histórico: retenção de 90 dias. Esta regra aplica-se ao histórico de envios, não elimina o endereço necessário à conta ativa.
