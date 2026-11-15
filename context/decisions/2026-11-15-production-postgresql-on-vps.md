@@ -6,6 +6,12 @@ Estado: aceite pelo utilizador em 15/11/2026. Por implementar.
 
 A base de dados de produção fica em PostgreSQL próprio, no servidor onde o PostgreSQL do staging corre hoje (a VPS C4G). O Neon deixa de ser o fornecedor previsto para produção.
 
+A produção usa uma instância de PostgreSQL separada da do staging, na mesma VPS: contentor, volume, rede e credenciais próprios (confirmado pelo utilizador em 15/11/2026). Um ensaio, uma atualização de versão ou o superutilizador do staging nunca tocam em dados reais.
+
+A API, o worker, o Keycloak e o frontend de produção ficam também nesta VPS (confirmado pelo utilizador em 15/11/2026). Staging e produção partilham a máquina, mas não partilham redes, volumes nem credenciais.
+
+O Keycloak de produção é uma instância própria, com base de dados própria, separada da do staging (confirmado pelo utilizador em 15/11/2026). Reinícios, atualizações e módulos em teste no staging não afetam o login de produção.
+
 Substitui, nesta parte, a [decisão de alojamento](hosting-and-external-services.md) («PostgreSQL no Neon») e fecha o ponto «Fornecedor de PostgreSQL para produção» da [decisão do staging](2026-11-12-staging-postgresql-on-vps.md).
 
 ## Motivo
@@ -21,6 +27,4 @@ As migrações publicadas exigem superutilizador, que um PostgreSQL gerido não 
 
 ## Por decidir
 
-- Instância: um PostgreSQL de produção separado (contentor, volume, rede e credenciais próprios) ou a mesma instância do staging com bases diferentes. Recomendação: separado, para que um ensaio, uma atualização de versão ou um superutilizador do staging nunca toquem em dados reais.
-- Se a API, o worker, o Keycloak e o frontend de produção ficam também nesta VPS.
 - Limites de recursos entre staging e produção na mesma máquina (memória, disco, ligações).

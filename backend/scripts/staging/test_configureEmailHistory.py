@@ -63,6 +63,25 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(realm['eventsListeners'], ['existing', 'c4g-email-delivery'])
         self.assertEqual(realm['eventsExpiration'], 90 * 86400)
 
+    def test_listener_order_is_irrelevant_but_membership_must_match(self):
+        for mode in ('reordered', 'missing', 'extra'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
+                api, _, _, _ = self.fixture()
+
+                def response(path, method='GET', body=None, **kwargs):
+                    result = api(path, method, body, **kwargs)
+                    if path == REALM and method == 'GET' and 'c4g-email-delivery' in result.get('eventsListeners', []):
+                        values = list(reversed(result['eventsListeners']))
+                        result['eventsListeners'] = values if mode == 'reordered' else values[:-1] if mode == 'missing' else values + ['unexpected']
+                    return result
+
+                credentials = {'KC_BOOTSTRAP_ADMIN_USERNAME': 'test', 'KC_BOOTSTRAP_ADMIN_PASSWORD': 'test'}
+                if mode == 'reordered':
+                    self.assertEqual(configure(credentials, Path(directory) / 'backup', True, response), 'KEYCLOAK_EMAIL_HISTORY_READY')
+                else:
+                    with self.assertRaisesRegex(ValueError, 'EMAIL_HISTORY_VERIFY_FAILED'):
+                        configure(credentials, Path(directory) / 'backup', True, response)
+
     def test_unrestricted_client_refused_before_configuration(self):
         api, _, client, writes = self.fixture()
         client['fullScopeAllowed'] = True

@@ -18,7 +18,7 @@ Sem implantação automática. Usar uma revisão enviada para o remoto e checkou
 2. A partir da raiz da release, preparar o artefacto sem tocar no Keycloak em execu��o:
 
    ```bash
-   docker build -f dev/keycloak/email-templates/Dockerfile -t c4g-email-history-provider:build .
+   docker build -f dev/keycloak/email-templates/Dockerfile -t c4g-email-history-provider:build dev/keycloak/email-templates
    ARTIFACT=$(docker create c4g-email-history-provider:build unused)
    docker cp "$ARTIFACT:/c4g-email-templates.jar" ./c4g-email-templates.jar
    docker rm "$ARTIFACT"
@@ -51,3 +51,7 @@ Antes de 056, é possível repor as imagens anteriores. Depois de 056, manter im
 - Recuperação administrativa por `execute-actions-email` e teste SMTP não são classificados como recuperação pública.
 - Sem histórico retroativo. Endereços de contas ativas e convites operacionais têm finalidades próprias; não são a tabela de histórico. Backups/logs têm política própria de acesso e retenção.
 - Sem verificação de navegador ou implantação remota nesta prova. Operações na VPS continuam a ser executadas pelo utilizador.
+
+15/11/2026: VPS build at 20d96098 failed because the root .dockerignore excludes dev. Use the provider directory as context and COPY src/main. No installation occurred. Central 055 confirmed; worker Compose differs from API: /srv/c4g-staging/releases/billing-c262040-RWzaGlYY/deploy/staging/compose.yaml.
+
+VPS preparation confirmed by user: /srv/c4g-staging/patches/email-history-20d96098-FXARJJ; Linux JAR SHA256 f180737541932956b7271fbbe485a63075ac976662993a0f0bf920521f4c8d91. Build succeeded with the provider directory context. Keycloak installation and collection activation not yet confirmed.

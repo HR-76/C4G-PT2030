@@ -60,7 +60,7 @@ def configure(credentials, backup, apply=False, api=request):
     for field in ('smtpServer', 'resetPasswordAllowed', 'browserFlow', 'resetCredentialsFlow', 'loginTheme', 'emailTheme'):
         if before.get(field) != after.get(field):
             raise ValueError('EMAIL_HISTORY_CONFIGURATION_DRIFT')
-    if after.get('eventsListeners') != listeners:
+    if set(after.get('eventsListeners') or []) != set(listeners):
         raise ValueError('EMAIL_HISTORY_VERIFY_FAILED')
     secret = admin('/clients/' + cid + '/client-secret')['value']
     service_token = api('/realms/c4g-staging/protocol/openid-connect/token', 'POST', {
