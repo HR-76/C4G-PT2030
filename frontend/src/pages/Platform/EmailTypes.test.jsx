@@ -24,7 +24,7 @@ it('lists invitation and password reset without the discontinued email code', as
   }
   expect(within(row('Reposição de palavra-passe')).getByText('O texto é definido no serviço de autenticação.')).toBeTruthy()
   expect(screen.queryByText(/A reposição por email está (desligada|ativa)/)).toBeNull()
-  expect(screen.getAllByRole('link')).toHaveLength(1)
+  expect(screen.getByRole('link', { name: 'Histórico de envios' }).getAttribute('href')).toBe('/administracao/email/historico')
   expect(screen.queryByText('Código por email')).toBeNull()
 })
 

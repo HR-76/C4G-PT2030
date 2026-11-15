@@ -335,6 +335,7 @@ def run():
         step = 'realm_setup'
         status, _, _ = api.request('/admin/realms', {
             'realm': realm, 'enabled': True, 'sslRequired': 'none', 'registrationAllowed': False,
+            'eventsListeners': ['c4g-email-delivery'] if args.restricted_publisher else ['jboss-logging'],
             'resetPasswordAllowed': True, 'internationalizationEnabled': True, 'defaultLocale': 'pt',
             'supportedLocales': ['pt', 'en'], 'emailTheme': 'keycloak', 'actionTokenGeneratedByUserLifespan': 300,
             'smtpServer': {'host': '127.0.0.1', 'port': str(capture.server_address[1]), 'from': 'sender@capture.invalid',
@@ -479,7 +480,8 @@ def run():
             from restricted_probe import run_probe
             run_probe(api, admin, origin, realm, check, reset, captured, lambda: len(capture.messages),
                       first_save=postgres.publish_during_native_locale_update if postgres else None,
-                      failed_save=postgres.with_forced_version_failure if postgres else None)
+                      failed_save=postgres.with_forced_version_failure if postgres else None,
+                      history_storage=postgres.verify_delivery_retention if postgres else None)
             if postgres:
                 step = 'postgres_audit'
                 audit = postgres.verify_restricted_state()

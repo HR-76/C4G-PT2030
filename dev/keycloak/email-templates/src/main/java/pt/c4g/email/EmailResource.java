@@ -7,6 +7,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -57,8 +58,11 @@ public final class EmailResource {
     }
     @FunctionalInterface private interface Work { Object run() throws Exception; }
     private Response handle(Work work) {
+        return handle(ROLE, work);
+    }
+    private Response handle(String role, Work work) {
         try {
-            authenticate();
+            authenticate(role);
             require(session.getContext().getUri().getQueryParameters().isEmpty(), 400, "INVALID_INPUT");
             return response(200, work.run());
         } catch (Refused refused) {
@@ -73,7 +77,7 @@ public final class EmailResource {
             return response(503, Map.of("code", "EMAIL_PUBLICATION_UNAVAILABLE"));
         }
     }
-    private void authenticate() {
+    private void authenticate(String requiredRole) {
         RealmModel realm = session.getContext().getRealm();
         List<String> headers = session.getContext().getRequestHeaders().getRequestHeader("Authorization");
         require(headers != null && headers.size() == 1, 401, "NOT_AUTHORIZED");
@@ -86,13 +90,56 @@ public final class EmailResource {
         require(client != null && client.isEnabled() && client.isServiceAccountsEnabled() && !client.isPublicClient(), 403, "NOT_AUTHORIZED");
         require(auth.user() != null && auth.user().isEnabled() && client.getId().equals(auth.user().getServiceAccountClientLink()), 403, "NOT_AUTHORIZED");
         require(CLIENT.equals(auth.token().getIssuedFor()) && auth.client() != null && client.getId().equals(auth.client().getId()), 403, "NOT_AUTHORIZED");
-        RoleModel role = client.getRole(ROLE);
+        RoleModel role = client.getRole(requiredRole);
         require(role != null && auth.user().hasRole(role), 403, "NOT_AUTHORIZED");
         var access = auth.token().getResourceAccess(CLIENT);
-        require(access != null && access.isUserInRole(ROLE), 403, "NOT_AUTHORIZED");
+        require(access != null && access.isUserInRole(requiredRole), 403, "NOT_AUTHORIZED");
         serviceActorId = auth.user().getId();
     }
     private EntityManager entityManager() { return session.getProvider(JpaConnectionProvider.class).getEntityManager(); }
+
+    @POST @Path("delivery-history/search") @Consumes(MediaType.APPLICATION_JSON)
+    public Response deliveries(InputStream stream) {
+        return handle("read-delivery-history", () -> {
+            JsonNode input = new com.fasterxml.jackson.databind.ObjectMapper().readTree(stream.readNBytes(1025));
+            require(input != null && input.isObject() && input.size() == 3
+                && input.path("before").canConvertToLong() && input.path("id").isTextual()
+                && input.path("status").isTextual(), 400, "INVALID_INPUT");
+            long before = input.get("before").asLong();
+            String id = input.get("id").asText(), status = input.get("status").asText();
+            require(before > 0 && before <= 8640000000000000L && id.matches("[0-9a-f-]{36}")
+                && Set.of("", "ACCEPTED", "UNCONFIRMED").contains(status), 400, "INVALID_INPUT");
+            String realm = session.getContext().getRealm().getId();
+            require(session.getContext().getRealm().getEventsListenersStream().anyMatch(EmailDeliveryListener.ID::equals),
+                503, "EMAIL_HISTORY_UNAVAILABLE");
+            var rows = entityManager().createQuery("select d from EmailDelivery d where d.realmId = :realm"
+                + " and (d.occurredAt < :before or (d.occurredAt = :before and d.id <= :id))"
+                + " and (:status = '' or d.result = :status) order by d.occurredAt desc, d.id desc", EmailDelivery.class)
+                .setParameter("realm", realm).setParameter("before", before).setParameter("id", id)
+                .setParameter("status", status).setMaxResults(52).getResultList();
+            long cutoff = System.currentTimeMillis() - EmailDeliveryListener.RETENTION_MS;
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (EmailDelivery row : rows) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("id", row.id); item.put("occurredAt", row.occurredAt);
+                item.put("recipient", row.occurredAt <= cutoff ? null : row.recipient);
+                item.put("status", row.result); result.add(item);
+            }
+            return Map.of("items", result);
+        });
+    }
+
+    @POST @Path("delivery-history/retention")
+    public Response retention(InputStream stream) {
+        return handle("read-delivery-history", () -> {
+            require(stream.read() == -1, 400, "INVALID_INPUT");
+            int count = entityManager().createQuery("update EmailDelivery d set d.recipient = null"
+                + " where d.realmId = :realm and d.recipient is not null and d.occurredAt <= :cutoff")
+                .setParameter("realm", session.getContext().getRealm().getId())
+                .setParameter("cutoff", System.currentTimeMillis() - EmailDeliveryListener.RETENTION_MS).executeUpdate();
+            return Map.of("anonymized", count);
+        });
+    }
 
     /** Stable database lock includes first-write races; no in-memory mutex. */
     private RealmModel lockedRealm(EntityManager em) {

@@ -74,3 +74,7 @@
   .email-actions .btn { flex: 1 1 100%; justify-content: center; }
   .email-preview iframe { height: 340px; }
 }
+.email-history-filters { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.email-history-filters label { display: grid; gap: .35rem; }
+.email-history-filters select { min-width: 15rem; max-width: 100%; padding: .5rem; }
+.email-history-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }

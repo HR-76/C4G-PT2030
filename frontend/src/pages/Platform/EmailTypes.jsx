@@ -25,7 +25,7 @@ export function EmailTypesView({ api = platformEmailApi }) {
   }, [api, reload])
 
   return <div className="page email-templates">
-    <header className="email-heading"><h1>Email</h1></header>
+    <header className="email-heading"><h1>Email</h1><Link className="btn btn-outline" to="/administracao/email/historico">Histórico de envios</Link></header>
     <section className="email-panel" aria-label="Tipos de email">
       {!summaries && !error && <LoadingIndicator>A carregar os tipos de email…</LoadingIndicator>}
       {error && <div className="alert alert-error" role="alert">{error}

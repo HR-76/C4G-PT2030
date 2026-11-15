@@ -152,6 +152,7 @@ const emailTemplatePath = (type, scope) => scope
   ? `${emailRoot}/organizations/${scope}/templates/${type}`
   : `${emailRoot}/templates/${type}`
 export const platformEmailApi = {
+  history: (params, signal) => api.get(`${emailRoot}/history`, { params, signal }),
   types: signal => api.get(emailRoot + '/templates', { signal, timeout: 15000 }),
   template: (type, scope, signal) => api.get(emailTemplatePath(type, scope), { signal, timeout: 15000 }),
   save: (type, scope, body) => api.put(emailTemplatePath(type, scope), body, { timeout: 20000 }),

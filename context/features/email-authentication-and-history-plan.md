@@ -1,6 +1,6 @@
 # Emails de autentica√ß√£o, configura√ß√£o e hist√≥rico
 
-Estado: SMTP Resend e recupera√ß√£o p√∫blica validados no staging pelo utilizador em 15/11/2026: op√ß√£o vis√≠vel, email recebido, palavra-passe alterada e login conclu√≠do. Editor global da recupera√ß√£o e publica√ß√£o restrita implementados, desligados por omiss√£o; 51 verifica√ß√µes aprovadas em Keycloak 26.8.0/PostgreSQL 18.6 tempor√°rios, com SMTP de captura. Ainda n√£o implantados. Hist√≥rico de envios/90 dias e personaliza√ß√£o do c√≥digo por email continuam pendentes. Complementa [o contrato de email](email-templates-and-configuration.md).
+Estado em 15/11/2026: recuperaÁ„o e editor implantados no staging, remoÁ„o do cÛdigo por email confirmada pelo utilizador. HistÛrico de convites e recuperaÁ„o em desenvolvimento/validaÁ„o, ainda n„o implantado; contrato e critÈrios atuais em [histÛrico de envios](email-delivery-history.md). As referÍncias abaixo a trÍs tipos e a incrementos n„o implantados s„o histÛricas e foram superadas pelas decisıes posteriores.
 
 ## Decis√µes confirmadas
 

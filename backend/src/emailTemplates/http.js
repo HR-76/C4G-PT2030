@@ -15,6 +15,7 @@ const STATUS = Object.freeze({
   STATE_CONFLICT: 409,
   EMAIL_DELIVERY_UNAVAILABLE: 503,
   EMAIL_PUBLISH_UNAVAILABLE: 503,
+  EMAIL_HISTORY_UNAVAILABLE: 503,
   EMAIL_PUBLICATION_DRIFT: 409
 });
 
@@ -53,7 +54,7 @@ function hasBody(request) {
 // Admin C4G routes, mounted at /api/admin/email. The session, origin and CSRF checks are the application's;
 // who is an administrator is confirmed by the service on every request.
 // logos is optional: without it the /logo routes answer OPERATION_NOT_AVAILABLE like any unknown path.
-function createPlatformEmailRouter({ express, service, authenticate, logos = null }) {
+function createPlatformEmailRouter({ express, service, authenticate, logos = null, history = null }) {
   const methods = ['types', 'template', 'save', 'reset', 'preview', 'test'];
   if (!express?.Router || typeof authenticate !== 'function'
       || methods.some(method => typeof service?.[method] !== 'function')) {
@@ -93,6 +94,16 @@ function createPlatformEmailRouter({ express, service, authenticate, logos = nul
     router.post(`${prefix}/:type/test`, handle('command', request => service.test(request.params.type, scope(request), request.body, request)));
   };
   router.get('/templates', handle('read', request => service.types(request)));
+  router.get('/history', async (request, response) => {
+    try {
+      if (hasBody(request)) throw Object.assign(new Error('INVALID_INPUT'), { code: 'INVALID_INPUT' });
+      if (!history) throw Object.assign(new Error('EMAIL_HISTORY_UNAVAILABLE'), { code: 'EMAIL_HISTORY_UNAVAILABLE' });
+      return response.json(await history.list({ ...request.query }, request));
+    } catch (error) {
+      const failure = publicError(error);
+      return response.status(failure.status).json({ error: failure.body, correlationId: randomUUID() });
+    }
+  });
   mount('/templates', () => null);
   mount('/organizations/:organizationId/templates', request => request.params.organizationId);
   // The C4G logo. An entity's logo is changed only by that entity, in /api/organization-directory/email-logo.

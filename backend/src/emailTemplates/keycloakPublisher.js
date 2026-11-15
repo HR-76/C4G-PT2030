@@ -118,7 +118,7 @@ function createKeycloakPublisher({ issuer, clientSecret, allowLoopbackHttp = fal
   }
   const endpoint = base + '/c4g-email-templates/password-reset';
 
-  async function request(method, body) {
+  async function request(method, body, path = 'password-reset', validate = validateState) {
     try {
       // One deadline covers authentication, publication and all response bytes.
       const signal = AbortSignal.timeout(timeoutMs);
@@ -134,7 +134,7 @@ function createKeycloakPublisher({ issuer, clientSecret, allowLoopbackHttp = fal
       const token = await jsonBody(tokenResponse, TOKEN_MAX_BYTES);
       if (!token || typeof token.access_token !== 'string' || !token.access_token || token.access_token.length > 32000
           || /\s/.test(token.access_token) || typeof token.token_type !== 'string' || token.token_type.toLowerCase() !== 'bearer') fail();
-      const response = await fetchImpl(endpoint, {
+      const response = await fetchImpl(path === 'password-reset' ? endpoint : base + '/c4g-email-templates/' + path, {
         method, redirect: 'error', signal,
         headers: { Authorization: 'Bearer ' + token.access_token, Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}) },
         ...(body ? { body } : {})
@@ -144,7 +144,7 @@ function createKeycloakPublisher({ issuer, clientSecret, allowLoopbackHttp = fal
         if (objectWithKeys(result, ['code']) && Object.hasOwn(ERROR_STATUS, result.code) && response.status === ERROR_STATUS[result.code]) fail(result.code);
         fail();
       }
-      return validateState(result);
+      return validate(result);
     } catch (error) {
       if (error?.[PUBLIC_FAILURE] && Object.hasOwn(ERROR_STATUS, error.code)) fail(error.code);
       fail();
@@ -153,6 +153,21 @@ function createKeycloakPublisher({ issuer, clientSecret, allowLoopbackHttp = fal
 
   return Object.freeze({
     read: () => request('GET'),
+    history: input => request('POST', JSON.stringify(input), 'delivery-history/search', value => {
+      if (!objectWithKeys(value, ['items']) || !Array.isArray(value.items) || value.items.length > 52) fail();
+      return { items: value.items.map(row => {
+        if (!objectWithKeys(row, ['id', 'occurredAt', 'recipient', 'status']) || !UUID.test(row.id || '')
+            || !Number.isSafeInteger(row.occurredAt) || row.occurredAt < 1 || row.occurredAt > Date.now() + 60000
+            || !['ACCEPTED', 'UNCONFIRMED'].includes(row.status)
+            || !(row.recipient === null || (typeof row.recipient === 'string' && row.recipient.length <= 254
+              && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.recipient)))) fail();
+        return { id: row.id, occurredAt: row.occurredAt, recipient: row.recipient, status: row.status };
+      }) };
+    }),
+    retention: () => request('POST', undefined, 'delivery-history/retention', value => {
+      if (!objectWithKeys(value, ['anonymized']) || !Number.isSafeInteger(value.anonymized) || value.anonymized < 0) fail();
+      return { anonymized: value.anonymized };
+    }),
     async publish(payload) {
       const body = validateInput(payload);
       const intention = JSON.parse(body);

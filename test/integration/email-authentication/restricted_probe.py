@@ -23,7 +23,7 @@ class RestrictedProbeFailure(Exception):
     pass
 
 
-def run_probe(api, admin, origin, realm, check, reset, captured, captured_count, first_save=None, failed_save=None):
+def run_probe(api, admin, origin, realm, check, reset, captured, captured_count, first_save=None, failed_save=None, history_storage=None):
     """Run against the gate's fresh realm, after the native baseline proof."""
     secret = secrets.token_urlsafe(32)
     issuer = origin + '/realms/' + realm
@@ -293,3 +293,38 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count,
     admin('/localization/pt', 'POST', reset_state['messages'])
     check('restricted_rejected_operations_never_created_a_revision', state() == reset_state)
     check('restricted_probe_sends_only_two_capture_messages', captured_count() == initial_count + 2)
+
+    # Delivery history is a different permission from publishing templates.
+    history_path = endpoint.rsplit('/', 1)[0] + '/delivery-history'
+    import time
+    search = {'before': int(time.time() * 1000) + 10000, 'id': 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'status': ''}
+    status, _ = request('POST', search, path=history_path + '/search')
+    check('history_publisher_without_read_role_refused', status == 403)
+    admin('/clients/' + dedicated + '/roles', 'POST', {'name': 'read-delivery-history'})
+    history_role = admin('/clients/' + dedicated + '/roles/read-delivery-history')
+    admin('/clients/' + dedicated + '/scope-mappings/clients/' + dedicated, 'POST', [history_role])
+    admin(mappings, 'POST', [history_role])
+    status, value = request('POST', search, path=history_path + '/search')
+    check('history_native_reset_matches_smtp_capture', status == 200 and len(value.get('items', [])) == captured_count()
+          and all(row['status'] == 'ACCEPTED' and row['recipient'] == 'recipient@capture.invalid' for row in value['items']))
+    check('history_response_has_only_closed_fields', all(set(row) == {'id', 'occurredAt', 'recipient', 'status'} for row in value.get('items', [])))
+    # Native SMTP failure must be visible without leaking its error text.
+    smtp = admin()['smtpServer']
+    try:
+        admin('', 'PUT', {'smtpServer': {**smtp, 'port': '1'}})
+        reset()
+    finally:
+        admin('', 'PUT', {'smtpServer': smtp})
+    search['before'] = int(time.time() * 1000) + 10000
+    status, value = request('POST', {**search, 'status': 'UNCONFIRMED'}, path=history_path + '/search')
+    check('history_native_smtp_failure_recorded', status == 200 and len(value.get('items', [])) == 1
+          and value['items'][0]['status'] == 'UNCONFIRMED' and captured_count() == initial_count + 2)
+    if history_storage:
+        def sweep():
+            status, result = request('POST', path=history_path + '/retention')
+            require(status == 200, 'history_retention_endpoint')
+            return result
+        check('history_recipient_physically_anonymized', history_storage(sweep))
+    admin(mappings, 'DELETE', [history_role])
+    status, _ = request('POST', search, path=history_path + '/search')
+    check('history_revoked_role_refused', status == 403)

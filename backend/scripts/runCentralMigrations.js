@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === emailDeliveryManifest.at(-1).version)) return emailDeliveryManifest;
   if (rows.some(row => row.version === entityTypeManifest.at(-1).version)) return entityTypeManifest;
   if (rows.some(row => row.version === billingValidationManifest.at(-1).version)) return billingValidationManifest;
   if (rows.some(row => row.version === opportunityComplementManifest.at(-1).version)) return opportunityComplementManifest;
@@ -373,3 +374,11 @@ async function applyRegisteredEntityTypePackage(pool,packageId){
  return applyCentralMigrationsWithManifest(pool,entityTypeManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:entityTypeManifest});
 }
 module.exports.applyRegisteredEntityTypePackage=applyRegisteredEntityTypePackage;
+
+async function applyRegisteredEmailDeliveryPackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/emailDeliveryMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('EMAIL_DELIVERY_PACKAGE_REQUIRED');
+ const {emailDeliveryManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,emailDeliveryManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:emailDeliveryManifest});
+}
+module.exports.applyRegisteredEmailDeliveryPackage=applyRegisteredEmailDeliveryPackage;

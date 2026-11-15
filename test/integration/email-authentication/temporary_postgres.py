@@ -297,6 +297,33 @@ SELECT 'HOLDER:' || pg_backend_pid()::text FROM changed HAVING count(*) = 1;
                           input='ALTER TABLE c4g_email_template_version DROP CONSTRAINT c4g_email_probe_force_failure;',
                           code='POSTGRES_FAILURE_GUARD_REMOVE_FAILED')
 
+    def verify_delivery_retention(self, sweep):
+        self._guard()
+        require(self.started, 'POSTGRES_NOT_STARTED')
+        # Only this disposable database; addresses remain synthetic and are never emitted.
+        self._run('psql', ['-X', '--no-password', '-qAt', '-v', 'ON_ERROR_STOP=1', '-f', '-'],
+                  input="UPDATE c4g_email_delivery SET occurred_at=(extract(epoch FROM clock_timestamp()-interval '91 days')*1000)::bigint;",
+                  code='POSTGRES_HISTORY_AGE_FAILED')
+        sweep()
+        result = self._run('psql', ['-X', '--no-password', '-qAt', '-v', 'ON_ERROR_STOP=1', '-f', '-'],
+                           input='SELECT count(*)>0 AND count(recipient)=0 FROM c4g_email_delivery;',
+                           code='POSTGRES_HISTORY_RETENTION_FAILED', capture=True)
+        repeated = sweep()
+        explicit = result.stdout.strip() == 't' and repeated.get('anonymized') == 0
+        # Prove the independent Keycloak timer, without calling the retention API.
+        self._run('psql', ['-X', '--no-password', '-qAt', '-v', 'ON_ERROR_STOP=1', '-f', '-'],
+                  input="UPDATE c4g_email_delivery SET recipient='timer@capture.invalid';",
+                  code='POSTGRES_HISTORY_TIMER_SETUP_FAILED')
+        deadline = time.monotonic() + 75
+        while time.monotonic() < deadline:
+            remaining = self._run('psql', ['-X', '--no-password', '-qAt', '-v', 'ON_ERROR_STOP=1', '-f', '-'],
+                                  input='SELECT count(recipient) FROM c4g_email_delivery;',
+                                  code='POSTGRES_HISTORY_TIMER_CHECK_FAILED', capture=True)
+            if remaining.stdout.strip() == '0':
+                return explicit
+            time.sleep(1)
+        return False
+
     def close(self):
         """Stop this exact owned cluster; erase it only after confirmed shutdown."""
         self._guard()

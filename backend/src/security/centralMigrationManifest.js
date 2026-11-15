@@ -196,6 +196,8 @@ const billingValidationEntry=require('./billingValidationMigrationPackage').entr
 const billingValidationManifest=Object.freeze([...opportunityComplementManifest,billingValidationEntry]);
 const entityTypeEntry=require('./entityTypeMigrationPackage').entry;
 const entityTypeManifest=Object.freeze([...billingValidationManifest,entityTypeEntry]);
+const emailDeliveryEntry=require('./emailDeliveryMigrationPackage').entry;
+const emailDeliveryManifest=Object.freeze([...entityTypeManifest,emailDeliveryEntry]);
 const receiptEntry = Object.freeze({
   ...manifest.at(-1), version: '036_f12_service_authority',
   requiresPreflightVersion: manifest.at(-1).version,
@@ -219,7 +221,7 @@ const failureCapacityEntry = Object.freeze({
   schemaFingerprint: 'ee681abdb069c65117f7de58add9635be3ae62366996304e8096c7465af8b5d6'
 });
 const failureCapacityManifest = Object.freeze([...replayCapacityManifest, failureCapacityEntry]);
-const allKnownMigrations = Object.freeze([...knownManifest, centralRuntimeReadEntry, opportunityComplementEntry, billingValidationEntry, entityTypeEntry, receiptEntry, replayCapacityEntry, failureCapacityEntry]);
+const allKnownMigrations = Object.freeze([...knownManifest, centralRuntimeReadEntry, opportunityComplementEntry, billingValidationEntry, entityTypeEntry, emailDeliveryEntry, receiptEntry, replayCapacityEntry, failureCapacityEntry]);
 
 function canonicalizeMigrationSql(sql) {
   if (typeof sql !== "string") throw new TypeError("Central migration SQL must be UTF-8 text.");
@@ -264,7 +266,7 @@ function sourceMigrationSql(version, direction, readSql) {
   if (!entry) throw new Error(`Unknown central migration: ${version}`);
   if (direction === "down" && entry.irreversible) throw new Error(`${version} is irreversible.`);
   if (!["up", "down"].includes(direction)) throw new Error(`Invalid migration direction: ${direction}`);
-  const sourcePath = centralEntries.includes(entry) || entry === writerEntry || entry === reconciliationEntry || entry === prearchiveEntry || catalogReadEntries.includes(entry) || entry === centralImportEntry || entry === billingPdfEntry || entry === emailTemplateEntry || entry === centralRuntimeReadEntry || entry === opportunityComplementEntry || entry === billingValidationEntry || entry === entityTypeEntry || entry === receiptEntry || entry === replayCapacityEntry || entry === failureCapacityEntry
+  const sourcePath = centralEntries.includes(entry) || entry === writerEntry || entry === reconciliationEntry || entry === prearchiveEntry || catalogReadEntries.includes(entry) || entry === centralImportEntry || entry === billingPdfEntry || entry === emailTemplateEntry || entry === centralRuntimeReadEntry || entry === opportunityComplementEntry || entry === billingValidationEntry || entry === entityTypeEntry || entry === emailDeliveryEntry || entry === receiptEntry || entry === replayCapacityEntry || entry === failureCapacityEntry
     ? path.resolve(migrationsRoot, '../candidates', `${version.slice(4)}.${direction}.sql`)
     : path.join(migrationsRoot, `${version}.${direction}.sql`);
   const sourceSql = readSql(sourcePath);
@@ -298,6 +300,7 @@ function supportsCentralVersion(currentVersion, introducedVersion) {
     : currentVersion === replayCapacityEntry.version ? replayCapacityManifest
     : currentVersion === receiptEntry.version ? receiptManifest
     // 052 lives in its own chain (the 051 chain never ends at 052), so a Central at 052 is compared against that chain.
+    : currentVersion === emailDeliveryEntry.version ? emailDeliveryManifest
     : currentVersion === entityTypeEntry.version ? entityTypeManifest
     : currentVersion === billingValidationEntry.version ? billingValidationManifest
     : currentVersion === opportunityComplementEntry.version ? opportunityComplementManifest
@@ -315,6 +318,6 @@ function migrationRecordMatches(record, requirement) {
 
 module.exports = {
   canonicalizeMigrationSql, checksumSql, manifest, registeredManifest, writerManifest, reconciliationManifest,
-  knownManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest, allKnownMigrations, centralImportManifest, billingPdfManifest, catalogReadManifest, prearchiveManifest, migrationChecksumPolicy, migrationSql,
+  knownManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest, receiptManifest, replayCapacityManifest, failureCapacityManifest, allKnownMigrations, centralImportManifest, billingPdfManifest, catalogReadManifest, prearchiveManifest, migrationChecksumPolicy, migrationSql,
   migrationRecordMatches, requiredCentralMigrations, supportsCentralVersion
 };

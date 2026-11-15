@@ -15,7 +15,7 @@ function input(value){
 function view(row){return {id:row.id,organizationId:row.organization_id,name:row.input.adminName,email:row.input.adminEmail,profileCode:row.profile_code,phase:row.phase,status:row.status,revision:Number(row.revision),errorCode:row.error_code||null,emailDelivery:deliveryView(row.receipt?.activationEmail)};}
 
 // Composition-only ports. No provider credentials, arbitrary SQL or HTTP claims enter this service.
-function createMemberOnboardingService({coordinator,identity,projection,verification,issuer,policyVersion,assuranceRequirements,mfaPolicyCode,dataResidencyCode,email,prepareEmail,audit=createOnboardingAudit()}){
+function createMemberOnboardingService({coordinator,identity,projection,verification,issuer,policyVersion,assuranceRequirements,mfaPolicyCode,dataResidencyCode,email,prepareEmail,deliveryHistory,audit=createOnboardingAudit()}){
  if(!isAuthorityCoordinator(coordinator)||![identity,projection].every(p=>typeof p?.ensure==='function')||typeof verification?.verify!=='function'||typeof issuer!=='string'||!issuer.startsWith('https://')||!policyVersion||!assuranceRequirements||!mfaPolicyCode||!dataResidencyCode)fail('ONBOARDING_COMPOSITION_INVALID');
  const first=async(c,s,p)=>(await c.query(s,p)).rows[0];
  async function admin(c,request,organizationId,profileCode){
@@ -158,7 +158,8 @@ function createMemberOnboardingService({coordinator,identity,projection,verifica
    if(pinned.status==='ACCEPTED')return deliveryView(pinned);
    // Never expose the activation secret to the browser or persist it in plaintext.
    let delivery;
-   try{delivery=await email.send({invitationId:invitation.id,to:value.email,secret:invitation.secret,expiresAt:invitation.expiresAt,...(pinned.message?{message:pinned.message}:{})});}
+   const send=()=>email.send({invitationId:invitation.id,to:value.email,secret:invitation.secret,expiresAt:invitation.expiresAt,...(pinned.message?{message:pinned.message}:{})});
+   try{delivery=deliveryHistory?await deliveryHistory.deliver({id:invitation.id,organizationId:value.organizationId,recipient:value.email},send):await send();}
    catch{delivery={status:'UNCONFIRMED'};}
    const result={invitationId:invitation.id,status:delivery?.status==='ACCEPTED'?'ACCEPTED':delivery?.status==='NOT_CONFIGURED'?'NOT_CONFIGURED':'UNCONFIRMED'};
    await write(async c=>{
@@ -168,7 +169,10 @@ function createMemberOnboardingService({coordinator,identity,projection,verifica
    return deliveryView({...pinned,...result});
   },
   // Composition-only port; the template service authorizes and resolves the recipient.
-  async testEmail(value){return email?.test?email.test(value):{status:'NOT_CONFIGURED'};},
+  async testEmail(value){
+   const send=()=>email?.test?email.test(value):Promise.resolve({status:'NOT_CONFIGURED'});
+   return deliveryHistory?deliveryHistory.deliver({id:value.idempotencyKey,recipient:value.to,test:true},send):send();
+  },
   async revoke(id,invitationId,request){
    uuid(invitationId);
    return write(async c=>{

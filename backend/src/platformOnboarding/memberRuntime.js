@@ -48,7 +48,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   const worker = createWorker(path.join(directory, 'worker.json'));
   let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null;
 
-  function createMemberOnboarding({ authorityCoordinator, authConfig, prepareEmail }) {
+  function createMemberOnboarding({ authorityCoordinator, authConfig, prepareEmail, deliveryHistory }) {
     service = createService({ coordinator: authorityCoordinator, issuer: settings.issuer, policyVersion: authConfig.policyVersion,
       assuranceRequirements: authConfig.assurancePolicy[authConfig.privilegedLoginCategory], mfaPolicyCode: 'USER_OPTIONAL',
       dataResidencyCode: settings.dataResidencyCode,
@@ -56,7 +56,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
       projection: { ensure: value => worker.call('projection', value) },
       // The adapter needs the service, so it only exists after start(); activation cannot be reached before that.
       verification: { verify: value => { if (!oidc) throw invalid('ACTIVATION_INVALID'); return oidc.verify(value); } },
-      prepareEmail,
+      prepareEmail, deliveryHistory,
       email: { secret: value => worker.call('activationSecret', value), send: value => worker.call('activationEmail', value), test: value => worker.call('testInvitationEmail', value) } });
     return service;
   }

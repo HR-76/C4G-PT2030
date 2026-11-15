@@ -15,7 +15,7 @@ public final class EmailEntities implements JpaEntityProviderFactory {
     @Override public void close() { }
     @Override public JpaEntityProvider create(KeycloakSession session) {
         return new JpaEntityProvider() {
-            @Override public List<Class<?>> getEntities() { return List.of(EmailHead.class, EmailVersion.class); }
+            @Override public List<Class<?>> getEntities() { return List.of(EmailHead.class, EmailVersion.class, EmailDelivery.class); }
             @Override public String getChangelogLocation() { return "META-INF/c4g-email-templates.xml"; }
             @Override public String getFactoryId() { return ID; }
             @Override public void close() { }

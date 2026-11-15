@@ -198,9 +198,9 @@ function serviceDouble(overrides = {}) {
   return { service, calls };
 }
 
-async function listen(service, authenticate = (req, res, next) => next()) {
+async function listen(service, authenticate = (req, res, next) => next(), history = null) {
   const app = express();
-  app.use('/api/admin/email', express.json({ limit: '64kb' }), createPlatformEmailRouter({ express, service, authenticate }));
+  app.use('/api/admin/email', express.json({ limit: '64kb' }), createPlatformEmailRouter({ express, service, authenticate, history }));
   const server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   const root = `http://127.0.0.1:${server.address().port}/api/admin/email`;
@@ -210,6 +210,33 @@ async function listen(service, authenticate = (req, res, next) => next()) {
   };
   return { call, close: () => new Promise(resolve => server.close(resolve)) };
 }
+
+test('history forwards closed query filters, disables caching and sanitizes failures', async () => {
+  const { service } = serviceDouble();
+  const calls = [];
+  const history = { async list(input) { calls.push(input); return { items: [], nextCursor: null }; } };
+  const http = await listen(service, undefined, history);
+  try {
+    const response = await http.call('GET', '/history?type=password-reset&status=ACCEPTED');
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    assert.deepEqual(calls, [{ type: 'password-reset', status: 'ACCEPTED' }]);
+    history.list = async () => { throw new Error('private SMTP response'); };
+    const failed = await http.call('GET', '/history');
+    assert.equal(failed.status, 503);
+    assert.deepEqual(failed.body.error, { code: 'SERVICE_UNAVAILABLE' });
+    assert.doesNotMatch(JSON.stringify(failed.body), /private|SMTP/);
+  } finally { await http.close(); }
+});
+
+test('disabled history reports unavailable, not an empty list', async () => {
+  const http = await listen(serviceDouble().service);
+  try {
+    const response = await http.call('GET', '/history');
+    assert.equal(response.status, 503);
+    assert.deepEqual(response.body.error, { code: 'EMAIL_HISTORY_UNAVAILABLE' });
+  } finally { await http.close(); }
+});
 
 test('each route reaches its service method, for the global template and for an organization', async () => {
   const { service, calls } = serviceDouble(), http = await listen(service);
@@ -261,7 +288,7 @@ test('errors leave the server as a closed code, with sanitized reasons and no in
     const unavailable = await http.call('POST', '/templates/member-invitation/test', {});
     assert.equal(unavailable.status, 503); assert.deepEqual(unavailable.body.error, { code: 'EMAIL_DELIVERY_UNAVAILABLE' });
   } finally { await http.close(); }
-  assert.deepEqual(Object.keys(STATUS).sort(), ['C4G_ADMIN_REQUIRED', 'EMAIL_DELIVERY_UNAVAILABLE', 'EMAIL_PUBLICATION_DRIFT', 'EMAIL_PUBLISH_UNAVAILABLE', 'EMAIL_TEMPLATE_INVALID', 'EMAIL_TEMPLATE_NOT_CUSTOMIZED',
+  assert.deepEqual(Object.keys(STATUS).sort(), ['C4G_ADMIN_REQUIRED', 'EMAIL_DELIVERY_UNAVAILABLE', 'EMAIL_HISTORY_UNAVAILABLE', 'EMAIL_PUBLICATION_DRIFT', 'EMAIL_PUBLISH_UNAVAILABLE', 'EMAIL_TEMPLATE_INVALID', 'EMAIL_TEMPLATE_NOT_CUSTOMIZED',
     'IDEMPOTENCY_CONFLICT', 'INVALID_INPUT', 'RESOURCE_NOT_AVAILABLE', 'STALE_REVISION', 'STATE_CONFLICT']);
 });
 

@@ -6,7 +6,7 @@ const {centralEntries:activationEntries}=require('../security/opportunityV2Migra
 const centralEntries=Object.freeze([...activationEntries,require('../security/opportunityEuWriterMigrationPackage').entry,require('../security/opportunityEuReconciliationMigrationPackage').entry,require('../security/opportunityEuLegacyPrearchiveMigrationPackage').entry]);
 // The chain that includes 052 (grants only) and 053 (a table in public): neither adds opportunity_catalog tables, and a
 // Central at either version is a known version here too.
-const {supportsCentralVersion,opportunityComplementManifest:centralManifest}=require('../security/centralMigrationManifest');
+const {supportsCentralVersion,emailDeliveryManifest:centralManifest}=require('../security/centralMigrationManifest');
 const TABLES=Object.freeze(['duplicate_candidate','idempotency_record','opportunity','provenance','revision']);
 const CENTRAL_ADDITIONS=Object.freeze([
  ['funding_candidate_v2'],['manual_v2_candidate'],

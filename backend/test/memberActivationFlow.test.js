@@ -7,7 +7,7 @@ const q=require('../src/platformOnboarding/memberSql');
 const {createActivationEmail}=require('../src/platformOnboarding/activationEmail');
 
 // Exercise the service with a transactional journal double, without external databases.
-function fixture({configured=true,prepareEmail}={}){
+function fixture({configured=true,prepareEmail,deliveryHistory}={}){
  const id=randomUUID(),organizationId=randomUUID(),actorId=randomUUID();
  const row={id,organization_id:organizationId,global_user_id:randomUUID(),membership_id:randomUUID(),profile_code:'CONTRIBUTOR',phase:'READY',status:'WAITING',revision:1,input:{adminName:'Person',adminEmail:'person@example.invalid'},receipt:{subject:randomUUID(),mode:'CREATED'}};
  const invitations=[],sent=[];let authorized=true,outcome='ACCEPTED',writeFailure=false;
@@ -36,7 +36,7 @@ function fixture({configured=true,prepareEmail}={}){
  const filename=path.resolve(__dirname,'../src/platformOnboarding/memberService.js'),localRequire=createRequire(filename),module={exports:{}};
  vm.runInNewContext(fs.readFileSync(filename,'utf8'),{module,require:name=>name==='../security/authorityCoordinator'?{isAuthorityCoordinator:value=>value===coordinator}:localRequire(name),structuredClone,Date,Buffer});
  const transport=createActivationEmail({key:'k'.repeat(32),apiKey:'test',from:'test@example.invalid',origin:'https://app.example.invalid'});
- const service=module.exports.createMemberOnboardingService({coordinator,prepareEmail,issuer:'https://identity.example.invalid',policyVersion:'test',assuranceRequirements:{},mfaPolicyCode:'test',dataResidencyCode:'test',identity:{ensure:async()=>{}},projection:{ensure:async()=>{}},verification:{verify:async()=>{}},audit:async()=>{},email:{secret:configured?transport.secret:async()=>null,send:async value=>{sent.push(value);return {status:outcome};}}});
+ const service=module.exports.createMemberOnboardingService({coordinator,prepareEmail,deliveryHistory,issuer:'https://identity.example.invalid',policyVersion:'test',assuranceRequirements:{},mfaPolicyCode:'test',dataResidencyCode:'test',identity:{ensure:async()=>{}},projection:{ensure:async()=>{}},verification:{verify:async()=>{}},audit:async()=>{},email:{secret:configured?transport.secret:async()=>null,send:async value=>{sent.push(value);return {status:outcome};}}});
  const request={sessionID:'session',authContext:{sessionId:'session'},user:{id:actorId},headers:{'x-c4g-organization':organizationId}};
  return {service,id,row,invitations,sent,request,setOutcome:value=>outcome=value,deny:()=>authorized=false,failWrite:()=>writeFailure=true};
 }
@@ -139,4 +139,33 @@ test('HTTP creation prepares the user and dispatches email before responding',as
  await routes.get('/')({method:'POST',body:{name:'Person'},query:{},params:{}},{set(){},json:value=>response=value,status(){throw Error('Unexpected HTTP error');}});
  assert.deepEqual(calls,[{name:'Person',organizationId:'org'},'operation']);
  assert.equal(response.emailDelivery.status,'ACCEPTED');
+});
+
+
+test('invitation history receives only the authorized scope and recipient, never activation secrets',async()=>{
+ const records=[];
+ const f=fixture({deliveryHistory:{async deliver(metadata,send){records.push(metadata);return send();}}});
+ await f.service.prepare(f.id,f.request);
+ assert.equal(records.length,1);
+ assert.deepEqual(Object.keys(records[0]).sort(),['id','organizationId','recipient']);
+ assert.equal(records[0].organizationId,f.row.organization_id);
+ assert.equal(records[0].id,f.invitations[0].id);
+ assert.equal(records[0].recipient,'person@example.invalid');
+ assert.equal(JSON.stringify(records).includes(f.sent[0].secret),false);
+ await f.service.prepare(f.id,f.request);
+ assert.equal(records.length,1);
+});
+
+test('invitation history cannot be touched by a denied membership operation',async()=>{
+ let records=0;
+ const f=fixture({deliveryHistory:{async deliver(){records++;}}});
+ f.deny();
+ await assert.rejects(f.service.prepare(f.id,f.request));
+ assert.equal(records,0);assert.equal(f.sent.length,0);
+});
+
+test('history preparation failure does not send an invitation',async()=>{
+ const f=fixture({deliveryHistory:{async deliver(){throw Error('STORAGE_UNAVAILABLE');}}});
+ const result=await f.service.prepare(f.id,f.request);
+ assert.equal(result.emailDelivery.status,'UNCONFIRMED');assert.equal(f.sent.length,0);
 });
