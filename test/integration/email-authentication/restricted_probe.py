@@ -23,7 +23,7 @@ class RestrictedProbeFailure(Exception):
     pass
 
 
-def run_probe(api, admin, origin, realm, check, reset, captured, captured_count):
+def run_probe(api, admin, origin, realm, check, reset, captured, captured_count, first_save=None, failed_save=None):
     """Run against the gate's fresh realm, after the native baseline proof."""
     secret = secrets.token_urlsafe(32)
     issuer = origin + '/realms/' + realm
@@ -59,10 +59,10 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count)
         require(result.get('ok') is True, 'restricted_node_' + operation + suffix)
         return result['value']
 
-    def client(client_id, client_secret=None, service=True, direct=False):
+    def client(client_id, client_secret=None, service=True, direct=False, full_scope=True):
         representation = {'clientId': client_id, 'enabled': True, 'publicClient': client_secret is None,
                           'serviceAccountsEnabled': service, 'standardFlowEnabled': False,
-                          'directAccessGrantsEnabled': direct, 'fullScopeAllowed': True,
+                          'directAccessGrantsEnabled': direct, 'fullScopeAllowed': full_scope,
                           'protocol': 'openid-connect'}
         if client_secret is not None:
             representation['secret'] = client_secret
@@ -130,9 +130,12 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count)
         unrelated[locale] = admin('/localization/' + locale)
         require(unrelated[locale].get('probeSentinel') == 'preserved', 'restricted_sentinel_setup')
 
-    dedicated = client(CLIENT, secret)
+    dedicated = client(CLIENT, secret, full_scope=False)
     admin('/clients/' + dedicated + '/roles', 'POST', {'name': ROLE})
     role = admin('/clients/' + dedicated + '/roles/' + ROLE)
+    admin('/clients/' + dedicated + '/scope-mappings/clients/' + dedicated, 'POST', [role])
+    check('restricted_dedicated_scope_is_explicit', admin('/clients/' + dedicated).get('fullScopeAllowed') is False
+          and any(value['id'] == role['id'] for value in admin('/clients/' + dedicated + '/scope-mappings/clients/' + dedicated)))
     service_user = admin('/clients/' + dedicated + '/service-account-user')
     mappings = '/users/' + service_user['id'] + '/role-mappings/clients/' + dedicated
 
@@ -145,6 +148,11 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count)
     bearer = token()
     zero = succeeded('read')
     check('restricted_initial_revision_zero', zero == {'revision': 0, 'configured': False})
+    admin('/localization/pt', 'POST', {'passwordResetSubject': 'Pre-existing native override'})
+    status, value = request()
+    check('restricted_initial_native_override_refused', status == 409 and value == {'code': 'EMAIL_PUBLICATION_DRIFT'})
+    admin('/localization/pt/passwordResetSubject', 'DELETE')
+    require(state() == zero, 'restricted_initial_override_did_not_create_revision')
     view = succeeded('service-template')
     check('restricted_application_reads_unpublished_draft', view.get('revision') == 0 and view.get('publication') == 'UNPUBLISHED'
           and view.get('capabilities') == {'test': False})
@@ -186,8 +194,15 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count)
                   '<p><a href="{LigacaoRecuperacao}">Recuperar acesso</a></p><p>Validade: {Validade}</p><script>alert(1)</script>'
     prepared = prepare("C4G — publicação restrita d'água", source_html)
     first_key = str(uuid.uuid4())
-    first = succeeded('save', body={'subject': prepared['template']['subject'], 'html': source_html,
-                                   'expectedRevision': 0, 'idempotencyKey': first_key})
+    def save_first():
+        return succeeded('save', body={'subject': prepared['template']['subject'], 'html': source_html,
+                                      'expectedRevision': 0, 'idempotencyKey': first_key})
+    if first_save:
+        first, blocked_on_native_write = first_save(save_first)
+        unrelated['pt']['probeSentinel'] = 'concurrent-preserved'
+        check('restricted_concurrent_native_locale_write_is_serialized', blocked_on_native_write)
+    else:
+        first = save_first()
     first_state = state()
     first_intention = from_state(first_state, 0, first_key)
     check('restricted_application_save_publishes_revision_one', first.get('revision') == 1 and first.get('publication') == 'PUBLISHED'
@@ -257,6 +272,13 @@ def run_probe(api, admin, origin, realm, check, reset, captured, captured_count)
     reset(locale='en')
     message, _, _, _ = captured(next_message)
     check('restricted_reset_template_reaches_native_email', str(message['Subject']) == reset_view['subject'])
+
+    if failed_save:
+        attempted = intention(prepare('Publicação revertida por falha da base'), 3)
+        failed = failed_save(lambda: node('publish', payload=attempted))
+        check('restricted_database_failure_rolls_back_publication', failed == {'ok': False, 'code': 'EMAIL_PUBLISH_UNAVAILABLE'}
+              and state() == reset_state and all(admin('/localization/' + locale).get(key) == reset_state['messages'][key]
+                                                for locale in ('pt', 'en') for key in KEYS))
 
     # Simulate an operator changing one managed key outside this restricted API.
     admin('/localization/pt', 'POST', {'passwordResetSubject': 'External drift'})

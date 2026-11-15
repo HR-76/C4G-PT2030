@@ -1,6 +1,6 @@
 # Alteração do tipo da entidade
 
-Estado: implementado e validado em ambiente isolado — 15/11/2026. Publicação pendente.
+Estado: publicado no staging em 15/11/2026; confirmação funcional na interface pendente.
 
 ## Contrato confirmado
 
@@ -41,3 +41,13 @@ As quebras de linha do SQL são normalizadas pelo instalador antes da medição;
 - Backend completo: 3347 testes, 3334 PASS, 9 ignorados e 4 falhas. Três eram fixtures do catálogo que ainda desconheciam 055; foram corrigidas, acrescentada a prova de admissão de 055 e os 15 testes de `authorityMetadataDedup.test.js` passaram. A falha restante, SEC-AC-01 em `security/f2Security.test.js`, é anterior a este trabalho: `pages/Applications/useNextStepCompletion.js` já contém `sessionStorage` em HEAD, mas não está na lista de exceções desse teste. Não foi alterada nem ocultada.
 - Serviços/rotas da ficha: 8 PASS; protocolo fechado, pacote e serviço: 16 PASS. A nova query está incluída na comparação exata entre catálogo JavaScript e SQL autorizado.
 - Build de produção, lint e verificação sintática dos scripts alterados executados; nenhum commit, push, migração habitual ou deploy.
+
+## Publicação no staging — 15/11/2026
+
+Execução pelo utilizador na consola da VPS, autorizada nesta conversa. Resultado devolvido: `CENTRAL=055_entity_type_edit`, `READY=200` e `PUBLICACAO_055_CONCLUIDA`. Frontend ativo: `/srv/c4g-staging-web/releases/entity-type-055-20261115T140228Z`. Backup final e configurações privadas: `/srv/c4g-staging/backup/entity-type-055-activation-20261115T140228Z` (não copiar para logs).
+
+A API preserva a correção PT2030 da imagem anterior. API, worker de recolha e worker de validação de faturação foram recriados com configurações guardadas. A ativação exigiu corrigir campos de rede incompatíveis na recriação Docker e três listas de versões admitidas: productionComposition, customerBilling/pdfRuntime e catalogReaderSecurity. A correção das imagens usa root apenas no build e repõe o utilizador original. 29 testes focados de catálogo/faturação passaram.
+
+As imagens efetivas são `c4g-staging-api:c262040-pt2030-entity-type-055-v1` para API e `c4g-staging-api:c262040-entity-type-055-v1` para os dois workers, incluindo a correção de readiness. Os contentores anteriores foram preservados parados. Não arrancar imagens 054 contra a Central 055. Uma futura publicação por Compose deve selecionar imagens compatíveis com 055; os caminhos/labels anteriores foram preservados, não constituem indicação da imagem atual.
+
+A prontidão e publicação foram confirmadas pelo resultado enviado pelo utilizador; a alteração de um tipo real pela interface ainda não foi observada. Nenhum tipo real foi escolhido automaticamente.

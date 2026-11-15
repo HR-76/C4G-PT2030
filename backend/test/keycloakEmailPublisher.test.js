@@ -195,3 +195,12 @@ test('composition is disabled by default and cannot silently accept unknown mode
     assert.throws(() => createKeycloakPublisher({ issuer, clientSecret: SECRET }), TypeError);
   }
 });
+
+test('composition accepts the URL issuer returned by loadAuthConfig without weakening transport validation', () => {
+  const env = { NODE_ENV: 'production', EMAIL_AUTHENTICATION_RUNTIME: 'keycloak-restricted-v1', EMAIL_AUTHENTICATION_CLIENT_SECRET: SECRET };
+  assert.equal(typeof configuredKeycloakPublisher({ env, issuer: new URL(ISSUER) }).read, 'function');
+  for (const issuer of ['http://127.0.0.1:19080/realms/probe', 'https://user:password@host.invalid/realms/x',
+    'https://host.invalid/realms/x?arbitrary=1', 'https://host.invalid/admin/realms/x']) {
+    assert.throws(() => configuredKeycloakPublisher({ env, issuer: new URL(issuer) }), TypeError);
+  }
+});

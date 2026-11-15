@@ -21,7 +21,7 @@ async function run(input) {
   const publisher = configuredKeycloakPublisher({ env: {
     NODE_ENV: 'test', EMAIL_AUTHENTICATION_RUNTIME: 'keycloak-restricted-v1',
     EMAIL_AUTHENTICATION_CLIENT_SECRET: input.clientSecret
-  }, issuer: input.issuer });
+  }, issuer: new URL(input.issuer) });
   if (input.operation === 'read') return publisher.read();
   if (input.operation === 'publish') return publisher.publish(input.payload);
 

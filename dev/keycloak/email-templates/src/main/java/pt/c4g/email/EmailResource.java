@@ -103,11 +103,13 @@ public final class EmailResource {
         // Refresh storage first, then obtain the update delegate to register cache invalidation.
         em.refresh(entity, LockModeType.PESSIMISTIC_WRITE);
         RealmModel realm = contextRealm instanceof CachedRealmModel cached ? cached.getDelegateForUpdate() : contextRealm;
-        // Localizations are separate entities; refresh any previously loaded rows too.
+        // Native admin writes need not lock the realm. Lock existing locale rows
+        // too, so a concurrent native update cannot be lost between drift check
+        // and the merge preserving keys outside this publisher's ownership.
         List<RealmLocalizationTextsEntity> rows = em.createQuery(
-            "select l from RealmLocalizationTextsEntity l where l.realm.id = :realm", RealmLocalizationTextsEntity.class)
+            "select l from RealmLocalizationTextsEntity l where l.realm.id = :realm order by l.locale", RealmLocalizationTextsEntity.class)
             .setParameter("realm", realm.getId()).getResultList();
-        rows.forEach(em::refresh);
+        rows.forEach(row -> em.refresh(row, LockModeType.PESSIMISTIC_WRITE));
         return realm;
     }
     @GET @Path("password-reset")

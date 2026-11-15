@@ -173,7 +173,8 @@ function configuredKeycloakPublisher({ env, issuer }) {
   if (mode === 'disabled') return null;
   if (mode !== 'keycloak-restricted-v1') throw new TypeError('Email authentication runtime is invalid.');
   return createKeycloakPublisher({
-    issuer, clientSecret: env.EMAIL_AUTHENTICATION_CLIENT_SECRET,
+    // loadAuthConfig supplies a URL; the transport still validates its exact href.
+    issuer: issuer instanceof URL ? issuer.href : issuer, clientSecret: env.EMAIL_AUTHENTICATION_CLIENT_SECRET,
     allowLoopbackHttp: env.NODE_ENV !== 'production'
   });
 }

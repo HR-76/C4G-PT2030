@@ -219,18 +219,22 @@ def run():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--authorized-local', action='store_true')
     parser.add_argument('--restricted-publisher', action='store_true')
+    parser.add_argument('--postgres-temporary', action='store_true')
+    parser.add_argument('--provider-jar', type=Path, help='Owned .tmp artifact for regression comparison only')
     args = parser.parse_args()
     require(args.authorized_local, 'EXPLICIT_LOCAL_AUTHORIZATION_REQUIRED')
     require(JAVA.is_file(), 'JDK_MISSING')
     require(ZIP.is_file() and hashlib.file_digest(ZIP.open('rb'), 'sha256').hexdigest() == SHA256, 'DISTRIBUTION_CHECKSUM')
-    extension_jar = ROOT / '.tmp/email-templates-build/c4g-email-templates-26.8.0.jar'
+    extension_jar = (args.provider_jar or ROOT / '.tmp/email-templates-build/c4g-email-templates-26.8.0.jar').resolve()
+    require(extension_jar.is_relative_to((ROOT / '.tmp').resolve()) and extension_jar.suffix == '.jar', 'OWNED_PROVIDER_PATH_REQUIRED')
+    require(not args.provider_jar or args.restricted_publisher, 'PROVIDER_REQUIRES_RESTRICTED_GATE')
     if args.restricted_publisher:
         require(extension_jar.is_file(), 'RESTRICTED_PROVIDER_NOT_BUILT')
     base = ROOT / '.tmp' / ('email-keycloak-' + secrets.token_hex(8))
     base.mkdir()
     evidence = {'keycloak': '26.8.0', 'distributionSha256': SHA256, 'database': 'isolated H2 dev-file',
                 'smtp': 'loopback memory capture, no relay', 'checks': [], 'failedChecks': [], 'passed': False}
-    process, capture, smtp_thread = None, None, None
+    process, capture, smtp_thread, postgres = None, None, None, None
     step = 'extract'
 
     def check(name, condition=True):
@@ -256,6 +260,13 @@ def run():
         password = secrets.token_urlsafe(32)
         env.update({'TEMP': str(base), 'TMP': str(base), 'KC_BOOTSTRAP_ADMIN_USERNAME': 'email-probe-admin',
                     'KC_BOOTSTRAP_ADMIN_PASSWORD': password})
+        if args.postgres_temporary:
+            step = 'postgres_start'
+            from temporary_postgres import TemporaryPostgres
+            postgres = TemporaryPostgres(base)
+            postgres.start()
+            env.update(postgres.keycloak_environment())
+            evidence['database'] = 'isolated PostgreSQL ' + postgres.version
         command = [str(JAVA), '-Xms128m', '-Xmx768m', '-Djava.util.logging.manager=org.jboss.logmanager.LogManager',
                    '-Djava.util.concurrent.ForkJoinPool.common.threadFactory=io.quarkus.bootstrap.forkjoin.QuarkusForkJoinWorkerThreadFactory',
                    '-Duser.language=en', '-Duser.country=US', '-Dpicocli.disable.closures=true',
@@ -264,7 +275,7 @@ def run():
                    '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.base/java.util=ALL-UNNAMED',
                    '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED', '--enable-native-access=ALL-UNNAMED',
                    '-cp', str(home / 'lib/quarkus-run.jar'), 'io.quarkus.bootstrap.runner.QuarkusEntryPoint',
-                   'start-dev', '--db=dev-file', '--http-host=127.0.0.1', f'--http-port={port}',
+                   'start-dev', '--db=postgres' if postgres else '--db=dev-file', '--http-host=127.0.0.1', f'--http-port={port}',
                    '--hostname=' + origin, '--cache=local', '--log-level=warn']
         # Capture bounded startup diagnostics only in memory; never persist logs.
         diagnostics = []
@@ -466,13 +477,21 @@ def run():
         if args.restricted_publisher:
             step = 'restricted_publisher'
             from restricted_probe import run_probe
-            run_probe(api, admin, origin, realm, check, reset, captured, lambda: len(capture.messages))
+            run_probe(api, admin, origin, realm, check, reset, captured, lambda: len(capture.messages),
+                      first_save=postgres.publish_during_native_locale_update if postgres else None,
+                      failed_save=postgres.with_forced_version_failure if postgres else None)
+            if postgres:
+                step = 'postgres_audit'
+                audit = postgres.verify_restricted_state()
+                evidence['restrictedStorage'] = audit
+                check('restricted_postgres_audit_and_history', audit['heads'] == 1 and audit['versions'] == 3
+                      and all(value is True for key, value in audit.items() if key not in ('heads', 'versions')))
         evidence['capturedMessages'] = len(capture.messages)
         evidence['passed'] = not evidence['failedChecks']
     except Exception as error:
         # Never print exception payloads, HTTP bodies, email links or credentials.
         evidence['failedStep'] = step
-        evidence['failure'] = str(error) if isinstance(error, GateFailure) else type(error).__name__
+        evidence['failure'] = str(error) if isinstance(error, GateFailure) or type(error).__name__ == 'TemporaryPostgresFailure' else type(error).__name__
         if 'diagnostics' in locals():
             evidence['keycloakEventErrors'] = sorted(set(re.findall(
                 r'\berror="?([a-z_]{3,50})"?(?=[,\s])', ''.join(diagnostics))))
@@ -499,6 +518,16 @@ def run():
         if data.exists():
             shutil.rmtree(data)
         evidence['databaseRemoved'] = not data.exists()
+        if postgres:
+            try:
+                cleanup = postgres.close()
+                evidence['servicesStopped'] = evidence['servicesStopped'] and cleanup['servicesStopped']
+                evidence['databaseRemoved'] = evidence['databaseRemoved'] and cleanup['databaseRemoved']
+            except Exception:
+                # Do not erase a cluster whose shutdown/ownership was not confirmed.
+                evidence.update({'passed': False, 'servicesStopped': False, 'databaseRemoved': False,
+                                 'cleanupFailure': 'POSTGRES_CLEANUP_NOT_CONFIRMED'})
+        evidence['passed'] = evidence['passed'] and evidence['servicesStopped'] and evidence['databaseRemoved']
         (base / 'evidence.json').write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding='utf-8')
         print('Evidence: ' + str(base / 'evidence.json'), flush=True)
     return 0 if evidence['passed'] else 1

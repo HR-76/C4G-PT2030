@@ -167,7 +167,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]
     });
     const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:centralPool,customerService:customerBillingService}):null;
-    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation']);
+    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation','055_entity_type_edit']);
     const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:centralPool,customerService:customerBillingService,env});
     if(billingPdfs)readyBillingPdfs=()=>billingPdfs.ready();
     if(billingPdfs)closeBillingPdfs=dependencies.ownResource?.(billingPdfs,()=>billingPdfs.close())||(()=>billingPdfs.close());
