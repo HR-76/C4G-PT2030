@@ -1,8 +1,18 @@
 # Carregamento central PT2030: do ficheiro ao Catálogo
 
-Estado: **implementado e provado numa base isolada em 12/11/2026**, por implantar na VPS. Pedido pelo utilizador («carregar o ficheiro e levar para oportunidades e para o catálogo»). Decisões: (1) só candidatas novas, confirmada pelo utilizador; (2) Catálogo central comum e (3) o mesmo administrador C4G aceita, adotadas a partir das propostas deste contrato porque o utilizador respondeu «sim» sem as contrariar. Estende [central-import-upload-preview.md](central-import-upload-preview.md), que ficou deliberadamente em pré-visualização. Contexto: [staging completo](staging-completion-plan.md).
+Estado em 15/11/2026: **importação recuperada no staging; reimportação validada**. **Único teste pendente deste percurso: criação de oportunidades novas no staging.** Pedido pelo utilizador («carregar o ficheiro e levar para oportunidades e para o catálogo»). Decisões: (1) só candidatas novas, confirmada pelo utilizador; (2) Catálogo central comum e (3) o mesmo administrador C4G aceita, adotadas a partir das propostas deste contrato porque o utilizador respondeu «sim» sem as contrariar. Estende [central-import-upload-preview.md](central-import-upload-preview.md), que ficou deliberadamente em pré-visualização. Contexto: [staging completo](staging-completion-plan.md).
 
-## Estado medido (código lido em 12/11/2026)
+## Recuperação e reimportação validadas no staging — 15/11/2026
+
+- Publicação executada pelo utilizador no terminal Hostinger: API `c4g-staging-api:c262040-pt2030-entity-type-055-v2`, compatível com a Central `055_entity_type_edit`. A correção anterior limitada à 054 deixou de chegar após a publicação da 055. A validação explícita da 055 devolveu `VALIDACAO_OK`; foi acrescentada essa versão à lista da importação na imagem ativa. O código do repositório usa a seleção de versões compatíveis do manifesto.
+- Após a recriação, o contentor ficou em `created`; o arranque explícito devolveu `running`, zero reinícios, sem erro e readiness `READY`. O utilizador confirmou que o campo para carregar o Excel voltou a aparecer.
+- O ficheiro chegou à revisão. A captura fornecida mostra as linhas visíveis como «Já aceite» e o botão «Não há oportunidades novas». O utilizador confirmou que todas estavam aceites e pediu o registo da reimportação como validada: reconhecimento das oportunidades existentes, sem proposta de novas aceitações ou duplicados. Não foi fornecida uma contagem total nem feita uma auditoria SQL independente neste ensaio.
+- **Importação recuperada e reimportação validada**, com base nos resultados do terminal, captura da interface e confirmação do utilizador. Este ensaio não criou oportunidades novas.
+- **Pendente apenas o teste de criação de oportunidades novas no staging:** carregar um ficheiro com avisos ainda ausentes do catálogo, rever e aceitar as novas candidatas, confirmar a presença no Catálogo e Dashboard e repetir para verificar que passam a «Já aceite».
+
+As secções datadas abaixo preservam a evolução e as validações anteriores; as referências a implantação ou prova em staging pendentes descrevem esses momentos, não o estado atual.
+
+## Estado inicial medido (código lido em 12/11/2026, antes da implementação)
 
 O percurso tem quatro degraus e só o primeiro está ligado:
 
