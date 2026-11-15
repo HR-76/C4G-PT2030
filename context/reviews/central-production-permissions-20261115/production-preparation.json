@@ -1,0 +1,43 @@
+{
+  "status": "PREPARED_NOT_DEPLOYABLE",
+  "baseCommit": "6e0b8942c5bad38efddfbe1977b2a37ac23898d3",
+  "applicationOrigin": "https://gcni.c4g.ai",
+  "identityOrigin": "https://login.c4g.ai",
+  "baseCI": {
+    "run": 43739440762,
+    "number": 200,
+    "conclusion": "success"
+  },
+  "validation": {
+    "preparationTestsPassed": 7,
+    "preparationTestsFailed": 0,
+    "lint": "PASS",
+    "syntax": "PASS",
+    "dockerValidation": "NOT_RUN_DOCKER_UNAVAILABLE",
+    "vpsOrDatabaseChanges": false,
+    "stagingChanges": false
+  },
+  "blockers": [
+    "first organization and tenant provisioning; generic Central056 bootstrap",
+    "invitation/user deletion variants for057 and email scope",
+    "access management with MFA-optional policy",
+    "production infrastructure image digests/certificates/resources",
+    "external backups and recovery rehearsal; RPO/RTO/owner",
+    "real Keycloak/R2/tenant/proxy acceptance and final release CI"
+  ],
+  "files": {
+    "context/runbooks/production-057-configuration.md": "df096f4badaddbce2a5cd1140a221f5db4ae4019d51919c77ddc5c99ea867374",
+    "context/runbooks/production-057-deployment.md": "4b6f737d2a30fe6bec69b45ecbc93773d70fba0dd0bc100a5accdc07256deba7",
+    "context/runbooks/production-057-rollback.md": "9a6b8e59ee7f49a6c517347a3e6208b9e6822fe00d3a6b7dec179805f8799ae7",
+    "deploy/production/api.env.example": "fe04fc37ac1d0c6dc0e5b0b53f842180bb754582ca4280668fbe36d97b28ad55",
+    "deploy/production/billing-mail.env.example": "3b402bf2ac712c3639cbcc9a07eb40f086c84e6ec891af4b00e79410628eb690",
+    "deploy/production/central-logins.json.example": "062331a7535206ff4be1276d2536be54057cbb500a8ccd0282aa4e37ffbaae93",
+    "deploy/production/compose.yaml": "cf40d1922f1d558a13484117ae2f531a917ac856d307b9cdd58a8da735afaeea",
+    "deploy/production/Dockerfile": "d4edb6aac2fc4ca49ac901adbaa19eb18a5181d709f0872d0a73936fe1cfe2d5",
+    "deploy/production/install.env.example": "323f84b4af46581d21b9e55b0ce678b7fc58851ab0f79a6d483f177192b685bc",
+    "deploy/production/README.md": "f17f7a8769eb789dd37d3129bda9e9cca0cfc3f08700933d247e502f02729108",
+    "deploy/production/release.env.example": "727e9d99579c16e3e89b39651cf795e78ed1fb57aef5eb3fdc1336dc50aa6806",
+    "deploy/production/retention.env.example": "88c0c293630b8a606195ce6828ac83e14e60d1ce7b2738472073e3bee6c65b32",
+    "test/production-preparation.test.cjs": "086a050ad24e007a86f8bd90e58b4c4e51f614533f5293a69675ed05f62d1329"
+  }
+}

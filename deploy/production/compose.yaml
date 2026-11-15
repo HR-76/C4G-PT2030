@@ -1,0 +1,112 @@
+name: c4g-production-app
+
+# Candidate application stack. PostgreSQL/Keycloak and these networks must be provisioned separately.
+# No service starts without an explicit profile. Images and configuration are release-bound.
+services:
+  pod:
+    profiles: [release]
+    image: ${C4G_PRODUCTION_POD_IMAGE:?immutable pod image digest required}
+    init: true
+    restart: unless-stopped
+    command: [sleep, infinity]
+    ports: ["127.0.0.1:8600:5000"]
+    networks: [edge, data, identity]
+    mem_limit: 64m
+    pids_limit: 64
+    logging: &logging
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  api:
+    profiles: [release]
+    image: ${C4G_PRODUCTION_IMAGE:?immutable application image digest required}
+    init: true
+    restart: unless-stopped
+    network_mode: service:pod
+    depends_on:
+      pod: {condition: service_started}
+      clamav: {condition: service_healthy}
+    env_file:
+      - path: /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/api.env
+        format: raw
+    environment: {NODE_EXTRA_CA_CERTS: /certs/ca.pem}
+    volumes:
+      - /srv/c4g-production/postgres/certs/ca.pem:/certs/ca.pem:ro
+    read_only: true
+    tmpfs: [/tmp:size=128m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 1g
+    pids_limit: 256
+    stop_grace_period: 45s
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:5000/health/ready',{signal:AbortSignal.timeout(15000)}).then(async r=>{const b=await r.json();process.exit(r.status===200&&b.status==='READY'?0:1)}).catch(()=>process.exit(1))"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+      start_period: 120s
+    logging: *logging
+
+  clamav:
+    profiles: [release]
+    image: ${C4G_PRODUCTION_CLAMAV_IMAGE:?immutable scanner image digest required}
+    restart: unless-stopped
+    network_mode: service:pod
+    depends_on: {pod: {condition: service_started}}
+    volumes: [clamav-db:/var/lib/clamav]
+    mem_limit: 2g
+    pids_limit: 256
+    healthcheck:
+      test: [CMD-SHELL, clamdcheck.sh]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+    logging: *logging
+
+  migrate:
+    profiles: [maintenance]
+    image: ${C4G_PRODUCTION_IMAGE:?immutable application image digest required}
+    restart: "no"
+    # Default is a target/plan check. --apply must be supplied explicitly in a one-shot run.
+    command: [node, scripts/installProductionCentral.js, --expected-database, c4g_central_production]
+    env_file:
+      - path: /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/install.env
+        format: raw
+    environment: {NODE_EXTRA_CA_CERTS: /certs/ca.pem}
+    volumes:
+      - /srv/c4g-production/postgres/certs/ca.pem:/certs/ca.pem:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/central-logins.json:/run/private/central-logins.json:ro
+    networks: [data]
+    read_only: true
+    tmpfs: [/tmp:size=64m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    logging: *logging
+
+  retention:
+    profiles: [retention]
+    image: ${C4G_PRODUCTION_IMAGE:?immutable application image digest required}
+    restart: "no"
+    command: [node, src/emailTemplates/retentionWorker.js]
+    env_file:
+      - path: /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/retention.env
+        format: raw
+    environment: {NODE_EXTRA_CA_CERTS: /certs/ca.pem}
+    volumes: [/srv/c4g-production/postgres/certs/ca.pem:/certs/ca.pem:ro]
+    networks: [data]
+    read_only: true
+    tmpfs: [/tmp:size=32m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    logging: *logging
+
+volumes:
+  clamav-db:
+    name: c4g-production-clamav-db
+networks:
+  edge: {}
+  data: {external: true, name: c4g-production-data}
+  identity: {external: true, name: c4g-production-identity}

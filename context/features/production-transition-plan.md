@@ -2,6 +2,8 @@
 
 Estado: Draft (15/11/2026). Proposta para análise; não autoriza implementação, deploy nem alterações na VPS. As decisões da fase 0 são do utilizador e ainda não foram tomadas.
 
+Atualização 15/11/2026: as decisões listadas em «Decidido» já foram tomadas. O utilizador pediu a preparação da aplicação057 e do deploy, **sem alterar staging**; [bundle e gates](../runbooks/production-057-deployment.md), [configuração](../runbooks/production-057-configuration.md) e [rollback](../runbooks/production-057-rollback.md) preparados, não executados. Os ensaios/cortes de staging sugeridos abaixo não estão autorizados por esse pedido: substituir por ensaio isolado. Persistem bloqueios de provisionamento, recuperação e compatibilidade funcional identificados no novo runbook.
+
 Origem: análise do staging de 15/11/2026 (repositório, runbooks e sondagem só de leitura de `app-teste.c4g.ai` e `login-teste.c4g.ai`). O estado da VPS e do CI no GitHub não foi verificado diretamente.
 
 ## Princípio
@@ -9,6 +11,8 @@ Origem: análise do staging de 15/11/2026 (repositório, runbooks e sondagem só
 A produção é um ambiente novo, instalado de raiz a partir de uma versão identificada. O staging não é promovido nem copiado: tem dados sintéticos, liga à Central como superutilizador e usa caminhos de código só de teste. O staging passa a ser o ensaio obrigatório de cada passo antes de chegar à produção.
 
 ## Decidido
+
+- 15/11/2026: aplicação em `gcni.c4g.ai` (substitui `app.c4g.ai` inicialmente indicado) e autenticação em `login.c4g.ai`.
 
 - 15/11/2026: PostgreSQL de produção próprio, na VPS onde corre hoje o do staging ([decisão](../decisions/2026-11-15-production-postgresql-on-vps.md)). O Neon sai do plano.
 - 15/11/2026: instância de PostgreSQL de produção separada da do staging, na mesma VPS, com contentor, volume, rede e credenciais próprios.
