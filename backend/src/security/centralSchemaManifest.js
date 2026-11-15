@@ -167,7 +167,8 @@ async function validateCentralSchemaSnapshot(client, snapshot, version, observed
   if(prearchiveFingerprint)await require('./euLegacyPrearchiveSecurityManifest').assertEuLegacyPrearchiveSecurity(client,prearchiveFingerprint);
   const readFingerprint=registeredManifest.find(entry=>entry.version===version)?.readFingerprint;
   if(readFingerprint && await require('../opportunities/catalogRead/dedicatedCredentials').normalReadFingerprint(client)!==readFingerprint)throw Error('CATALOG_READ_SCHEMA_DRIFT');
-  if(registeredManifest.find(entry=>entry.version===version)?.centralImportSecurity)await require('./centralImportSecurity').assertCentralImportSecurity(client, { production: version === '057_production_central_permissions' });
+  const registeredEntry=registeredManifest.find(entry=>entry.version===version);
+  if(registeredEntry?.centralImportSecurity)await require('./centralImportSecurity').assertCentralImportSecurity(client, { production: registeredEntry.productionPermissions === true });
   return observedFingerprint;
 }
 

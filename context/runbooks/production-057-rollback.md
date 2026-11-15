@@ -1,8 +1,10 @@
-# Produção 057: paragem, recuperação e rollback
+# Produção 057/058: paragem, recuperação e rollback
 
 Estado: preparado para revisão em 15/11/2026; **não executado nem ensaiado na infraestrutura de produção**. Base analisada: `6e0b8942c5bad38efddfbe1977b2a37ac23898d3`. Âmbito: instâncias PostgreSQL e Keycloak próprias na VPS atual, com recursos separados do staging, conforme a [decisão de alojamento](../decisions/2026-11-15-production-postgresql-on-vps.md).
 
 Este procedimento não autoriza alterações no staging, restauração de dados ou corte de tráfego. A execução futura depende de release, alvos e checkpoint identificados. A prova PostgreSQL descartável da 057 valida instalação e permissões; não prova recuperação completa de Central, tenants, identidade e objetos.
+
+Atualização 15/11/2026: a extensão [058 de convites/eliminação](production-058-account-lifecycle.md) também é irreversível. Registar058 e os seus pins no checkpoint quando instalada. Falha antes do commit da058 reverte para057; depois do commit, uma imagem que só conhece057 não é compatível. Manter uma imagem que admita058 ou restaurar um checkpoint coerente com reconciliação dos efeitos externos. Não apagar o diário de eliminação nem reativar acessos revogados para tentar recuperar uma operação: retomar o mesmo pedido depois de corrigir a dependência.
 
 ## 1. O que significa voltar atrás
 
@@ -28,7 +30,7 @@ O compose de aplicação preparado é `deploy/production/compose.yaml`, projeto 
 | Elemento do checkpoint | Evidência a conservar |
 |---|---|
 | Release | SHA completo, digests das imagens API/frontend/Keycloak/PostgreSQL, checksums de ficheiros de configuração sem valores secretos, versão das extensões e providers Keycloak. Não usar `latest` como identidade de rollback. |
-| Central | Cópia recuperável, ledger/checksums, schema e fingerprints de segurança, contagens de controlo, identidade do cluster/base. Registar a variante exata: o pacote preparado cobre 056/057 genéricos. |
+| Central | Cópia recuperável, ledger/checksums, schema e fingerprints de segurança, contagens de controlo, identidade do cluster/base. Registar a versão exata: 056/057 genéricos e extensão058 quando instalada. |
 | Todos os tenants ativos | Inventário completo e cópia de cada base, versão/schema, tenant ID, geração de base, bindings e diretório Central correspondentes. Uma cópia apenas da Central não é um checkpoint funcional. |
 | Papéis e permissões PostgreSQL | Owners, ACLs, memberships com opções INHERIT/SET/ADMIN e demais definições necessárias ao restauro. Material que inclua credenciais/verificadores de passwords fica cifrado e fora dos logs. O restauro não pode substituir owners e ACLs por um proprietário genérico e continuar a declarar os fingerprints válidos. |
 | Keycloak | Cópia da base própria, realm, clients, providers, versão e configuração da instância. Não reutilizar contas nem a base de staging. |
@@ -59,7 +61,7 @@ Inspecionar apenas a instância de produção previamente identificada com uma l
 ```sql
 SELECT version, checksum_sha256, irreversible, applied_at
 FROM public.c4g_schema_migration
-WHERE version IN ('056_email_delivery_history', '057_production_central_permissions')
+WHERE version IN ('056_email_delivery_history', '057_production_central_permissions', '058_platform_account_lifecycle')
 ORDER BY version;
 ```
 

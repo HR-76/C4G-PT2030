@@ -77,6 +77,8 @@ Guardar resultado sanitizado, SHA do código e checksums do pacote. Nunca imprim
 
 Conferir a configuração privada com cada login correspondente; provisionar separadamente a password do `c4g_authority_runtime`. Não montar install.env/central-logins.json na API. Remover o acesso instalador dos processos de serviço; manter os meios de recuperação com o operador.
 
+Para convites e eliminação, aplicar de seguida o [pacote incremental058](production-058-account-lifecycle.md) pelo instalador próprio. Preserva057 e os logins; não repetir o provisionador057. O check e o apply da058 são explícitos e o arranque produtivo com esses runtimes exige o novo schema. Incluir058 no checkpoint, release e ensaio de rollback.
+
 ## 5. Arranque privado e verificação
 
 ```bash
@@ -104,7 +106,9 @@ Depois dos gates, aprovar a janela com o responsável e só então publicar DNS/
 
 ## 7. Critério de avanço / pendências
 
-**A preparação pode ser revista; a execução produtiva ainda está bloqueada por:** primeira entidade e provisionamento genérico Central056/tenant/admin; âmbito de convites/eliminação/email e respetivas variantes057; correção do contrato de gestão de acessos/MFA opcional; versões/digests e recursos da infraestrutura; evidência de backup/restauro/RPO/RTO/responsável; configuração real Keycloak/R2/certificados/proxy; validação Docker na VPS; ensaio de rollback e release final identificada. Os testes locais/CI da aplicação não resolvem estes pontos.
+**A preparação pode ser revista; a execução produtiva ainda está bloqueada por:** primeira entidade e provisionamento genérico Central056/tenant/admin; configuração privada e aceite integrado de convites/eliminação/email; versões/digests e recursos da infraestrutura; evidência de backup/restauro/RPO/RTO/responsável; configuração real Keycloak/R2/certificados/proxy; validação Docker na VPS; ensaio de rollback e release final identificada. A compatibilidade SQL dos convites/eliminação está integrada na058; os testes locais não comprovam os fornecedores reais.
+
+O bloqueio de código da gestão de acessos com MFA opcional foi [corrigido localmente](../features/platform-access-optional-mfa.md), sem deploy. Incluir a correção na release candidata e validar o percurso OIDC de confirmação de sessão no ensaio isolado. O recibo `production-preparation.json` preserva o estado e os hashes da preparação anterior à correção; não representa os ficheiros atuais.
 
 O rollback preparado é [este procedimento](production-057-rollback.md). Não usar down -v, apagar ledger, restaurar sobre staging ou voltar à imagem anterior sem prova de compatibilidade057. Na primeira entrada não existe uma release de produção anterior: a resposta segura é manutenção, correção sobre057 ou recuperação isolada com reconciliação explícita.
 

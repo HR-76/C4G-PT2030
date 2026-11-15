@@ -37,8 +37,11 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     Object.freeze({...entries[0], version:'054_billing_account_validation',schemaFingerprint:hash(schemaFor('billing-validation-package'))}),
     Object.freeze({...entries[0], version:'055_entity_type_edit',schemaFingerprint:hash(schemaFor('entity-type-package'))}),
     Object.freeze({...entries[0], version:'056_email_delivery_history',schemaFingerprint:hash(schemaFor('email-delivery-package'))}),
-    Object.freeze({...entries[0], version:'057_production_central_permissions',schemaFingerprint:hash(schemaFor('production-permissions-package'))})]);
-  const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}]]);
+    Object.freeze({...entries[0], version:'057_production_central_permissions',schemaFingerprint:hash(schemaFor('production-permissions-package'))}),
+    Object.freeze({...entries[0], version:'058_platform_account_lifecycle',schemaFingerprint:hash(schemaFor('account-lifecycle-package')),centralImportSecurity:true,productionPermissions:true})]);
+  const centralImportChecks=[];
+  const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}],
+    ['./centralImportSecurity',{async assertCentralImportSecurity(_client,options){centralImportChecks.push(options);}}]]);
   function load(name) {
     const filename = path.resolve(__dirname, '../src/security', name + '.js');
     const localRequire = createRequire(filename), module = {exports: {}};
@@ -89,7 +92,7 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     connected.release();
     return Object.freeze({currentVersion: versions[1]});
   }});
-  return {authority, schema, state, client, queries, catalogReads, securityReads, releases, entries, security, load, preflights: () => preflights};
+  return {authority, schema, state, client, queries, catalogReads, securityReads, releases, entries, security, load, centralImportChecks, preflights: () => preflights};
 }
 
 test('authority snapshot validation is pure, exact and fails closed for absent or unknown evidence', () => {
@@ -257,4 +260,17 @@ test('reader admits email delivery only through the exact registered schema snap
 test('reader admits production permissions through its exact registered schema snapshot',async()=>{
  const f=fixture();f.state.table='production-permissions-package';
  assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client),'057_production_central_permissions');
+});
+
+test('reader admits account lifecycle only through its exact registered schema snapshot',async()=>{
+ const f=fixture();f.state.table='account-lifecycle-package';
+ assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client),'058_platform_account_lifecycle');
+ f.state.table='account-lifecycle-drift';
+ await assert.rejects(()=>f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client),/CATALOG_READER_SCHEMA_DRIFT/);
+});
+
+test('account lifecycle preserves production import security checks through the registered package flag',async()=>{
+ const f=fixture();f.state.table='account-lifecycle-package';
+ await f.schema.assertCentralSchema(f.client,'058_platform_account_lifecycle');
+ assert.deepEqual(f.centralImportChecks,[{production:true}]);
 });

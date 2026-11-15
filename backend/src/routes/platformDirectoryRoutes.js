@@ -18,7 +18,7 @@ function createPlatformDirectoryRouter({express,service,authenticate,access,memb
   if(Object.keys(req.query).length||(verb==='get'&&req.body&&Object.keys(req.body).length))throw Object.assign(Error(),{code:'INVALID_INPUT'});
   if(!access){await service.entity(req.params.id,req);throw Error('Unconfigured');}
   res.json(await(kind==='list'?access.list(req.params.id,req):access.change(req.params.id,req.params.membershipId,req.body,req,kind)));
- }catch(e){const statuses={C4G_ADMIN_REQUIRED:403,MFA_REQUIRED:403,ONBOARDING_INPUT_INVALID:400,INVALID_INPUT:400,RESOURCE_NOT_AVAILABLE:404,STALE_REVISION:409,SELF_ACCESS_PROTECTED:409,MEMBERSHIP_UNAVAILABLE:409};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}});
+ }catch(e){const statuses={C4G_ADMIN_REQUIRED:403,MFA_REQUIRED:403,REAUTH_REQUIRED:403,ONBOARDING_INPUT_INVALID:400,INVALID_INPUT:400,RESOURCE_NOT_AVAILABLE:404,STALE_REVISION:409,SELF_ACCESS_PROTECTED:409,MEMBERSHIP_UNAVAILABLE:409};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}});
  const handle=work=>async(req,res)=>{try{
   if(req.body&&Object.keys(req.body).length)throw Object.assign(Error(),{code:'INVALID_INPUT'});
   res.json(await work(req));

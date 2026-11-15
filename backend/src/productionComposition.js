@@ -54,6 +54,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   const { express, cors, centralPool, routes = {} } = dependencies;
   const productionProfile=require("./security/productionCentralProfile").configuration(env);
   if(productionProfile&&!dependencies.capabilityPools)throw Error("PRODUCTION_POOLS_REQUIRED");
+  const readyAccountLifecycle=require('./platformOnboarding/productionReadiness').createProductionAccountReadiness({env,pool:centralPool});
   const commandsPool=dependencies.capabilityPools?.commands||centralPool;
   const authoringPool=dependencies.capabilityPools?.authoring||centralPool;
   const logsPool=dependencies.capabilityPools?.logs||centralPool;
@@ -165,7 +166,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     const userDeletion=dependencies.createUserDeletion?.({authorityCoordinator,authConfig})||null;
     composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,userDeletion,
       members:memberOnboarding,
-      access:env.PLATFORM_ACCESS_RUNTIME==='central'?require('./platformDirectory/access').createPlatformAccess({coordinator:authorityCoordinator,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],recentMfaRequirement:authConfig.assurancePolicy['recent-mfa']}):null,
+      access:env.PLATFORM_ACCESS_RUNTIME==='central'?require('./platformDirectory/access').createPlatformAccess({coordinator:authorityCoordinator,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}):null,
       service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health,deletionAvailable:Boolean(userDeletion)})});
     const platformBillingService=require('./platformBilling/service').createPlatformBillingService({
       coordinator:authorityCoordinator,centralPool
@@ -175,7 +176,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]
     });
     const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:commandsPool,customerService:customerBillingService}):null;
-    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation','055_entity_type_edit','056_email_delivery_history','057_production_central_permissions']);
+    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation','055_entity_type_edit','056_email_delivery_history','057_production_central_permissions','058_platform_account_lifecycle']);
     const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:commandsPool,customerService:customerBillingService,env});
     if(billingPdfs)readyBillingPdfs=()=>billingPdfs.ready();
     if(billingPdfs)closeBillingPdfs=dependencies.ownResource?.(billingPdfs,()=>billingPdfs.close())||(()=>billingPdfs.close());
@@ -371,7 +372,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     app, authMode: authConfig.mode, importsRuntime,authorizationCatalogs, auditBootstrap, documentBootstrap,
     closeOpportunityRuntime:async()=>{try{if(ownsPlatformLogs)await platformLogs.flush();await closeCatalogReadConnection();}finally{await emailHistory?.close();await closeReceiptRecovery();await closeCentralImport();await closeBillingPdfs();await closeDocumentInfrastructure();await closeCatalogReader();await closeOwnedTenantPools();}},
     organizationalScopes, taxonomies, profileAuthoring,profileCompetencies,profileFinancial,profileOperational,profilePopulations,observability, featureTelemetry, logger, port: env.PORT || 5000,
-    assertDatabaseReadiness:async()=>{if(productionProfile)for(const pool of Object.values(dependencies.capabilityPools))await require('./security/centralMigrationPreflight').preflightCentral(pool);await databaseReadiness.assertReady();await emailHistory?.ready();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await readyBillingValidation();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
+    assertDatabaseReadiness:async()=>{if(productionProfile)for(const pool of Object.values(dependencies.capabilityPools))await require('./security/centralMigrationPreflight').preflightCentral(pool);await readyAccountLifecycle();await databaseReadiness.assertReady();await emailHistory?.ready();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await readyBillingValidation();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
     logFrontendUrlHealth: () => logFrontendUrlHealth(env, logger)
   };
 }

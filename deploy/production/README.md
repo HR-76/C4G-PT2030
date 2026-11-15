@@ -1,9 +1,10 @@
-# Preparação de produção — 057
+# Preparação de produção — 057/058
 
 Pacote candidato, sem execução remota. Aplicação: `https://gcni.c4g.ai`; identidade: `https://login.c4g.ai` (confirmados pelo utilizador). Não reutilizar ficheiros privados, redes, volumes, bases, identidades ou contas do staging.
 
 - [Procedimento de aplicação e deploy](../../context/runbooks/production-057-deployment.md)
 - [Configuração e perfis](../../context/runbooks/production-057-configuration.md)
+- [Extensão058 para convites e eliminação](../../context/runbooks/production-058-account-lifecycle.md)
 - [Rollback e recuperação](../../context/runbooks/production-057-rollback.md)
 
 O compose cobre **apenas a aplicação e os jobs de migração/retenção**. Não cria PostgreSQL, Keycloak, tenant, primeiro administrador, proxy ou backups. São pré-requisitos explícitos, não serviços já existentes presumidos. Os modelos `*.example` contêm placeholders e flags de ensaio técnico: não constituem uma configuração final autorizada para clientes.

@@ -1,9 +1,10 @@
 import {afterEach,expect,it,vi} from 'vitest'
-import {cleanup,render,screen,fireEvent,waitFor} from '@testing-library/react'
+import {act,cleanup,render,screen,fireEvent,waitFor} from '@testing-library/react'
 import {AccessTable} from './OrganizationAccess'
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({})}))
-vi.mock('../../api/api',()=>({organizationDirectoryApi:vi.fn()}))
+vi.mock('../../api/api',()=>({organizationDirectoryApi:vi.fn(),authApi:{stepUpPolicy:vi.fn(),stepUp:vi.fn()}}))
 afterEach(cleanup)
+afterEach(()=>window.history.replaceState(null,'','/'))
 it.each([[403,'O seu perfil não permite consultar os acessos desta organização.'],[503,'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.'],[500,'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.']])('explains access load failure %s accurately',async(status,message)=>{
  const api=apiFor();api.access.mockRejectedValue({response:{status}});
  render(<AccessTable organizationId="a" api={api}/>);
@@ -62,4 +63,72 @@ it('opens at once with the accesses the shell already confirmed, reads them agai
  expect(first.container.textContent).not.toBe('');expect(api.access).toHaveBeenCalledTimes(2);cleanup()
  const second=render(<AccessTable organizationId="a" api={api}/>)
  expect(second.container.querySelector('table')).toBeNull()
+})
+
+async function requestStatusChange(){
+ fireEvent.click(await screen.findByRole('button',{name:'Suspender acesso'}))
+ fireEvent.click(screen.getByRole('button',{name:'Confirmar alteração',exact:true}))
+ return screen.findByRole('button',{name:'Confirmar sessão'})
+}
+function expiredAccess(code='REAUTH_REQUIRED'){
+ const api=apiFor()
+ api.membershipStatus.mockRejectedValue({response:{status:403,data:{error:{code}}}})
+ return api
+}
+it.each([[true,'REAUTH_REQUIRED','recent-auth'],[false,'MFA_REQUIRED','recent-mfa']])('confirms the configured session policy without repeating the access change (optional MFA: %s)',async(optional,code,category)=>{
+ const target='/administracao/entidades/entity-a?tab=acessos#utilizadores'
+ window.history.replaceState(null,'',target)
+ const api=expiredAccess(code),auth={stepUpPolicy:vi.fn().mockResolvedValue({data:{mfaOptional:optional}}),stepUp:vi.fn()}
+ render(<AccessTable organizationId="a" api={api} auth={auth}/>)
+ const confirm=await requestStatusChange()
+ expect(screen.getByRole('alert').textContent).toContain(optional?'Confirme novamente a sessão':'Confirme novamente a autenticação multifator')
+ expect(screen.queryByRole('button',{name:'Repetir o mesmo envio'})).toBeNull()
+ expect(auth.stepUpPolicy).not.toHaveBeenCalled()
+ fireEvent.click(confirm)
+ await waitFor(()=>expect(auth.stepUp).toHaveBeenCalledExactlyOnceWith(category,target))
+ expect(api.membershipStatus).toHaveBeenCalledTimes(1)
+ expect(api.membershipProfile).not.toHaveBeenCalled()
+})
+it.each(['unavailable','missing','invalid'])('lets the user retry session confirmation when its policy is %s',async(failure)=>{
+ const api=expiredAccess(),auth={stepUpPolicy:vi.fn(),stepUp:vi.fn()}
+ if(failure==='unavailable')auth.stepUpPolicy.mockRejectedValueOnce(Error('offline'))
+ else auth.stepUpPolicy.mockResolvedValueOnce({data:failure==='missing'?{}:{mfaOptional:'true'}})
+ auth.stepUpPolicy.mockResolvedValueOnce({data:{mfaOptional:true}})
+ render(<AccessTable organizationId="a" api={api} auth={auth}/>)
+ fireEvent.click(await requestStatusChange())
+ await screen.findByText('Não foi possível iniciar a confirmação da sessão. Tente novamente.')
+ expect(auth.stepUp).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('button',{name:'Confirmar sessão'}))
+ await waitFor(()=>expect(auth.stepUp).toHaveBeenCalledExactlyOnceWith('recent-auth','/'))
+ expect(api.membershipStatus).toHaveBeenCalledTimes(1)
+})
+it.each(['resolve','reject'])('ignores a late session-policy %s after changing organization',async(outcome)=>{
+ let resolve,reject
+ const response=new Promise((yes,no)=>{resolve=yes;reject=no})
+ const first=expiredAccess(),second=apiFor({...member,name:'Outra entidade'}),auth={stepUpPolicy:vi.fn().mockReturnValue(response),stepUp:vi.fn()}
+ const view=render(<AccessTable organizationId="a" api={first} auth={auth}/>)
+ fireEvent.click(await requestStatusChange())
+ view.rerender(<AccessTable organizationId="b" api={second} auth={auth}/>)
+ await screen.findByText('Outra entidade')
+ await act(async()=>{if(outcome==='resolve')resolve({data:{mfaOptional:true}});else reject(Error('offline'));await response.catch(()=>{})})
+ expect(auth.stepUp).not.toHaveBeenCalled()
+ expect(screen.queryByRole('alert')).toBeNull()
+ expect(screen.queryByRole('button',{name:'Confirmar sessão'})).toBeNull()
+ expect(second.membershipStatus).not.toHaveBeenCalled()
+})
+it('ignores session-policy completion after leaving access management',async()=>{
+ let resolve
+ const response=new Promise(done=>{resolve=done})
+ const auth={stepUpPolicy:vi.fn().mockReturnValue(response),stepUp:vi.fn()}
+ const view=render(<AccessTable organizationId="a" api={expiredAccess()} auth={auth}/>)
+ fireEvent.click(await requestStatusChange());view.unmount()
+ await act(async()=>{resolve({data:{mfaOptional:true}});await response})
+ expect(auth.stepUp).not.toHaveBeenCalled()
+})
+it('uses a safe fallback instead of an encoded external return path',async()=>{
+ window.history.replaceState(null,'','/%2f%2foutside.invalid')
+ const auth={stepUpPolicy:vi.fn().mockResolvedValue({data:{mfaOptional:true}}),stepUp:vi.fn()}
+ render(<AccessTable organizationId="a" api={expiredAccess()} auth={auth}/>)
+ fireEvent.click(await requestStatusChange())
+ await waitFor(()=>expect(auth.stepUp).toHaveBeenCalledExactlyOnceWith('recent-auth','/'))
 })

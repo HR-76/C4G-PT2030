@@ -1,0 +1,97 @@
+{
+  "status": "LOCAL_VALIDATED_NOT_DEPLOYED",
+  "date": "2026-11-15",
+  "baseCommit": "b32d334d94e9b40cb0741d6984067d99bebd34ee",
+  "includesPriorLocalAccessCorrection": true,
+  "package": "platform-account-lifecycle-v1",
+  "baseline": "057_production_central_permissions",
+  "target": "058_platform_account_lifecycle",
+  "validation": {
+    "postgres": {
+      "version": "18.6",
+      "disposable": true,
+      "upgrade": {
+        "checks": 28,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "fresh": {
+        "checks": 26,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "identicalPins": true,
+      "productionCapabilityPrivilegesUnchanged": true,
+      "clustersStoppedAndDataDisposed": true,
+      "tenant041RealRls": true
+    },
+    "focused": {
+      "passed": 51,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "backend": {
+      "total": 3453,
+      "passed": 3444,
+      "skipped": 9,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "frontend": {
+      "files": 128,
+      "passed": 1150,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "preparation": {
+      "passed": 7,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "lint": "PASS",
+    "syntax": "PASS",
+    "build": "PASS",
+    "diffCheck": "PASS",
+    "regressionFirst": true
+  },
+  "scope": {
+    "mfaOptional": true,
+    "stagingChanged": false,
+    "productionChanged": false,
+    "deploy": false,
+    "commit": false,
+    "push": false,
+    "historical057Unchanged": true,
+    "historicalStagingVariantsUnchanged": true
+  },
+  "limits": [
+    "Identity, email and OIDC providers are simulated; production acceptance remains pending.",
+    "Tenant identity-erasure SQL is exercised separately from the simulated Central projection port.",
+    "Private worker configuration, tenant bindings and the remaining production runbook gates are still required."
+  ],
+  "files": {
+    "backend/database/central/candidates/platform_account_lifecycle.up.sql": "43b4bb3f832eec9b11155804f3b1d54eb0e35ae828f3dd6d4a8498cb3a8a07c5",
+    "backend/scripts/installPlatformAccountLifecycle.js": "f16cbd957adaf913a8532973e4ec0199c89ffc765862719e7d0aa5a2ef572818",
+    "backend/scripts/runCentralMigrations.js": "6a1d00de9fd129dedcd45a9713d3108e8e29a85cd74b30b670860f23a45ae7f9",
+    "backend/src/platformOnboarding/productionReadiness.js": "af27545d8b58c858b3d7810710c72cdb6c44734edda7dce4c59facba852cc4d8",
+    "backend/src/security/platformAccountLifecycleMigrationPackage.js": "c8db53dc5080fd622068ea301b7bbcbb398382615c2cd64e3e58f6d4b075847e",
+    "backend/src/security/centralMigrationManifest.js": "febcb22330cfba83a653dad420a992dd8a967c4a42df336e04739c51ad3d9b06",
+    "backend/src/security/centralMigrationPreflight.js": "7c9309b64e76e05de42a42adc4e82dbfb0a251ba8d73cbc33ec7deed9b0d31df",
+    "backend/src/security/centralSchemaManifest.js": "c765ef2bc764d964131eb5a1dd322a02ceef68ee2e98dd68f9023b7bd0af4eb3",
+    "backend/src/security/catalogReaderSchema.js": "bd2f30e4ad50200b0bfc7bbd21f162f1d7e361970d580c2ccd2a43428bc7e715",
+    "backend/src/security/catalogReaderSecurity.js": "c845d6e95b36e29aa2f08395d0669b22e8c5728776bb64f11c971faf2ac316db",
+    "backend/src/productionComposition.js": "08684c9975683ca68eebf43490868a4bf21045297b3d8a84aed479e7d33269b5",
+    "backend/src/customerBilling/pdfRuntime.js": "3cc8f6a13207e3ee04f964db310415d43b27e6f2256eb0b3b7383ef38986c4ea",
+    "backend/test/installPlatformAccountLifecycle.test.js": "88f8212c169212f12c076f06e2496062b6592013a70a3b22d5b498885ce69ee4",
+    "backend/test/platformAccountLifecycleMigration.test.js": "5d62b77ce66ab0cb648477334ea16448a1f7c689def7ee7e3894d74405d1a868",
+    "backend/test/platformAccountLifecycleCompatibility.test.js": "195be7b80de8887d31aabcaf76a63c00ce12a71b37c4a169b1af080034e11581",
+    "backend/test/platformAccountProductionReadiness.test.js": "162030d1dce2e1dd9315389b4bca47ed1a540b0d38ed1d4377ed9228c31c22f5",
+    "backend/test/authorityMetadataDedup.test.js": "42741d639dc01c793d8f5435ce6f91e427a92b58fd0890933f5088cbf4b4f5e1",
+    "test/integration/platform-account-lifecycle/gate.cjs": "12f4d5f6d2d4cb59b255ac4092cfe70eba372f4ed948b385e1e63983e2b7c378",
+    "test/integration/platform-account-lifecycle/probe.cjs": "b56a0699932be5e3f502db9221042cbcaa06e50cc6db69a6191b0c03e2c153ba",
+    "test/integration/platform-account-lifecycle/invitations.cjs": "9749d3f1a5a8d853bc71d953269e6496d92adba6ead0e8973918a9606ffa363d",
+    "test/integration/platform-account-lifecycle/deletion.cjs": "32fd00d0f034b7e092266c50517bafa003217749d67c0cbb335be6b18749bae0",
+    "context/features/production-account-lifecycle.md": "1a3b40b3a7b30540d7c3136edba78561bbb5fe5f1dec2ba3cca34382f28ba66d",
+    "context/runbooks/production-058-account-lifecycle.md": "40addc140d6e549a39bda7dad070d1d30721d92960a03a7b52b9afb2d8bb145d"
+  }
+}

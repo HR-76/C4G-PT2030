@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest, productionCentralManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest, productionCentralManifest, platformAccountLifecycleManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === platformAccountLifecycleManifest.at(-1).version)) return platformAccountLifecycleManifest;
   if (rows.some(row => row.version === productionCentralManifest.at(-1).version)) return productionCentralManifest;
   if (rows.some(row => row.version === emailDeliveryManifest.at(-1).version)) return emailDeliveryManifest;
   if (rows.some(row => row.version === entityTypeManifest.at(-1).version)) return entityTypeManifest;
@@ -391,3 +392,11 @@ async function applyRegisteredProductionCentralPackage(pool, packageId) {
  return applyCentralMigrationsWithManifest(pool,productionCentralManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:productionCentralManifest});
 }
 module.exports.applyRegisteredProductionCentralPackage=applyRegisteredProductionCentralPackage;
+
+async function applyRegisteredPlatformAccountLifecyclePackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/platformAccountLifecycleMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('PLATFORM_ACCOUNT_LIFECYCLE_PACKAGE_REQUIRED');
+ const {platformAccountLifecycleManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,platformAccountLifecycleManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:platformAccountLifecycleManifest});
+}
+module.exports.applyRegisteredPlatformAccountLifecyclePackage=applyRegisteredPlatformAccountLifecyclePackage;
