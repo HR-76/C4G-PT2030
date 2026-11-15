@@ -89,7 +89,7 @@ function createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,en
     if(!metadataDatabasePrivileges||Object.values(metadataDatabasePrivileges).some(Boolean))throw new Error('TENANT_METADATA_DATABASE_PRIVILEGES_INVALID');
     const edges=(await client.query(`SELECT granted.rolname,m.set_option,m.inherit_option,m.admin_option FROM pg_catalog.pg_auth_members m
       JOIN pg_catalog.pg_roles granted ON granted.oid=m.roleid WHERE m.member=(SELECT oid FROM pg_catalog.pg_roles WHERE rolname='c4g_tenant_api_capabilities')`)).rows;
-    const expectedRoles=['c4g_opportunity_tenant_runtime','c4g_f4_metadata_executor',...(editorialEnabled?['c4g_organization_profile_runtime']:[]),...(documentsEnabled?['c4g_document_runtime']:[])];
+    const expectedRoles=require('../security/tenantApiProfile').apiFunctionalRoles({editorialEnabled,documentsEnabled});
     if(edges.length!==expectedRoles.length||edges.some(edge=>!expectedRoles.includes(edge.rolname)
       ||!edge.set_option||edge.inherit_option||edge.admin_option))throw new Error('TENANT_API_PROFILE_MEMBERSHIP_INVALID');
     if(editorialEnabled||documentsEnabled)await require('../security/localTenantIdentityProvisioner').validateLocalTenantRoleChain(client,

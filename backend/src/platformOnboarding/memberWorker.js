@@ -14,17 +14,17 @@ const purpose=config.purpose||'MEMBERSHIP';
 // The local identity provider answers its administration API on the issuer itself; elsewhere it may be private (adminOrigin).
 if(local&&config.adminOrigin)throw Error('LOCAL_IDENTITY_REQUIRED');
 const identity=require('./keycloakAdapter').createKeycloakAdapter({issuer:config.issuer,accessToken,ownershipKey:config.ownershipKey,usernameMode:'email',purpose,adminOrigin:config.adminOrigin||null});
-const projection=purpose==='MEMBERSHIP'?require('./memberProjection').createMemberProjection({bindings:config.bindings,allowedResidency:config.allowedResidency}):null;
+const projection=purpose==='MEMBERSHIP'?require('./memberProjection').createMemberProjection({bindings:config.bindings,allowedResidency:config.allowedResidency,tenantApiProfile:config.tenantApiProfile}):null;
 const methods={identity:x=>identity.ensure(x),...(projection?{projection:x=>projection.ensure(x)}:{}),passwordReady:x=>identity.passwordReady(x.subject)};
 if(purpose==='MEMBERSHIP'&&process.env.USER_DELETION_RUNTIME==='central'){
  const deletionIdentity=require('../platformDirectory/deletionIdentity').createDeletionIdentity({issuer:config.issuer,accessToken,adminOrigin:config.adminOrigin||null});
- const deletionProjection=require('../platformDirectory/deletionProjection').createDeletionProjection({bindings:config.bindings,allowedResidency:config.allowedResidency});
+ const deletionProjection=require('../platformDirectory/deletionProjection').createDeletionProjection({bindings:config.bindings,allowedResidency:config.allowedResidency,tenantApiProfile:config.tenantApiProfile});
  methods.deleteIdentity=x=>deletionIdentity.remove(x);
  methods.erasePerson=x=>deletionProjection.anonymize(x);
  methods.deletionReady=()=>deletionProjection.ready();
 }
 if(purpose==='MEMBERSHIP'){
- const email=require('./activationEmail').createActivationEmail({key:config.ownershipKey,apiKey:process.env.RESEND_API_KEY,from:process.env.ACTIVATION_EMAIL_FROM,origin:process.env.ACTIVATION_PUBLIC_URL});
+ const email=require('./activationEmail').createActivationEmail({key:config.ownershipKey,...require('./memberWorkerEmail').memberWorkerEmailConfiguration(config,process.env)});
  methods.activationSecret=x=>email.secret(x);
  methods.activationEmail=x=>email.send(x);
  methods.testInvitationEmail=x=>email.test(x);

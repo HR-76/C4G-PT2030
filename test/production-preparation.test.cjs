@@ -18,7 +18,7 @@ test('candidate compose has its own project, networks, paths and loopback endpoi
   assert.match(service.image,/^\$\{C4G_PRODUCTION_.*:\?/,'no mutable image fallback');
   assert.ok(service.mem_limit);
  }
- assert.deepEqual(Object.keys(compose.services).sort(),['api','clamav','migrate','pod','retention']);
+ assert.deepEqual(Object.keys(compose.services).sort(),['api','billing-mail','bootstrap','clamav','migrate','pod','retention']);
 });
 
 test('API and scanner share only the stable production pod, with readiness gating',()=>{
@@ -33,14 +33,58 @@ test('API and scanner share only the stable production pod, with readiness gatin
 
 test('privileged migration credentials and retention credentials never enter API or each other',()=>{
  const files=name=>compose.services[name].env_file.map(item=>item.path);
- assert.equal(files('api').length,1);assert.match(files('api')[0],/\/api.env$/);
- assert.match(files('migrate')[0],/\/install.env$/);assert.match(files('retention')[0],/\/retention.env$/);
+ assert.equal(files('api').length,3);assert.match(files('api')[0],/\/api.env$/);
+ assert.match(files('api')[1],/\/central-runtime.env$/);assert.match(files('api')[2],/\/api-features.env$/);
+ assert.match(files('migrate')[0],/\/install.env$/);assert.match(files('retention')[0],/\/retention-runtime.env$/);
  assert.doesNotMatch(JSON.stringify(compose.services.api),/install.env|central-logins.json|retention.env/);
  assert.doesNotMatch(JSON.stringify(compose.services.retention),/api.env|install.env|central-logins.json/);
  assert.equal(compose.services.migrate.command.includes('--apply'),false);
  assert.equal(compose.services.migrate.restart,'no');assert.equal(compose.services.retention.restart,'no');
  assert.deepEqual(Object.keys(env('retention.env.example')).sort(),['CENTRAL_EMAIL_RETENTION_DATABASE_URL','NODE_ENV']);
  assert.deepEqual(Object.keys(env('install.env.example')).sort(),['NODE_ENV','PRODUCTION_INSTALL_DATABASE_URL']);
+});
+
+test('initial bootstrap is explicit and separate from upgrades and serving processes',()=>{
+ const service=compose.services.bootstrap;
+ assert.deepEqual(service.profiles,['bootstrap']);assert.equal(service.restart,'no');
+ assert.ok(service.command.includes('scripts/installProductionPlatform.js'));
+ assert.ok(service.command.includes('--runtime-config'));assert.ok(service.command.includes('--runtime-credentials'));
+ assert.equal(service.command.includes('--apply'),false);
+ assert.deepEqual(service.networks,['data','identity']);
+ assert.ok(service.volumes.some(value=>value.endsWith(':/run/output:rw')));
+ for(const file of ['bootstrap.config.json','bootstrap.credentials.json','runtime.config.json','runtime.credentials.json'])assert.ok(service.volumes.some(value=>value.endsWith(`:/run/private/${file}:ro`)));
+ assert.match(service.env_file[0].path,/\/bootstrap.env$/);
+ assert.doesNotMatch(JSON.stringify(compose.services.api),/bootstrap.env|bootstrap.credentials|runtime.credentials|\/run\/output/);
+ assert.deepEqual(compose.services.migrate.profiles,['maintenance']);
+ assert.ok(compose.services.migrate.command.includes('scripts/installProductionCentral.js'));
+});
+
+test('standalone bootstrap cannot depend on private files that it is about to generate',()=>{
+ const initial=require('../backend/node_modules/yaml').parse(read('compose.bootstrap.yaml'));
+ assert.equal(initial.name,'c4g-production-bootstrap');
+ assert.deepEqual(Object.keys(initial.services),['bootstrap']);
+ assert.deepEqual(initial.services.bootstrap,compose.services.bootstrap);
+ assert.deepEqual(initial.networks,{data:compose.networks.data,identity:compose.networks.identity});
+ assert.doesNotMatch(read('compose.bootstrap.yaml'),/api-features.env|central-runtime.env|member-worker.json|billing-mail.env|retention-runtime.env|C4G_PRODUCTION_POD_IMAGE|C4G_PRODUCTION_CLAMAV_IMAGE/);
+});
+
+test('members configuration and private bridge are mounted without publishing the bridge',()=>{
+ const api=compose.services.api,values=env('api.env.example');
+ assert.equal(values.MEMBER_ONBOARDING_DIRECTORY,'/run/private/members');
+ assert.ok(api.volumes.some(value=>value.endsWith('/member-http.json:/run/private/members/http.json:ro')));
+ assert.ok(api.volumes.some(value=>value.endsWith('/member-worker.json:/run/private/members/worker.json:ro')));
+ assert.deepEqual(compose.services.pod.networks.identity.aliases,['c4g-activation-bridge']);
+ assert.equal(compose.services.pod.ports.some(value=>value.includes('5285')),false);
+ assert.equal(values.RESEND_API_KEY,undefined,'invitation transport key belongs in the IPC worker file');
+});
+
+test('billing worker is separately selected and cannot read installer or API credentials',()=>{
+ const service=compose.services['billing-mail'];
+ assert.deepEqual(service.profiles,['billing-mail']);
+ assert.deepEqual(service.command,['node','src/billingValidation/workerMain.js']);
+ assert.match(service.env_file[0].path,/\/billing-mail.env$/);
+ assert.doesNotMatch(JSON.stringify(service),/api.env|bootstrap.env|install.env|central-logins|member-worker/);
+ assert.equal(service.read_only,true);assert.deepEqual(service.cap_drop,['ALL']);
 });
 
 test('six API credential names map to the actual production capability contract with verified TLS',()=>{
@@ -77,10 +121,10 @@ test('auth template fails until secrets are supplied and uses the registered MFA
 
 test('profiles preserve manual/PT2030 and PDF while explicitly keeping unsupported variants out of rehearsal',()=>{
  const values=env('api.env.example');
- for(const [name,value] of Object.entries({FUNDING_TENDERS_RUNTIME:'central',FUNDING_TENDERS_SOURCE:'unconfigured',CENTRAL_PT2030_IMPORT_RUNTIME:'catalog',BILLING_PDF_RUNTIME:'private',DOCUMENTS_RUNTIME:'disabled',OPPORTUNITY_IMPORTS_RUNTIME:'disabled',OPPORTUNITY_ACTIVATION_RUNTIME:'disabled',CATALOG_READ_RUNTIME:'disabled',MEMBER_ONBOARDING_RUNTIME:'disabled',USER_DELETION_RUNTIME:'disabled'}))assert.equal(values[name],value);
+ for(const [name,value] of Object.entries({FUNDING_TENDERS_RUNTIME:'central',FUNDING_TENDERS_SOURCE:'unconfigured',CENTRAL_PT2030_IMPORT_RUNTIME:'catalog',BILLING_PDF_RUNTIME:'private',DOCUMENTS_RUNTIME:'disabled',OPPORTUNITY_IMPORTS_RUNTIME:'disabled',OPPORTUNITY_ACTIVATION_RUNTIME:'disabled',CATALOG_READ_RUNTIME:'disabled',MEMBER_ONBOARDING_RUNTIME:'central',USER_DELETION_RUNTIME:'central',BILLING_VALIDATION_RUNTIME:'central',EMAIL_AUTHENTICATION_RUNTIME:'keycloak-restricted-v1',EMAIL_HISTORY_RUNTIME:'central-keycloak-v1'}))assert.equal(values[name],value);
  assert.equal(values.C4G_CLAMAV_HOST,'127.0.0.1');
  assert.equal(values.F12_RECEIPT_RECOVERY_DATABASE_URL,undefined);
- assert.match(read('api.env.example'),/NOT approval to remove those features/);
+ assert.match(read('api.env.example'),/NOT RUNNABLE/);
 });
 
 test('unfilled password sample is refused by the real installer before any mutation',async()=>{

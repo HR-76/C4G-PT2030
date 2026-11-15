@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "app": {
+    "origin": "https://gcni.c4g.ai",
+    "oidcClientId": "c4g-production-web",
+    "trustedProxyHops": 1,
+    "uiKeyId": "production-1"
+  },
+  "identity": {
+    "issuer": "https://login.c4g.ai/realms/REPLACE_REALM",
+    "adminOrigin": "http://c4g-production-keycloak:8080",
+    "memberClientId": "c4g-production-member-worker",
+    "manualClientId": "c4g-production-member-activation",
+    "existingClientId": "c4g-production-member-existing",
+    "bridgeEndpoint": "http://c4g-activation-bridge:5285/bridge/check",
+    "certificate": null
+  },
+  "email": {
+    "activationFrom": "C4G <REPLACE_ACTIVATION_MAILBOX>",
+    "billingFrom": "C4G <REPLACE_BILLING_MAILBOX>",
+    "smtp": {
+      "host": "REPLACE_SMTP_HOST",
+      "port": 587,
+      "username": "REPLACE_SMTP_USERNAME",
+      "from": "REPLACE_AUTHENTICATION_MAILBOX",
+      "fromDisplayName": "C4G"
+    }
+  }
+}

@@ -5,16 +5,17 @@ const {Pool}=require('pg');
 const {accountIdentityErasureManifest}=require('../../src/security/tenantMigrationManifest');
 const {bindingDigest}=require('../../src/security/localTenantCredentialAdapter');
 const {validateLocalTenantRoleChain}=require('../../src/security/localTenantIdentityProvisioner');
+const {PRODUCTION_EDITORIAL_PROFILE:PROFILE_CODE,requireTenantApiProfile}=require('../../src/security/tenantApiProfile');
+const {literal}=require('./config');
 const AGGREGATOR='c4g_tenant_api_capabilities';
-const FUNCTIONAL_ROLES=Object.freeze(['c4g_opportunity_tenant_runtime','c4g_f4_metadata_executor']);
+const FUNCTIONAL_ROLES=requireTenantApiProfile(PROFILE_CODE).functionalRoles;
 const ATTRIBUTES='NOINHERIT NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION';
 function identifier(value){if(!/^[a-z][a-z0-9_]{0,62}$/.test(value||''))throw Error('PRODUCTION_TENANT_IDENTIFIER_INVALID');return '"'+value+'"';}
-function literal(value){return "'"+value.replace(/'/g,"''")+"'";}
 function refuse(code){throw Object.assign(new Error(code),{code});}
 
 function tenantProfileMarker(config){
  const {installationId,target,organization,tenant}=config;
- const intent={installationId,host:target.host,port:target.port,expectedSystemIdentifier:target.expectedSystemIdentifier,centralDatabase:target.centralDatabase,tenantDatabase:target.tenantDatabase,
+ const intent={installationId,profile:PROFILE_CODE,host:target.host,port:target.port,expectedSystemIdentifier:target.expectedSystemIdentifier,centralDatabase:target.centralDatabase,tenantDatabase:target.tenantDatabase,
   ssl:target.ssl,organizationId:organization.id,tenantId:tenant.id,generationId:tenant.generationId,login:tenant.apiLogin,credentialRef:tenant.credentialRef};
  return 'C4G_PRODUCTION_TENANT_API:'+createHash('sha256').update(JSON.stringify(intent)).digest('hex');
 }
@@ -85,6 +86,7 @@ async function provisionTenantApiProfile({pool,config,password},dependencies={})
    await client.query(`COMMENT ON ROLE ${login} IS ${literal(marker)}`);
    await client.query(`GRANT ${AGGREGATOR} TO ${login} WITH SET TRUE, INHERIT FALSE, ADMIN FALSE`);
    await client.query(`GRANT c4g_opportunity_tenant_runtime TO ${AGGREGATOR} WITH SET TRUE, INHERIT FALSE, ADMIN FALSE`);
+   await client.query(`GRANT c4g_organization_profile_runtime TO ${AGGREGATOR} WITH SET TRUE, INHERIT FALSE, ADMIN FALSE`);
    await client.query(`GRANT CONNECT ON DATABASE ${database} TO ${login}`);
    state='PROVISIONED';
   }
@@ -98,7 +100,7 @@ async function provisionTenantApiProfile({pool,config,password},dependencies={})
 }
 
 async function verifyTenantConnection({config,snapshot,tenantCredentials},{PoolClass=Pool,createRuntime=require('../../src/config/opportunityRuntime').createConfiguredOpportunityRuntime}={}){
- const runtime=createRuntime({centralPool:{query(){refuse('PRODUCTION_TENANT_CENTRAL_QUERY_FORBIDDEN');}},env:{
+ const runtime=createRuntime({centralPool:{query(){refuse('PRODUCTION_TENANT_CENTRAL_QUERY_FORBIDDEN');}},editorialEnabled:true,env:{
   OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([tenantCredentials]),
   OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify([{regionCode:config.tenant.regionCode,policyVersion:config.tenant.residencyPolicyVersion}])}});
  const candidate=new PoolClass({host:tenantCredentials.host,port:tenantCredentials.port,database:tenantCredentials.database,user:tenantCredentials.login,
@@ -162,4 +164,4 @@ async function installTenant({tenantPool,config,credentials},dependencies={}){
  return {snapshot,tenantCredentials};
 }
 
-module.exports={installTenant,provisionTenantApiProfile,verifyTenantConnection,tenantProfileMarker,validateFreshBaseline,FUNCTIONAL_ROLES};
+module.exports={installTenant,provisionTenantApiProfile,verifyTenantConnection,tenantProfileMarker,validateFreshBaseline,FUNCTIONAL_ROLES,PROFILE_CODE};

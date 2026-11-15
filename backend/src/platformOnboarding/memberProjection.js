@@ -2,16 +2,18 @@
 const {Pool}=require('pg');
 const {uuid,hash,fail}=require('./contracts');
 // allowedResidency: the regions the tenant credentials may live in; the local installation is the default.
-function createMemberProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}],createPool=options=>new Pool(options)}){
+function createMemberProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}],createPool=options=>new Pool(options),tenantApiProfile}){
+ const profile=require('../security/tenantApiProfile').requireTenantApiProfile(tenantApiProfile);
  return {async ensure(x){
   for(const key of ['operationId','organizationId','globalUserId','membershipId'])uuid(x[key]);
   const entry=bindings.find(b=>b.organizationId===x.organizationId);if(!entry)fail('ONBOARDING_NOT_READY');
   const {credentials,snapshot}=entry;
   if(snapshot.organizationId!==x.organizationId||snapshot.tenantId!==credentials.tenantId||snapshot.databaseRef!==credentials.database)fail('ONBOARDING_NOT_READY');
-  const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});
+  const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},editorialEnabled:profile.editorialEnabled,env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});
   const pool=createPool({host:credentials.host,port:credentials.port,database:credentials.database,user:credentials.login,password:credentials.password,ssl:credentials.ssl?{rejectUnauthorized:true}:false,max:1});
-  const c=await pool.connect();let begun=false;
+  let c,begun=false;
   try{
+   c=await pool.connect();
    await runtime.bindingVerifier.verify({client:c,snapshot,requiredCapabilities:[],correlationId:x.operationId,phase:'PREPARATION'});
    await c.query('BEGIN');begun=true;await c.query("SELECT set_config('app.organization_id',$1,true)",[x.organizationId]);await c.query('SET LOCAL ROLE c4g_opportunity_tenant_runtime');
    const digest=hash(JSON.stringify({organizationId:x.organizationId,membershipId:x.membershipId,name:x.input.adminName,email:x.input.adminEmail}));
@@ -25,7 +27,7 @@ function createMemberProjection({bindings,allowedResidency=[{regionCode:'LOCAL',
     await c.query("INSERT INTO organizational_scope.directory_receipt(organization_id,idempotency_key,subject_id,operation,resource_id,intention_digest,result_projection) VALUES($1,$2,$3,'PERSON_CREATE',$4,$5,$6)",[x.organizationId,x.operationId,x.globalUserId,x.membershipId,digest,JSON.stringify({personId:x.membershipId,membershipId:x.membershipId})]);
    }
    await c.query('COMMIT');begun=false;return {operationId:x.operationId,organizationId:x.organizationId,globalUserId:x.globalUserId,membershipId:x.membershipId,projected:true};
-  }catch(e){if(begun)await c.query('ROLLBACK').catch(()=>{});throw e;}finally{c.release();await pool.end();await runtime.poolManager.closeAll();}
+  }catch(e){if(begun)await c.query('ROLLBACK').catch(()=>{});throw e;}finally{c?.release();await pool.end();await runtime.poolManager.closeAll();}
  }};
 }
 module.exports={createMemberProjection};

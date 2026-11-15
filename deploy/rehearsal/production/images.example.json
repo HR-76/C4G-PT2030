@@ -1,0 +1,5 @@
+{
+  "applicationImage": "REPLACE_CANDIDATE_REPOSITORY@sha256:REPLACE_REAL_IMAGE_DIGEST",
+  "postgresImage": "postgres:18.6-bookworm@sha256:REPLACE_REAL_IMAGE_DIGEST",
+  "revision": "REPLACE_FULL_CANDIDATE_COMMIT_SHA"
+}

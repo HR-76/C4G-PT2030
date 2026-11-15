@@ -18,17 +18,32 @@ function administrativeConnection(adminPool, config, database) {
 // Insecure loopback is available only to the in-process disposable integration gate;
 // it has no CLI flag or environment switch. The CLI always verifies TLS.
 async function install({ adminPool, config: input, credentials: privateInput, apply = false, identityToken,
-  fetchImpl, allowInsecureLoopback = false, onPhase = async () => {}, afterMigrationSql = null }) {
+  fetchImpl, allowInsecureLoopback = false, onPhase = async () => {}, afterMigrationSql = null,
+  runtimeConfig: runtimeInput = null, runtimeCredentials: runtimePrivateInput = null, onRuntimeArtifacts = async () => {} }) {
   const config = validateConfig(input, { allowInsecureLoopback });
   if (typeof apply !== 'boolean') throw Error('PRODUCTION_APPLY_INVALID');
+  if (runtimePrivateInput !== null && runtimeInput === null) throw Error('PRODUCTION_RUNTIME_CONFIGURATION_REQUIRED');
+  const runtimeModule = runtimeInput !== null ? require('./productionBootstrap/runtimeConfiguration') : null;
+  const runtimeConfig = runtimeModule?.validateRuntimeConfig(runtimeInput, config);
   const observed = await inspectTarget(adminPool, config);
+  const requireBoundRuntime = async () => {
+    if (!runtimeConfig && (await adminPool.query('SELECT 1 FROM pg_roles WHERE rolname=$1',
+      [require('./productionBootstrap/runtimeIntent').ROLE])).rowCount) throw Error('PRODUCTION_RUNTIME_CONFIGURATION_REQUIRED');
+  };
+  await requireBoundRuntime();
   const plan = { installationId: config.installationId, intentDigest: configDigest(config),
     centralVersion: CENTRAL_VERSION, tenantVersion: TENANT_VERSION, resume: observed.resume,
-    databases: [config.target.centralDatabase, config.target.tenantDatabase] };
+    databases: [config.target.centralDatabase, config.target.tenantDatabase],
+    ...(runtimeConfig ? { runtimeConfigurationDigest: runtimeModule.runtimeConfigDigest(runtimeConfig) } : {}) };
   if (!apply) return { apply: false, ...plan, administratorVerification: 'REQUIRED_ON_APPLY' };
   const credentials = validateCredentials(privateInput);
+  const runtimeCredentials = runtimeConfig ? runtimeModule.validateRuntimeCredentials(runtimePrivateInput) : null;
+  if (runtimeCredentials) {
+    const secrets = [...Object.values(credentials.central), credentials.tenantApi, credentials.permitSecret, ...Object.values(runtimeCredentials)];
+    if (new Set(secrets).size !== secrets.length) throw Error('PRODUCTION_RUNTIME_SECRETS_MUST_BE_SEPARATE');
+  }
   const identity = require('./productionBootstrap/identity');
-  const identityProof = await identity.verifyAdministrator(config, { token: identityToken, fetchImpl });
+  const identityProof = await identity.verifyAdministrator(config, { token: identityToken, fetchImpl, adminOrigin: runtimeConfig?.identity.adminOrigin });
   const guard = await adminPool.connect(), pools = [];
   const own = options => { const pool = new Pool(options); pools.push(pool); return pool; };
   let locked = false;
@@ -37,7 +52,13 @@ async function install({ adminPool, config: input, credentials: privateInput, ap
     if (!row?.acquired) throw Error('PRODUCTION_INSTALLER_ALREADY_RUNNING');
     locked = true;
     await inspectTarget(adminPool, config);
+    await requireBoundRuntime();
     await ensureDatabases(adminPool, config, credentials);
+    if (runtimeConfig) {
+      const intent = require('./productionBootstrap/runtimeIntent');
+      await intent.bindRuntimeIntent({ pool: adminPool, installationMarker: require('./productionBootstrap/cluster').ownership(config),
+        publicDigest: plan.runtimeConfigurationDigest, material: intent.runtimeSecretProof(runtimeConfig, runtimeCredentials) });
+    }
     await onPhase('databases-ready');
     const centralPool = own(administrativeConnection(adminPool, config, config.target.centralDatabase));
     const tenantPool = own(administrativeConnection(adminPool, config, config.target.tenantDatabase));
@@ -47,6 +68,7 @@ async function install({ adminPool, config: input, credentials: privateInput, ap
       await onPhase('central-migrated');
       await require('../src/audit/partitionMaintenance').ensureAuditPartitionsWithPool(centralPool);
       await provisionCentralProfiles({ centralPool, config, credentials });
+      if (runtimeConfig) await require('./productionBootstrap/billing').provisionBillingProfile({ centralPool, config, password: runtimeCredentials.billingDatabasePassword });
       await onPhase('central-profiles-ready');
       tenant = await require('./productionBootstrap/tenant').installTenant({ adminPool, tenantPool, config, credentials });
       await onPhase('tenant-ready');
@@ -54,16 +76,29 @@ async function install({ adminPool, config: input, credentials: privateInput, ap
     const technical = await inspectRole(adminPool);
     if (technical.can_login || technical.superuser || technical.members) throw Error('PRODUCTION_INSTALLER_ROLE_UNSAFE');
     const logins = await validateCentralProfiles({ config, credentials, Pool });
+    if (runtimeConfig) {
+      const billing = require('./productionBootstrap/billing');
+      await billing.validateBillingProfile({ config, password: runtimeCredentials.billingDatabasePassword, Pool });
+      logins.billingMail = billing.BILLING_LOGIN;
+    }
     await require('../src/security/centralMigrationPreflight').preflightCentral(centralPool);
     const authorityPool = own({ ...administrativeConnection(adminPool, config, config.target.centralDatabase),
       user: 'c4g_authority_runtime', password: credentials.central.authority });
     await identity.bootstrapIdentity({ centralPool, authorityPool, ...tenant, config, identityProof,
       permitSecret: credentials.permitSecret, onPhase });
+    if (runtimeConfig) {
+      const coordinator = require('../src/security/authorityCoordinator').createAuthorityCoordinator({ pool: authorityPool, permitSecret: credentials.permitSecret });
+      const directory = require('../src/security/tenantDirectoryReader').createTenantDirectoryReader({ coordinator, organizations: [config.organization.id], workload: 'API' });
+      const snapshot = await directory.resolveSnapshotByOrganization(config.organization.id, 'API');
+      await onRuntimeArtifacts(runtimeModule.buildRuntimeArtifacts({ bootstrapConfig: config, runtimeConfig, runtimeCredentials,
+        tenantCredentials: tenant.tenantCredentials, snapshot }));
+    }
     await onPhase('identity-ready');
     return { installed: true, installationId: plan.installationId, intentDigest: plan.intentDigest,
       centralVersion: CENTRAL_VERSION, tenantVersion: TENANT_VERSION, organizationId: config.organization.id,
       tenantId: config.tenant.id, administratorId: config.administrator.globalUserId,
-      organizationProfile: config.administrator.organizationProfile, mfa: 'OPTIONAL', logins: { ...logins, tenantApi: config.tenant.apiLogin } };
+      organizationProfile: config.administrator.organizationProfile, mfa: 'OPTIONAL', logins: { ...logins, tenantApi: config.tenant.apiLogin },
+      ...(runtimeConfig ? { runtimeConfigurationDigest: plan.runtimeConfigurationDigest } : {}) };
   } finally {
     await Promise.allSettled(pools.map(pool => pool.end()));
     // Discarding this session releases the cluster-wide installation lock even after failure.
@@ -75,7 +110,7 @@ function runtimeArtifacts(config, credentials, receipt) {
   const logins = { ...require('./installProductionCentral').LOGINS, authority: 'c4g_authority_runtime' };
   const variables = { read: 'CENTRAL_DATABASE_URL', commands: 'CENTRAL_COMMANDS_DATABASE_URL', authoring: 'CENTRAL_AUTHORING_DATABASE_URL',
     logs: 'CENTRAL_LOGS_DATABASE_URL', catalog: 'CATALOG_DATABASE_URL', authority: 'AUTHORITY_DATABASE_URL', retention: 'CENTRAL_EMAIL_RETENTION_DATABASE_URL' };
-  const lines = ['CENTRAL_RUNTIME_PROFILE=production-v1'];
+  const lines = ['CENTRAL_RUNTIME_PROFILE=production-v1', 'PROFILE_EDITORIAL_RUNTIME=f13-editorial', 'PQ1_ACTIVATION_RUNTIME=f13-f14-pq1'];
   const retentionLines = ['NODE_ENV=production', 'CENTRAL_RUNTIME_PROFILE=production-v1'];
   for (const [key, login] of Object.entries(logins)) {
     const url = new URL('postgresql://localhost');
@@ -111,6 +146,7 @@ function writeArtifacts(directory, artifacts) {
   if (fs.lstatSync(directory).isSymbolicLink()) throw Error('PRODUCTION_OUTPUT_DIRECTORY_UNSAFE');
   if (process.platform !== 'win32') fs.chmodSync(directory, 0o700);
   for (const [name, body] of Object.entries(artifacts)) {
+    if (!/^[a-z][a-z0-9.-]*$/.test(name) || typeof body !== 'string') throw Error('PRODUCTION_OUTPUT_ARTIFACT_INVALID');
     const file = path.join(directory, name);
     if (fs.existsSync(file)) {
       if (fs.lstatSync(file).isSymbolicLink() || fs.readFileSync(file, 'utf8') !== body) throw Error('PRODUCTION_OUTPUT_CONFLICT');
@@ -122,6 +158,9 @@ async function main() {
   const args = parseArguments(process.argv.slice(2));
   const config = validateConfig(JSON.parse(fs.readFileSync(args.config, 'utf8')));
   const credentials = args.apply ? validateCredentials(JSON.parse(fs.readFileSync(args.credentials, 'utf8'))) : undefined;
+  const runtimeConfig = args.runtimeConfig ? require('./productionBootstrap/runtimeConfiguration').validateRuntimeConfig(
+    JSON.parse(fs.readFileSync(args.runtimeConfig, 'utf8')), config) : null;
+  const runtimeCredentials = args.apply && args.runtimeCredentials ? JSON.parse(fs.readFileSync(args.runtimeCredentials, 'utf8')) : null;
   let url;
   try { url = new URL(process.env.PRODUCTION_INSTALL_DATABASE_URL); } catch { throw Error('PRODUCTION_ADMIN_CONNECTION_REQUIRED'); }
   if (!['postgres:', 'postgresql:'].includes(url.protocol) || url.hostname.replace(/^\[|\]$/g, '') !== config.target.host
@@ -130,8 +169,10 @@ async function main() {
   const adminPool = new Pool({ host: config.target.host, port: config.target.port, database: 'postgres', ssl: config.target.ssl,
     user: decodeURIComponent(url.username), password: decodeURIComponent(url.password), max: 4, connectionTimeoutMillis: 10000 });
   try {
-    const receipt = await install({ adminPool, config, credentials, apply: args.apply, identityToken: process.env.PRODUCTION_BOOTSTRAP_KEYCLOAK_TOKEN });
-    if (args.apply) writeArtifacts(path.resolve(args.outputDir), runtimeArtifacts(config, credentials, receipt));
+    let preparedRuntime = {};
+    const receipt = await install({ adminPool, config, credentials, apply: args.apply, identityToken: process.env.PRODUCTION_BOOTSTRAP_KEYCLOAK_TOKEN,
+      runtimeConfig, runtimeCredentials, onRuntimeArtifacts: artifacts => { preparedRuntime = artifacts; } });
+    if (args.apply) writeArtifacts(path.resolve(args.outputDir), { ...runtimeArtifacts(config, credentials, receipt), ...preparedRuntime });
     process.stdout.write(JSON.stringify(receipt) + '\n');
   } finally { await adminPool.end(); }
 }

@@ -12,6 +12,18 @@ const proof = c => ({ issuer: c.administrator.issuer, subject: c.administrator.s
 const providerUser = c => ({ id: c.administrator.subject, email: c.administrator.email, enabled: true, emailVerified: true, requiredActions: [] });
 const snapshot = c => ({ organizationId: c.organization.id, tenantId: c.tenant.id, databaseGenerationId: c.tenant.generationId, databaseRef: 'tenant_production', credentialRef: 'production-tenant', regionCode: 'EU', residencyPolicyVersion: 'production-v1', schema: { currentVersion: '041_account_identity_erasure' } });
 
+test('bootstrap verifies the administrator through the admitted private Keycloak origin', async () => {
+  const c = config(), requests = [];
+  const result = await verifyAdministrator(c, { token: 'private-test-token', adminOrigin: 'http://c4g-production-keycloak:8080',
+    fetchImpl: async (url, options) => { requests.push({ url, options }); return { ok: true, json: async () => providerUser(c) }; } });
+  assert.deepEqual(result, proof(c));
+  assert.equal(requests[0].url, `http://c4g-production-keycloak:8080/admin/realms/production/users/${c.administrator.subject}`);
+  assert.equal(requests[0].options.redirect, 'error');
+  for (const adminOrigin of ['http://outside.example.test:8080', 'https://user:secret@example.test', 'https://id.example.test/path', 'http://c4g-production-keycloak:8080?x=y']) {
+    await assert.rejects(verifyAdministrator(c, { token: 'private-test-token', adminOrigin, fetchImpl: () => assert.fail('must reject origin before network') }), /PRODUCTION_IDENTITY_CONFIGURATION_INVALID/);
+  }
+});
+
 test('production administrator verification is a bounded read-only provider call and preserves optional MFA', async () => {
   const c = config(); const requests = [];
   const result = await verifyAdministrator(c, { token: 'private-test-token', fetchImpl: async (url, options) => { requests.push({ url, options }); return { ok: true, json: async () => ({ ...providerUser(c), requiredActions: ['CONFIGURE_TOTP'] }) }; } });
@@ -194,6 +206,7 @@ test('production projection factory receives the organization lookup key require
     assert.equal(entry.snapshot.organizationId, entry.organizationId);
     assert.equal(entry.snapshot.tenantId, entry.credentials.tenantId);
     assert.equal(entry.snapshot.databaseRef, entry.credentials.database);
+    assert.equal(options.tenantApiProfile, 'production-editorial-v1');
     return projection(options);
   };
   await bootstrapIdentity(h.args);

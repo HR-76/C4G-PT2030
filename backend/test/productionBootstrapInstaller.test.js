@@ -79,7 +79,7 @@ test('default production installer plan only reads the target and never reads cr
   assert.deepEqual(receipt, { apply: false, installationId: input.installationId, intentDigest: configDigest(input),
     centralVersion: '058_platform_account_lifecycle', tenantVersion: '041_account_identity_erasure', resume: false,
     databases: ['prod_central', 'prod_tenant'], administratorVerification: 'REQUIRED_ON_APPLY' });
-  assert.equal(statements.length, 5);
+  assert.equal(statements.length, 6);
   assert.equal(JSON.stringify(receipt).includes('private-admin-canary'), false);
 });
 
@@ -89,7 +89,7 @@ test('invalid apply or missing credentials cannot acquire the installation lock'
   assert.equal(statements.length, 0);
   await assert.rejects(install({ adminPool: pool, config: input, apply: true,
     fetchImpl() { assert.fail('Missing credentials must fail before Keycloak'); } }), /PRODUCTION_BOOTSTRAP_CREDENTIALS_INVALID/);
-  assert.equal(statements.length, 5);
+  assert.equal(statements.length, 6);
 });
 
 test('unverified first administrator fails before lock or database writes', async () => {
@@ -101,7 +101,7 @@ test('unverified first administrator fails before lock or database writes', asyn
         enabled: false, emailVerified: true, requiredActions: [] }; } };
     } }), /PRODUCTION_ADMINISTRATOR_UNVERIFIED/);
   assert.deepEqual(requests, [{ url: 'https://login.c4g.ai/admin/realms/synthetic/users/synthetic-subject', method: 'GET', redirect: 'error' }]);
-  assert.equal(statements.length, 5);
+  assert.equal(statements.length, 6);
 });
 
 test('busy installer lock is released without database mutations', async () => {
@@ -110,7 +110,7 @@ test('busy installer lock is released without database mutations', async () => {
     release() { released = true; } });
   await assert.rejects(install({ adminPool: pool, config: input, credentials: credentials(), apply: true,
     identityToken: 'synthetic-private-token', fetchImpl: verifiedUser(input) }), /PRODUCTION_INSTALLER_ALREADY_RUNNING/);
-  assert.equal(released, true); assert.equal(statements.length, 5);
+  assert.equal(released, true); assert.equal(statements.length, 6);
 });
 
 test('target identity is rechecked under the lock and failure discards the guard before writes', async () => {
@@ -120,7 +120,7 @@ test('target identity is rechecked under the lock and failure discards the guard
   await assert.rejects(install({ adminPool: pool, config: input, credentials: credentials(), apply: true,
     identityToken: 'synthetic-private-token', fetchImpl: verifiedUser(input) }), /PRODUCTION_SYSTEM_IDENTIFIER_MISMATCH/);
   assert.equal(releaseError?.message, 'PRODUCTION_INSTALLER_GUARD_DISPOSED');
-  assert.equal(statements.length, 6);
+  assert.equal(statements.length, 7);
 });
 
 test('runtime artifacts bind separate limited logins and safely encode punctuation in each database URL', () => {
@@ -128,6 +128,8 @@ test('runtime artifacts bind separate limited logins and safely encode punctuati
   const artifacts = runtimeArtifacts(input, secrets, receipt);
   const env = environment(artifacts['central-runtime.env']), retentionEnv = environment(artifacts['retention-runtime.env']);
   assert.equal(env.CENTRAL_RUNTIME_PROFILE, 'production-v1');
+  assert.equal(env.PROFILE_EDITORIAL_RUNTIME, 'f13-editorial');
+  assert.equal(env.PQ1_ACTIVATION_RUNTIME, 'f13-f14-pq1');
   const variables = { read: 'CENTRAL_DATABASE_URL', commands: 'CENTRAL_COMMANDS_DATABASE_URL', authoring: 'CENTRAL_AUTHORING_DATABASE_URL',
     logs: 'CENTRAL_LOGS_DATABASE_URL', retention: 'CENTRAL_EMAIL_RETENTION_DATABASE_URL', catalog: 'CATALOG_DATABASE_URL', authority: 'AUTHORITY_DATABASE_URL' };
   const logins = new Set();

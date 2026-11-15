@@ -6,14 +6,15 @@ async function anonymizePerson(client,value){
  if(result.rows.length!==1||!result.rows[0].person_id)fail('PROJECTION_DELETION_UNCONFIRMED');
  return {organizationId:org,membershipId:member,anonymized:true};
 }
-function createDeletionProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}]}){
+function createDeletionProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}],tenantApiProfile,createPool=options=>new (require('pg').Pool)(options)}){
+ const profile=require('../security/tenantApiProfile').requireTenantApiProfile(tenantApiProfile);
  async function run(value,readOnly=false){
   for(const key of ['organizationId','membershipId','globalUserId','requestId'])uuid(value[key]);
   const entry=bindings.find(b=>b.organizationId===value.organizationId);if(!entry)fail('PROJECTION_DELETION_UNCONFIRMED');
   const {credentials,snapshot}=entry;
   if(snapshot.organizationId!==value.organizationId||snapshot.tenantId!==credentials.tenantId||snapshot.databaseRef!==credentials.database)fail('PROJECTION_DELETION_UNCONFIRMED');
-  const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});
-  const pool=new (require('pg').Pool)({host:credentials.host,port:credentials.port,database:credentials.database,user:credentials.login,password:credentials.password,ssl:credentials.ssl?{rejectUnauthorized:true}:false,max:1});
+  const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},editorialEnabled:profile.editorialEnabled,env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});
+  const pool=createPool({host:credentials.host,port:credentials.port,database:credentials.database,user:credentials.login,password:credentials.password,ssl:credentials.ssl?{rejectUnauthorized:true}:false,max:1});
   let client,begun=false;
   try{
    client=await pool.connect();

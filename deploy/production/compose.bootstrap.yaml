@@ -1,0 +1,33 @@
+name: c4g-production-bootstrap
+
+# Initial installation has no dependency on runtime files that it will generate.
+# Keep this service identical to the explicit bootstrap service in compose.yaml.
+services:
+  bootstrap:
+    profiles: [bootstrap]
+    image: ${C4G_PRODUCTION_IMAGE:?immutable application image digest required}
+    restart: "no"
+    command: [node, scripts/installProductionPlatform.js, --config, /run/private/bootstrap.config.json, --credentials, /run/private/bootstrap.credentials.json, --runtime-config, /run/private/runtime.config.json, --runtime-credentials, /run/private/runtime.credentials.json, --output-dir, /run/output]
+    env_file:
+      - path: /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/bootstrap.env
+        format: raw
+    environment: {NODE_EXTRA_CA_CERTS: /certs/ca.pem}
+    volumes:
+      - /srv/c4g-production/postgres/certs/ca.pem:/certs/ca.pem:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/bootstrap.config.json:/run/private/bootstrap.config.json:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/bootstrap.credentials.json:/run/private/bootstrap.credentials.json:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/runtime.config.json:/run/private/runtime.config.json:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/runtime.credentials.json:/run/private/runtime.credentials.json:ro
+      - /srv/c4g-production/config/${C4G_PRODUCTION_CONFIG:?configuration id required}/bootstrap-output:/run/output:rw
+    networks: [data, identity]
+    read_only: true
+    tmpfs: [/tmp:size=64m,mode=1777]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+networks:
+  data: {external: true, name: c4g-production-data}
+  identity: {external: true, name: c4g-production-identity}

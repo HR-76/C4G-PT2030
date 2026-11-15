@@ -144,7 +144,8 @@ function literal(value) {
 function parseArguments(argv) {
   if (!Array.isArray(argv)) fail(ARGUMENTS_ERROR);
   const result = { config: null, credentials: null, outputDir: null, apply: false }, seen = new Set();
-  const flags = { '--config': 'config', '--credentials': 'credentials', '--output-dir': 'outputDir' };
+  const flags = { '--config': 'config', '--credentials': 'credentials', '--output-dir': 'outputDir',
+    '--runtime-config': 'runtimeConfig', '--runtime-credentials': 'runtimeCredentials' };
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index];
     if (seen.has(flag)) fail(ARGUMENTS_ERROR);
@@ -157,6 +158,7 @@ function parseArguments(argv) {
     result[flags[flag]] = value;
   }
   if (!result.config || !result.outputDir || (result.apply && !result.credentials)) fail(ARGUMENTS_ERROR);
+  if ((result.runtimeCredentials && !result.runtimeConfig) || (result.apply && result.runtimeConfig && !result.runtimeCredentials)) fail(ARGUMENTS_ERROR);
   return Object.freeze(result);
 }
 

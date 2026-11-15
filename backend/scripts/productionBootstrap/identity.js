@@ -52,12 +52,17 @@ function bootstrapIds(config) {
   return Object.freeze({ identityRefId: derive('identity'), assignmentId: derive('platform-administrator') });
 }
 
-async function verifyAdministrator(config, { token, fetchImpl = fetch } = {}) {
+async function verifyAdministrator(config, { token, fetchImpl = fetch, adminOrigin = null } = {}) {
   const a = administrator(config), issuer = new URL(a.issuer);
   if (typeof token !== 'string' || !token || /[\r\n]/.test(token) || typeof fetchImpl !== 'function') fail('PRODUCTION_IDENTITY_CONFIGURATION_INVALID');
+  let administration;
+  try { administration = new URL(adminOrigin ?? issuer.origin); } catch { fail('PRODUCTION_IDENTITY_CONFIGURATION_INVALID'); }
+  const privateHttp = administration.protocol === 'http:' && ['c4g-production-keycloak', 'c4g-rehearsal-keycloak'].includes(administration.hostname) && administration.port === '8080';
+  if ((administration.protocol !== 'https:' && !privateHttp) || administration.origin !== (adminOrigin ?? issuer.origin)
+    || administration.username || administration.password || /staging/i.test(administration.hostname)) fail('PRODUCTION_IDENTITY_CONFIGURATION_INVALID');
   let user;
   try {
-    const response = await fetchImpl(`${issuer.origin}/admin${issuer.pathname}/users/${encodeURIComponent(a.subject)}`, {
+    const response = await fetchImpl(`${administration.origin}/admin${issuer.pathname}/users/${encodeURIComponent(a.subject)}`, {
       method: 'GET', redirect: 'error', signal: AbortSignal.timeout(15000), headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
     });
     if (!response.ok) fail('PRODUCTION_IDENTITY_PROVIDER_UNAVAILABLE');
@@ -160,6 +165,7 @@ async function bootstrapIdentity({ centralPool, authorityPool, permitSecret, ten
   await onPhase('directory-published');
   if (a.organizationProfile) {
     const projection = (ports.createProjection || require('../../src/platformOnboarding/memberProjection').createMemberProjection)({
+      tenantApiProfile: require('../../src/security/tenantApiProfile').PRODUCTION_EDITORIAL_PROFILE,
       bindings: [{ organizationId: o.id, credentials: tenantCredentials, snapshot: published }], allowedResidency: [{ regionCode: snapshot.regionCode, policyVersion: snapshot.residencyPolicyVersion }],
       createPool: options => new Pool({ ...options, ssl: config.target?.ssl ?? options.ssl })
     });
