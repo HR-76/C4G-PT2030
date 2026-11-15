@@ -5,7 +5,8 @@ Decisão do utilizador em 2026-11-14: apenas C4G_ADMIN pode eliminar contas; ret
 ## Contrato
 
 - Ação «Eliminar conta» no diretório global de utilizadores C4G, com revisão do nome/email, consequências e confirmação escrita ELIMINAR. Não disponível ao administrador de entidade.
-- Autorização C4G e MFA recente novamente no servidor em cada pedido, incluindo retoma. Impedir autoeliminação e eliminação do último administrador ativo C4G ou da entidade.
+- Autorização C4G e autenticação recente conforme a categoria privilegiada da política reconhecida, novamente no servidor em cada pedido, incluindo retoma. A decisão de [MFA opcional em toda a aplicação](../decisions/2026-10-17-user-optional-mfa.md) também se aplica aqui: não exigir OTP na política `c4g-user-mfa-v1`; conservar MFA nos ambientes que usam a política anterior. Impedir autoeliminação e eliminação do último administrador ativo C4G ou da entidade.
+- Quando falta autenticação recente, disponibilizar «Confirmar sessão» através do step-up OIDC existente e regressar ao diretório. Nunca executar uma eliminação automaticamente após o regresso: o administrador volta a abrir a conta e confirma ELIMINAR.
 - Antes de efeitos externos, persistir pedido idempotente e revogar conta, vínculos, convites e sessões numa transação coordenada. Não permitir reativação normal de conta eliminada.
 - Eliminar identidade Keycloak pelo issuer/subject verificados no servidor, nunca por email. Falha ou resposta perdida mantém acesso bloqueado e pedido retomável; não apresentar conclusão antes de confirmar cada etapa.
 - Anonimizar nome, email, função e perfil descritivo nas fichas associadas de todas as entidades, conservando IDs e relações para candidaturas, equipas, tarefas e auditoria. Anonimizar também os dados estruturados dos pedidos de criação e convites. Não substituir texto arbitrário dentro de documentos ou mensagens.
