@@ -1,16 +1,18 @@
 export const emailTypes = {
   'member-invitation': 'Convite de colaborador',
+  'password-reset': 'Reposição de palavra-passe',
 }
 
-// The types the Email list shows. Only those with `configurable` open an editor;
-// the others are sent by the authentication service and wait for phase 2.
+// The invitation remains available with the original API. Authentication
+// templates additionally require an affirmative capability from the server.
 export const emailTypeCatalog = [
   { type: 'member-invitation', label: emailTypes['member-invitation'], sender: 'Aplicação', scope: 'Global e por entidade', configurable: true },
-  { type: 'password-reset', label: 'Reposição de palavra-passe', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
+  { type: 'password-reset', label: emailTypes['password-reset'], sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
   { type: 'email-code', label: 'Código por email', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
 ]
 
-export const isConfigurableType = type => emailTypeCatalog.some(item => item.type === type && item.configurable)
+export const isConfigurableType = (type, summary) => type === 'member-invitation'
+  || (type === 'password-reset' && summary?.configurable === true)
 
 // What the server reports about a configurable type, in words.
 export function typeStatus(summary) {
@@ -24,6 +26,7 @@ export function typeStatus(summary) {
 export const variableLabels = {
   Organizacao: 'Nome da entidade',
   LigacaoAtivacao: 'Ligação de ativação',
+  LigacaoRecuperacao: 'Ligação de recuperação',
   Validade: 'Validade da ligação',
   Logotipo: 'Logótipo',
 }
@@ -68,13 +71,15 @@ export function emailError(error) {
     EMAIL_TEMPLATE_INVALID: 'O template não pode ser guardado. Corrija os pontos indicados.',
     INVALID_INPUT: 'Existem dados inválidos. Reveja os campos.',
     C4G_ADMIN_REQUIRED: 'Esta área está reservada à administração C4G. O seu acesso pode ter sido alterado.',
-    RESOURCE_NOT_AVAILABLE: 'A entidade já não está disponível.',
+    RESOURCE_NOT_AVAILABLE: 'O template ou a entidade já não está disponível.',
     STALE_REVISION: 'O template foi alterado entretanto. Recarregue antes de guardar.',
     IDEMPOTENCY_CONFLICT: 'Este pedido já foi usado com dados diferentes. Repita a ação.',
     EMAIL_TEMPLATE_NOT_CUSTOMIZED: 'Este template já não tem alterações próprias para repor.',
     STATE_CONFLICT: 'O template foi alterado entretanto. Recarregue e repita.',
     // The server answers these while sending is not built yet, or where the logos are not installed.
     EMAIL_DELIVERY_UNAVAILABLE: 'O envio de teste ainda não está disponível.',
+    EMAIL_PUBLISH_UNAVAILABLE: 'Não foi possível confirmar a publicação no serviço de autenticação. Recarregue o template antes de repetir.',
+    EMAIL_PUBLICATION_DRIFT: 'O texto no serviço de autenticação foi alterado entretanto. Recarregue o template antes de guardar.',
     OPERATION_NOT_AVAILABLE: 'Esta função ainda não está disponível.',
     EMAIL_LOGO_INVALID: 'O ficheiro não é uma imagem PNG ou JPEG válida.',
     EMAIL_LOGO_TOO_LARGE: 'A imagem excede 512 KB.',

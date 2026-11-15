@@ -177,8 +177,13 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     // Invitation templates (Central 051); provider credentials remain in the member worker.
     // Email logos (the email plan's increment 5): the C4G logo here, each entity's own in its directory, and the public read.
     emailLogos=require('./emailTemplates/logoService').createEmailLogoService({centralPool});
+    const authenticationEmailPublisher=require('./emailTemplates/keycloakPublisher').configuredKeycloakPublisher({env,issuer:authConfig.issuer});
+    const emailTemplateService=require('./emailTemplates/authenticationService').createAuthenticationEmailService({
+      centralPool,publicBaseUrl:env.PUBLIC_APP_URL,publisher:authenticationEmailPublisher,
+      baseService:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL,testDelivery:memberOnboarding?.testEmail})
+    });
     composedRoutes.platformEmail=require('./emailTemplates/http').createPlatformEmailRouter({
-      express,authenticate,logos:emailLogos,service:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL,testDelivery:memberOnboarding?.testEmail})
+      express,authenticate,logos:emailLogos,service:emailTemplateService
     });
     composedRoutes.publicEmailLogos=require('./emailTemplates/logoHttp').createPublicEmailLogoRouter({express,logos:emailLogos});
     // Opportunity complement (Central 053): descriptive data beside a catalog opportunity. Collection from the public

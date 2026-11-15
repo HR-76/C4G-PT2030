@@ -83,3 +83,16 @@ it('keeps the previous rows on screen, dimmed and inactive, while another search
  await act(async()=>fail({response:{status:503}}))
  await screen.findByRole('alert');expect(screen.queryByText('Entidade A')).toBeNull()
 })
+
+it('updates the administrative identity and incomplete profile after a type change',async()=>{
+ const client=api();client.entity.mockResolvedValue({data:{...entity,typeCode:'UNSPECIFIED'}})
+ client.saveEntityType=vi.fn().mockResolvedValue({data:{...profile,revision:1,fields:{typeCode:'CONSULTANCY'}}})
+ mount(client,'/administracao/entidades/a')
+ fireEvent.click(await screen.findByRole('button',{name:'Alterar tipo'}))
+ fireEvent.change(screen.getByLabelText('Tipo de entidade'),{target:{value:'CONSULTANCY'}})
+ fireEvent.click(screen.getByRole('button',{name:'Guardar tipo'}))
+ await screen.findByText('Tipo atualizado.')
+ expect(client.saveEntityType).toHaveBeenCalledWith('a',{typeCode:'CONSULTANCY',expectedTypeCode:'UNSPECIFIED',expectedRevision:0,requestId:expect.any(String)})
+ expect(screen.getAllByText('Consultoria')).toHaveLength(2)
+ expect(screen.getByText('Por completar')).toBeTruthy()
+})

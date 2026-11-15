@@ -57,6 +57,12 @@ function command(value){
  if(!value||Object.keys(value).sort().join(',')!=='expectedRevision,fields,requestId'||!Number.isSafeInteger(value.expectedRevision)||value.expectedRevision<0)fail('ONBOARDING_INPUT_INVALID');
  return {expectedRevision:value.expectedRevision,requestId:uuid(value.requestId),fields:value.fields};
 }
+function typeCommand(value){
+ if(!value||Object.keys(value).sort().join(',')!=='expectedRevision,expectedTypeCode,requestId,typeCode'||!Number.isSafeInteger(value.expectedRevision)||value.expectedRevision<0||typeof value.expectedTypeCode!=='string'||!/^[A-Z][A-Z0-9_]{0,63}$/.test(value.expectedTypeCode))fail('ONBOARDING_INPUT_INVALID');
+ const fields=assertValid(validate({typeCode:value.typeCode},{step:null,complete:false}));
+ if(!types.includes(fields.typeCode))throw Object.assign(Error('REGISTRATION_FIELDS_INVALID'),{code:'REGISTRATION_FIELDS_INVALID',fields:{typeCode:'Selecione um tipo de entidade.'}});
+ return {expectedRevision:value.expectedRevision,expectedTypeCode:value.expectedTypeCode,requestId:uuid(value.requestId),typeCode:fields.typeCode};
+}
 function profileCommand(value){
  if(!value||Object.keys(value).sort().join(',')!=='expectedRevision,fields,requestId'||!Number.isSafeInteger(value.expectedRevision)||value.expectedRevision<0||!value.fields||Object.getPrototypeOf(value.fields)!==Object.prototype||Object.keys(value.fields).sort().join(',')!==[...profileKeys].sort().join(','))fail('ONBOARDING_INPUT_INVALID');
  return {expectedRevision:value.expectedRevision,requestId:uuid(value.requestId),fields:value.fields};
@@ -83,4 +89,4 @@ function validateProfile(raw,identity,{now=new Date()}={}){
  return {fields,errors,valid:Object.keys(errors).length===0};
 }
 function assertValid(result){if(!result.valid)throw Object.assign(Error('REGISTRATION_FIELDS_INVALID'),{code:'REGISTRATION_FIELDS_INVALID',fields:result.errors});return result.fields;}
-module.exports={types,steps,profileKeys,validate,validateProfile,validNif,command,profileCommand,assertValid};
+module.exports={typeCommand,types,steps,profileKeys,validate,validateProfile,validNif,command,profileCommand,assertValid};

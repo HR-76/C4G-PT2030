@@ -121,6 +121,7 @@ export const platformDirectoryApi = {
   entities: (params, signal) => api.get('/admin/directory/entities', { params, signal, timeout: 15000 }),
   entity: (id, signal) => api.get(`/admin/directory/entities/${id}`, { signal, timeout: 15000 }),
   entityProfile: (id, signal) => api.get(`/admin/directory/entities/${id}/registration`, { signal, timeout: 15000 }),
+  saveEntityType: (id, body) => api.put(`/admin/directory/entities/${id}/type`, body, { timeout: 20000 }),
   saveEntityProfile: (id, body) => api.put(`/admin/directory/entities/${id}/registration`, body, { timeout: 20000 }),
   users: (params, signal) => api.get('/admin/directory/users', { params, signal, timeout: 15000 }),
   userDeletionStatus: id => api.get(`/admin/directory/users/${encodeURIComponent(id)}/deletion`, { timeout: 15000 }),
@@ -256,7 +257,7 @@ export function organizationDirectoryApi(organizationId) {
     matching:(params,signal)=>read('/matching',{params,timeout:60000},signal),
     personProfileEdit:(id,body)=>write('put',`/people/${id}/profile`,body),
     personLinkEdit:(id,body)=>write('put',`/people/${id}/account`,body),selfEdit:body=>write('put','/me',body),
-    profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
+    profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationType:body=>write('put','/registration/type',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
     unitRename:(id,body)=>write('put',`/units/${id}/name`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
     personCreate:body=>write('post','/people',body),personEdit:(id,body)=>write('put',`/people/${id}`,body),
     // The entity's own email logo. The body of an upload is the image itself, so the revision and the idempotency key travel in headers.

@@ -34,7 +34,8 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     Object.freeze({...entries[0], version:'051_email_templates',schemaFingerprint:hash(schemaFor('email-template-package'))}),
     Object.freeze({...entries[0], version:'052_central_runtime_read',schemaFingerprint:hash(schemaFor('central-runtime-read-package'))}),
     Object.freeze({...entries[0], version:'053_opportunity_complement',schemaFingerprint:hash(schemaFor('opportunity-complement-package'))}),
-    Object.freeze({...entries[0], version:'054_billing_account_validation',schemaFingerprint:hash(schemaFor('billing-validation-package'))})]);
+    Object.freeze({...entries[0], version:'054_billing_account_validation',schemaFingerprint:hash(schemaFor('billing-validation-package'))}),
+    Object.freeze({...entries[0], version:'055_entity_type_edit',schemaFingerprint:hash(schemaFor('entity-type-package'))})]);
   const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}]]);
   function load(name) {
     const filename = path.resolve(__dirname, '../src/security', name + '.js');
@@ -237,4 +238,10 @@ test('reader admits the billing validation package through its exact schema snap
   const f = fixture();
   f.state.table = 'billing-validation-package';
   assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client), '054_billing_account_validation');
+});
+
+test('reader admits the entity type package through its exact schema snapshot', async () => {
+  const f = fixture();
+  f.state.table = 'entity-type-package';
+  assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client), '055_entity_type_edit');
 });

@@ -31,7 +31,7 @@ function createDirectoryRouter({express,service,matching,membershipAccess,member
   if(!matching)throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});
   res.json(await matching.execute({...req.query},req));
  }catch(error){failure(error,res);}});
-  for(const [verb,path,method] of [['put','/description','descriptionEdit'],['put','/strategy','strategyEdit'],['put','/registration','registrationProfile'],['put','/registration/contacts','registrationContacts'],['get','/','context'],['put','/','profileEdit'],['get','/units','units'],['post','/units','unitCreate'],
+  for(const [verb,path,method] of [['put','/description','descriptionEdit'],['put','/strategy','strategyEdit'],['put','/registration','registrationProfile'],['put','/registration/type','registrationType'],['put','/registration/contacts','registrationContacts'],['get','/','context'],['put','/','profileEdit'],['get','/units','units'],['post','/units','unitCreate'],
   ['put','/units/:id/name','unitRename'],['put','/units/:id/parent','unitMove'],['get','/me','self'],['put','/me','selfEdit'],['get','/memberships','memberships'],['get','/people/:id','person'],['put','/people/:id/profile','personProfileEdit'],['put','/people/:id/account','personLinkEdit'],['get','/people','people'],['post','/people','personCreate'],['put','/people/:id','personEdit']]){
   router[verb](path,async(req,res)=>{try{
    if((verb==='get'&&req.body&&Object.keys(req.body).length)||(verb!=='get'&&Object.keys(req.query).length))throw Object.assign(new Error(),{code:'INVALID_INPUT'});

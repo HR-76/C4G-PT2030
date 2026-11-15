@@ -8,6 +8,12 @@ const {MIME,MAX_BYTES}=require('./planXlsxV2');
 const {LIMITS}=require('../documents/constants');
 const {authoritySql}=require('../platformDirectory/service');
 const {createPortugal2030CatalogAcceptance}=require('./catalogAcceptance');
+const {allKnownMigrations,supportsCentralVersion}=require('../security/centralMigrationManifest');
+const importVersion=require('../security/centralImportMigrationPackage').entry.version;
+// Only registered compatible schemas are candidates; availability still validates their actual fingerprints and security.
+const importSchemaVersions=Object.freeze(allKnownMigrations
+ .filter(entry=>entry.runtimeAdmissible!==false&&entry.centralImportSecurity===true&&supportsCentralVersion(entry.version,importVersion))
+ .map(entry=>entry.version));
 async function sessionAuthority(client,userId,sessionId){
  if(typeof sessionId!=='string'||!sessionId||!(await client.query(authoritySql+' FOR SHARE OF s,u,a',[sessionId,userId])).rowCount)throw Object.assign(Error(),{code:'C4G_ADMIN_REQUIRED'});
 }
@@ -55,7 +61,7 @@ function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatfo
  return Object.freeze({
   async availability(){try{
    const schema=await central.transaction(async c=>{
-    await require('../security/centralSchemaManifest').assertCentralSchemaForVersions(c,[require('../security/centralImportMigrationPackage').entry.version,require('../security/billingPdfMigrationPackage').entry.version,require('../security/emailTemplateMigrationPackage').entry.version,require('../security/centralRuntimeReadPackage').entry.version,require('../security/opportunityComplementMigrationPackage').entry.version]);
+    await require('../security/centralSchemaManifest').assertCentralSchemaForVersions(c,importSchemaVersions);
     const exists=(await c.query("SELECT to_regclass('opportunity_catalog.pt2030_document_upload') IS NOT NULL AND to_regclass('opportunity_catalog.pt2030_plan_preview') IS NOT NULL AND (NOT $1::boolean OR to_regclass('opportunity_catalog.pt2030_plan_import') IS NOT NULL AND to_regclass('opportunity_catalog.pt2030_plan_observation') IS NOT NULL AND to_regclass('opportunity_catalog.pt2030_plan_revision') IS NOT NULL) AS ready",[acceptance!==null])).rows[0]?.ready;
     if(!exists)return false;
     await c.query('SELECT document_id,document_version_id,requested_by,request_id,filename,size_bytes,sha256,sheets,scan_state FROM opportunity_catalog.pt2030_document_upload LIMIT 0');

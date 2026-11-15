@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === entityTypeManifest.at(-1).version)) return entityTypeManifest;
   if (rows.some(row => row.version === billingValidationManifest.at(-1).version)) return billingValidationManifest;
   if (rows.some(row => row.version === opportunityComplementManifest.at(-1).version)) return opportunityComplementManifest;
   if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
@@ -364,3 +365,11 @@ async function applyRegisteredBillingValidationPackage(pool,packageId){
  return applyCentralMigrationsWithManifest(pool,billingValidationManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:billingValidationManifest});
 }
 module.exports.applyRegisteredBillingValidationPackage=applyRegisteredBillingValidationPackage;
+
+async function applyRegisteredEntityTypePackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/entityTypeMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('ENTITY_TYPE_PACKAGE_NOT_REGISTERED');
+ const {entityTypeManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,entityTypeManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:entityTypeManifest});
+}
+module.exports.applyRegisteredEntityTypePackage=applyRegisteredEntityTypePackage;

@@ -19,7 +19,7 @@ function PlainEditor({ value, onChange, variables: names, disabled, labelledBy }
   return <><textarea aria-labelledby={labelledBy} value={value} disabled={disabled} onChange={event => onChange(event.target.value)}/><span data-testid="variables">{names.join(',')}</span></>
 }
 
-function setup(overrides = {}) {
+function setup(overrides = {}, type = 'member-invitation') {
   const api = {
     template: vi.fn().mockResolvedValue({ data: template() }),
     save: vi.fn(), reset: vi.fn(), preview: vi.fn(), test: vi.fn(),
@@ -28,7 +28,7 @@ function setup(overrides = {}) {
     ...overrides,
   }
   const directoryApi = { entities: vi.fn().mockResolvedValue({ data: { items: [{ id: ORG, name: 'Associação A' }] } }) }
-  render(<MemoryRouter><EmailTemplatesView api={api} directoryApi={directoryApi} Editor={PlainEditor}/></MemoryRouter>)
+  render(<MemoryRouter><EmailTemplatesView type={type} api={api} directoryApi={directoryApi} Editor={PlainEditor}/></MemoryRouter>)
   return { api, directoryApi }
 }
 const body = () => screen.getByRole('textbox', { name: 'Corpo do email' })
@@ -205,4 +205,73 @@ it('words the codes of the real API, including the functions that are not availa
   expect(emailError(coded('EMAIL_TEMPLATE_NOT_CUSTOMIZED'))).toBe('Este template já não tem alterações próprias para repor.')
   expect(emailError(coded('STATE_CONFLICT'))).toBe('O template foi alterado entretanto. Recarregue e repita.')
   expect(emailError(coded('SERVICE_UNAVAILABLE', 503))).toBe('Não foi possível concluir. Tente novamente.')
+})
+
+const RESET_BODY = '<p><a href="{LigacaoRecuperacao}">Recuperar</a></p><p>Válida durante {Validade}.</p>'
+const resetTemplate = (patch = {}) => template({
+  type: 'password-reset', subject: 'Recupere o acesso', html: RESET_BODY,
+  publication: 'UNPUBLISHED', capabilities: { test: false },
+  variables: { body: ['LigacaoRecuperacao', 'Validade', 'Logotipo'], subject: [], required: ['LigacaoRecuperacao', 'Validade'] },
+  logo: { source: 'C4G', url: '/api/public/email-logos/current' }, ...patch,
+})
+
+it('keeps reset global, uses a readonly logo and makes the initial unpublished model actionable', async () => {
+  const save = vi.fn().mockResolvedValue({ data: resetTemplate({ source: 'GLOBAL', revision: 1, publication: 'PUBLISHED' }) })
+  const { api, directoryApi } = setup({ template: vi.fn().mockResolvedValue({ data: resetTemplate() }), save }, 'password-reset')
+  await screen.findByLabelText('Assunto')
+  expect(api.template).toHaveBeenCalledWith('password-reset', null, expect.any(AbortSignal))
+  expect(screen.getByRole('heading', { level: 1, name: 'Reposição de palavra-passe' })).toBeTruthy()
+  expect(screen.getByText('O serviço de autenticação usa o texto original. Guarde para aplicar este modelo.')).toBeTruthy()
+  expect(screen.queryByLabelText('Aplicar a')).toBeNull()
+  expect(screen.queryByRole('search')).toBeNull()
+  expect(directoryApi.entities).not.toHaveBeenCalled()
+  expect(screen.queryByRole('button', { name: 'Enviar teste para mim' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Carregar logótipo' })).toBeNull()
+  expect(api.logo).not.toHaveBeenCalled()
+  expect(screen.getByRole('img', { name: 'Logótipo da C4G nos emails' }).getAttribute('src')).toBe('/api/public/email-logos/current')
+  expect(screen.getByRole('button', { name: 'Guardar' }).disabled).toBe(false)
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+  expect((await screen.findByRole('status')).textContent).toBe('Template guardado.')
+  expect(api.save).toHaveBeenCalledWith('password-reset', null, { subject: 'Recupere o acesso', html: RESET_BODY, expectedRevision: 0, idempotencyKey: expect.any(String) })
+  expect(screen.queryByText('O serviço de autenticação usa o texto original. Guarde para aplicar este modelo.')).toBeNull()
+  // A second save can publish a changed global logo even without editing text.
+  expect(screen.getByRole('button', { name: 'Guardar' }).disabled).toBe(false)
+})
+
+it('previews and resets authentication text only in global scope', async () => {
+  const { api } = setup({
+    template: vi.fn().mockResolvedValue({ data: resetTemplate({ source: 'GLOBAL', revision: 2, publication: 'PUBLISHED' }) }),
+    preview: vi.fn().mockResolvedValue({ data: { subject: 'Exemplo', html: '<p>Exemplo</p>', text: 'Exemplo' } }),
+    reset: vi.fn().mockResolvedValue({ data: resetTemplate({ source: 'DEFAULT', revision: 3, publication: 'PUBLISHED' }) }),
+  }, 'password-reset')
+  await screen.findByLabelText('Assunto')
+  fireEvent.click(screen.getByRole('button', { name: 'Pré-visualizar' }))
+  await screen.findByTitle('Email em HTML')
+  expect(api.preview).toHaveBeenCalledWith('password-reset', null, { subject: 'Recupere o acesso', html: RESET_BODY })
+  fireEvent.click(screen.getByRole('button', { name: 'Repor o texto original' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
+  expect((await screen.findByRole('status')).textContent).toBe('O template global voltou ao texto original.')
+  expect(api.reset).toHaveBeenCalledWith('password-reset', null, { expectedRevision: 2, idempotencyKey: expect.any(String) })
+})
+
+it.each(['EMAIL_PUBLISH_UNAVAILABLE', 'EMAIL_PUBLICATION_DRIFT'])('keeps draft text and reports %s without claiming publication', async code => {
+  const { api } = setup({
+    template: vi.fn().mockResolvedValue({ data: resetTemplate() }),
+    save: vi.fn().mockRejectedValue({ response: { status: 503, data: { error: { code } } } }),
+  }, 'password-reset')
+  fireEvent.change(await screen.findByLabelText('Assunto'), { target: { value: 'Por publicar' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('Recarregue o template')
+  expect(screen.queryByText('Template guardado.')).toBeNull()
+  expect(screen.getByLabelText('Assunto').value).toBe('Por publicar')
+  expect(api.save).toHaveBeenCalledTimes(1)
+})
+
+it('requires the recovery link and validity supplied by the server before saving', async () => {
+  const { api } = setup({ template: vi.fn().mockResolvedValue({ data: resetTemplate() }) }, 'password-reset')
+  await screen.findByLabelText('Assunto')
+  fireEvent.change(body(), { target: { value: '<p>Sem variáveis</p>' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Guardar' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('Falta ligação de recuperação no corpo do email.')
+  expect(api.save).not.toHaveBeenCalled()
 })

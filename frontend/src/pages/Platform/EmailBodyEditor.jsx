@@ -4,7 +4,10 @@ import StarterKit from '@tiptap/starter-kit'
 import { Bold, Italic, Link2, Link2Off, List, ListOrdered, Redo2, Underline, Undo2 } from 'lucide-react'
 import { variableLabels } from './emailTemplatePresentation'
 
-const ACTIVATION_LINK = '{LigacaoAtivacao}'
+const LINK_VARIABLES = {
+  LigacaoAtivacao: { href: '{LigacaoAtivacao}', label: 'Ativar acesso' },
+  LigacaoRecuperacao: { href: '{LigacaoRecuperacao}', label: 'Recuperar acesso' },
+}
 
 // Only the formatting the server keeps is offered, so what the administrator
 // sees while writing is what survives sanitization.
@@ -21,7 +24,7 @@ const extensions = [
       autolink: false,
       protocols: ['https'],
       HTMLAttributes: { rel: null, target: null },
-      isAllowedUri: url => url === ACTIVATION_LINK || /^https:\/\//i.test(url),
+      isAllowedUri: url => Object.values(LINK_VARIABLES).some(link => link.href === url) || /^https:\/\//i.test(url),
     },
   }),
 ]
@@ -73,8 +76,9 @@ export default function EmailBodyEditor({ value, onChange, variables = [], disab
     run(chain => chain.extendMarkRange('link').setLink({ href: url.trim() }))
   }
   const insertVariable = name => {
-    if (name === 'LigacaoAtivacao') {
-      run(chain => chain.insertContent(`<a href="${ACTIVATION_LINK}">Ativar acesso</a> `))
+    if (Object.hasOwn(LINK_VARIABLES, name)) {
+      const link = LINK_VARIABLES[name]
+      run(chain => chain.insertContent(`<a href="${link.href}">${link.label}</a> `))
       return
     }
     run(chain => chain.insertContent(`{${name}}`))

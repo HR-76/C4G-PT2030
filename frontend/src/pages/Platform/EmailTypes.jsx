@@ -4,7 +4,7 @@ import { Settings } from 'lucide-react'
 import LoadingIndicator from '../../components/LoadingIndicator'
 import { platformEmailApi } from '../../api/api'
 import { useAuth } from '../../contexts/AuthContext'
-import { emailError, emailTypeCatalog, typeStatus } from './emailTemplatePresentation'
+import { emailError, emailTypeCatalog, isConfigurableType, typeStatus } from './emailTemplatePresentation'
 import './email-templates.css'
 
 export default function EmailTypes() {
@@ -33,15 +33,18 @@ export function EmailTypesView({ api = platformEmailApi }) {
       </div>}
       {summaries && <div className="table-wrap"><table className="data-table email-types">
         <thead><tr><th scope="col">Tipo</th><th scope="col">Enviado por</th><th scope="col">Âmbito</th><th scope="col">Estado</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
-        <tbody>{emailTypeCatalog.map(item => <tr key={item.type}>
+        <tbody>{emailTypeCatalog.map(item => {
+          const summary = summaries.find(value => value.type === item.type)
+          const configurable = isConfigurableType(item.type, summary)
+          return <tr key={item.type}>
           <th scope="row">{item.label}</th>
           <td>{item.sender}</td>
           <td>{item.scope}</td>
-          <td>{item.configurable
-            ? typeStatus(summaries.find(summary => summary.type === item.type)).map(line => <span className="email-type-line" key={line}>{line}</span>)
+          <td>{configurable
+            ? typeStatus(summary).map(line => <span className="email-type-line" key={line}>{line}</span>)
             : <><span className="badge badge-gray">Ainda não configurável</span><span className="email-type-line email-type-note">{item.note}</span></>}</td>
-          <td>{item.configurable && <Link className="btn btn-outline" to={`/administracao/email/${item.type}`} aria-label={`Configurar ${item.label}`}><Settings size={16} aria-hidden="true"/>Configurar</Link>}</td>
-        </tr>)}</tbody>
+          <td>{configurable && <Link className="btn btn-outline" to={`/administracao/email/${item.type}`} aria-label={`Configurar ${item.label}`}><Settings size={16} aria-hidden="true"/>Configurar</Link>}</td>
+        </tr>})}</tbody>
       </table></div>}
     </section>
   </div>

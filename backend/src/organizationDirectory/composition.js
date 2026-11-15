@@ -111,10 +111,11 @@ function createDirectoryComposition({sessionStore,sessionRegistry,authorityCoord
   },
   async execute(method,raw,id,request){
   try{
-   if(method==='registrationContacts'||method==='registrationProfile'){
+   if(['registrationContacts','registrationProfile','registrationType'].includes(method)){
    if(!registrationService)fail('RESOURCE_NOT_AVAILABLE');
    const org=uuid(request.headers?.['x-c4g-organization']),handle=await authority.captureAuthenticatedRequest(request),trusted=await authority.resolve(handle);
    if(trusted.actor.organizationId!==org)fail('CONTEXT_CHANGED');
+    if(method==='registrationType')return registrationService.typeForEntity(org,raw,request,trusted,authorizeRegistration);
     return method==='registrationContacts'?registrationService.contacts(org,raw,request,trusted,authorizeRegistration):registrationService.saveForEntity(org,raw,request,trusted,authorizeRegistration);
   }
   const input=parse(method,raw),exactId=id?uuid(id):null;

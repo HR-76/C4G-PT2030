@@ -1,6 +1,6 @@
 # Emails de autenticação, configuração e histórico
 
-Estado: SMTP Resend e recuperação pública validados no staging pelo utilizador em 15/11/2026: opção visível, email recebido, palavra-passe alterada e login concluído. Editor dos emails de autenticação e histórico ainda por implementar. Complementa [o contrato de email](email-templates-and-configuration.md).
+Estado: SMTP Resend e recuperação pública validados no staging pelo utilizador em 15/11/2026: opção visível, email recebido, palavra-passe alterada e login concluído. Personalização nativa da recuperação validada em Keycloak 26.8.0 temporário local com SMTP de captura. Publicação restrita, editor dos emails de autenticação e histórico ainda por implementar. Complementa [o contrato de email](email-templates-and-configuration.md).
 
 ## Decisões confirmadas
 
@@ -27,10 +27,22 @@ Estado: SMTP Resend e recuperação pública validados no staging pelo utilizado
 - `backend/scripts/localPlatform/identityLocalization.js` configura apenas o idioma do realm; não demonstra a edição dos textos de email.
 - No [provider oficial do Keycloak 26.8.0](https://github.com/keycloak/keycloak/blob/26.8.0/services/src/main/java/org/keycloak/email/freemarker/FreeMarkerEmailTemplateProvider.java), a recuperação usa `passwordResetSubject` e `password-reset.ftl`. É necessário confirmar os templates e as mensagens efetivamente carregados pelo tema e pela extensão de código antes de escolher as chaves de configuração.
 - O contrato exige uma conta de serviço restrita. A revisão do [recurso administrativo oficial](https://github.com/keycloak/keycloak/blob/26.8.0/services/src/main/java/org/keycloak/services/resources/admin/RealmAdminResource.java) faz parte da análise de permissões; não conceder administração geral do realm por conveniência.
-- Docker, Maven e `psql` não estão disponíveis no PATH desta máquina. A prova em Keycloak/PostgreSQL descartáveis precisa de ambiente isolado identificado; não usar as bases habituais para suprir essa ausência.
+- Docker, Maven e `psql` não estão disponíveis no PATH desta máquina. A prova em Keycloak/PostgreSQL descartáveis precisa de ambiente isolado identificado; não usar as bases habituais para suprir essa ausência. O JDK 23 foi encontrado em `C:/Program Files/Java/jdk-23` e usado diretamente para provar MessageFormat; o launcher Java no PATH não respondeu.
 - O utilizador não sabe onde está o artefacto. Pesquisa adicional no perfil local (excluindo caches, AppData e node_modules) também não o encontrou. Tentou-se consultar apenas os nomes dos JAR em `/srv/c4g-staging/keycloak-providers` pela ligação SSH já conhecida: primeira tentativa expirou antes da autenticação; a segunda foi reposta pelo servidor durante a negociação. Nenhum comando remoto chegou a executar. A continuidade da inspeção do componente depende de acesso SSH funcional ou da recuperação do artefacto/fontes.
 
 ## Incrementos e critérios de aceitação
+
+### Editor e publicação restrita — incremento de 15/11/2026
+
+Implementar uma extensão própria de publicação de textos, independente do autenticador de código ausente. Endpoint fechado `/realms/{realm}/c4g-email-templates/password-reset`, apenas GET/PUT, para o cliente de serviço dedicado `c4g-email-templates` e função desse cliente `publish-password-reset`. Verificar bearer, audiência, cliente, associação real da conta de serviço, estado atual e função atual; nenhum papel administrativo nativo do realm. A aplicação autoriza C4G_ADMIN na Central antes de aceder ao publicador.
+
+A extensão guarda versões imutáveis em tabelas JPA próprias na base do Keycloak: ator C4G, identidade do serviço, instante, revisão, intenção idempotente, template e as três mensagens efetivamente publicadas. A escrita da versão, CAS da revisão e atualização da localização pertencem à mesma transação. Não guardar histórico ilimitado nos atributos do realm, carregados em todas as leituras. Não alterar a Central 051. Publicar só as três chaves de recuperação em todos os idiomas suportados/default e `en` de fallback; manter as restantes chaves e configurações. Não aceitar SMTP, outros tipos, realms, locales ou nomes de chaves arbitrários no payload. Rejeitar deriva externa das mensagens geridas e a adoção silenciosa de overrides preexistentes.
+
+O primeiro GET sem versão oferece o modelo C4G como rascunho, identificado `UNPUBLISHED`: o Keycloak continua com o texto nativo até guardar. SAVE publica modelo personalizado; RESET publica o modelo C4G original com nova revisão. Repetir a mesma intenção devolve o resultado original; reutilizar a chave com conteúdo diferente ou gravar sobre revisão desatualizada falha. Falha/timeout não anuncia sucesso. A API devolve campos fechados e nunca SMTP, tokens, respostas brutas ou ligações/códigos reais.
+
+O frontend mostra a capacidade de configurar apenas quando o publicador restrito responder corretamente. A rota direta confirma essa capacidade antes de pedir o template. Âmbito sempre global, sem consultas/seleção de entidades e sem envio de teste nesta etapa. Pré-visualização com ligação `.invalid` e validade de exemplo, validação/sanitização iguais à publicação. Logótipo C4G apenas para leitura neste editor; a URL atual é fixada ao guardar/repor, sem afirmar republicação automática quando o logótipo muda.
+
+Critérios: autorização/revogação e cliente errado; limites e campos fechados; ausência de segredos; SAVE/RESET/readback; resposta perdida/idempotência; concorrência e revisão desatualizada; rollback e deriva; preservação de SMTP/fluxos/chaves não geridas; email capturado usa o template publicado; frontend sem sucesso em falha e sem controlos de entidade/teste para recuperação. Reutilizar o Keycloak/H2/SMTP local descartável já autorizado, agora com a extensão. Implantação em staging e concessão de credenciais habituais permanecem operações posteriores e explícitas.
 
 ### Preparação da personalização nativa (15/11/2026)
 
@@ -54,4 +66,17 @@ A lista de emails deixa de afirmar que a recuperação está desligada sem consu
 - Testes de autorização, isolamento, sanitização, eventos duplicados/fora de ordem, falhas do IdP e eliminação efetiva de endereços na fronteira dos 90 dias.
 - Migração nova, aditiva, com versão escolhida a partir do manifesto atual (há trabalho concorrente no repositório); não alterar a migração 051 já aplicada.
 - Gate em Keycloak 26.8.0, PostgreSQL e SMTP descartáveis. Provar as mensagens realmente capturadas e o histórico efetivamente gravado.
-- Implantação, concessões e SMTP externo são operações posteriores ao código e à prova isolada; nenhuma foi executada nesta investigação.
+- A personalização, concessões da conta de serviço e histórico não foram implantados. A configuração SMTP e ativação da recuperação foram entretanto executadas pelo utilizador na consola, como registado acima; não repetir o configurador inicial.
+
+## Resultado local de 15/11/2026
+
+Autorização adicional do utilizador: criar Keycloak temporário local, com base própria e SMTP de captura, para provar a personalização sem emails reais. O gate usa distribuição oficial 26.8.0 verificada por SHA-256, cópia nova em `.tmp`, H2 exclusivo dessa cópia, portas apenas em loopback e destinatários `.invalid`. Não lê configuração dos ambientes habituais. Credenciais aleatórias e mensagens capturadas ficam em memória; a evidência persistida contém apenas resultados, contagens e versões. Os processos criados pelo gate são encerrados no fim, também em falha. A prova cobre configuração nativa e não representa implementação da conta de serviço restrita do futuro editor.
+
+**Gate nativo concluído:** [14 verificações aprovadas](../../test/integration/email-authentication/evidence-20261115.json), quatro mensagens capturadas, seis testes do harness aprovados. Assunto/HTML/texto, duração, idiomas pt/en, sanitização, logótipo, alteração efetiva da credencial, recusa da palavra-passe antiga e de ligações reutilizadas/expiradas provados. Conta desconhecida: resposta visível equivalente, sem envio; não foi medida enumeração por tempo. Publicação mantém SMTP/fluxos/chave sentinela; serviço sem funções recebe 403, sem alterar o texto. Instalação, H2 e SMTP descartáveis foram encerrados/limpos, sem Resend ou staging. O PUT do perfil no gate preserva explicitamente os campos ao mudar idioma. Compilador de produção sem alterações nesta prova. [Comandos e limites](../../test/integration/email-authentication/README.md).
+
+- `keycloakPasswordReset.js` prepara as três mensagens nativas de recuperação. Reutiliza a validação/sanitização com variáveis separadas das dos convites, gera texto simples e escapa o padrão MessageFormat. Não alarga os tipos aceites pela API ou pela migração 051.
+- `preparePasswordResetEmail.js` exporta JSON para revisão; não publica nem envia. A prova e os limites estão no [runbook de testes](../../test/integration/email-authentication/README.md).
+- Removida a indicação fixa e desatualizada de recuperação desligada na lista de emails. A regressão falhou antes da correção e passou depois. A lista continua sem anunciar edição ou estado operacional que não consulta.
+- 48 testes focados backend, 18 frontend, nove casos no Java MessageFormat real e build aprovados. Não é uma prova de envio no Keycloak; publicação restrita, editor, histórico e retenção continuam pendentes.
+- Nova tentativa SSH expirou na troca de banner, antes de autenticação. Não houve execução remota nesta etapa.
+- Validação final: lint e sintaxe aprovados. Suite backend com loopback permitido: 3330 aprovados, nove ignorados e duas falhas (`emailLogoApi`: porta efémera recusada pelo fetch; `f2Security`: regra preexistente de sessionStorage). Os 15 testes de logótipos passaram na repetição isolada. Frontend: 1122 aprovados e um timeout preexistente em ApplicationPartners. A primeira execução backend na sandbox foi interrompida devido às recusas de acesso HTTP local. Outro trabalho alterou e fez commit do checkout durante a validação; os totais não representam um snapshot exclusivo desta alteração.

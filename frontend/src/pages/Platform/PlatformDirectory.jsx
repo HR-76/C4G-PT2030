@@ -1,3 +1,4 @@
+import {registrationTypes} from '../Organization/RegistrationFields'
 import FilterBar from '../../components/FilterBar'
 import SearchInput from '../../components/SearchInput'
 import LoadingIndicator from '../../components/LoadingIndicator'
@@ -17,7 +18,7 @@ import UserDeletionDialog from './UserDeletionDialog'
 const root='/administracao/entidades'
 const states={ACTIVE:'Ativo',SUSPENDED:'Suspenso',ARCHIVED:'Arquivado',PROVISIONING:'Em preparação',TERMINATING:'Em encerramento',PENDING_PROJECTION:'Por ativar',REMOVED:'Removido'}
 const roles={ORG_ADMIN:'Administrador',FUNDING_MANAGER:'Gestor de candidaturas',CONTRIBUTOR:'Técnico',VIEWER:'Consulta',C4G_ADMIN:'Administrador C4G',SUPPORT:'Suporte C4G'}
-const types={UNSPECIFIED:'Não indicado',COMPANY:'Empresa',RESEARCH:'Investigação',UNIVERSITY:'Universidade',PUBLIC_BODY:'Entidade pública',ASSOCIATION:'Associação'}
+const types={...registrationTypes,UNSPECIFIED:'Por definir'}
 const status=value=><span className={`directory-status directory-status-${value?.toLowerCase()}`}>{states[value]||value}</span>
 const errors={C4G_ADMIN_REQUIRED:'Esta área está reservada à administração C4G. O seu acesso pode ter sido alterado.',RESOURCE_NOT_AVAILABLE:'A entidade não está disponível.',INVALID_INPUT:'Os filtros do endereço não são válidos. Limpe os filtros para voltar à lista.'}
 
@@ -69,7 +70,7 @@ export function DirectoryView({api=platformDirectoryApi,enableInvitations=false,
    <div><dt>Tipo</dt><dd>{types[data.entity.typeCode]||data.entity.typeCode}</dd></div><div><dt>Moeda de reporting</dt><dd>{data.entity.currency}</dd></div>
    <div><dt>Acessos ativos</dt><dd>{data.entity.activeAccounts}</dd></div><div><dt>Registada em</dt><dd>{new Intl.DateTimeFormat('pt-PT',{timeZone:'Europe/Lisbon',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(data.entity.createdAt))}</dd></div>
    </dl></section>
-   <EntityProfileCard profile={data.profile} organization={data.entity} canEdit onSave={async body=>(await api.saveEntityProfile(entityId,body)).data}/>
+   <EntityProfileCard profile={data.profile} organization={data.entity} canEdit onSaveType={async body=>{const saved=(await api.saveEntityType(entityId,body)).data;setSnapshot(old=>old?.key===key?{...old,profile:saved,entity:{...old.entity,typeCode:saved.fields.typeCode}}:old);return saved}} onSave={async body=>(await api.saveEntityProfile(entityId,body)).data}/>
    </div>
    <section id="utilizadores" aria-label="Utilizadores e acessos" hidden={!accessSection}>
     <EntityUsers organizationId={entityId} organizationName={data.entity.name} platform/>

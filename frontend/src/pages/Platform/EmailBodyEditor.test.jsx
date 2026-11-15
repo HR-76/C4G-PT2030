@@ -11,9 +11,9 @@ for (const prototype of [Range.prototype, Text.prototype]) {
 }
 
 const variables = ['Organizacao', 'LigacaoAtivacao', 'Validade', 'Logotipo']
-function setup(value = '<p>Olá</p>') {
+function setup(value = '<p>Olá</p>', names = variables) {
   const onChange = vi.fn()
-  const view = render(<><span id="body-label">Corpo do email</span><EmailBodyEditor value={value} variables={variables} labelledBy="body-label" onChange={onChange}/></>)
+  const view = render(<><span id="body-label">Corpo do email</span><EmailBodyEditor value={value} variables={names} labelledBy="body-label" onChange={onChange}/></>)
   return { onChange, ...view }
 }
 const last = onChange => onChange.mock.calls.at(-1)[0]
@@ -57,4 +57,14 @@ it('replaces the document when a new value arrives and locks when disabled', asy
   expect(editor.getAttribute('contenteditable')).toBe('false')
   expect(screen.getByRole('button', { name: 'Negrito' }).disabled).toBe(true)
   expect(onChange).not.toHaveBeenCalled()
+})
+
+it('preserves and inserts the recovery link while offering only reset variables', async () => {
+  const { onChange } = setup('<p><a href="{LigacaoRecuperacao}">Recuperar</a></p>', ['LigacaoRecuperacao', 'Validade', 'Logotipo'])
+  const editor = await screen.findByRole('textbox', { name: 'Corpo do email' })
+  expect(editor.querySelector('a').getAttribute('href')).toBe('{LigacaoRecuperacao}')
+  expect(screen.queryByRole('button', { name: 'Ligação de ativação' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Nome da entidade' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Ligação de recuperação' }))
+  await waitFor(() => expect(last(onChange)).toContain('<a href="{LigacaoRecuperacao}">Recuperar acesso</a>'))
 })

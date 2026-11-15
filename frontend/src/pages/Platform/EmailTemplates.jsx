@@ -17,17 +17,48 @@ const TYPES_PATH = '/administracao/email'
 
 export default function EmailTemplates() {
   const { user } = useAuth(), { type } = useParams()
-  if (!isConfigurableType(type)) return <div className="page email-templates">
+  if (!Object.hasOwn(emailTypes, type)) return <UnavailableTemplate/>
+  if (type === 'password-reset') return <AuthenticationTemplateAccess key={`${user?.id}:${type}`} type={type}/>
+  return <EmailTemplatesView key={`${user?.id}:${type}`} type={type}/>
+}
+
+function UnavailableTemplate() {
+  return <div className="page email-templates">
     <header className="email-heading"><h1>Email</h1></header>
     <section className="email-panel">
       <p className="email-source">Este tipo de email ainda não é configurável.</p>
       <p><Link to={TYPES_PATH}>Voltar aos tipos de email</Link></p>
     </section>
   </div>
-  return <EmailTemplatesView key={`${user?.id}:${type}`} type={type}/>
+}
+
+function AuthenticationTemplateAccess({ type, api = platformEmailApi }) {
+  const [allowed, setAllowed] = useState(null), [error, setError] = useState(''), [reload, setReload] = useState(0)
+  useEffect(() => {
+    let active = true; const controller = new AbortController()
+    setAllowed(null); setError('')
+    api.types(controller.signal)
+      .then(response => {
+        if (active) setAllowed(isConfigurableType(type, response.data.items?.find(item => item.type === type)))
+      })
+      .catch(reason => { if (active && reason?.code !== 'ERR_CANCELED') setError(emailError(reason)) })
+    return () => { active = false; controller.abort() }
+  }, [api, type, reload])
+  if (allowed === false) return <UnavailableTemplate/>
+  if (allowed) return <EmailTemplatesView type={type} api={api}/>
+  return <div className="page email-templates">
+    <header className="email-heading"><h1>{emailTypes[type]}</h1></header>
+    <section className="email-panel">
+      {error ? <div className="alert alert-error" role="alert">{error}
+        <button className="btn btn-outline" onClick={() => setReload(value => value + 1)}>Tentar novamente</button>
+      </div> : <LoadingIndicator>A carregar o template…</LoadingIndicator>}
+      <p><Link to={TYPES_PATH}>Voltar aos tipos de email</Link></p>
+    </section>
+  </div>
 }
 
 function sourceText(data, scope) {
+  if (data.publication === 'UNPUBLISHED') return 'O serviço de autenticação usa o texto original. Guarde para aplicar este modelo.'
   if (data.source === 'DEFAULT') return scope ? 'Esta entidade usa o texto original da plataforma.' : 'Texto original da plataforma.'
   if (scope && data.source === 'GLOBAL') return 'Esta entidade usa o template global.'
   const who = data.updatedBy ? ` por ${data.updatedBy}` : ''
@@ -36,15 +67,18 @@ function sourceText(data, scope) {
 }
 
 export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = platformEmailApi, directoryApi = platformDirectoryApi, Editor = EmailBodyEditor }) {
+  const globalOnly = TYPE === 'password-reset'
   const [scope, setScope] = useState(''), [entities, setEntities] = useState([]), [entityQuery, setEntityQuery] = useState('')
   const [data, setData] = useState(null), [form, setForm] = useState({ subject: '', html: '' })
   const [busy, setBusy] = useState(true), [working, setWorking] = useState(''), [reload, setReload] = useState(0)
   const [error, setError] = useState(''), [problems, setProblems] = useState([]), [notice, setNotice] = useState('')
   const [preview, setPreview] = useState(null), [previewPart, setPreviewPart] = useState('html'), [confirmReset, setConfirmReset] = useState(false)
   const generation = useRef(0), bodyLabel = useId()
+  const templateScope = globalOnly ? null : scope || null
 
   const findEntities = async event => {
     event?.preventDefault()
+    if (globalOnly) return
     try {
       const { data: found } = await directoryApi.entities({ ...(entityQuery.trim() ? { q: entityQuery.trim() } : {}), status: 'ACTIVE', page: 1 })
       setEntities(found.items)
@@ -53,12 +87,12 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
     }
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs once on entry; later searches are explicit.
-  useEffect(() => { findEntities() }, [])
+  useEffect(() => { if (!globalOnly) findEntities() }, [globalOnly])
 
   useEffect(() => {
     const epoch = ++generation.current, controller = new AbortController()
     setBusy(true); setError(''); setProblems([]); setPreview(null); setConfirmReset(false)
-    api.template(TYPE, scope || null, controller.signal)
+    api.template(TYPE, templateScope, controller.signal)
       .then(response => {
         if (epoch !== generation.current) return
         setData(response.data)
@@ -71,12 +105,12 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
       })
       .finally(() => { if (epoch === generation.current) setBusy(false) })
     return () => { generation.current += 1; controller.abort() }
-  }, [api, TYPE, scope, reload])
+  }, [api, TYPE, templateScope, reload])
 
   const dirty = Boolean(data) && (form.subject !== data.subject || form.html !== data.html)
   const required = data?.variables?.required || []
   const missing = missingVariables(form.html, required)
-  const ownTemplate = Boolean(data) && data.source === (scope ? 'ORGANIZATION' : 'GLOBAL')
+  const ownTemplate = Boolean(data) && data.source === (templateScope ? 'ORGANIZATION' : 'GLOBAL')
   const locked = busy || Boolean(working)
 
   const changeScope = value => {
@@ -97,7 +131,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
     }
   }
   const showPreview = () => command('preview', async () => {
-    const response = await api.preview(TYPE, scope || null, form)
+    const response = await api.preview(TYPE, templateScope, form)
     setPreview(response.data)
   })
   const save = event => {
@@ -108,7 +142,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
       return
     }
     command('save', async () => {
-      const response = await api.save(TYPE, scope || null, { ...form, expectedRevision: data.revision, idempotencyKey: crypto.randomUUID() })
+      const response = await api.save(TYPE, templateScope, { ...form, expectedRevision: data.revision, idempotencyKey: crypto.randomUUID() })
       setData(response.data)
       setForm({ subject: response.data.subject, html: response.data.html })
       setPreview(null)
@@ -117,15 +151,15 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
     })
   }
   const sendTest = () => command('test', async () => {
-    const response = await api.test(TYPE, scope || null, { ...form, idempotencyKey: crypto.randomUUID() })
+    const response = await api.test(TYPE, templateScope, { ...form, idempotencyKey: crypto.randomUUID() })
     setNotice((testStatus[response.data.status] || testStatus.UNCONFIRMED)(response.data.to))
   })
   const reset = () => command('reset', async () => {
-    const response = await api.reset(TYPE, scope || null, { expectedRevision: data.revision, idempotencyKey: crypto.randomUUID() })
+    const response = await api.reset(TYPE, templateScope, { expectedRevision: data.revision, idempotencyKey: crypto.randomUUID() })
     setData(response.data)
     setForm({ subject: response.data.subject, html: response.data.html })
     setPreview(null); setConfirmReset(false)
-    setNotice(scope ? 'A entidade voltou a usar o template global.' : 'O template global voltou ao texto original.')
+    setNotice(templateScope ? 'A entidade voltou a usar o template global.' : 'O template global voltou ao texto original.')
   })
 
   return <div className="page email-templates">
@@ -135,7 +169,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
     </header>
 
     <section className="email-panel" aria-label="Template de email">
-      <div className="email-scope">
+      {!globalOnly && <div className="email-scope">
         <label>Aplicar a<select value={scope} disabled={locked} onChange={event => changeScope(event.target.value)}>
           <option value="">Todas as entidades (global)</option>
           {entities.map(entity => <option key={entity.id} value={entity.id}>{entity.name}</option>)}
@@ -144,7 +178,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
           <label>Procurar entidade<SearchInput value={entityQuery} maxLength={120} placeholder="Nome ou NIF" onChange={event => setEntityQuery(event.target.value)}/></label>
           <button className="btn btn-secondary" type="submit">Procurar</button>
         </form>
-      </div>
+      </div>}
 
       {busy && <LoadingIndicator>A carregar o template…</LoadingIndicator>}
       {error && !data && <div className="alert alert-error" role="alert">{error}
@@ -153,7 +187,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
 
       {data && !busy && <div className="email-workspace">
         <form className="email-form" onSubmit={save} aria-label="Editar template">
-          <p className="email-source">{sourceText(data, scope)}</p>
+          <p className="email-source">{sourceText(data, templateScope)}</p>
           <label className="email-field">Assunto
             <input value={form.subject} maxLength={limits.subject} required disabled={locked} onChange={event => edit({ subject: event.target.value })}/>
           </label>
@@ -163,10 +197,10 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
           </div>
           {missing.length > 0 && <p className="email-missing" role="status">Falta no corpo: {missing.map(name => variableLabels[name] || name).join(', ')}.</p>}
           <div className="email-actions">
-            <button className="btn btn-primary" type="submit" disabled={locked || !dirty} aria-busy={working === 'save'}><Save size={16} aria-hidden="true"/>Guardar</button>
+            <button className="btn btn-primary" type="submit" disabled={locked || (!dirty && !globalOnly)} aria-busy={working === 'save'}><Save size={16} aria-hidden="true"/>Guardar</button>
             <button className="btn btn-outline" type="button" disabled={locked} aria-busy={working === 'preview'} onClick={showPreview}><Eye size={16} aria-hidden="true"/>Pré-visualizar</button>
-            <button className="btn btn-outline" type="button" disabled={locked} aria-busy={working === 'test'} onClick={sendTest}><Send size={16} aria-hidden="true"/>Enviar teste para mim</button>
-            {ownTemplate && !confirmReset && <button className="btn btn-secondary" type="button" disabled={locked} onClick={() => setConfirmReset(true)}><RotateCcw size={16} aria-hidden="true"/>{scope ? 'Usar o template global' : 'Repor o texto original'}</button>}
+            {!globalOnly && data.capabilities?.test !== false && <button className="btn btn-outline" type="button" disabled={locked} aria-busy={working === 'test'} onClick={sendTest}><Send size={16} aria-hidden="true"/>Enviar teste para mim</button>}
+            {ownTemplate && !confirmReset && <button className="btn btn-secondary" type="button" disabled={locked} onClick={() => setConfirmReset(true)}><RotateCcw size={16} aria-hidden="true"/>{templateScope ? 'Usar o template global' : 'Repor o texto original'}</button>}
           </div>
           {/* Feedback sits by the buttons that caused it, not at the top of a long page. */}
           {error && <div className="alert alert-error" role="alert">{error}
@@ -174,7 +208,7 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
           </div>}
           {notice && <p className="alert alert-success" role="status">{notice}</p>}
           {confirmReset && <div className="email-confirm" role="group" aria-label="Confirmar reposição">
-            <p>{scope ? 'A entidade deixa de ter template próprio e passa a usar o global.' : 'O template global volta ao texto original da plataforma.'} As versões anteriores ficam guardadas.</p>
+            <p>{templateScope ? 'A entidade deixa de ter template próprio e passa a usar o global.' : 'O template global volta ao texto original da plataforma.'} As versões anteriores ficam guardadas.</p>
             <button className="btn btn-danger" type="button" disabled={locked} aria-busy={working === 'reset'} onClick={reset}>Confirmar</button>
             <button className="btn btn-secondary" type="button" disabled={locked} onClick={() => setConfirmReset(false)}>Cancelar</button>
           </div>}
@@ -199,7 +233,11 @@ export function EmailTemplatesView({ type: TYPE = 'member-invitation', api = pla
                 : <pre tabIndex={0} aria-label="Email em texto simples">{preview.text}</pre>}
             </>}
           </section>
-          {scope
+          {globalOnly ? <section className="email-logo" aria-label="Logótipo da C4G">
+            <h2>Logótipo da C4G</h2>
+            <img src={data.logo?.url || '/logo-c4g.png'} alt="Logótipo da C4G nos emails"/>
+            <p className="email-logo-note">O logótipo é aplicado ao guardar o template.</p>
+          </section> : scope
             ? <EntityLogo logo={data.logo}/>
             : <PlatformLogo api={api} disabled={locked}/>}
         </aside>

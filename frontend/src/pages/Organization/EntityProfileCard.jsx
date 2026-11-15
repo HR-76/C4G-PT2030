@@ -13,13 +13,16 @@ const groups=[
 ]
 const shown=(fields,key)=>fields?.[key]===0?'0':fields?.[key]||'Por preencher'
 
-export default function EntityProfileCard({profile,organization,canEdit,onSave,defaults={}}){
+export default function EntityProfileCard({profile,organization,canEdit,onSave,onSaveType,defaults={}}){
  const initial={...empty,...defaults,...(profile?.fields||{})},[current,setCurrent]=useState(profile),[editing,setEditing]=useState(false),[fields,setFields]=useState(initial),[errors,setErrors]=useState({}),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),pending=useRef(null)
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; defaults, editing are read at that moment.
  useEffect(()=>{setCurrent(profile);if(!editing)setFields({...empty,...defaults,...(profile?.fields||{})})},[profile,organization?.id])
  const registration=current||profile,values={...empty,...defaults,...(registration?.fields||{})},complete=Boolean(registration?.complete||registration?.fields?.nif),revision=Number(registration?.revision||0)
  // The server only stores the profile of an entity whose type is one of the registration types.
- const typeKnown=Object.hasOwn(registrationTypes,organization?.typeCode),typeMissing='O tipo desta entidade ainda não está definido. A ficha só pode ser guardada depois de a C4G indicar o tipo.'
+ const typeCode=registration?.fields?.typeCode||organization?.typeCode,typeLabel=registrationTypes[typeCode]||'Por definir'
+ const typeKnown=Object.hasOwn(registrationTypes,typeCode),typeMissing='Defina o tipo da entidade em Alterar tipo antes de guardar a ficha.'
+ const [editingType,setEditingType]=useState(false)
+
  function begin(){setFields(values);setErrors({});setMessage('');pending.current=null;setEditing(true)}
  async function submit(event,intent){event?.preventDefault();if(busy)return;setBusy(true);setErrors({});setMessage('')
   const body=intent||{expectedRevision:revision,requestId:crypto.randomUUID(),fields:Object.fromEntries(keys.map(key=>[key,key==='workerCount'&&fields[key]!==''?Number(fields[key]):fields[key]]))};pending.current=body
@@ -31,14 +34,15 @@ export default function EntityProfileCard({profile,organization,canEdit,onSave,d
  const set=(key,next)=>setFields(old=>({...old,[key]:next}))
  return <section className="entity-profile-sheet" aria-labelledby="entity-profile-title">
   <header className="entity-profile-header"><div className="entity-profile-title-line"><Building2 size={21} aria-hidden="true"/><h2 id="entity-profile-title">Ficha da entidade</h2><span className={complete?'entity-profile-state complete':'entity-profile-state incomplete'}>{complete?'Completa':'Por completar'}</span></div>
-   {canEdit&&!editing&&<button className="btn btn-outline" type="button" onClick={begin}>{complete?'Editar ficha':'Preencher ficha'}</button>}
+   {canEdit&&!editing&&!editingType&&<div className="entity-profile-header-actions">{onSaveType&&<button className="btn btn-outline" type="button" onClick={()=>{setMessage('');setEditingType(true)}}>Alterar tipo</button>}<button className="btn btn-outline" type="button" onClick={begin}>{complete?'Editar ficha':'Preencher ficha'}</button></div>}
   </header>
+  {editingType&&canEdit&&<TypeForm typeCode={typeCode} revision={revision} onSave={onSaveType} onCancel={()=>setEditingType(false)} onSaved={saved=>{setCurrent(saved);setEditingType(false);setMessage('Tipo atualizado.')}}/>}
   {message&&<p className={editing?'entity-profile-message error':'entity-profile-message'} role={editing?'alert':'status'}>{message}</p>}
   {(!editing||!canEdit)?<div className="entity-profile-document">
-   <section><h3>Identificação</h3><dl><div><dt>Denominação legal</dt><dd>{organization.legalName}</dd></div><div><dt>Nome apresentado</dt><dd>{organization.name}</dd></div><div><dt>Tipo</dt><dd>{registrationTypes[organization.typeCode]||organization.typeCode||'Por preencher'}</dd></div><div><dt>NIF</dt><dd>{shown(values,'nif')}</dd></div><div><dt>Sigla</dt><dd>{shown(values,'acronym')}</dd></div><div><dt>País e moeda</dt><dd>Portugal · EUR</dd></div></dl></section>
+   <section><h3>Identificação</h3><dl><div><dt>Denominação legal</dt><dd>{organization.legalName}</dd></div><div><dt>Nome apresentado</dt><dd>{organization.name}</dd></div><div><dt>Tipo</dt><dd>{typeLabel}</dd></div><div><dt>NIF</dt><dd>{shown(values,'nif')}</dd></div><div><dt>Sigla</dt><dd>{shown(values,'acronym')}</dd></div><div><dt>País e moeda</dt><dd>Portugal · EUR</dd></div></dl></section>
    {groups.map(group=><section key={group.title}><h3><group.icon size={17} aria-hidden="true"/>{group.title}</h3><dl>{group.fields.map(([key,label])=><div key={key}><dt>{label}</dt><dd>{shown(values,key)}</dd></div>)}</dl>{group.title==='Contacto principal'&&<p className="entity-profile-note">Contacto operacional; não representa acesso nem representação legal.</p>}</section>)}
   </div>:<form className="entity-profile-form" onSubmit={submit} noValidate>
-   <fieldset disabled={busy}><legend>Identificação</legend><div className="entity-profile-identity"><div><span>Denominação legal</span><strong>{organization.legalName}</strong></div><div><span>Nome apresentado</span><strong>{organization.name}</strong></div><div><span>Tipo</span><strong>{registrationTypes[organization.typeCode]||organization.typeCode}</strong></div><div><span>País e moeda</span><strong>Portugal · EUR</strong></div></div>
+   <fieldset disabled={busy}><legend>Identificação</legend><div className="entity-profile-identity"><div><span>Denominação legal</span><strong>{organization.legalName}</strong></div><div><span>Nome apresentado</span><strong>{organization.name}</strong></div><div><span>Tipo</span><strong>{typeLabel}</strong></div><div><span>País e moeda</span><strong>Portugal · EUR</strong></div></div>
     <div className="entity-profile-fields"><Field name="nif" hint={complete ? "NIF confirmado · apenas consulta" : null} label="NIF" maxLength={9} required value={fields.nif} error={errors.nif} readOnly={complete} set={set}/><Field name="acronym" label="Sigla" maxLength={50} value={fields.acronym} error={errors.acronym} set={set}/></div></fieldset>
    {groups.map(group=><fieldset disabled={busy} key={group.title}><legend><group.icon size={17} aria-hidden="true"/>{group.title}</legend><div className="entity-profile-fields">{group.fields.map(([key,label,maxLength,type])=><Field key={key} name={key} label={label} maxLength={maxLength} type={type} required={!optional.has(key)} value={fields[key]} error={errors[key]} set={set}/>)}</div>{group.title==='Contacto principal'&&<p className="entity-profile-note">Use a pessoa que deve receber comunicações operacionais da C4G. Este registo não cria acesso.</p>}</fieldset>)}
    {!typeKnown&&!message&&<p className="entity-profile-message error" role="alert">{typeMissing}</p>}
@@ -48,3 +52,22 @@ export default function EntityProfileCard({profile,organization,canEdit,onSave,d
 }
 
 function Field({name,label,value,error,set,hint,required=false,type='text',maxLength,readOnly=false}){return <label className={['address','addressComplement'].includes(name)?'entity-profile-wide':''}>{label}{required&&<span aria-label="obrigatório"> *</span>}{!required&&<small> (opcional)</small>}<input name={name} type={type} value={value??''} maxLength={maxLength} min={type==='number'?0:undefined} step={type==='number'?1:undefined} placeholder={name==='postalCode'?'0000-000':undefined} readOnly={readOnly} required={required} aria-invalid={Boolean(error)} aria-describedby={[hint && `profile-hint-${name}`,error && `profile-error-${name}`].filter(Boolean).join(' ') || undefined} onChange={event=>set(name,event.target.value)}/>{hint&&<small id={`profile-hint-${name}`}>{hint}</small>}{error&&<span id={`profile-error-${name}`} className="entity-profile-field-error">{error}</span>}</label>}
+
+function TypeForm({typeCode,revision,onSave,onSaved,onCancel}){
+ const [value,setValue]=useState(Object.hasOwn(registrationTypes,typeCode)?typeCode:''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[pending,setPending]=useState(null)
+ async function submit(event,retry){
+  event?.preventDefault();if(busy)return
+  const command=retry||{expectedRevision:revision,expectedTypeCode:typeCode,typeCode:value,requestId:crypto.randomUUID()}
+  setBusy(true);setError('');setPending(command)
+  try{const saved=await onSave(command);setPending(null);onSaved(saved)}
+  catch(e){const code=e.response?.data?.error?.code,confirmed=e.response?.status&&e.response.status<500
+   if(confirmed)setPending(null)
+   setError(code==='ONBOARDING_STALE'?'A ficha foi alterada. Atualize a página antes de tentar novamente.':confirmed?(e.response?.data?.error?.fields?.typeCode||'Não foi possível alterar o tipo. Verifique a sua permissão e tente novamente.'):'A gravação não foi confirmada. Repita o mesmo envio para confirmar o resultado.')
+  }finally{setBusy(false)}
+ }
+ return <form className="entity-profile-form" onSubmit={submit}>
+  <fieldset disabled={busy||Boolean(pending)}><legend>Alterar tipo</legend><div className="entity-profile-fields"><label>Tipo de entidade<select value={value} onChange={e=>setValue(e.target.value)} required><option value="">Selecione…</option>{Object.entries(registrationTypes).map(([code,label])=><option key={code} value={code}>{label}</option>)}</select></label></div></fieldset>
+  {error&&<p className="entity-profile-message error" role="alert">{error}</p>}
+  <div className="entity-profile-actions"><button className="btn btn-primary" disabled={busy||!value||Boolean(pending)}>{busy?'A guardar…':'Guardar tipo'}</button>{pending&&!busy&&<button className="btn btn-primary" type="button" onClick={()=>submit(null,pending)}>Repetir o mesmo envio</button>}<button className="btn btn-secondary" type="button" disabled={busy} onClick={onCancel}>Cancelar</button></div>
+ </form>
+}

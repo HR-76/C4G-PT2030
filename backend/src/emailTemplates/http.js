@@ -13,7 +13,9 @@ const STATUS = Object.freeze({
   IDEMPOTENCY_CONFLICT: 409,
   EMAIL_TEMPLATE_NOT_CUSTOMIZED: 409,
   STATE_CONFLICT: 409,
-  EMAIL_DELIVERY_UNAVAILABLE: 503
+  EMAIL_DELIVERY_UNAVAILABLE: 503,
+  EMAIL_PUBLISH_UNAVAILABLE: 503,
+  EMAIL_PUBLICATION_DRIFT: 409
 });
 
 // Why a template was refused. Only these codes, and only a variable name, ever leave the server.

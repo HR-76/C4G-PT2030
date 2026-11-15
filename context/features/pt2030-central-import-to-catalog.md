@@ -44,6 +44,18 @@ Reutilizar o que existe e acrescentar só o que falta:
 
 Migração nova da Central, publicação automática sem decisão humana, importação por organização, avisos oficiais Portugal 2030 (`PORTUGAL2030_NOTICE`), ligação à recolha automática. Em produção a decisão 3 pode exigir segundo aprovador.
 
+## Regressão de disponibilidade após Central 054 (15/11/2026)
+
+A lista de esquemas admitidos pela disponibilidade parava na Central 053. A 054 de validação de faturação herda o contrato da importação, mas era recusada antes das verificações de armazenamento e antivírus, resultando em `available:false` e na mensagem genérica da página.
+
+Aceitação da correção: admitir explicitamente a 054, conservando a validação real do fingerprint e da segurança SQL; manter a recusa de esquemas inválidos, tabelas/permissões em falta e dependências indisponíveis. Testar disponibilidade em preview e catálogo. Não ativar serviços, aplicar migrações nem importar dados. A ocorrência no staging da imagem exige confirmação da versão instalada e da resposta autenticada da API.
+
+Continuação em 15/11: com a 055 agora registada no checkout, substituir a lista manual por versões do manifesto que sejam admissíveis em runtime, declarem `centralImportSecurity` e descendam da migração de importação segundo `supportsCentralVersion`. Não admitir versões desconhecidas, anteriores à importação ou de ramos incompatíveis. A seleção não dispensa o fingerprint nem as verificações de segurança existentes. Regressões explícitas nas versões 049, 054 e 055, nos dois modos.
+
+Diagnóstico confirmado pelo utilizador no terminal Hostinger: API `c262040-billing-v1`, Central `054_billing_account_validation` aplicada em 15/11/2026 00:25 UTC, modo `catalog`, ClamAV saudável, readiness `READY`; o código da API ainda enumera apenas as versões 049–053. Assim, a recusa da 054 explica a indisponibilidade neste ambiente. Publicação da correção ainda pendente. Na continuação local: 22 testes de runtime/upload/aceitação aprovados, lint aprovado; suite frontend concluída com 1126 aprovados e um timeout em ApplicationPartners.
+
+Validação local: duas regressões falharam antes e passaram após a alteração; 4 testes de runtime, 6 de upload, 8 de aceitação e 6 HTTP aprovados. Os testes de disponibilidade cobrem também recusa de drift, tabelas/permissões ausentes e armazenamento/antivírus indisponíveis. Build aprovado. Lint global encontrou duas chaves duplicadas em `frontend/src/api/api.js`, ficheiro com alterações concorrentes fora deste incremento. Suites completas iniciadas e interrompidas por sobrecarga e falhas alheias; tentativa com concorrência limitada voltou a apresentar timeout em `ApplicationPartners`. Não se declara aprovação das suites completas nem validação no staging; nenhum deploy ou migração executado.
+
 ## Implementação (12/11/2026)
 
 - Modo `CENTRAL_PT2030_IMPORT_RUNTIME=catalog` (além de `preview`, que continua só pré-visualização). O `env --storage` de staging passa a gerar `catalog`.

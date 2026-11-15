@@ -30,3 +30,11 @@ test('both profile boundaries return closed validation errors without leaking in
  const platformRouter=createPlatformDirectoryRouter({express,service:{async entity(){}},registration:{async saveForPlatform(){throw invalid}},authenticate:(req,res,next)=>next()});
  await withServer(platformRouter,async base=>{const response=await fetch(`${base}/entities/${organizationId}/registration`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(command)});assert.equal(response.status,400);assert.deepEqual((await response.json()).error,{code:'REGISTRATION_FIELDS_INVALID',fields:invalid.fields})});
 });
+
+test('type HTTP boundaries forward the independent type command',async()=>{
+ const body={typeCode:'COMPANY',expectedTypeCode:'UNSPECIFIED',expectedRevision:0,requestId:randomUUID()};
+ const entityRouter=createDirectoryRouter({express,service:{async execute(method,value,id,req){assert.equal(method,'registrationType');assert.deepEqual(value,body);assert.equal(req.headers['x-c4g-organization'],organizationId);return result}},authenticate:(req,res,next)=>next(),organizationMiddleware});
+ await withServer(entityRouter,async base=>{const response=await fetch(`${base}/registration/type`,{method:'PUT',headers:{'Content-Type':'application/json','X-C4G-Organization':organizationId},body:JSON.stringify(body)});assert.equal(response.status,200)});
+ const platformRouter=createPlatformDirectoryRouter({express,service:{async entity(id){assert.equal(id,organizationId)}},registration:{async typeForPlatform(id,value){assert.equal(id,organizationId);assert.deepEqual(value,body);return result}},authenticate:(req,res,next)=>next()});
+ await withServer(platformRouter,async base=>{const response=await fetch(`${base}/entities/${organizationId}/type`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});assert.equal(response.status,200)});
+});

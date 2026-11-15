@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+ <changeSet id="c4g-email-templates-1" author="c4g">
+  <createTable tableName="C4G_EMAIL_TEMPLATE_VERSION">
+   <column name="ID" type="VARCHAR(36)"><constraints primaryKey="true" nullable="false" primaryKeyName="PK_C4G_EMAIL_VERSION"/></column>
+   <column name="REALM_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
+   <column name="REVISION" type="BIGINT"><constraints nullable="false"/></column>
+   <column name="REQUEST_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
+   <column name="REQUEST_SHA256" type="VARCHAR(64)"><constraints nullable="false"/></column>
+   <column name="ACTOR_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
+   <column name="CREATED_AT" type="BIGINT"><constraints nullable="false"/></column>
+   <column name="PAYLOAD_JSON" type="NCLOB"><constraints nullable="false"/></column>
+   <column name="LOCALES_JSON" type="NCLOB"><constraints nullable="false"/></column>
+  </createTable>
+  <addUniqueConstraint tableName="C4G_EMAIL_TEMPLATE_VERSION" columnNames="REALM_ID,REQUEST_ID" constraintName="UQ_C4G_EMAIL_REQUEST"/>
+  <addUniqueConstraint tableName="C4G_EMAIL_TEMPLATE_VERSION" columnNames="REALM_ID,REVISION" constraintName="UQ_C4G_EMAIL_REVISION"/>
+  <addForeignKeyConstraint baseTableName="C4G_EMAIL_TEMPLATE_VERSION" baseColumnNames="REALM_ID" referencedTableName="REALM" referencedColumnNames="ID" constraintName="FK_C4G_EMAIL_VERSION_REALM" onDelete="CASCADE"/>
+  <createTable tableName="C4G_EMAIL_TEMPLATE_HEAD">
+   <column name="REALM_ID" type="VARCHAR(36)"><constraints primaryKey="true" nullable="false" primaryKeyName="PK_C4G_EMAIL_HEAD"/></column>
+   <column name="REVISION" type="BIGINT"><constraints nullable="false"/></column>
+   <column name="VERSION_ID" type="VARCHAR(36)"><constraints nullable="false"/></column>
+  </createTable>
+  <addForeignKeyConstraint baseTableName="C4G_EMAIL_TEMPLATE_HEAD" baseColumnNames="REALM_ID" referencedTableName="REALM" referencedColumnNames="ID" constraintName="FK_C4G_EMAIL_HEAD_REALM" onDelete="CASCADE"/>
+ </changeSet>
+</databaseChangeLog>

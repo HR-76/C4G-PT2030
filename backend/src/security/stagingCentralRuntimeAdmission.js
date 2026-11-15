@@ -12,6 +12,10 @@ const fingerprints = Object.freeze({
   authority: '69fe614017584d90de8da44dc2a8b380b1e85812926a8e759607e202e175e969',
 });
 const later = Object.freeze({
+  '055_entity_type_edit': Object.freeze({
+    schema: 'a9490cd7a75d1edff9111f4c723f1553b3a5b4f7eb9a4f131ab4e60a6e9214ab',
+    authority: '0e00978486771c8fa1e47a0cfbb43ae749794931e01d5d0317213876abd2e5bc',
+  }),
   '054_billing_account_validation': Object.freeze({
     schema: 'cfdbedb567f55b6313bc5290074ccd8cdbf9d1f9df1e6f0ba4f5abef011e0961',
     authority: 'ebdb09c37b0a2e2a748f0427e992c0144bf162e1d39ff92824c9687ed9293aec',

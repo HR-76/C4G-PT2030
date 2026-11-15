@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { EmailTypesView } from './EmailTypes'
 import EmailTemplates from './EmailTemplates'
 
-const emailApi = vi.hoisted(() => ({ template: vi.fn() }))
+const emailApi = vi.hoisted(() => ({ types: vi.fn(), template: vi.fn() }))
 vi.mock('../../api/api', () => ({ platformEmailApi: emailApi, platformDirectoryApi: { entities: vi.fn() } }))
 vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1' } }) }))
 afterEach(() => { cleanup(); vi.clearAllMocks() })
@@ -46,11 +46,56 @@ it('shows a refusal without rows and retries on request', async () => {
 })
 
 it('does not open an editor for a type that cannot be configured', () => {
-  for (const type of ['password-reset', 'desconhecido']) {
+  for (const type of ['email-code', 'desconhecido']) {
     render(<MemoryRouter initialEntries={[`/administracao/email/${type}`]}><Routes><Route path="/administracao/email/:type" element={<EmailTemplates/>}/></Routes></MemoryRouter>)
     expect(screen.getByText('Este tipo de email ainda não é configurável.')).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Voltar aos tipos de email' }).getAttribute('href')).toBe('/administracao/email')
     cleanup()
   }
+  expect(emailApi.template).not.toHaveBeenCalled()
+  expect(emailApi.types).not.toHaveBeenCalled()
+})
+
+it('offers password reset only with an affirmative server capability and keeps email code closed', async () => {
+  list({ types: vi.fn().mockResolvedValue({ data: { items: [
+    { type: 'password-reset', configurable: true, globalCustomized: true },
+    { type: 'email-code', configurable: true },
+  ] } }) })
+  const reset = within(await screen.findByRole('row', { name: /Reposição de palavra-passe/ }))
+  expect(reset.getByRole('link', { name: 'Configurar Reposição de palavra-passe' }).getAttribute('href')).toBe('/administracao/email/password-reset')
+  expect(reset.getByText('Template global alterado')).toBeTruthy()
+  expect(within(row('Código por email')).queryByRole('link')).toBeNull()
+})
+
+const resetRoute = () => render(<MemoryRouter initialEntries={['/administracao/email/password-reset']}><Routes>
+  <Route path="/administracao/email/:type" element={<EmailTemplates/>}/>
+</Routes></MemoryRouter>)
+
+it.each([undefined, false, 'true'])('refuses direct reset editing without explicit capability %s', async configurable => {
+  emailApi.types.mockResolvedValue({ data: { items: configurable === undefined ? [] : [{ type: 'password-reset', configurable }] } })
+  resetRoute()
+  expect(await screen.findByText('Este tipo de email ainda não é configurável.')).toBeTruthy()
+  expect(emailApi.template).not.toHaveBeenCalled()
+})
+
+it('checks reset capability before fetching the template and does not bypass a subsequent refusal', async () => {
+  let resolveTypes
+  emailApi.types.mockImplementation(() => new Promise(resolve => { resolveTypes = resolve }))
+  emailApi.template.mockRejectedValue({ response: { status: 403, data: { error: { code: 'C4G_ADMIN_REQUIRED' } } } })
+  resetRoute()
+  expect(emailApi.template).not.toHaveBeenCalled()
+  resolveTypes({ data: { items: [{ type: 'password-reset', configurable: true }] } })
+  expect((await screen.findByRole('alert')).textContent).toContain('Esta área está reservada à administração C4G.')
+  expect(emailApi.template).toHaveBeenCalledWith('password-reset', null, expect.any(AbortSignal))
+  expect(screen.queryByLabelText('Assunto')).toBeNull()
+})
+
+it('does not fetch a reset template when capability lookup fails and can retry', async () => {
+  emailApi.types.mockRejectedValueOnce({ response: { status: 503 } }).mockResolvedValue({ data: { items: [] } })
+  resetRoute()
+  expect((await screen.findByRole('alert')).textContent).toContain('Não foi possível concluir.')
+  expect(emailApi.template).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }))
+  expect(await screen.findByText('Este tipo de email ainda não é configurável.')).toBeTruthy()
   expect(emailApi.template).not.toHaveBeenCalled()
 })
