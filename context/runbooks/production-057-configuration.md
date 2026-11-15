@@ -1,5 +1,7 @@
 # Produção 057: configuração privada e perfis
 
+Atualização — a instalação inicial tem agora [configuração fechada, exemplos e geração de credenciais de runtime](production-bootstrap-installer.md), incluindo Central058, tenant041 e primeiro administrador. Os ficheiros gerados são fragmentos privados para completar a configuração descrita abaixo; não fazem deploy nem substituem os inputs da entidade e identidade reais.
+
 Preparação de 15/11/2026; não aplicada. Domínios confirmados: aplicação `gcni.c4g.ai`, login `login.c4g.ai`. Realm `c4g-production`, client `c4g-production-web`, nome da Central, porta 8600, timeouts e limites de recursos são propostas operacionais a validar. A primeira entidade ainda não foi identificada.
 
 ## Ficheiros e isolamento

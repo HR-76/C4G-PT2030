@@ -1,5 +1,7 @@
 # Produção: preparação da migração 057 e deploy
 
+Atualização — instalador inicial: para uma instância nova, usar o [bootstrap completo até058](production-bootstrap-installer.md). Este substitui os passos manuais de criar Central/tenant e depois aplicar057/058; não executar o job de atualização057 sobre a Central já instalada até058. A configuração privada, a infraestrutura e a autorização de deploy continuam separadas. O staging permanece fora do âmbito.
+
 Preparado em 15/11/2026. **Não aplicado.** Staging inalterado. Domínios confirmados: aplicação `gcni.c4g.ai`, login `login.c4g.ai`. Base de código: `6e0b8942c5bad38efddfbe1977b2a37ac23898d3` (`Prod 1`, ramo local `staging-vps`). O bundle de preparação acrescentado neste trabalho ainda precisa de commit/release identificados; não foi criado commit, tag, merge ou push.
 
 CI consultado no GitHub para o commit base: [CI #200](https://github.com/HR-76/C4G-PT2030/actions/runs/43739440762), concluído com success. Os testes locais anteriores estão [registados](../reviews/central-production-permissions-20261115/backend-suite-repair.md). Isto não substitui CI/ensaios da release final que incluir estes artefactos.

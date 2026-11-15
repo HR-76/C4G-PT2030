@@ -1,0 +1,165 @@
+{
+  "postgres": "18",
+  "mode": "fresh",
+  "checks": [
+    {
+      "name": "default plan performs no mutations",
+      "pass": true
+    },
+    {
+      "name": "wrong physical identity and staging config fail before mutations",
+      "pass": true
+    },
+    {
+      "name": "unverified provider identity fails before any database creation",
+      "pass": true
+    },
+    {
+      "name": "shared instance and foreign roles are refused",
+      "pass": true
+    },
+    {
+      "name": "complete installation succeeds after all durable phase interruptions",
+      "pass": true
+    },
+    {
+      "name": "replay preserves data and password verifiers without duplicate admin or membership",
+      "pass": true
+    },
+    {
+      "name": "changed immutable config or secret is refused without replacement",
+      "pass": true
+    },
+    {
+      "name": "stale technical elevation is repaired on safe replay",
+      "pass": true
+    },
+    {
+      "name": "058 and 041 pinned preflights remain exact after activation",
+      "pass": true
+    },
+    {
+      "name": "all service identities are limited and confined to their database",
+      "pass": true
+    },
+    {
+      "name": "limited tenant login enforces organization RLS and rejects Central connection",
+      "pass": true
+    },
+    {
+      "name": "privilege drift fails closed and does not repair or elevate the login",
+      "pass": true
+    },
+    {
+      "name": "public receipt contains no secrets; private artifacts are explicit and conflict-safe",
+      "pass": true
+    },
+    {
+      "name": "read: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "commands: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "authoring: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "logs: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "retention: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "catalog: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "authority: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "read: entity is visible; identities, sessions and directory cannot be mutated",
+      "pass": true
+    },
+    {
+      "name": "commands: closed email commands execute; arbitrary DML, retention and claim do not",
+      "pass": true
+    },
+    {
+      "name": "authoring: catalog reads and administrator gate execute; collection and generic updates do not",
+      "pass": true
+    },
+    {
+      "name": "logs: support event insertion works while reading and deleting events are forbidden",
+      "pass": true
+    },
+    {
+      "name": "retention: dedicated retention command works without access to email content",
+      "pass": true
+    },
+    {
+      "name": "catalog: dedicated reader admission and catalog SELECT work, writes and identities fail",
+      "pass": true
+    },
+    {
+      "name": "authority: exact identity lookup works through coordinator; direct DML and arbitrary SQL fail",
+      "pass": true
+    },
+    {
+      "name": "tenant API cannot connect to a second physically separate database",
+      "pass": true
+    },
+    {
+      "name": "real limited identity resolver recognizes only the bound C4G administrator",
+      "pass": true
+    },
+    {
+      "name": "real membership and authorization ports resolve exact ORG_ADMIN grants with optional MFA",
+      "pass": true
+    },
+    {
+      "name": "real bounded authority directory resolves the published tenant and named person projection",
+      "pass": true
+    },
+    {
+      "name": "direct F5 DML is denied to both authority and production read logins",
+      "pass": true
+    },
+    {
+      "name": "bootstrap audit records the installation service without personal data or secrets",
+      "pass": true
+    },
+    {
+      "name": "C4G role gives the first administrator no implicit membership or F5 authority in a second organization",
+      "pass": true
+    }
+  ],
+  "total": 34,
+  "receipt": {
+    "installed": true,
+    "installationId": "50eec5ef-5cdb-4b3f-9f90-424150933109",
+    "intentDigest": "c8cf8c63c30322c5eca7fe73d5390c7bd45e262f06f29e29821d5a7799279aa0",
+    "centralVersion": "058_platform_account_lifecycle",
+    "tenantVersion": "041_account_identity_erasure",
+    "organizationId": "3ecb0a9a-919b-4f69-844e-f3df25e6480e",
+    "tenantId": "affce5c7-e565-4dfa-a7b2-ebcfc5cd5e6d",
+    "administratorId": "cd5e0261-5552-4865-8a49-cc652da75cef",
+    "organizationProfile": "ORG_ADMIN",
+    "mfa": "OPTIONAL",
+    "logins": {
+      "read": "c4g_prod_api_read",
+      "commands": "c4g_prod_api_commands",
+      "authoring": "c4g_prod_catalog_authoring",
+      "logs": "c4g_prod_logs",
+      "retention": "c4g_prod_email_retention",
+      "catalog": "c4g_prod_catalog_read",
+      "authority": "c4g_authority_runtime",
+      "tenantApi": "prod_tenant_api"
+    }
+  }
+}

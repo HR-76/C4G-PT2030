@@ -1,5 +1,7 @@
 # Transição para produção: plano por fases
 
+Atualização — o [instalador completo](production-bootstrap-installer.md) implementa o bootstrap Central058/tenant041, perfis limitados e primeiro administrador; [execução, configuração e rollback](../runbooks/production-bootstrap-installer.md) preparados para destino isolado. A preparação da infraestrutura, dos inputs reais e da release final continua pendente. Esta atualização não autoriza alterações no staging ou deploy.
+
 Estado: Draft (15/11/2026). Proposta para análise; não autoriza implementação, deploy nem alterações na VPS. As decisões da fase 0 são do utilizador e ainda não foram tomadas.
 
 Atualização 15/11/2026: as decisões listadas em «Decidido» já foram tomadas. O utilizador pediu a preparação da aplicação057 e do deploy, **sem alterar staging**; [bundle e gates](../runbooks/production-057-deployment.md), [configuração](../runbooks/production-057-configuration.md) e [rollback](../runbooks/production-057-rollback.md) preparados, não executados. Os ensaios/cortes de staging sugeridos abaixo não estão autorizados por esse pedido: substituir por ensaio isolado. Persistem bloqueios de provisionamento, recuperação e compatibilidade funcional identificados no novo runbook.

@@ -2,14 +2,14 @@
 const {Pool}=require('pg');
 const {uuid,hash,fail}=require('./contracts');
 // allowedResidency: the regions the tenant credentials may live in; the local installation is the default.
-function createMemberProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}]}){
+function createMemberProjection({bindings,allowedResidency=[{regionCode:'LOCAL',policyVersion:'local-development-v1'}],createPool=options=>new Pool(options)}){
  return {async ensure(x){
   for(const key of ['operationId','organizationId','globalUserId','membershipId'])uuid(x[key]);
   const entry=bindings.find(b=>b.organizationId===x.organizationId);if(!entry)fail('ONBOARDING_NOT_READY');
   const {credentials,snapshot}=entry;
   if(snapshot.organizationId!==x.organizationId||snapshot.tenantId!==credentials.tenantId||snapshot.databaseRef!==credentials.database)fail('ONBOARDING_NOT_READY');
   const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});
-  const pool=new Pool({host:credentials.host,port:credentials.port,database:credentials.database,user:credentials.login,password:credentials.password,ssl:credentials.ssl?{rejectUnauthorized:true}:false,max:1});
+  const pool=createPool({host:credentials.host,port:credentials.port,database:credentials.database,user:credentials.login,password:credentials.password,ssl:credentials.ssl?{rejectUnauthorized:true}:false,max:1});
   const c=await pool.connect();let begun=false;
   try{
    await runtime.bindingVerifier.verify({client:c,snapshot,requiredCapabilities:[],correlationId:x.operationId,phase:'PREPARATION'});
