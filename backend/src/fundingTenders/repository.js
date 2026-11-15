@@ -51,6 +51,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     finally { client.release(); }
   }
   async function administrator(client, userId, lock = false) {
+    if(client.productionCapability){if(!(await client.query("SELECT c4g_production.active_administrator($1) AS allowed",[userId])).rows[0]?.allowed)fail("FUNDING_FORBIDDEN");return;}
     const user = (await client.query(`SELECT id FROM public.global_user WHERE id=$1 AND status='ACTIVE'${lock ? ' FOR SHARE' : ''}`, [userId])).rows[0];
     const assignment = (await client.query(`SELECT id FROM public.platform_admin_assignment WHERE global_user_id=$1 AND role_code='C4G_ADMIN' AND status='ACTIVE'${lock ? ' FOR SHARE' : ''}`, [userId])).rows[0];
     if (!user || !assignment) fail('FUNDING_FORBIDDEN');
@@ -105,6 +106,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
   }
   async function status(userId) { return transaction(async client => {
     await administrator(client, userId);
+    if(pool.productionCapability)return {source:SOURCE,lastRun:null,lastRuns:[],lastCompleteRuns:[],runs:[],runsLimited:false};
     if(coverageEnabled){
       const rows=(await client.query(`SELECT * FROM (${history}) h ORDER BY created_at DESC,run_id DESC LIMIT 101`)).rows;
       const latest=(await client.query(`SELECT DISTINCT ON (source_code) * FROM (${history}) h ORDER BY source_code,created_at DESC,run_id DESC`)).rows;

@@ -39,7 +39,7 @@ async function start({production=null,dependencies=null,env=process.env,host=und
       if((env.AUTH_MODE||'oidc')!=='oidc')throw new Error('C4G_API_OIDC_REQUIRED');
       const composition=require('./productionComposition');
       const loader=dependencyLoader||composition.loadProductionDependencies;
-      if(!dependencies){dependencies=loader({ownResource:owner.own});for(const pool of [...new Set([dependencies.centralPool,dependencies.authorityPool].filter(Boolean))]){trackPool(pool);ownedPools.push(pool);}const coverage=await configuredCoverage({env,pool:dependencies.centralPool});if(coverage)dependencies.fundingCoverage=coverage;}
+      if(!dependencies){dependencies=loader({ownResource:owner.own,env});for(const pool of [...new Set([dependencies.centralPool,dependencies.authorityPool,...Object.values(dependencies.capabilityPools||{})].filter(Boolean))]){trackPool(pool);ownedPools.push(pool);}const coverage=await configuredCoverage({env,pool:dependencies.centralPool});if(coverage)dependencies.fundingCoverage=coverage;}
       // Member invitations (MEMBER_ONBOARDING_RUNTIME=central): the service joins the composition; its pages and bridge start after readiness.
       members=(memberOnboardingLoader||require('./platformOnboarding/memberRuntime').configuredMemberOnboarding)({env,express:dependencies.express});
       if(members){owner.own(members,()=>members.close());dependencies={...dependencies,createMemberOnboarding:members.createMemberOnboarding,createUserDeletion:members.createUserDeletion};}

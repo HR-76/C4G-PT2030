@@ -35,7 +35,7 @@ function createPlatformDirectory({pool,logs,health,deletionAvailable=false}){
   const c=await pool.connect();
   try{
    await c.query('BEGIN READ ONLY');await c.query("SET LOCAL statement_timeout='5s'");
-   const authorize=async()=>{if(!(await c.query(authoritySql,[sid,userId])).rowCount)fail('C4G_ADMIN_REQUIRED');};
+   const authorize=async()=>{if(!(await c.query(c.productionCapability?'SELECT $2::uuid AS id WHERE c4g_production.administrator($1,$2,false)':authoritySql,[sid,userId])).rowCount)fail('C4G_ADMIN_REQUIRED');};
    await authorize();const result=await work(c);await authorize();await c.query('COMMIT');return result;
   }catch(e){await c.query('ROLLBACK').catch(()=>{});throw e;}finally{c.release();}
  }

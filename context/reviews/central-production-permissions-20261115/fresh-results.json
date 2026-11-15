@@ -1,0 +1,129 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "name": "production installer applies only explicit target and provisions dedicated logins",
+      "pass": true
+    },
+    {
+      "name": "read: real limited login",
+      "pass": true
+    },
+    {
+      "name": "read: preflight under capability",
+      "pass": true
+    },
+    {
+      "name": "commands: real limited login",
+      "pass": true
+    },
+    {
+      "name": "commands: preflight under capability",
+      "pass": true
+    },
+    {
+      "name": "authoring: real limited login",
+      "pass": true
+    },
+    {
+      "name": "authoring: preflight under capability",
+      "pass": true
+    },
+    {
+      "name": "logs: real limited login",
+      "pass": true
+    },
+    {
+      "name": "logs: preflight under capability",
+      "pass": true
+    },
+    {
+      "name": "retention: real limited login",
+      "pass": true
+    },
+    {
+      "name": "retention: preflight under capability",
+      "pass": true
+    },
+    {
+      "name": "real authority protocol resolves only configured organization and workload",
+      "pass": true
+    },
+    {
+      "name": "dedicated catalog reader admits 057 with restricted grants",
+      "pass": true
+    },
+    {
+      "name": "catalog excludes private originals and Central personal data",
+      "pass": true
+    },
+    {
+      "name": "manual real repository writes and retries atomically",
+      "pass": true
+    },
+    {
+      "name": "manual audit failure rolls back catalog and receipt",
+      "pass": true
+    },
+    {
+      "name": "PT2030 readiness and upload with private originals",
+      "pass": true
+    },
+    {
+      "name": "PT2030 preview and stage with real SQL and session locks",
+      "pass": true
+    },
+    {
+      "name": "PT2030 review acceptance and replay through real v2 writer",
+      "pass": true
+    },
+    {
+      "name": "readiness with limited metadata observer",
+      "pass": true
+    },
+    {
+      "name": "read has no mutation or session contents",
+      "pass": true
+    },
+    {
+      "name": "admin verifier checks expired/other actor and does not expose session",
+      "pass": true
+    },
+    {
+      "name": "platform directory factory with actual limited pool",
+      "pass": true
+    },
+    {
+      "name": "logs insert-only and rollback returns role",
+      "pass": true
+    },
+    {
+      "name": "cross-organization template/logo authorization",
+      "pass": true
+    },
+    {
+      "name": "email recording separated from retention and delivery claim",
+      "pass": true
+    },
+    {
+      "name": "authoring has no collection, identities or generic update",
+      "pass": true
+    },
+    {
+      "name": "revocation waits for authoring transaction lock",
+      "pass": true
+    },
+    {
+      "name": "unexpected membership is refused at checkout",
+      "pass": true
+    },
+    {
+      "name": "capability grant drift is refused by preflight",
+      "pass": true
+    },
+    {
+      "name": "PUBLIC function grant drift blocks all production capability admission",
+      "pass": true
+    }
+  ]
+}

@@ -58,7 +58,7 @@ function createFundingRouters({ express, pool, catalogReader, authenticate, orga
     if (!req.authContext || !evaluateAssurance({evidence:req.authContext.evidence,requirement:recentMfaRequirement,
       nowSeconds:Date.now()/1000,expectedPolicyVersion:policyVersion}).allowed)
       throw Object.assign(new Error(),{code:'MFA_REQUIRED'});
-    try { res.status(201).json(await manual.create(req.user.id,req.body)); }
+    try { res.status(201).json(await manual.create(req.user.id,req.body,req.sessionID)); }
     catch(error) {
       if (['OPPORTUNITY_INVALID_INPUT','OPPORTUNITY_UNKNOWN_FIELD','OPPORTUNITY_LIMIT_EXCEEDED'].includes(error.code)) error.code='INVALID_INPUT';
       if (error.code==='OPPORTUNITY_DIGEST_MISMATCH') error.code='IDEMPOTENCY_CONFLICT';

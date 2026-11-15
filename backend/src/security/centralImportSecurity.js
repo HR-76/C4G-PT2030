@@ -1,6 +1,6 @@
 'use strict';
 // Exact grants for private central originals and previews. No tenant/catalog reader access.
-async function assertCentralImportSecurity(client){
+async function assertCentralImportSecurity(client,{production=false}={}){
  const names=['pt2030_document_upload','pt2030_plan_preview'];
  const rows=(await client.query(`SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,
  COALESCE(r.rolname,'PUBLIC') AS grantee,a.privilege_type,a.is_grantable
@@ -11,9 +11,10 @@ async function assertCentralImportSecurity(client){
  for(const name of names){
   const grants=rows.filter(r=>r.relname===name);
   if(!grants.length||grants.some(r=>r.owner!=='c4g_opportunity_central_owner'||r.is_grantable||
-   !['c4g_opportunity_central_owner','c4g_opportunity_central_runtime'].includes(r.grantee)))throw Error('CENTRAL_IMPORT_PERMISSION_DRIFT');
+   !['c4g_opportunity_central_owner','c4g_opportunity_central_runtime',...(production?['c4g_prod_authoring_role']:[])].includes(r.grantee)))throw Error('CENTRAL_IMPORT_PERMISSION_DRIFT');
   const runtime=grants.filter(r=>r.grantee==='c4g_opportunity_central_runtime').map(r=>r.privilege_type).sort();
   if(JSON.stringify(runtime)!==JSON.stringify(['INSERT','SELECT']))throw Error('CENTRAL_IMPORT_PERMISSION_DRIFT');
+  if(production && JSON.stringify(grants.filter(r=>r.grantee==='c4g_prod_authoring_role').map(r=>r.privilege_type).sort())!==JSON.stringify(['INSERT','SELECT']))throw Error('CENTRAL_IMPORT_PERMISSION_DRIFT');
  }
  const columns=await client.query(`SELECT 1 FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid
  JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='opportunity_catalog' AND c.relname=ANY($1::text[]) AND a.attacl IS NOT NULL`,[names]);

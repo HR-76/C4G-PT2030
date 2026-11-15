@@ -52,15 +52,15 @@ test('the explicit entrypoint refuses any other package id', async () => {
 });
 
 // The lists that stopped at 051 are what kept the staging API restarting once the ledger reached 052.
-test('every runtime allowlist of Central versions admits 053', () => {
+test('runtime admission accepts registered 053 and keeps schema/ledger validation mandatory', async t => {
   const read = file => fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
   for (const file of ['src/security/catalogReaderSchema.js', 'src/security/catalogReaderSecurity.js', 'src/customerBilling/pdfRuntime.js']) {
     assert.ok(read(file).includes(`'${entry.version}'`), `${file} does not admit ${entry.version}`);
   }
-  for (const file of ['src/portugal2030/uploadRuntime.js', 'src/opportunities/catalogRead/ledgerContract.js']) {
-    assert.ok(read(file).includes('opportunityComplementMigrationPackage'), `${file} does not admit ${entry.version}`);
-  }
-  assert.ok(read('src/opportunities/preflight.js').includes('opportunityComplementManifest'));
+  const { assertImportAvailability, assertCatalogLedger, assertOpportunityPreflight } = require('./support/centralRuntimeAdmissionAssertions');
+  await assertImportAvailability(t, entry.version);
+  assertCatalogLedger(manifest.opportunityComplementManifest);
+  await assertOpportunityPreflight(manifest.opportunityComplementManifest);
   assert.ok(read('src/security/centralMigrationPreflight.js').includes('opportunityComplementManifest.at(-1).version'));
   assert.ok(read('scripts/staging/install.js').includes("run.applyRegisteredOpportunityComplementPackage(pool, 'opportunity-complement-v1')"));
 });

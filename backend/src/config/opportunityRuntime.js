@@ -16,8 +16,8 @@ function createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,en
   if(workerFunctionalRoles && (editorialEnabled||documentsEnabled||!Array.isArray(workerFunctionalRoles)))throw new TypeError('Invalid worker role profile.');
   // Validate the service scope before constructing resources with independent ownership.
   let directoryRepository;
-  if(documentsEnabled){
-    let organizations;try{organizations=JSON.parse(env.DOCUMENT_API_ORGANIZATIONS_JSON);}catch{throw new TypeError('TENANT_DIRECTORY_CONFIGURATION_INVALID');}
+  if(documentsEnabled||env.CENTRAL_RUNTIME_PROFILE==='production-v1'){
+    let organizations;try{organizations=JSON.parse(env.CENTRAL_RUNTIME_PROFILE==='production-v1'?env.CENTRAL_API_ORGANIZATIONS_JSON:env.DOCUMENT_API_ORGANIZATIONS_JSON);}catch{throw new TypeError('TENANT_DIRECTORY_CONFIGURATION_INVALID');}
     directoryRepository=require('../security/tenantDirectoryReader').createTenantDirectoryReader({coordinator:authorityCoordinator,organizations,workload:'API'});
   }else directoryRepository=createTenantDirectoryRepository(centralPool);
   let entries,regions;

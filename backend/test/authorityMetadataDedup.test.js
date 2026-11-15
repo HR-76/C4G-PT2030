@@ -36,7 +36,8 @@ function fixture({authorityFingerprint, preAuthority = false} = {}) {
     Object.freeze({...entries[0], version:'053_opportunity_complement',schemaFingerprint:hash(schemaFor('opportunity-complement-package'))}),
     Object.freeze({...entries[0], version:'054_billing_account_validation',schemaFingerprint:hash(schemaFor('billing-validation-package'))}),
     Object.freeze({...entries[0], version:'055_entity_type_edit',schemaFingerprint:hash(schemaFor('entity-type-package'))}),
-    Object.freeze({...entries[0], version:'056_email_delivery_history',schemaFingerprint:hash(schemaFor('email-delivery-package'))})]);
+    Object.freeze({...entries[0], version:'056_email_delivery_history',schemaFingerprint:hash(schemaFor('email-delivery-package'))}),
+    Object.freeze({...entries[0], version:'057_production_central_permissions',schemaFingerprint:hash(schemaFor('production-permissions-package'))})]);
   const dependencies = new Map([['./centralMigrationManifest', {manifest:baselineManifest,registeredManifest,knownManifest}]]);
   function load(name) {
     const filename = path.resolve(__dirname, '../src/security', name + '.js');
@@ -251,4 +252,9 @@ test('reader admits email delivery only through the exact registered schema snap
   const f = fixture();
   f.state.table = 'email-delivery-package';
   assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client), '056_email_delivery_history');
+});
+
+test('reader admits production permissions through its exact registered schema snapshot',async()=>{
+ const f=fixture();f.state.table='production-permissions-package';
+ assert.equal(await f.load('catalogReaderSchema').assertCatalogReaderSchema(f.client),'057_production_central_permissions');
 });

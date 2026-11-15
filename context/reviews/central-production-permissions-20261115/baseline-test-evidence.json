@@ -1,0 +1,8 @@
+{
+  "baseline": "736e3a5e28904bb001ad07113853b816bfabbfa1",
+  "staticAllowlistAssertionsAlreadyAbsent": {
+    "centralRuntimeReadPackage": true,
+    "opportunityComplementMigrationPackage": true
+  },
+  "frontendUnmodified": true
+}

@@ -75,8 +75,8 @@ function createDeliveryHistory({ pool, keycloak, repository = createEmailTemplat
   async function finish(id, status) {
     await pool.query('SELECT public.email_delivery_finish($1,$2)', [id, STATES.includes(status) && status ? status : 'UNCONFIRMED']);
   }
-  async function retention() {
-    await pool.query('SELECT public.email_delivery_retention()');
+  async function retention({central=true}={}) {
+    if(central)await pool.query('SELECT public.email_delivery_retention()');
     if (!keycloak?.retention) fail('EMAIL_HISTORY_UNAVAILABLE');
     await keycloak.retention();
   }

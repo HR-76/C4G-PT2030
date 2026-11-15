@@ -8,7 +8,7 @@ function configuredDeliveryHistory({ env, pool, keycloak, setIntervalImpl = setI
   let timer = null, pending = null, failure = false, closed = false;
   async function sweep() {
     if (pending) return pending;
-    pending = history.retention().then(() => { failure = false; }).catch(() => { failure = true; })
+    pending = history.retention({central:!pool.productionCapability}).then(() => { failure = false; }).catch(() => { failure = true; })
       .finally(() => { pending = null; });
     return pending;
   }
@@ -16,7 +16,7 @@ function configuredDeliveryHistory({ env, pool, keycloak, setIntervalImpl = setI
     ...history,
     async list(input, request) {
       const result = await history.list(input, request);
-      return { ...result, retentionHealthy: !failure };
+      return { ...result, retentionHealthy: failure ? false : pool.productionCapability ? null : true };
     },
     async ready() {
       if (closed) throw new Error('EMAIL_HISTORY_CLOSED');

@@ -14,8 +14,8 @@ const importVersion=require('../security/centralImportMigrationPackage').entry.v
 const importSchemaVersions=Object.freeze(allKnownMigrations
  .filter(entry=>entry.runtimeAdmissible!==false&&entry.centralImportSecurity===true&&supportsCentralVersion(entry.version,importVersion))
  .map(entry=>entry.version));
-async function sessionAuthority(client,userId,sessionId){
- if(typeof sessionId!=='string'||!sessionId||!(await client.query(authoritySql+' FOR SHARE OF s,u,a',[sessionId,userId])).rowCount)throw Object.assign(Error(),{code:'C4G_ADMIN_REQUIRED'});
+async function sessionAuthority(client,userId,sessionId,lock=true){
+ if(typeof sessionId!=='string'||!sessionId||!(await client.query(client.productionCapability?`SELECT $2::uuid AS id WHERE c4g_production.administrator($1,$2,${lock?'true':'false'})`:authoritySql+' FOR SHARE OF s,u,a',[sessionId,userId])).rowCount)throw Object.assign(Error(),{code:'C4G_ADMIN_REQUIRED'});
 }
 function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatformAudit({source:'API'}),authority=null,readAuthority=null}){
  const central=createFundingRepository({pool});
@@ -50,7 +50,7 @@ function createCentralImportUploadRuntime({pool,store,scanner,audit=createPlatfo
  // Trusted, authorized read of one staged import: the same session and C4G administrator checks as upload and preview.
  async function readImport({userId,sessionId,importId}){
   return central.transaction(async c=>{
-   await sessionAuthority(c,userId,sessionId);await central.administrator(c,userId);
+   await sessionAuthority(c,userId,sessionId,false);await central.administrator(c,userId);
    const head=(await c.query("SELECT i.import_id,p.bundle->>'mappingDigest' AS mapping_digest FROM opportunity_catalog.pt2030_plan_import i JOIN opportunity_catalog.pt2030_plan_preview p ON p.preview_id=i.preview_id WHERE i.import_id=$1",[importId])).rows[0];
    if(!head)throw Object.assign(Error(),{code:'PT2030_IMPORT_NOT_FOUND'});
    const rows=(await c.query("SELECT o.physical_row,o.external_identifier,o.errors,o.candidate_revision_id,r.content_digest,r.canonical_snapshot,p.opportunity_id AS accepted_id,p.current_revision_id AS accepted_revision,p.row_version AS accepted_row_version FROM opportunity_catalog.pt2030_plan_observation o LEFT JOIN opportunity_catalog.pt2030_plan_revision r ON r.revision_id=o.candidate_revision_id LEFT JOIN opportunity_catalog.source_identity_v2 s ON s.source_namespace='PORTUGAL2030_PLAN' AND s.external_identifier=o.external_identifier LEFT JOIN opportunity_catalog.opportunity p ON p.opportunity_id=s.opportunity_id WHERE o.import_id=$1 ORDER BY o.physical_row",[importId])).rows;

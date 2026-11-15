@@ -32,14 +32,15 @@ const {createPopulationRuntimeComposition}=require('./organizationalProfile/popu
 const {createPopulationTelemetry}=require('./organizationalProfile/populationTelemetry');
 const {createOperationalTelemetry}=require('./organizationalProfile/operationalTelemetry');
 
-function loadProductionDependencies({ownResource=(resource,dispose)=>dispose}={}) {
-  const centralPool = require("./config/centralDb");
-  ownResource(centralPool,()=>centralPool.end());
+function loadProductionDependencies({ownResource=(resource,dispose)=>dispose,env=process.env}={}) {
+  const capabilityPools = require("./security/productionCentralProfile").loadPools({env,ownResource,Pool:require("pg").Pool});
+  const centralPool = capabilityPools?.read || require("./config/centralDb");
+  if(!capabilityPools)ownResource(centralPool,()=>centralPool.end());
   const authorityPool=require('./config/authorityDb');
   ownResource(authorityPool,()=>authorityPool.end());
   return {
     ownResource,
-    express: require("express"), cors: require("cors"), centralPool,authorityPool,routes: {}
+    express: require("express"), cors: require("cors"), centralPool,authorityPool,capabilityPools,routes: {}
   };
 }
 
@@ -51,6 +52,11 @@ function selectAuthRoutes(mode, routes, oidcAuth = null) {
 function createProductionComposition({ dependencies, env, logger = null, isolatedCatalogAdmission = null, isolatedSessionReadConcurrency = false, observeSessionTiming = null, isolatedSessionTouchCoalescing = false }) {
   if(isolatedSessionTouchCoalescing&&!require('./opportunities/catalogRead/isolatedAdmission').isIsolatedAdmission(isolatedCatalogAdmission))throw new TypeError('Isolated admission required for session touch coalescing');
   const { express, cors, centralPool, routes = {} } = dependencies;
+  const productionProfile=require("./security/productionCentralProfile").configuration(env);
+  if(productionProfile&&!dependencies.capabilityPools)throw Error("PRODUCTION_POOLS_REQUIRED");
+  const commandsPool=dependencies.capabilityPools?.commands||centralPool;
+  const authoringPool=dependencies.capabilityPools?.authoring||centralPool;
+  const logsPool=dependencies.capabilityPools?.logs||centralPool;
   let closeBillingPdfs=async()=>{},readyBillingPdfs=async()=>{},readyBillingValidation=async()=>{};
   let closeReceiptRecovery = async () => {}, readyReceiptRecovery = async () => {};
   const authConfig = loadAuthConfig(env);
@@ -68,7 +74,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   const euWriterV2=require('./fundingTenders/euWriterConfig').configuredEuWriter(env);
   if(!['disabled','f12-xlsx'].includes(importsRuntime))throw new TypeError('C4G imports runtime must be disabled or f12-xlsx.');
   // Resolved once: the sign-in audit, the Logs page and the HTTP middleware all share this collector.
-  const {logs:platformLogs,owned:ownsPlatformLogs}=require('./platformDirectory/logs').configuredPlatformLogs({env,pool:centralPool,provided:dependencies.platformLogs,
+  const {logs:platformLogs,owned:ownsPlatformLogs}=require('./platformDirectory/logs').configuredPlatformLogs({env,pool:logsPool,provided:dependencies.platformLogs,
     onFailure:()=>logger?.warn('c4g.telemetry.dropped',{component:'platform_logs',operation:'telemetry.export',outcome:'error'})});
   const authorizationCatalogs = validateProductionAuthorizationBootstrap();
   const auditBootstrap = validateProductionAuditBootstrap();
@@ -123,9 +129,9 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   let functionalRuntimeDependencies = null;
   let emailLogos = null;
   const authenticationEmailPublisher=security?require('./emailTemplates/keycloakPublisher').configuredKeycloakPublisher({env,issuer:authConfig.issuer}):null;
-  const emailHistory=security?require('./emailTemplates/deliveryRuntime').configuredDeliveryHistory({env,pool:centralPool,keycloak:authenticationEmailPublisher}):null;
+  const emailHistory=security?require('./emailTemplates/deliveryRuntime').configuredDeliveryHistory({env,pool:commandsPool,keycloak:authenticationEmailPublisher}):null;
   const memberOnboarding=security&&dependencies.createMemberOnboarding?.({authorityCoordinator,authConfig,
-    deliveryHistory:emailHistory,prepareEmail:require('./emailTemplates/invitation').createInvitationTemplate({centralPool,publicBaseUrl:env.PUBLIC_APP_URL})});
+    deliveryHistory:emailHistory,prepareEmail:require('./emailTemplates/invitation').createInvitationTemplate({centralPool:commandsPool,publicBaseUrl:env.PUBLIC_APP_URL})});
   if (security) {
     security.credentialGuard = createCredentialGuard();
     const oidcClient = new OidcClient(authConfig);
@@ -154,7 +160,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       generateCsrfToken: security.generateCsrfToken
     });
     composedRoutes = selectAuthRoutes(authConfig.mode, routes, oidcAuth);
-    const centralImports=dependencies.centralImportRuntime||require('./portugal2030/uploadRuntime').configuredCentralImport({pool:centralPool,env,authorityPolicy:{policyVersion:authConfig.policyVersion,requirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}});
+    const centralImports=dependencies.centralImportRuntime||require('./portugal2030/uploadRuntime').configuredCentralImport({pool:authoringPool,env,authorityPolicy:{policyVersion:authConfig.policyVersion,requirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}});
     if(centralImports)closeCentralImport=dependencies.ownResource?.(centralImports,()=>centralImports.close())||(()=>centralImports.close());
     const userDeletion=dependencies.createUserDeletion?.({authorityCoordinator,authConfig})||null;
     composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,userDeletion,
@@ -168,9 +174,9 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       sessionStore:security.sessionStore,sessionRegistry,authorityCoordinator,authorizationCatalogs,centralPool,
       assurancePolicyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]
     });
-    const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:centralPool,customerService:customerBillingService}):null;
-    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation','055_entity_type_edit','056_email_delivery_history']);
-    const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:centralPool,customerService:customerBillingService,env});
+    const billingValidation=env.BILLING_VALIDATION_RUNTIME==='central'?require('./billingValidation/service').createBillingValidationService({pool:commandsPool,customerService:customerBillingService}):null;
+    if(billingValidation)readyBillingValidation=()=>require('./security/centralSchemaManifest').assertCentralSchemaForVersions(centralPool,['054_billing_account_validation','055_entity_type_edit','056_email_delivery_history','057_production_central_permissions']);
+    const billingPdfs=require('./customerBilling/pdfRuntime').configuredBillingPdfs({pool:commandsPool,customerService:customerBillingService,env});
     if(billingPdfs)readyBillingPdfs=()=>billingPdfs.ready();
     if(billingPdfs)closeBillingPdfs=dependencies.ownResource?.(billingPdfs,()=>billingPdfs.close())||(()=>billingPdfs.close());
     composedRoutes.platformBilling=require('./platformBilling/http').createPlatformBillingRouter({
@@ -178,10 +184,10 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     });
     // Invitation templates (Central 051); provider credentials remain in the member worker.
     // Email logos (the email plan's increment 5): the C4G logo here, each entity's own in its directory, and the public read.
-    emailLogos=require('./emailTemplates/logoService').createEmailLogoService({centralPool});
+    emailLogos=require('./emailTemplates/logoService').createEmailLogoService({centralPool:commandsPool});
     const emailTemplateService=require('./emailTemplates/authenticationService').createAuthenticationEmailService({
-      centralPool,publicBaseUrl:env.PUBLIC_APP_URL,publisher:authenticationEmailPublisher,
-      baseService:require('./emailTemplates/service').createEmailTemplateService({centralPool,publicBaseUrl:env.PUBLIC_APP_URL,testDelivery:memberOnboarding?.testEmail})
+      centralPool:commandsPool,publicBaseUrl:env.PUBLIC_APP_URL,publisher:authenticationEmailPublisher,
+      baseService:require('./emailTemplates/service').createEmailTemplateService({centralPool:commandsPool,publicBaseUrl:env.PUBLIC_APP_URL,testDelivery:memberOnboarding?.testEmail})
     });
     composedRoutes.platformEmail=require('./emailTemplates/http').createPlatformEmailRouter({
       express,authenticate,logos:emailLogos,service:emailTemplateService,history:emailHistory
@@ -189,7 +195,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes.publicEmailLogos=require('./emailTemplates/logoHttp').createPublicEmailLogoRouter({express,logos:emailLogos});
     // Opportunity complement (Central 053): descriptive data beside a catalog opportunity. Collection from the public
     // site stays off unless the deployment chooses what may be copied.
-    const opportunityComplements=require('./opportunities/complementService').createOpportunityComplementService({centralPool,collectionMode:env.OPPORTUNITY_COMPLEMENT_COLLECTION||'disabled'});
+    const opportunityComplements=require('./opportunities/complementService').createOpportunityComplementService({centralPool:commandsPool,collectionMode:env.OPPORTUNITY_COMPLEMENT_COLLECTION||'disabled'});
     composedRoutes.opportunityComplements=require('./opportunities/complementService').createOpportunityComplementRouter({express,authenticate,service:opportunityComplements});
     composedRoutes.customerBilling=require('./customerBilling/http').createCustomerBillingRouter({
       express,authenticate,organizationMiddleware,service:customerBillingService,pdfs:billingPdfs?.service,validation:billingValidation
@@ -207,8 +213,8 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
       catalogReader=require('./fundingTenders/catalogReader').createCatalogReader({env});
       closeCatalogReader=dependencies.ownResource?.(catalogReader,()=>catalogReader.close())||(()=>catalogReader.close());
       observability.health.register({code:'catalog-reader',criticality:'REQUIRED',check:async()=>{try{await catalogReader.ready();return true;}catch{return false;}}});
-      const funding=require('./fundingTenders/http').createFundingRouters({express,pool:centralPool,catalogReader,complements:opportunityComplements,authenticate,organizationMiddleware,sessionRegistry,
-        sourceMode:env.FUNDING_TENDERS_SOURCE||'fixture', sourceApproval:env.FUNDING_TENDERS_REHEARSAL_APPROVED,workerHealth:dependencies.fundingWorkerHealth,
+      const funding=require('./fundingTenders/http').createFundingRouters({express,pool:authoringPool,catalogReader,complements:opportunityComplements,authenticate,organizationMiddleware,sessionRegistry,
+        sourceMode:env.FUNDING_TENDERS_SOURCE||(productionProfile?'unconfigured':'fixture'), sourceApproval:env.FUNDING_TENDERS_REHEARSAL_APPROVED,workerHealth:dependencies.fundingWorkerHealth,
         coverage:dependencies.fundingCoverage,euSourceControlEnabled:activationEnabled,euWriterV2,
         policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]});
       composedRoutes={...composedRoutes,fundingAdmin:funding.admin,centralOpportunities:funding.catalog,platformCentralOpportunities:funding.platformCatalog};
@@ -365,7 +371,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     app, authMode: authConfig.mode, importsRuntime,authorizationCatalogs, auditBootstrap, documentBootstrap,
     closeOpportunityRuntime:async()=>{try{if(ownsPlatformLogs)await platformLogs.flush();await closeCatalogReadConnection();}finally{await emailHistory?.close();await closeReceiptRecovery();await closeCentralImport();await closeBillingPdfs();await closeDocumentInfrastructure();await closeCatalogReader();await closeOwnedTenantPools();}},
     organizationalScopes, taxonomies, profileAuthoring,profileCompetencies,profileFinancial,profileOperational,profilePopulations,observability, featureTelemetry, logger, port: env.PORT || 5000,
-    assertDatabaseReadiness:async()=>{await databaseReadiness.assertReady();await emailHistory?.ready();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await readyBillingValidation();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
+    assertDatabaseReadiness:async()=>{if(productionProfile)for(const pool of Object.values(dependencies.capabilityPools))await require('./security/centralMigrationPreflight').preflightCentral(pool);await databaseReadiness.assertReady();await emailHistory?.ready();if(ownsPlatformLogs)await require('./platformDirectory/logs').assertLogsSchema(centralPool);await readyBillingPdfs();await readyBillingValidation();await catalogReader?.ready();await documentInfrastructure?.assertReady();await opportunityActivation?.assertReady();await catalogReadConnection.ready();await readyReceiptRecovery();},
     logFrontendUrlHealth: () => logFrontendUrlHealth(env, logger)
   };
 }

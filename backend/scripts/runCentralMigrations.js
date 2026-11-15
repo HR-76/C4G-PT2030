@@ -75,9 +75,10 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest, productionCentralManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === productionCentralManifest.at(-1).version)) return productionCentralManifest;
   if (rows.some(row => row.version === emailDeliveryManifest.at(-1).version)) return emailDeliveryManifest;
   if (rows.some(row => row.version === entityTypeManifest.at(-1).version)) return entityTypeManifest;
   if (rows.some(row => row.version === billingValidationManifest.at(-1).version)) return billingValidationManifest;
@@ -382,3 +383,11 @@ async function applyRegisteredEmailDeliveryPackage(pool, packageId) {
  return applyCentralMigrationsWithManifest(pool,emailDeliveryManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:emailDeliveryManifest});
 }
 module.exports.applyRegisteredEmailDeliveryPackage=applyRegisteredEmailDeliveryPackage;
+
+async function applyRegisteredProductionCentralPackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/productionCentralMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('PRODUCTION_CENTRAL_PACKAGE_REQUIRED');
+ const {productionCentralManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,productionCentralManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:productionCentralManifest});
+}
+module.exports.applyRegisteredProductionCentralPackage=applyRegisteredProductionCentralPackage;
