@@ -1,11 +1,11 @@
 'use strict';
-// Isolated gate for Central package 051_email_templates. It creates its own
+// Isolated gate for Central package 054_billing_account_validation. It creates its own
 // PostgreSQL 18 cluster under .tmp on a free loopback port, applies the Central
 // migrations to it and stops it. It never connects to an existing database.
 //
-//   node test/integration/email-templates/gate.cjs
-//   EMAIL_GATE_MEMBER_VARIANT=1  also applies the member_email_delivery patch first
-//   EMAIL_GATE_CALIBRATE=1       applies the SQL directly and prints the fingerprints to pin
+//   node test/integration/billing-account-validation/gate.cjs
+//   --user-deletion reproduces 053 plus member email and account deletion
+//   --calibrate applies SQL directly and prints fingerprints to pin (isolated only)
 const fs = require('node:fs'), path = require('node:path'), net = require('node:net');
 const { execFileSync } = require('node:child_process');
 

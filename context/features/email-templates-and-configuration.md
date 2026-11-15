@@ -48,7 +48,7 @@ A entrada Email abre uma lista de tipos em `/administracao/email`; cada tipo con
 
 - Linhas: Convite de colaborador, Reposição de palavra-passe e Código por email. Colunas: tipo, quem envia, âmbito e estado.
 - O convite mostra se o template global foi alterado e quantas entidades têm template próprio, e tem a ação «Configurar».
-- Os dois tipos do Keycloak aparecem já, marcados «Ainda não configurável» e sem ação, até a fase 2 existir. A lista não afirma que estão ativos: a reposição de palavra-passe é indicada como desligada.
+- Os dois tipos do Keycloak aparecem já, marcados «Ainda não configurável» e sem ação, até a fase 2 existir. A lista não afirma se estão ativos sem consultar o ambiente; o texto é indicado como definido no serviço de autenticação. No staging, a recuperação foi ativada e validada pelo utilizador em 15/11/2026.
 - Um endereço com um tipo desconhecido ou ainda não configurável não abre editor; mostra o aviso e a ligação de volta à lista.
 - A lista de tipos é fixa no frontend; o estado do convite vem de `GET /api/admin/email/templates`. Só `C4G_ADMIN` a vê.
 

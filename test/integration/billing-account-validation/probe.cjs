@@ -5,6 +5,7 @@ const {Pool}=require('../../../backend/node_modules/pg');
 const manifest=require('../../../backend/src/security/centralMigrationManifest');
 const runner=require('../../../backend/scripts/runCentralMigrations');
 async function run({pool,port,base}) {
+ if(process.argv.includes('--user-deletion')&&process.argv.includes('--staging'))throw Error('UNREHEARSED_VARIANT_COMBINATION');
  await pool.query('CREATE ROLE c4g_central_owner NOLOGIN; CREATE ROLE c4g_central_runtime NOLOGIN');
  await pool.query("CREATE TABLE public.c4g_database_identity(product_code text NOT NULL,database_role text NOT NULL); INSERT INTO public.c4g_database_identity VALUES('C4G','CENTRAL')");
  await runner.applyCentralMigrationsWithManifest(pool,manifest.centralImportManifest,manifest.migrationSql);
@@ -20,11 +21,17 @@ async function run({pool,port,base}) {
   process.env.C4G_STAGING_CENTRAL_RUNTIME_LOGINS='admitted-v1';
  }
  await runner.applyRegisteredOpportunityComplementPackage(pool,'opportunity-complement-v1');
+ if(process.argv.includes('--user-deletion')) {
+  await pool.query(require('../../../backend/src/platformOnboarding/memberEmailSecurityPackage').load().sql);
+  await require('../../../backend/scripts/staging/userDeletionRollout').rollout(pool,{mode:'apply',expectedDatabase:'postgres'});
+ }
  if(process.argv.includes('--calibrate')) await pool.query(manifest.canonicalizeMigrationSql(fs.readFileSync(path.resolve(__dirname,'../../../backend/database/central/candidates/billing_account_validation.up.sql'),'utf8')));
  else {
   await runner.applyRegisteredBillingValidationPackage(pool,'billing-account-validation-v1');
   assert.deepEqual(await runner.applyRegisteredBillingValidationPackage(pool,'billing-account-validation-v1'),[]);
   assert.equal((await require('../../../backend/src/security/centralMigrationPreflight').preflightCentral(pool)).currentVersion,'054_billing_account_validation');
+  await require('../../../backend/src/security/authoritySecurityManifest').assertAuthoritySecurity(pool,'054_billing_account_validation');
+  await require('../../../backend/src/security/catalogReaderSchema').assertCatalogReaderSchema(pool);
  }
  const schema=require('../../../backend/src/security/centralSchemaManifest');
  const security=require('../../../backend/src/security/authoritySecurityManifest');

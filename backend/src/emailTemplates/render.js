@@ -20,7 +20,12 @@ function substitute(value, replacements) {
 
 // Validates what an administrator wants to save. Returns the subject and the
 // sanitized body that would be stored, plus what sanitization removed.
-function validateTemplate(input) {
+function validateTemplate(input, type = 'member-invitation') {
+  if (!['member-invitation', 'password-reset'].includes(type)) fail('EMAIL_TEMPLATE_TYPE_UNKNOWN');
+  const reset = type === 'password-reset';
+  const bodyVariables = reset ? ['LigacaoRecuperacao', 'Validade', 'Logotipo'] : BODY_VARIABLES;
+  const subjectVariables = reset ? [] : SUBJECT_VARIABLES;
+  const requiredVariables = reset ? ['LigacaoRecuperacao', 'Validade'] : REQUIRED_BODY_VARIABLES;
   const reasons = [];
   const subject = typeof input?.subject === 'string' ? input.subject.trim() : '';
   const rawHtml = typeof input?.html === 'string' ? input.html : '';
@@ -33,7 +38,7 @@ function validateTemplate(input) {
     fail('EMAIL_TEMPLATE_INVALID', { reasons });
   }
 
-  const { html, removed } = sanitizeBody(rawHtml);
+  const { html, removed } = sanitizeBody(rawHtml, reset ? '{LigacaoRecuperacao}' : '{LigacaoAtivacao}');
   const text = htmlToText(html);
   if (!text) reasons.push({ code: 'BODY_REQUIRED' });
 
@@ -41,15 +46,15 @@ function validateTemplate(input) {
     reasons.push({ code: 'RESERVED_TEXT' });
   }
   for (const name of variablesIn(subject)) {
-    if (!BODY_VARIABLES.includes(name)) reasons.push({ code: 'UNKNOWN_VARIABLE', variable: name });
-    else if (!SUBJECT_VARIABLES.includes(name)) reasons.push({ code: 'VARIABLE_NOT_ALLOWED_IN_SUBJECT', variable: name });
+    if (!bodyVariables.includes(name)) reasons.push({ code: 'UNKNOWN_VARIABLE', variable: name });
+    else if (!subjectVariables.includes(name)) reasons.push({ code: 'VARIABLE_NOT_ALLOWED_IN_SUBJECT', variable: name });
   }
   for (const name of variablesIn(html)) {
-    if (!BODY_VARIABLES.includes(name)) reasons.push({ code: 'UNKNOWN_VARIABLE', variable: name });
+    if (!bodyVariables.includes(name)) reasons.push({ code: 'UNKNOWN_VARIABLE', variable: name });
   }
   // The text part is derived from the markup, so checking it covers both.
   const present = variablesIn(text);
-  for (const name of REQUIRED_BODY_VARIABLES) {
+  for (const name of requiredVariables) {
     if (!present.has(name)) reasons.push({ code: 'REQUIRED_VARIABLE_MISSING', variable: name });
   }
 

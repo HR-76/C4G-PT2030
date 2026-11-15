@@ -22,7 +22,8 @@ it('lists the three email types and lets only the invitation be configured', asy
     expect(within(row(name)).getByText('Ainda não configurável')).toBeTruthy()
     expect(within(row(name)).queryByRole('link')).toBeNull()
   }
-  expect(within(row('Reposição de palavra-passe')).getByText(/desligada/)).toBeTruthy()
+  expect(within(row('Reposição de palavra-passe')).getByText('O texto é definido no serviço de autenticação.')).toBeTruthy()
+  expect(screen.queryByText(/A reposição por email está (desligada|ativa)/)).toBeNull()
   expect(screen.getAllByRole('link')).toHaveLength(1)
 })
 

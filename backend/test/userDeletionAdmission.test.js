@@ -9,6 +9,17 @@ test('admits only the measured 053 account deletion variant',()=>{
  }
  assert.equal(admission.admits(admission.version,'arbitrary',undefined),false);
 });
+test('billing extension admits only the independently measured combined variant',()=>{
+ const version='054_billing_account_validation';
+ for(const kind of ['schema','authority']){
+  assert.equal(admission.admits(version,kind,admission.later[version][kind]),true);
+  assert.equal(admission.admits(version,kind,admission.fingerprints[kind]),false);
+  assert.equal(admission.admits(admission.version,kind,admission.later[version][kind]),false);
+  assert.equal(admission.admits('055_unknown',kind,admission.later[version][kind]),false);
+  assert.equal(admission.admits(version,kind,'0'.repeat(64)),false);
+ }
+ assert.equal(admission.admits(version,'arbitrary',undefined),false);
+});
 test('candidate admits exactly the deletion statements with their hashes',()=>{
  const sql=fs.readFileSync(path.join(__dirname,'../database/central/candidates/platform_user_deletion.up.sql'),'utf8');
  const queries=Object.values(require('../src/platformDirectory/deletionSql'));

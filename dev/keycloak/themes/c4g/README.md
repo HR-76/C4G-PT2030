@@ -1,5 +1,7 @@
 # Tema C4G
 
+15/11/2026: favicon do login em `login/resources/img/favicon.ico`, com as letras verdes do logótipo C4G e fundo transparente (16, 32, 48, 64, 128 e 256 px). O template herdado carrega esse caminho automaticamente. Incluir o ficheiro na próxima atualização dos recursos do tema no ambiente ativo.
+
 Login com formulário nativo à esquerda e painel verde-petróleo C4G à direita. O painel mantém o círculo animado original, com catálogo central, matching explicável, candidaturas, equipa e prazos. Até 900 px, o painel segue o formulário; com movimento reduzido, a órbita permanece estática. Campos, submissão e ações de autenticação continuam herdados.
 
 11/11/2026: a proposta Corporate foi retirada a pedido do utilizador; repostos o círculo e a composição anterior. Preservados os estilos adicionais da verificação por email e dos botões. A instância ativa não chegou a ser alterada.

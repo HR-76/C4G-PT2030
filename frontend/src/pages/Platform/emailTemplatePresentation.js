@@ -6,7 +6,7 @@ export const emailTypes = {
 // the others are sent by the authentication service and wait for phase 2.
 export const emailTypeCatalog = [
   { type: 'member-invitation', label: emailTypes['member-invitation'], sender: 'Aplicação', scope: 'Global e por entidade', configurable: true },
-  { type: 'password-reset', label: 'Reposição de palavra-passe', sender: 'Serviço de autenticação', scope: 'Global', note: 'A reposição por email está desligada.' },
+  { type: 'password-reset', label: 'Reposição de palavra-passe', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
   { type: 'email-code', label: 'Código por email', sender: 'Serviço de autenticação', scope: 'Global', note: 'O texto é definido no serviço de autenticação.' },
 ]
 

@@ -8,8 +8,8 @@ const ALLOWED_TAGS = Object.freeze([
 const ALLOWED_ATTRIBUTES = Object.freeze({ a: Object.freeze(['href']) });
 const ACTIVATION_LINK_VARIABLE = '{LigacaoAtivacao}';
 
-function allowedHref(value) {
-  if (value === ACTIVATION_LINK_VARIABLE) return true;
+function allowedHref(value, linkVariable) {
+  if (value === linkVariable) return true;
   let url;
   try {
     url = new URL(value);
@@ -22,7 +22,10 @@ function allowedHref(value) {
 // Server-side boundary: the browser editor is never trusted to have cleaned
 // the markup. Returns the cleaned markup and what was taken out, so the
 // administrator sees the difference before saving.
-function sanitizeBody(input) {
+function sanitizeBody(input, linkVariable = ACTIVATION_LINK_VARIABLE) {
+  if (![ACTIVATION_LINK_VARIABLE, '{LigacaoRecuperacao}'].includes(linkVariable)) {
+    throw new TypeError('Unknown email link variable.');
+  }
   const removed = new Set();
 
   const html = sanitizeHtml(String(input), {
@@ -44,7 +47,7 @@ function sanitizeBody(input) {
             removed.add(`${tagName}[${name}]`);
             continue;
           }
-          if (name === 'href' && !allowedHref(value)) {
+          if (name === 'href' && !allowedHref(value, linkVariable)) {
             removed.add('a[href]');
             continue;
           }

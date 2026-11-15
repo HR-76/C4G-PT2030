@@ -88,3 +88,19 @@ entidade e pode pedir à entidade que valide os dados.
   suite backend relatada acima foi repetida fora dessa restrição. Execuções
   interrompidas por esse problema não são apresentadas como verificações aprovadas.
 - Nenhum email real enviado; não verificado com sessão OIDC real no browser.
+
+## Compatibilidade da atualização de staging (2026-11-15)
+
+A VPS tem Central 053 com as extensões de email de membros e eliminação de
+utilizadores. Antes de instalar 054, reproduzir essa combinação num cluster
+descartável e admitir apenas as assinaturas exatas medidas nesse ensaio.
+Critérios: instalação registada e repetição idempotente, preflight de esquema e
+autoridade, catálogo e testes de faturação aprovados; preservar a admissão 053.
+Não obter assinaturas de confiança a partir da base de staging.
+
+Ensaio 15/11: a instalação combinada falhou antes da correção com schema drift
+em 054. Após admitir as assinaturas medidas no cluster sintético, o gate
+`--user-deletion` passou (`.tmp/billing-validation-pg-1794701722451`), incluindo
+instalação, no-op, preflight, autoridade, catálogo e operações de faturação.
+Testes focados: 28 aprovados. Lint aprovado. Sem alterações na VPS nesta etapa;
+SSH externo continua indisponível e a operação prossegue pela consola do alojamento.

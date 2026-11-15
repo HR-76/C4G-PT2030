@@ -20,3 +20,8 @@ marcação de aceitação e cancelamento após revogação do destinatário. A s
 testa o transporte com fetch simulado; este gate não contacta Resend nem testa OIDC
 num browser. `--staging` reproduz os logins de staging numa base descartável.
 `--calibrate` mede assinaturas canónicas antes de registar o pacote; não é um instalador.
+
+`--user-deletion` reproduz Central 053 com email de membros e eliminação de
+utilizadores, instalada na VPS em 14/11. É uma variante distinta de `--staging`:
+as duas opções não podem ser combinadas. Valida também a autoridade e o catálogo
+depois da instalação registada de 054 e da repetição idempotente.
