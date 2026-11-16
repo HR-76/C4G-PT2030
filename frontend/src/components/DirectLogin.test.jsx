@@ -2,25 +2,51 @@ import { StrictMode } from 'react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import DirectLogin from './DirectLogin'
-afterEach(cleanup)
+afterEach(() => { cleanup(); window.sessionStorage.clear() })
 it('does not automatically restart a cancelled authentication', () => {
   window.history.replaceState(null, '', '/login?authentication=cancelled')
   try {
     const openLogin = vi.fn()
     render(<DirectLogin openLogin={openLogin} />)
     expect(openLogin).not.toHaveBeenCalled()
-    expect(screen.getByRole('link', { name: 'Voltar a entrar' })).toBeTruthy()
+    // Reported on 16/11/2026: the link looked like the sentence around it, so nobody saw it could be pressed.
+    expect(screen.getByRole('link', { name: 'Voltar a entrar' }).classList.contains('btn-primary')).toBe(true)
   } finally { window.history.replaceState(null, '', '/') }
 })
-it('offers an explicit retry for an expired authentication without restarting under StrictMode', () => {
+// Requested on 16/11/2026: an expired attempt reopens the login by itself, once.
+it('reopens the login once for an expired authentication, also under StrictMode', () => {
   window.history.replaceState(null, '', '/login?authentication=expired')
   try {
     const openLogin = vi.fn()
     const view = render(<StrictMode><DirectLogin openLogin={openLogin} /></StrictMode>)
     view.rerender(<StrictMode><DirectLogin openLogin={openLogin} /></StrictMode>)
+    expect(openLogin).toHaveBeenCalledExactlyOnceWith('/api/auth/oidc/login?returnTo=%2F')
+    expect(screen.getByRole('status').textContent).toContain('A abrir o login C4G…')
+    expect(screen.queryByRole('link', { name: 'Voltar a entrar' })).toBeNull()
+  } finally { window.history.replaceState(null, '', '/') }
+})
+it('stops at a visible button when the attempt expires again right after the automatic retry', () => {
+  window.history.replaceState(null, '', '/login?authentication=expired')
+  try {
+    render(<DirectLogin openLogin={vi.fn()} />)
+    cleanup()
+    const openLogin = vi.fn()
+    const view = render(<StrictMode><DirectLogin openLogin={openLogin} /></StrictMode>)
+    view.rerender(<StrictMode><DirectLogin openLogin={openLogin} /></StrictMode>)
     expect(openLogin).not.toHaveBeenCalled()
     expect(screen.getByRole('status').textContent).toContain('Esta tentativa de autenticação terminou.')
-    expect(screen.getByRole('link', { name: 'Voltar a entrar' }).getAttribute('href')).toBe('/api/auth/oidc/login?returnTo=%2F')
+    const link = screen.getByRole('link', { name: 'Voltar a entrar' })
+    expect(link.getAttribute('href')).toBe('/api/auth/oidc/login?returnTo=%2F')
+    expect(link.classList.contains('btn-primary')).toBe(true)
+  } finally { window.history.replaceState(null, '', '/') }
+})
+it('retries automatically again once the previous automatic retry is old', () => {
+  window.history.replaceState(null, '', '/login?authentication=expired')
+  try {
+    window.sessionStorage.setItem('c4g.login.expiredRetryAt', String(Date.now() - 121000))
+    const openLogin = vi.fn()
+    render(<DirectLogin openLogin={openLogin} />)
+    expect(openLogin).toHaveBeenCalledTimes(1)
   } finally { window.history.replaceState(null, '', '/') }
 })
 it('starts login normally for an unknown authentication status', () => {
@@ -56,6 +82,7 @@ it('offers explicit retry if navigation fails instead of automatically retrying'
   expect(openLogin).toHaveBeenCalledTimes(1)
   expect(screen.getByRole('alert')).toBeTruthy()
   expect(screen.getByRole('link',{name:'Tentar novamente'}).getAttribute('href')).toBe('/api/auth/oidc/login?returnTo=%2F')
+  expect(screen.getByRole('link',{name:'Tentar novamente'}).classList.contains('btn-primary')).toBe(true)
 })
 
 it('preserves organization-bound application destination in the OIDC request',()=>{

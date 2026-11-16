@@ -67,7 +67,7 @@ mkdir -p /srv/c4g-staging-web/releases/$C4G_RELEASE && cp -a /srv/c4g-staging/sr
 ```bash
 cp /srv/c4g-staging/state/api-private.env.generated /srv/c4g-staging/api-private.env && chmod 600 /srv/c4g-staging/api-private.env
 cd /srv/c4g-staging/src && docker compose -f deploy/staging/compose.yaml up -d
-sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9]*#root * /srv/c4g-staging-web/releases/$C4G_RELEASE#" /etc/caddy/Caddyfile
+sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9._-]*#root * /srv/c4g-staging-web/releases/$C4G_RELEASE#" /etc/caddy/Caddyfile
 caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
 curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
 ```
@@ -79,7 +79,7 @@ Esperado: `ready=200`. Depois, abre `https://app-teste.c4g.ai` e entra com uma d
 ```bash
 cp -a /srv/c4g-staging/api-private.env.neon-<data> /srv/c4g-staging/api-private.env
 cd /srv/c4g-staging/api-release-0715f01 && docker compose up -d
-sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9]*#root * /srv/c4g-staging-web/releases/0715f01#" /etc/caddy/Caddyfile && systemctl reload caddy
+sed -i "s#root \* /srv/c4g-staging-web/releases/[A-Za-z0-9._-]*#root * /srv/c4g-staging-web/releases/0715f01#" /etc/caddy/Caddyfile && systemctl reload caddy
 ```
 
 A base PostgreSQL nova não é alterada pelo regresso; a release antiga volta a usar o Neon.
