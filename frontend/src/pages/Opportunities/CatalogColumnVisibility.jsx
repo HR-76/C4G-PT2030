@@ -23,6 +23,12 @@ export default function CatalogColumnVisibility({ selected, hasOrganization, onC
     media.addEventListener('change',update)
     return () => media.removeEventListener('change',update)
   },[])
+  useEffect(()=>{
+    // Clicking anywhere else closes the menu, as a dropdown is expected to.
+    const close = event => { if (panel.current?.open && !panel.current.contains(event.target)) panel.current.open=false }
+    document.addEventListener('mousedown',close)
+    return () => document.removeEventListener('mousedown',close)
+  },[])
   const available = catalogColumns.filter(([key])=>hasOrganization || key!=='interesse')
   const visible = selected ?? available.map(([key])=>key).filter(key=>!['tipo','programa',...(mobile?['abertura','areas']:[])].includes(key))
   function preset(keys) {
