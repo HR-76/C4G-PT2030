@@ -6,6 +6,15 @@
 .application-partners details {margin:12px 0;}
 .application-partners summary {cursor:pointer;}
 .application-partners .partner-card {overflow-wrap:anywhere;}
+.application-partners .partner-table-wrap {margin-bottom:20px;}
+.application-partners-table {min-width:860px;}
+.application-partners-table td {overflow-wrap:anywhere;vertical-align:top;}
+.application-partners-table th:nth-child(1) {width:20%;}
+.application-partners-table th:nth-child(2) {width:11%;}
+.application-partners-table th:nth-child(3) {width:23%;}
+.application-partners-table th:nth-child(4) {width:19%;}
+.application-partners-table th:nth-child(6) {width:96px;}
+@media(max-width:768px){.application-partners-table {min-width:0;}}
 
 .application-partners .partner-person-row {grid-template-columns:minmax(0,1.2fr) minmax(100px,.8fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr) 32px;}
 .application-partners .field {min-width:0;}

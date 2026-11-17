@@ -86,6 +86,18 @@ it('edits the complete recovered UBI card while preserving person identity and o
  const {id,...fields}=partner
  expect(api.partnerEdit.mock.calls[0]).toEqual(['app',{partner:{...fields,country:'Espanha'},partnerId:'p',expectedRevision:3,idempotencyKey:expect.any(String)},'org'])
 })
+it('lists the application partners in a table with one row per partner',async()=>{
+ const partner={id:'p',entity_name:'Instituto',country:'Portugal',research_area_interest:'Investigação',responsible_person:'Maria',contact:'210000000',email:'geral@example.org',people:[{id:'person-1',name:'Ana',role:'INVESTIGADOR',research_area:'Saúde',contact:'',email:''}]}
+ api.partnersGet.mockResolvedValue({data:{items:[partner,{...partner,id:'q',entity_name:'Associação',country:'',people:[]}],revision:3,canEdit:false,total:2}})
+ render(<ApplicationPartners {...props}/>)
+ const table=await screen.findByRole('table')
+ expect(within(table).getAllByRole('columnheader').map(h=>h.textContent)).toEqual(['Entidade','País','Interesse','Responsável','Pessoas afetas'])
+ const rows=within(table).getAllByRole('row').slice(1)
+ expect(rows).toHaveLength(2)
+ expect(within(rows[0]).getAllByRole('cell').map(c=>c.textContent)).toEqual(['Instituto','Portugal','Investigação','Maria210000000geral@example.org','AnaInvestigador - Saúde'])
+ expect(within(rows[1]).getAllByRole('cell').map(c=>c.textContent)).toEqual(['Associação','—','Investigação','Maria210000000geral@example.org','—'])
+ expect(screen.queryByTitle('Editar')).toBeNull()
+})
 
 it.each([false,undefined])('preserves pending without retry for canEdit %s',async canEdit=>{
  const key=applicationPartnerIntentKey('user','org','app'),intent={...props,method:'partnerCreate',payload:{partner:{entity_name:'Preservado'},expectedRevision:1,idempotencyKey:'stable'}}
