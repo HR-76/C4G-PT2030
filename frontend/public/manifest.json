@@ -3,9 +3,9 @@
   "short_name": "C4G",
   "icons": [
     {
-      "src": "/favicon-c4g.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
+      "src": "/favicon-c4g.png",
+      "type": "image/png",
+      "sizes": "256x256",
       "purpose": "any"
     }
   ],
