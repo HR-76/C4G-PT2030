@@ -86,8 +86,7 @@ export default function OpportunityReadModelOverview({ fields = {}, readModel, s
       {data.description
         ? <OpportunityDescription id="opportunity-description-text" text={expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800)}…`} />
         : <p id="opportunity-description-text" className="catalog-description">{data.descriptionFallback}</p>}
-      {data.descriptionSource && <p className="opportunity-source opportunity-description-origin">{data.descriptionSource.origin === 'EDITORIAL' ? 'Texto redigido pela C4G.'
-        : <>{data.descriptionSource.truncated ? 'Resumo parcial publicado em ' : 'Resumo publicado em '}<DescriptionSource url={data.descriptionSource.sourceUrl} />.</>}</p>}
+      {data.descriptionSource && data.descriptionSource.origin !== 'EDITORIAL' && <p className="opportunity-source opportunity-description-origin">{data.descriptionSource.truncated ? 'Resumo parcial publicado em ' : 'Resumo publicado em '}<DescriptionSource url={data.descriptionSource.sourceUrl} />.</p>}
       {data.description?.length > 800 && <button className="btn btn-outline btn-sm" aria-expanded={expanded} aria-controls="opportunity-description-text" onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher descrição' : 'Ler descrição completa'}</button>}
     </section>
     {data.complementFacts.length > 0 && <section className="detail-section" aria-label="Informação complementar">

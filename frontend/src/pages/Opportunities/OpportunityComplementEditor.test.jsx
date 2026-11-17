@@ -83,6 +83,6 @@ it('shows the complement in the ficha with the origin of each description', () =
   render(<MemoryRouter><OpportunityOverview central fields={{ title: 'Aviso', summary: 'Descrição da fonte.' }} complement={{ fields: { description: { value: 'Texto da C4G.', origin: 'EDITORIAL' } } }} /></MemoryRouter>)
   expect(screen.getByText('Texto da C4G.')).toBeTruthy()
   expect(screen.queryByText('Descrição da fonte.')).toBeNull()
-  expect(screen.getByText('Texto redigido pela C4G.')).toBeTruthy()
+  expect(screen.queryByText('Texto redigido pela C4G.')).toBeNull()
   expect(screen.queryByRole('heading', { name: 'Informação complementar' })).toBeNull()
 })

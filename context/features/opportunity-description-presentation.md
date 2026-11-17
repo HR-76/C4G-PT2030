@@ -59,7 +59,7 @@ Migração autorizada pelo utilizador em 14/11/2026 («Sim, autorizo»), medida 
 - Serve qualquer oportunidade do catálogo (PT2030, EU ou manual). A recolha automática só existe para `PORTUGAL2030_PLAN`, ligada pelo ID do plano.
 - Edição e recolha só por `C4G_ADMIN`: a função de escrita na base confirma a sessão ativa e o papel em cada escrita, com bloqueio contra revogação concorrente. Idempotente por pedido; recusa versão desatualizada. O autor e a data ficam no próprio histórico; não é emitido evento na cadeia de auditoria e não é exigida autenticação recente (igual aos templates de email).
 - Recolha desligada por omissão. `OPPORTUNITY_COMPLEMENT_COLLECTION=facts` copia a página do aviso, código, prioridade, tipologias e taxa; `facts-and-summary` copia também o resumo. Só é escrito o que mudou.
-- Ficha: a descrição indica a origem («Texto redigido pela C4G» ou «Resumo [parcial] publicado em portugal2030.pt», com ligação), «Consultar fonte oficial» passa a apontar para a página do aviso e aparece a secção «Informação complementar». Admin C4G: botão «Editar informação» na ficha e «Atualizar dados PT2030» na lista.
+- Ficha: a descrição copiada indica a origem («Resumo [parcial] publicado em portugal2030.pt», com ligação); o texto escrito pelo Admin C4G não leva nota de origem (decisão de 17/11/2026), «Consultar fonte oficial» passa a apontar para a página do aviso e aparece a secção «Informação complementar». Admin C4G: botão «Editar informação» na ficha e «Atualizar dados PT2030» na lista.
 
 ### Implementação
 
