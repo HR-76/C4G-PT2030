@@ -1,5 +1,7 @@
 # Tema C4G
 
+17/11/2026: o separador do browser mostra só o ícone C4G, sem texto, a pedido do utilizador. Login: `loginTitle` em `login/messages/messages_pt.properties` é o carácter invisível U+200E (um título vazio faria o browser mostrar o endereço). Conta: `title`, `favIcon` e `favIconType` em `account/theme.properties`, com o ícone em `account/resources/favicon-c4g.png`. As páginas de confirmação de saída mantêm o título próprio, porque a mesma mensagem é o cabeçalho da página. Mensagens e propriedades ficam em cache: reiniciar o Keycloak depois de atualizar os ficheiros.
+
 15/11/2026: favicon do login em `login/resources/img/favicon.ico`, com as letras verdes do logótipo C4G e fundo transparente (16, 32, 48, 64, 128 e 256 px). O template herdado carrega esse caminho automaticamente. Incluir o ficheiro na próxima atualização dos recursos do tema no ambiente ativo.
 
 Login com formulário nativo à esquerda e painel verde-petróleo C4G à direita. O painel mantém o círculo animado original, com catálogo central, matching explicável, candidaturas, equipa e prazos. Até 900 px, o painel segue o formulário; com movimento reduzido, a órbita permanece estática. Campos, submissão e ações de autenticação continuam herdados.
