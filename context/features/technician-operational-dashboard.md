@@ -20,7 +20,7 @@ Pedido do utilizador em 18/11/2026: o Dashboard do Técnico passa a ter gráfico
 
 - **As minhas candidaturas por estado.** Anel e legenda com as candidaturas a que o Técnico tem acesso, as mesmas da lista de Candidaturas. Cada estado abre a lista filtrada.
 - **Tarefas por prazo.** Tarefas por concluir atribuídas ao Técnico, divididas em Em atraso, Hoje e Próximas.
-- **Carga por candidatura.** As oito candidaturas com mais tarefas por concluir do Técnico, com o número em atraso; indica quando há mais candidaturas com tarefas.
+- **Carga por candidatura.** As quatro candidaturas com mais tarefas por concluir do Técnico, com o número em atraso. Havendo mais candidaturas com tarefas, indica quantas e encaminha para O meu trabalho (limite pedido pelo utilizador em 18/11/2026, para o painel não ficar mais alto do que os vizinhos; o servidor continua a devolver até oito).
 
 Contrato:
 

@@ -94,7 +94,7 @@ it('retira os dados confirmados da parte recusada e mantém os das restantes',as
 
 it('mostra os três gráficos com as candidaturas por estado, as tarefas por prazo e a carga por candidatura',async()=>{
  privateApplicationsApi.technicianDashboard.mockResolvedValue(answer({applications:{total:3,countsByStatus:{PREPARATION:2,SUBMITTED:1,APPROVED:0}},
-  tasks:{total:5,items:[task],counts:{overdue:2,upcoming:3},byApplication:{total:9,items:[{applicationId:'a',title:'Projeto Alfa',total:4,overdue:2},{applicationId:'b',title:'Projeto Beta',total:1,overdue:0}]}}}))
+  tasks:{total:5,items:[task],counts:{overdue:2,upcoming:3},byApplication:{total:9,items:[{applicationId:'a',title:'Projeto Alfa',total:4,overdue:2},...['b','c','d','e','f'].map(id=>({applicationId:id,title:'Projeto '+id,total:1,overdue:0}))]}}}))
  show()
  const states=(await screen.findByRole('heading',{name:'As minhas candidaturas por estado'})).closest('section')
  expect(states.querySelector('.chart-ring strong').textContent).toBe('3')
@@ -106,7 +106,10 @@ it('mostra os três gráficos com as candidaturas por estado, as tarefas por pra
  const workload=screen.getByRole('heading',{name:'Carga por candidatura'}).closest('section')
  expect(within(workload).getByRole('link',{name:'Projeto Alfa'}).getAttribute('href')).toBe('/candidaturas/a#equipa-tarefas')
  expect(within(workload).getByText('2 em atraso')).toBeTruthy()
- expect(within(workload).getByText('A mostrar 2 de 9 candidaturas com tarefas.')).toBeTruthy()
+ expect(workload.querySelectorAll('.chart-budget')).toHaveLength(4)
+ expect(within(workload).queryByRole('link',{name:'Projeto e'})).toBeNull()
+ expect(within(workload).getByText(/A mostrar 4 de 9 candidaturas com tarefas./)).toBeTruthy()
+ expect(within(workload).getByRole('link',{name:'Ver todas em O meu trabalho'}).getAttribute('href')).toBe('/meu-trabalho')
 })
 
 it('distingue a ausência de dados da falha de cada gráfico e mantém as listas',async()=>{

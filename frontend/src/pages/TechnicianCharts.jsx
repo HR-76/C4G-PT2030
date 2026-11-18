@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Bar, States } from '../components/DashboardCharts'
 
+// The workload panel keeps the height of its neighbours; the rest is in O meu trabalho.
+const maxWorkload = 4
 const periods = [['overdue', 'Em atraso', 'var(--color-danger)'], ['today', 'Hoje', '#d97706'], ['upcoming', 'Próximas', 'var(--color-action)']]
 
 function Unavailable({ title }) {
@@ -16,7 +18,8 @@ export default function TechnicianCharts({ applications, tasks }) {
   const counts = tasks?.counts || {}
   const open = periods.reduce((sum, [code]) => sum + (counts[code] || 0), 0)
   const workload = tasks?.byApplication
-  const busiest = Math.max(0, ...(workload?.items || []).map(item => item.total))
+  const busy = (workload?.items || []).slice(0, maxWorkload)
+  const busiest = Math.max(0, ...busy.map(item => item.total))
   return <div className="dashboard-charts technician-charts">
     {applications === null ? <Unavailable title="As minhas candidaturas por estado" />
       : applications && <States title="As minhas candidaturas por estado" applications={{ total: applications.total, by_status: applications.countsByStatus || {} }} />}
@@ -30,13 +33,13 @@ export default function TechnicianCharts({ applications, tasks }) {
     </section>}
     {tasks && workload && <section className="chart-panel technician-workload">
       <h2>Carga por candidatura</h2>
-      <p className="chart-caption">{workload.items.length ? 'Tarefas por concluir em cada candidatura.' : 'Sem tarefas por concluir.'}</p>
-      {workload.items.map(item => <div className="chart-budget" key={item.applicationId}>
+      <p className="chart-caption">{busy.length ? 'Tarefas por concluir em cada candidatura.' : 'Sem tarefas por concluir.'}</p>
+      {busy.map(item => <div className="chart-budget" key={item.applicationId}>
         <div><Link to={`/candidaturas/${item.applicationId}#equipa-tarefas`}>{item.title}</Link><strong>{item.total}</strong></div>
         <Bar value={item.total} max={busiest} color="var(--color-action)" />
         {item.overdue > 0 && <small className="technician-workload-overdue">{item.overdue} em atraso</small>}
       </div>)}
-      {workload.total > workload.items.length && <p className="chart-caption">A mostrar {workload.items.length} de {workload.total} candidaturas com tarefas.</p>}
+      {workload.total > busy.length && <p className="chart-caption technician-workload-more">A mostrar {busy.length} de {workload.total} candidaturas com tarefas. <Link to="/meu-trabalho">Ver todas em O meu trabalho</Link></p>}
     </section>}
   </div>
 }
