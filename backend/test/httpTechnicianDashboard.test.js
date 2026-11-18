@@ -10,19 +10,21 @@ async function serve(execute,work){
  try{await work(read);}finally{await new Promise(r=>server.close(r));}
 }
 const tasks={today:'2026-11-14',items:[],total:0,counts:{},nextCursor:null},alerts={notifications:[],unread_count:0,total:0,truncated:false},reviews={items:[],nextCursor:null};
+const browse={items:[{applicationId:'a',title:'Privada'}],total:3,countsByStatus:{PREPARATION:2,SUBMITTED:1},page:1,pageSize:25,nextCursor:null,previousCursor:null};
+const applications={total:3,countsByStatus:{PREPARATION:2,SUBMITTED:1}};
 const refused=(code,extra={})=>Object.assign(new Error('refused'),{code,...extra});
 
-test('one request runs the three existing protected reads in order, one at a time, on the same request',async()=>{
+test('one request runs the four existing protected reads in order, one at a time, on the same request',async()=>{
  const calls=[];let running=0,request;
  await serve(async(method,input,id,req)=>{
   assert.equal(++running,1,'reads never overlap');request??=req;assert.equal(req,request);assert.equal(id,null);
   calls.push([method,input]);await new Promise(r=>setTimeout(r,5));running--;
-  return {workMine:tasks,alertsList:alerts,reviewMine:reviews}[method];
+  return {workMine:tasks,alertsList:alerts,reviewMine:reviews,browse}[method];
  },async read=>{
   const answer=await read();
   assert.equal(answer.status,200);assert.equal(answer.cache,'no-store');
-  assert.deepEqual(answer.body,{tasks,alerts,reviews});
-  assert.deepEqual(calls,[['workMine',{status:'OPEN',period:'all'}],['alertsList',{limit:5}],['reviewMine',{}]]);
+  assert.deepEqual(answer.body,{tasks,alerts,reviews,applications});
+  assert.deepEqual(calls,[['workMine',{status:'OPEN',period:'all'}],['alertsList',{limit:5}],['reviewMine',{}],['browse',{}]]);
  });
 });
 
@@ -30,14 +32,14 @@ test('a part that is unavailable or refused is reported in its place; the others
  await serve(async method=>{
   if(method==='reviewMine')throw refused('SCHEMA_UPGRADE_REQUIRED');
   if(method==='alertsList')throw refused('AUTHORITY_DENIED');
-  return tasks;
+  return method==='browse'?browse:tasks;
  },async read=>{
   const answer=await read();
   assert.equal(answer.status,200);
-  assert.deepEqual(answer.body,{tasks,alerts:{error:{code:'RESOURCE_NOT_AVAILABLE'}},reviews:{error:{code:'SCHEMA_UPGRADE_REQUIRED'}}});
+  assert.deepEqual(answer.body,{tasks,alerts:{error:{code:'RESOURCE_NOT_AVAILABLE'}},reviews:{error:{code:'SCHEMA_UPGRADE_REQUIRED'}},applications});
  });
- await serve(async method=>{if(method==='workMine')throw refused('private internals');return method==='alertsList'?alerts:reviews;},async read=>{
-  assert.deepEqual((await read()).body,{tasks:{error:{code:'SERVICE_UNAVAILABLE'}},alerts,reviews});
+ await serve(async method=>{if(method==='workMine')throw refused('private internals');if(method==='browse')throw refused('AUTHORITY_DENIED');return method==='alertsList'?alerts:reviews;},async read=>{
+  assert.deepEqual((await read()).body,{tasks:{error:{code:'SERVICE_UNAVAILABLE'}},alerts,reviews,applications:{error:{code:'RESOURCE_NOT_AVAILABLE'}}});
  });
 });
 

@@ -67,15 +67,17 @@ function createApplicationSliceRouter({express,service,authenticate,organization
  // competing as three simultaneous requests. A part that is refused or
  // unavailable is reported in its place and the others are still returned.
  // An invalid session refuses the whole request.
- const technicianParts=[['tasks','workMine',{status:'OPEN',period:'all'}],['alerts','alertsList',{limit:5}],['reviews','reviewMine',{}]];
+ // The applications part is the list read without filters; only its counts leave the server.
+ const technicianParts=[['tasks','workMine',{status:'OPEN',period:'all'}],['alerts','alertsList',{limit:5}],['reviews','reviewMine',{}],
+  ['applications','browse',{},({total,countsByStatus})=>({total,countsByStatus})]];
  router.get('/technician-dashboard',async(req,res)=>{
   const correlationId=requestCorrelation(),disconnected=()=>req.aborted||res.destroyed;
   try{
    if(Object.keys(req.query).length||(req.body&&Object.keys(req.body).length))throw Object.assign(new Error(),{code:'INVALID_INPUT'});
    const result={};
-   for(const [part,method,input] of technicianParts){
+   for(const [part,method,input,shape] of technicianParts){
     if(disconnected())return;
-    try{result[part]=await service.execute(method,{...input},null,req);}
+    try{const value=await service.execute(method,{...input},null,req);result[part]=shape?shape(value):value;}
     catch(error){
      const value=publicApplicationError(error);
      if(value.status===401)throw error;

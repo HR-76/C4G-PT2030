@@ -5,7 +5,7 @@ const api=vi.hoisted(()=>({partnersGet:vi.fn(),partnersHistory:vi.fn(),responsib
 const auth=vi.hoisted(()=>({user:{id:'00000000-0000-4000-8000-000000000004'},organization:{id:'00000000-0000-4000-8000-000000000001'}}))
 const interests=vi.hoisted(()=>({get:vi.fn(),units:vi.fn(),list:vi.fn()}))
 const central=vi.hoisted(()=>({get:vi.fn()}))
-vi.mock('../../api/api',()=>({privateApplicationsApi:api,opportunityInterestsApi:interests,centralOpportunitiesApi:central,privateOpportunitiesApi:{get:vi.fn().mockResolvedValue({data:{title:'Oportunidade'}})},pq1Api:{session:work=>work()}}))
+vi.mock('../../api/api',()=>({organizationDirectoryApi:()=>({context:()=>Promise.reject({response:{status:403}})}),privateApplicationsApi:api,opportunityInterestsApi:interests,centralOpportunitiesApi:central,privateOpportunitiesApi:{get:vi.fn().mockResolvedValue({data:{title:'Oportunidade'}})},pq1Api:{session:work=>work()}}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>auth}))
 import PrivateApplications from './PrivateApplications'
 import Interests from '../Interests/Interests'

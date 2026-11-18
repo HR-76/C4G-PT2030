@@ -13,6 +13,32 @@ function areaIds(values){
  if(!Array.isArray(values)||values.length>30||new Set(values).size!==values.length||values.some(id=>!ids.has(id)))fail();
  return [...values].sort();
 }
+function deadlineDate(deadline){
+ if(deadline===null)return;
+ if(typeof deadline!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(deadline)||deadline.startsWith('0000-'))fail();
+ const date=new Date(deadline);
+ if(!Number.isFinite(date.valueOf())||date.toISOString().slice(0,10)!==deadline)fail();
+}
+// A department's own interests and objectives. Whether they fit the entity strategy is
+// decided against the stored strategy, in the repository.
+function parseDepartmentProfile(raw){
+ exact(raw,['areaIds','objectives','expectedRevision','idempotencyKey']);
+ revision(raw.expectedRevision,0);uuid(raw.idempotencyKey);
+ const selected=areaIds(raw.areaIds);
+ if(!Array.isArray(raw.objectives)||raw.objectives.length>20)fail();
+ const objectives=raw.objectives.map(objective=>{
+  exact(objective,['id','title','target','deadline','areaIds','objectiveIds']);
+  const {id,title,target,deadline,objectiveIds}=objective;
+  uuid(id);text(title,256,true);text(target,1000);deadlineDate(deadline);
+  const related=areaIds(objective.areaIds);
+  if(related.some(area=>!selected.includes(area)))fail();
+  if(!Array.isArray(objectiveIds)||objectiveIds.length>30||new Set(objectiveIds).size!==objectiveIds.length)fail();
+  objectiveIds.forEach(uuid);
+  return {id,title,target,deadline,areaIds:related,objectiveIds:[...objectiveIds].sort()};
+ });
+ if(new Set(objectives.map(objective=>objective.id)).size!==objectives.length)fail();
+ return Object.freeze({...raw,areaIds:selected,objectives});
+}
 function parseStrategy(raw){
  exact(raw,['areaIds','interests','objectives','expectedRevision','idempotencyKey']);
  revision(raw.expectedRevision,0);uuid(raw.idempotencyKey);
@@ -21,17 +47,19 @@ function parseStrategy(raw){
  const interests=raw.interests.map(value=>text(value,256,true));
  if(!Array.isArray(raw.objectives)||raw.objectives.length>30)fail();
  const objectives=raw.objectives.map(objective=>{
-  exact(objective,['id','title','target','deadline','areaIds']);
-  const {id,title,target,deadline}=objective;
-  uuid(id);text(title,256,true);text(target,1000);
-  if(deadline!==null){
-   if(typeof deadline!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(deadline)||deadline.startsWith('0000-'))fail();
-   const date=new Date(deadline);
-   if(!Number.isFinite(date.valueOf())||date.toISOString().slice(0,10)!==deadline)fail();
+  // Application links are optional: a client that omits them keeps the links already stored.
+  const linked=Boolean(objective)&&typeof objective==='object'&&Object.hasOwn(objective,'applicationIds');
+  exact(objective,['id','title','target','deadline','areaIds',...(linked?['applicationIds']:[])]);
+  const {id,title,target,deadline,applicationIds}=objective;
+  if(linked){
+   if(!Array.isArray(applicationIds)||applicationIds.length>200||new Set(applicationIds).size!==applicationIds.length)fail();
+   applicationIds.forEach(uuid);
   }
+  uuid(id);text(title,256,true);text(target,1000);
+  deadlineDate(deadline);
   const related=areaIds(objective.areaIds);
   if(related.some(area=>!selected.includes(area)))fail();
-  return {id,title,target,deadline,areaIds:related};
+  return {id,title,target,deadline,areaIds:related,...(linked?{applicationIds:[...applicationIds].sort()}:{})};
  });
  if(new Set(objectives.map(objective=>objective.id)).size!==objectives.length)fail();
  return Object.freeze({...raw,areaIds:selected,interests,objectives});
@@ -44,6 +72,7 @@ function parse(method,raw){
   exact(raw,['description','expectedRevision','idempotencyKey']);text(raw.description,4000);revision(raw.expectedRevision,0);uuid(raw.idempotencyKey);return Object.freeze({...raw});
  }
  if(method==='strategyEdit')return parseStrategy(raw);
+ if(method==='departmentProfileEdit')return parseDepartmentProfile(raw);
  if(['personProfileEdit','selfEdit','personLinkEdit'].includes(method)){
   const link=method==='personLinkEdit',hasInterests=!link&&raw&&Object.hasOwn(raw,'interestAreaIds');
   exact(raw,[...(link?['membershipId']:['biography','keywords','areaIds',...(hasInterests?['interestAreaIds']:[])]),'expectedRevision','idempotencyKey']);

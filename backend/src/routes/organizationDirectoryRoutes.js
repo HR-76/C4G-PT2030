@@ -1,7 +1,7 @@
 'use strict';
 const {randomUUID}=require('node:crypto');
  const statuses={CONTACTS_CENTRAL:409,FISCAL_IDENTITY_LOCKED:409,FISCAL_IDENTITY_REVIEW_REQUIRED:409,ONBOARDING_INPUT_INVALID:400,REGISTRATION_FIELDS_INVALID:400,ONBOARDING_CONFLICT:409,ONBOARDING_STALE:409,ONBOARDING_NOT_READY:409,INVALID_INPUT:400,INVALID_CURSOR:400,SESSION_REQUIRED:401,AUTHORITY_REQUIRED:401,AUTHORITY_STALE:409,AUTHORITY_WRITE_PENDING:409,NOT_AUTHORIZED:403,RESOURCE_NOT_AVAILABLE:404,
- STALE_REVISION:409,SELF_ACCESS_PROTECTED:409,STATE_CONFLICT:409,IDEMPOTENCY_CONFLICT:409,DEPENDENCY_CONFLICT:409,UNIT_UNAVAILABLE:409,MEMBERSHIP_UNAVAILABLE:409,CONTEXT_CHANGED:409,LIMIT_EXCEEDED:409};
+ STALE_REVISION:409,SELF_ACCESS_PROTECTED:409,STATE_CONFLICT:409,IDEMPOTENCY_CONFLICT:409,DEPENDENCY_CONFLICT:409,UNIT_UNAVAILABLE:409,STRATEGIC_AREA_REQUIRED:409,STRATEGIC_OBJECTIVE_UNAVAILABLE:409,MEMBERSHIP_UNAVAILABLE:409,CONTEXT_CHANGED:409,LIMIT_EXCEEDED:409};
 function createDirectoryRouter({express,service,matching,membershipAccess,members,emailLogos=null,onFailure=()=>{},authenticate,organizationMiddleware}){
  const router=express.Router();
  const failure=(error,res)=>{
@@ -32,7 +32,7 @@ function createDirectoryRouter({express,service,matching,membershipAccess,member
   res.json(await matching.execute({...req.query},req));
  }catch(error){failure(error,res);}});
   for(const [verb,path,method] of [['put','/description','descriptionEdit'],['put','/strategy','strategyEdit'],['put','/registration','registrationProfile'],['put','/registration/type','registrationType'],['put','/registration/contacts','registrationContacts'],['get','/','context'],['put','/','profileEdit'],['get','/units','units'],['post','/units','unitCreate'],
-  ['put','/units/:id/name','unitRename'],['put','/units/:id/parent','unitMove'],['get','/me','self'],['put','/me','selfEdit'],['get','/memberships','memberships'],['get','/people/:id','person'],['put','/people/:id/profile','personProfileEdit'],['put','/people/:id/account','personLinkEdit'],['get','/people','people'],['post','/people','personCreate'],['put','/people/:id','personEdit']]){
+  ['put','/units/:id/name','unitRename'],['put','/units/:id/profile','departmentProfileEdit'],['put','/units/:id/parent','unitMove'],['get','/me','self'],['put','/me','selfEdit'],['get','/memberships','memberships'],['get','/people/:id','person'],['put','/people/:id/profile','personProfileEdit'],['put','/people/:id/account','personLinkEdit'],['get','/people','people'],['post','/people','personCreate'],['put','/people/:id','personEdit']]){
   router[verb](path,async(req,res)=>{try{
    if((verb==='get'&&req.body&&Object.keys(req.body).length)||(verb!=='get'&&Object.keys(req.query).length))throw Object.assign(new Error(),{code:'INVALID_INPUT'});
    const value=await service.execute(method,verb==='get'?{...req.query}:req.body,req.params.id,req);

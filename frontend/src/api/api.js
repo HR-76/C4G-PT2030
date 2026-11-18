@@ -259,7 +259,7 @@ export function organizationDirectoryApi(organizationId) {
     personProfileEdit:(id,body)=>write('put',`/people/${id}/profile`,body),
     personLinkEdit:(id,body)=>write('put',`/people/${id}/account`,body),selfEdit:body=>write('put','/me',body),
     profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationType:body=>write('put','/registration/type',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
-    unitRename:(id,body)=>write('put',`/units/${id}/name`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
+    unitRename:(id,body)=>write('put',`/units/${id}/name`,body),departmentProfileEdit:(id,body)=>write('put',`/units/${id}/profile`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
     personCreate:body=>write('post','/people',body),personEdit:(id,body)=>write('put',`/people/${id}`,body),
     // The entity's own email logo. The body of an upload is the image itself, so the revision and the idempotency key travel in headers.
     emailLogo:signal=>read('/email-logo',{},signal),

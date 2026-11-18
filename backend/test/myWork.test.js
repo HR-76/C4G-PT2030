@@ -12,7 +12,7 @@ function fixture(){
  const rows=Array.from({length:26},(_,i)=>({task_id:id(100+i),application_id:id(4+i%2),application_title:'Candidatura',title:'Tarefa '+i,deadline:'2026-11-11',status:'OPEN',bucket:'today'}));
  let digest='first';
  const options={organizationId:id(2),actor,authority,clock:{now:()=>args.now},cursor:createPq1UiTokens({keys:{test:'x'.repeat(32)},currentKeyId:'test'})};
- const client={async query(sql,params){calls.push({sql,params});return {rows:[{items:params[20]?rows.slice(25):rows,total:26,counts:{today:26},digest}]}}};
+ const client={async query(sql,params){calls.push({sql,params});return {rows:[{items:params[20]?rows.slice(25):rows,total:26,counts:{today:26},digest,workload_total:2,workload:[{application_id:id(4),title:'Candidatura',total:13,overdue:0},{application_id:id(5),title:'Candidatura',total:13,overdue:0}]}]}}};
  return {args,options,client,calls,revoke:()=>{digest='revoked'}};
 }
 test('strict query accepts filters but rejects client identity, arrays and invalid states',()=>{
@@ -30,6 +30,8 @@ test('SQL scopes tenant, participation, app/work and sources before assignment, 
  for(const pattern of [/a.organization_id=\$1/,/p.membership_id=\$3 AND p.active/,/a.application_id=ANY\(\$5::uuid\[\]\)/,/a.opportunity_id,a.organization_id\)=ANY\(\$7::uuid\[\]\)/,/a.evaluation_id=ANY\(\$9::uuid\[\]\)/,/a.application_id=ANY\(\$14::uuid\[\]\)/,/t.responsible_membership_id=\$15::uuid/,/t.organization_id=a.organization_id/,/ORDER BY deadline,task_id LIMIT 26/])assert.match(sql,pattern);
  assert.equal(params[14],id(3));assert.notEqual(params[14],id(1));assert.equal(params[15],'orçamento');assert.equal(params[16],'energia');
  assert.equal(result.items.length,25);assert.equal(result.total,26);assert.equal(result.counts.today,26);assert.equal(result.today,'2026-11-11');
+ assert.ok(sql.includes('FROM filtered GROUP BY application_id,application_title ORDER BY count(*) DESC,lower(application_title),application_id LIMIT 8'));
+ assert.deepEqual(result.byApplication,{total:2,items:[{applicationId:id(4),title:'Candidatura',total:13,overdue:0},{applicationId:id(5),title:'Candidatura',total:13,overdue:0}]});
  const next=await read(f.client,f.options,parse({q:'orçamento',applicationQ:'energia',cursor:result.nextCursor}));assert.equal(next.items.length,1);assert.equal(next.nextCursor,null);
 });
 test('cursor cannot cross user, organization, filter, authority or revoked result set',async()=>{

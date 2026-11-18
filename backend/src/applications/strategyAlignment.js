@@ -30,30 +30,37 @@ const alignmentCtes=`
   WHERE a.status='PREPARATION'
    AND (SELECT count(*) FROM assigned WHERE status='PREPARATION')<=${maxPreparation}
    AND EXISTS (SELECT 1 FROM strategy_objectives s CROSS JOIN LATERAL jsonb_array_elements(s.objectives) AS g(objective)
-    WHERE jsonb_array_length(objective->'areaIds')>0)
+    WHERE jsonb_array_length(objective->'areaIds')>0
+     OR jsonb_array_length(COALESCE(objective->'applicationIds','[]'::jsonb))>0)
  )`;
 
 const alignmentColumns=`(SELECT objectives FROM strategy_objectives) AS strategy_objectives,
  COALESCE((SELECT jsonb_agg(p ORDER BY lower(p.title),p."applicationId") FROM strategy_preparation p),'[]'::jsonb) AS strategy_preparation`;
 
+// An application counts for an objective when its opportunity matches one of the
+// objective's areas or when the organization linked it to that objective.
 function strategyAlignment(objectives,preparation,total){
- const goals=objectives.map(({id,title,areaIds})=>({id,title,areaIds,count:0}));
+ const goals=objectives.map(({id,title,areaIds,applicationIds})=>({id,title,areaIds,count:0,linked:new Set(applicationIds||[])}));
  const configured=new Set(goals.flatMap(goal=>goal.areaIds));
  const result={areaCatalogVersion:version,total,aligned:null};
- if(!configured.size||total===0)return {...result,state:configured.size?'NO_PREPARATION':'NO_OBJECTIVE_AREAS'};
+ const usable=configured.size>0||goals.some(goal=>goal.linked.size>0);
+ if(!usable||total===0)return {...result,state:usable?'NO_PREPARATION':'NO_OBJECTIVE_AREAS'};
  if(total>maxPreparation||preparation.length!==total)return {...result,state:'UNAVAILABLE'};
 
  let aligned=0;
  const applications=preparation.map(({applicationId,title,opportunityTitle,...fields})=>{
   const areaIds=classify({title:opportunityTitle,...fields}).map(area=>area.id).filter(id=>configured.has(id));
-  if(areaIds.length)aligned++;
+  const objectiveIds=[];
   for(const goal of goals){
-   if(areaIds.some(id=>goal.areaIds.includes(id)))goal.count++;
+   const linked=goal.linked.has(applicationId);
+   if(linked)objectiveIds.push(goal.id);
+   if(linked||areaIds.some(id=>goal.areaIds.includes(id)))goal.count++;
   }
-  return {applicationId,title,areaIds};
+  if(areaIds.length||objectiveIds.length)aligned++;
+  return {applicationId,title,areaIds,objectiveIds};
  });
  const areaNames=Object.fromEntries(areas.filter(area=>configured.has(area.id)).map(({id,name})=>[id,name]));
- return {...result,state:'READY',aligned,objectives:goals,applications,areaNames};
+ return {...result,state:'READY',aligned,objectives:goals.map(({linked,...goal})=>({...goal,linkedCount:linked.size})),applications,areaNames};
 }
 
 module.exports={alignmentCtes,alignmentColumns,strategyAlignment};

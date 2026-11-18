@@ -6,6 +6,7 @@ import ApplicationPreparationSummary from './ApplicationPreparationSummary'
 import ApplicationNextStep from './ApplicationNextStep'
 import useNextStepCompletion from './useNextStepCompletion'
 import ApplicationPartners from './ApplicationPartners'
+import ApplicationObjectives from './ApplicationObjectives'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
@@ -288,6 +289,7 @@ export function ApplicationRecord() {
       {record.lastSubmittedAt&&<p>Último registo de submissão: {new Date(record.lastSubmittedAt).toLocaleString('pt-PT')}</p>}
       {record.evaluationId&&<p>Avaliação F14 associada: {record.evaluationId} (referência, sem prova de elegibilidade)</p>}
       {record.canEdit===false&&<p>Acesso de consulta à candidatura. A edição requer autorização do gestor.</p>}
+      {organization?.navigation?.directory!==false&&<ApplicationObjectives key={`${userId}:${org}:${id}`} applicationId={id} organizationId={org}/>}
         </>},
         {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview onActionCompleted={()=>nextStep.complete('documents')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
         {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork onActionCompleted={()=>nextStep.complete('team')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},

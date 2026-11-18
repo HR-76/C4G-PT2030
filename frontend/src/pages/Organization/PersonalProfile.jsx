@@ -6,6 +6,7 @@ import {organizationDirectoryApi} from '../../api/api'
 import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import {clearDirectoryCache} from './directoryCache'
 import {AreaOptions} from './OrganizationStrategy'
+import DepartmentContext,{departmentsWithProfile} from './DepartmentContext'
 import './organization-people.css'
 import './personal-profile.css'
 
@@ -65,6 +66,7 @@ export function ProfileForm({organizationId,personId,api:providedApi,scope=null}
   {pending&&!busy&&<button className="btn btn-primary" onClick={()=>send(pending)}>Repetir o mesmo envio</button>}
   {loading?<LoadingIndicator>A carregar o perfil…</LoadingIndicator>:data&&!data.person?<section className="detail-section"><h3>Perfil ainda não associado</h3><p>A sua conta ainda não está associada a uma pessoa nesta organização. O gestor pode fazer essa associação na ficha da pessoa.</p><Link to="/catalogo">Continuar no catálogo</Link><p>Não precisa de completar o perfil para criar uma candidatura.</p></section>:data&&<>
    <section className="detail-section"><h3>Dados pessoais</h3><dl className="dl-list"><div className="dl-row"><dt>Nome</dt><dd>{data.person.name}</dd></div><div className="dl-row"><dt>Email</dt><dd>{data.person.email||'Por indicar'}</dd></div><div className="dl-row"><dt>Função</dt><dd>{data.person.functionLabel||'Por indicar'}</dd></div><div className="dl-row"><dt>Departamentos / Unidades</dt><dd>{data.units.length?data.units.map(u=><div key={u.scopeId}>{u.label}{u.isPrimary?' · Principal':''}</div>):'Afeta à organização'}</dd></div></dl></section>
+   {departmentsWithProfile(data.departments).length>0&&<section className="detail-section" aria-label="Objetivos dos departamentos"><h3>Objetivos dos departamentos</h3><DepartmentContext departments={data.departments} areas={data.areas}/></section>}
    {!data.permissions.edit&&<p>Acesso de consulta. Sem permissão para editar este perfil.</p>}
    <form onSubmit={save}><fieldset disabled={busy||Boolean(pending)||!data.permissions.edit}>
     <section className="detail-section personal-competencies"><h3>Apresentação</h3><div className="field-grid"><label className="field field-full">Biografia<textarea rows={3} maxLength={4000} value={form.biography} onChange={e=>setForm(f=>({...f,biography:e.target.value}))}/></label><label className="field field-full">Palavras-chave<textarea rows={2} maxLength={1000} value={form.keywords} onChange={e=>setForm(f=>({...f,keywords:e.target.value}))}/></label></div></section>

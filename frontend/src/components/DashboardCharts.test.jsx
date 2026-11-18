@@ -67,7 +67,7 @@ it('can reveal all matching applications when a result has more than eight', asy
 })
 
 it.each([
-  ['NO_OBJECTIVE_AREAS', 'Associe áreas temáticas aos objetivos para calcular o índice.'],
+  ['NO_OBJECTIVE_AREAS', 'Associe áreas temáticas aos objetivos ou ligue candidaturas a um objetivo para calcular o índice.'],
   ['NO_PREPARATION', 'Ainda não há candidaturas em preparação.'],
   ['UNAVAILABLE', 'Não foi possível calcular o índice para todas as candidaturas em preparação.'],
 ])('shows the %s state without a percentage', (state, message) => {
@@ -76,4 +76,25 @@ it.each([
   const chart = within(screen.getByRole('region', { name: 'Alinhamento estratégico' }))
   expect(chart.getByText(message)).toBeTruthy()
   expect(chart.queryByText(/\d\s?%/)).toBeNull()
+})
+
+it('counts applications linked to an objective and marks the link in its list', async () => {
+  const dashboard = alignmentDashboard({ state: 'READY', total: 2, aligned: 1, objectives: [
+    { id: 'first', title: 'Objetivo sem áreas com ligação', areaIds: [], count: 1, linkedCount: 1 },
+    { id: 'second', title: 'Objetivo por configurar', areaIds: [], count: 0, linkedCount: 0 },
+  ], areaNames: {}, applications: [
+    { applicationId: 'a', title: 'Projeto ligado', areaIds: [], objectiveIds: ['first'] },
+    { applicationId: 'b', title: 'Projeto solto', areaIds: [], objectiveIds: [] },
+  ] })
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const chart = within(screen.getByRole('region', { name: 'Alinhamento estratégico' }))
+  expect(chart.getAllByText('Sem áreas associadas')).toHaveLength(1)
+  const details = chart.getByText('Objetivo sem áreas com ligação').closest('li').querySelector('details')
+  details.open = true
+  expect((await within(details).findByRole('link', { name: 'Projeto ligado' })).getAttribute('href')).toBe('/candidaturas/a')
+  expect(within(details).getByText('Ligação manual')).toBeTruthy()
+  const unmatched = chart.getByText('Sem correspondência').closest('li').querySelector('details')
+  unmatched.open = true
+  expect(await within(unmatched).findByRole('link', { name: 'Projeto solto' })).toBeTruthy()
+  expect(within(unmatched).queryByRole('link', { name: 'Projeto ligado' })).toBeNull()
 })
