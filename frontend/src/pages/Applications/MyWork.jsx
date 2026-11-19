@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, CalendarDays, ChevronRight, ListChecks } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, ListChecks } from 'lucide-react'
 import { privateApplicationsApi } from '../../api/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { readScope, startConfirmedRead } from '../../api/confirmedReads'
@@ -26,6 +26,9 @@ function Work({ organization, scope }) {
   cursorNow.current = cursor
   const [data, setData] = useState(() => startConfirmedRead(scope, readName(initial, null)).held), [loading, setLoading] = useState(!data), [error, setError] = useState('')
   const [selected, setSelected] = useState(null), trigger = useRef(null)
+  // Groups the reader folded away; the choice lasts while the page is open.
+  const [folded, setFolded] = useState(() => new Set())
+  const fold = key => setFolded(previous => { const next = new Set(previous); if (!next.delete(key)) next.add(key); return next })
   // True while the next read is the silent one made when the window regains focus.
   const quiet = useRef(false)
   // Another selection keeps the previous tasks on screen, dimmed and inactive, until its answer arrives.
@@ -73,13 +76,14 @@ function Work({ organization, scope }) {
     {error && <div role="alert" className="my-work-error"><p>{error}</p><button className="btn btn-outline" onClick={() => reset(filters)}>Repetir consulta</button></div>}
     {data?.total === 0 && <div className="my-work-empty"><ListChecks size={32} aria-hidden="true" data-icon-tone="violet" /><h2>Sem tarefas com estes filtros</h2><p>Esta vista apresenta apenas tarefas atribuídas a si nas candidaturas a que tem acesso.</p></div>}
     {data && data.total > 0 && groups.filter(([key]) => data.counts[key] > 0).map(([key, label]) => {
-      const tasks = data.items.filter(task => task.group === key)
+      const tasks = data.items.filter(task => task.group === key), shown = !folded.has(key)
       return <section className={`my-work-group my-work-${key}${stale ? ' my-work-stale' : ''}`} key={key} aria-label={label} inert={stale ? '' : undefined} aria-busy={stale || undefined}>
-        <header><h2>{label} <span>{data.counts[key]}</span></h2><small>{tasks.length} carregadas</small></header>
-        {tasks.length ? <ul>{tasks.map(task => <li key={task.taskId}><button className="my-work-task" onClick={event => open(task, event)} aria-label={`Ver tarefa ${task.title}`}>
+        <header><h2><button type="button" className="my-work-fold" aria-expanded={shown} aria-controls={`my-work-tasks-${key}`} onClick={() => fold(key)}>
+          {shown ? <ChevronDown size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}{label} <span>{data.counts[key]}</span></button></h2><small>{tasks.length} carregadas</small></header>
+        <div id={`my-work-tasks-${key}`} hidden={!shown}>{!shown ? null : tasks.length ? <ul>{tasks.map(task => <li key={task.taskId}><button className="my-work-task" onClick={event => open(task, event)} aria-label={`Ver tarefa ${task.title}`}>
           <span className="my-work-task-copy"><strong>{task.title}</strong><span>{task.applicationTitle}</span></span>
           <span className="my-work-task-meta"><span className="my-work-state">{states[task.status]}</span><span><CalendarDays size={15} aria-hidden="true" />{date(task.deadline)}</span></span><ChevronRight size={18} aria-hidden="true" />
-        </button></li>)}</ul> : <p className="my-work-unloaded">Carregue mais tarefas para consultar este grupo.</p>}
+        </button></li>)}</ul> : <p className="my-work-unloaded">Carregue mais tarefas para consultar este grupo.</p>}</div>
       </section>
     })}
     {data?.nextCursor && <div className="my-work-more"><button className="btn btn-secondary" disabled={loading} onClick={() => setCursor(data.nextCursor)}>Mais tarefas</button></div>}

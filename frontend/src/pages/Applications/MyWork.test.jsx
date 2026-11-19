@@ -65,3 +65,18 @@ it('keeps the previous tasks on screen, dimmed and inactive, while other filters
  await act(async () => answer({ data: { items: [], total: 0, counts: {}, nextCursor: null } }))
  expect(screen.queryByRole('button', { name: 'Ver tarefa Rever orçamento' })).toBeNull()
 })
+
+it('folds and unfolds a group of tasks without reading again', async () => {
+  const before = mocks.read.mock.calls.length
+  render(<MemoryRouter><MyWork /></MemoryRouter>)
+  const group = await screen.findAllByRole('region').then(regions => regions[0])
+  const toggle = within(group).getByRole('button', { expanded: true })
+  const tasks = within(group).getAllByRole('button', { name: /^Ver tarefa/ }).length
+  expect(tasks).toBeGreaterThan(0)
+  fireEvent.click(toggle)
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  expect(within(group).queryByRole('button', { name: /^Ver tarefa/ })).toBeNull()
+  fireEvent.click(toggle)
+  expect(within(group).getAllByRole('button', { name: /^Ver tarefa/ })).toHaveLength(tasks)
+  expect(mocks.read.mock.calls.length).toBe(before + 1)
+})
