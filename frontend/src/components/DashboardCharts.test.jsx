@@ -98,3 +98,11 @@ it('counts applications linked to an objective and marks the link in its list', 
   expect(await within(unmatched).findByRole('link', { name: 'Projeto solto' })).toBeTruthy()
   expect(within(unmatched).queryByRole('link', { name: 'Projeto ligado' })).toBeNull()
 })
+
+it('opens the charts with the applications in progress and by status', () => {
+  const dashboard = { ...alignmentDashboard({ state: 'NO_PREPARATION', total: 0, aligned: null }), today: '2026-11-19' }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const titles = [...document.querySelectorAll('.dashboard-charts > section h2')].map(heading => heading.textContent)
+  expect(titles.slice(0, 2)).toEqual(['Candidaturas em curso', 'Candidaturas por estado'])
+  expect(titles.indexOf('Alinhamento estratégico')).toBeGreaterThan(1)
+})

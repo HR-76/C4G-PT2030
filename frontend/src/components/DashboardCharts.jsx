@@ -126,10 +126,12 @@ export default function DashboardCharts({ dashboard }) {
   const budgetUnits = units && [...units].sort((a, b) => Number(b.organizationBudget?.total || 0) - Number(a.organizationBudget?.total || 0) || a.label.localeCompare(b.label, 'pt'))
   const maxBudget = Math.max(0, ...(budgetUnits || []).map(unit => Number(unit.organizationBudget?.total || 0)))
   return <div className="dashboard-charts">
+    {/* The state of the applications opens the charts; history, strategy and budgets follow. */}
+    <ActivePipeline applications={dashboard.applications}/>
+    <States applications={dashboard.applications}/>
     <ApprovalTimeline history={dashboard.report?.approvalHistory} year={dashboard.today?.slice(0,4)}/>
     {dashboard.report?.strategyAlignment && <StrategyAlignment alignment={dashboard.report.strategyAlignment} />}
-    <ActivePipeline applications={dashboard.applications}/>
-    <States applications={dashboard.applications}/><Budgets applications={dashboard.applications}/>
+    <Budgets applications={dashboard.applications}/>
     <section className="chart-panel chart-units"><h2>Candidaturas por unidade</h2><p className="chart-caption">Cada candidatura conta na unidade principal do responsável.</p>
       {!units ? <p>Sem acesso aos indicadores do diretório.</p> : !units.length ? <p>Sem unidades para apresentar.</p> :
         <ul>{units.map(unit=><li key={unit.unitId || 'unassigned'}><span>{unit.label}{unit.lifecycle==='ARCHIVED' ? ' (arquivada)' : ''}</span>
