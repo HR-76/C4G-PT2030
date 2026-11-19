@@ -31,7 +31,6 @@
 .partner-card-detail .partner-dl dd { white-space:pre-wrap; }
 @media(max-width:640px){.partner-card-detail {padding:0 16px 16px;}}
 #equipa-tarefas, #parceiros, #documentos-revisao { scroll-margin-top:140px; }
-.application-next-step .form-actions { flex-wrap:wrap; }
 
 /* Local navigation keeps all application forms mounted and reachable. */
 .application-section-navigation { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 1.5rem; padding: .75rem; border: 1px solid var(--border, var(--color-border)); border-radius: 8px; background: var(--surface, var(--color-surface)); }
