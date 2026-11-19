@@ -1,3 +1,4 @@
+import LoadingIndicator from '../components/LoadingIndicator'
 import {useEffect, useRef, useState} from 'react'
 import {Globe, BookOpen, GraduationCap, Network, Map, RefreshCw} from 'lucide-react'
 import {fundingTendersApi as api, authApi} from '../api/api'
@@ -121,7 +122,7 @@ export default function FundingTenders() {
         <span aria-live="polite">Página {currentHistoryPage} de {historyPages}</span>
         <button type="button" className="btn btn-secondary" disabled={currentHistoryPage===historyPages} onClick={()=>setHistoryPage(currentHistoryPage+1)}>Seguinte</button>
       </nav>}
-      {!data && <p>{error?'Não foi possível carregar o histórico. Consulte novamente o estado.':'A carregar histórico…'}</p>}
+      {!data && (error ? <p>Não foi possível carregar o histórico. Consulte novamente o estado.</p> : <LoadingIndicator compact>A carregar histórico…</LoadingIndicator>)}
       {data && !data.runs?.length && <p>Sem atualizações registadas.</p>}
     </section>
   </div>

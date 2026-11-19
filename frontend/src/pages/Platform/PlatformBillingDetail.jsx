@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import BillingPdf from '../Billing/BillingPdf'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, CheckCircle2, FilePlus2, Pencil, RefreshCw, RotateCcw, WalletCards, XCircle } from 'lucide-react'
@@ -30,7 +31,7 @@ export function BillingDetailView({ cycleId, api = platformBillingApi }) {
     <header className="billing-heading"><div><h1>{data?.organizationName || 'Detalhe do ciclo'}</h1>{data && <p>{data.serviceDescription} · {formatDate(data.periodStart)} a {formatDate(data.periodEnd)} · Valor do ciclo {formatMoney(data.cycleAmount, data.currency)}</p>}</div><button className="btn btn-outline" disabled={busy} onClick={load}><RefreshCw size={16} aria-hidden="true"/>Atualizar</button></header>
     {notice && <div className="alert alert-success" role="status">{notice}</div>}
     {error && <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={load}>Tentar novamente</button></div>}
-    {busy && !data && <div className="billing-loading" role="status"><span/>A carregar o ciclo…</div>}
+    {busy && !data && <LoadingIndicator>A carregar o ciclo…</LoadingIndicator>}
     {data && <>
       <CycleHero data={data}/>
       <ActionBar data={data} onAction={setAction}/>

@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import useTaskSelection from './useTaskSelection'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MessageSquare, UserPlus } from 'lucide-react'
@@ -167,7 +168,7 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
     {!editor&&feedback}
     {workReady && (!canEdit || work.canEdit !== true) && !pending && <p className="text-muted">Acesso de consulta à equipa e às tarefas.</p>}
     {work&&(!writable||storageBlocked)&&<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar equipa e tarefas</button>}
-    {!work?<>{reading ? <p role="status">A carregar equipa e tarefas…</p> : <button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar equipa e tarefas</button>}</>:<>
+    {!work?<>{reading ? <LoadingIndicator>A carregar equipa e tarefas…</LoadingIndicator> : <button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar equipa e tarefas</button>}</>:<>
       <dl className="work-summary">
         <div><dt>Responsável da candidatura</dt><dd>{applicationResponsibleId?memberName(applicationResponsibleId):'Não identificado'}</dd></div>
         <div><dt>Prazo interno da candidatura</dt><dd>{dateLabel(applicationDeadline)}</dd></div>
@@ -281,7 +282,7 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
         {afterInternal(taskForm.deadline)&&<p role="status">Este prazo ultrapassa o prazo interno da candidatura. Confirme se é intencional.</p>}
         <div className="form-actions"><button className="btn btn-primary" type="submit" disabled={busy||!!pending}>{editing?'Guardar tarefa':'Criar tarefa'}</button>{editing&&<button type="button" className="btn btn-secondary btn-sm" disabled={busy||!!pending} onClick={()=>{setEditing(null);setTaskForm(emptyTask);setEditor(null)}}>Cancelar edição</button>}</div>
       </form></FormModal>}
-      <details className="work-history"><summary>Histórico da equipa e tarefas</summary><p>Revisão da equipa e tarefas: {work.revision}.</p>{historyLoading&&<p role="status">A carregar histórico…</p>}{historyError&&<p role="alert">Não foi possível carregar o histórico da equipa. <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>}<ol>{history.map(h=><li key={h.revision}>Revisão {h.revision}: {KIND[h.kind]}{h.membershipId&&` — ${memberName(h.membershipId)}`}{h.taskId&&` — tarefa ${h.taskId}`}{h.title&&` · título: ${h.title}`}{h.responsibleMembershipId&&` · responsável: ${memberName(h.responsibleMembershipId)}`}{h.deadline&&` · prazo: ${h.deadline}`}{h.status&&` · estado: ${STATUS[h.status]}`} · autor: {h.actorSubjectId} · {new Date(h.recordedAt).toLocaleString('pt-PT')}
+      <details className="work-history"><summary>Histórico da equipa e tarefas</summary><p>Revisão da equipa e tarefas: {work.revision}.</p>{historyLoading&&<LoadingIndicator compact>A carregar histórico…</LoadingIndicator>}{historyError&&<p role="alert">Não foi possível carregar o histórico da equipa. <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>}<ol>{history.map(h=><li key={h.revision}>Revisão {h.revision}: {KIND[h.kind]}{h.membershipId&&` — ${memberName(h.membershipId)}`}{h.taskId&&` — tarefa ${h.taskId}`}{h.title&&` · título: ${h.title}`}{h.responsibleMembershipId&&` · responsável: ${memberName(h.responsibleMembershipId)}`}{h.deadline&&` · prazo: ${h.deadline}`}{h.status&&` · estado: ${STATUS[h.status]}`} · autor: {h.actorSubjectId} · {new Date(h.recordedAt).toLocaleString('pt-PT')}
         {h.description&&<p className="task-description">{h.description}</p>}
       </li>)}</ol>
       {historyNext&&<button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={loadHistory}>Mais histórico de tarefas</button>}

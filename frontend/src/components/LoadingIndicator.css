@@ -1,4 +1,6 @@
 .loading-indicator { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; min-height:152px; padding:24px; color:var(--text-secondary,var(--color-text-secondary)); text-align:center; }
+.loading-indicator-compact { flex-direction:row; justify-content:flex-start; gap:10px; min-height:0; padding:10px 0; text-align:start; }
+.loading-indicator-compact .loading-indicator-icon { width:28px; height:28px; }
 .loading-indicator > span { max-width:100%; overflow-wrap:anywhere; }
 .loading-indicator-icon { flex-shrink:0; color:var(--primary,var(--ui-action)); }
 .loading-orbit-track { fill:none; stroke:var(--color-border); stroke-width:1; }

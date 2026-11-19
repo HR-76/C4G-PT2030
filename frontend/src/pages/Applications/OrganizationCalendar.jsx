@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -163,7 +164,7 @@ export default function OrganizationCalendar() {
         </form>}
       </div>
     </header>
-    {!result && <p className="organization-calendar-feedback" role="status">A carregar prazos…</p>}
+    {!result && <LoadingIndicator>A carregar prazos…</LoadingIndicator>}
     {result?.error && <div className="organization-calendar-feedback" role="alert">
       <p>{result.error === 403 ? 'Sem acesso ao calendário da entidade.' : result.error === 404 && applicationId
         ? 'Esta candidatura já não está disponível no calendário.' : 'Não foi possível carregar o calendário.'}</p>

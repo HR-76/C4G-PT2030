@@ -1,3 +1,4 @@
+import LoadingIndicator from '../components/LoadingIndicator'
 import FormModal from '../components/FormModal'
 import { PartnerCards } from './Applications/PartnerComponents'
 import FilterBar from '../components/FilterBar'
@@ -125,6 +126,7 @@ function PartnersView({organizationId, organizationName, scope=null}) {
         {loading ? 'A consultar parceiros…' : error?'Consulta indisponível':`${page?.total??rows.length} parceiro${(page?.total??rows.length) !== 1 ? 's' : ''}`}
       </div>
 
+      {loading && !rows.length && <LoadingIndicator />}
       <div className="table-wrap">
         <table role="table" className="data-table partners-table mobile-card-table">
           <colgroup>

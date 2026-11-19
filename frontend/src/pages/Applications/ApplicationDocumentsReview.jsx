@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import {useEffect,useRef,useState} from 'react'
 import {FileText} from 'lucide-react'
 import {privateApplicationsApi as api} from '../../api/api'
@@ -186,7 +187,7 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   {error&&<p role="alert">{error}</p>}{accessBlocked&&snapshot&&<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar permissões documentais</button>}{notice&&<p role="status">{notice}</p>}
   {pending&&<p role="status">Envio por confirmar. {!permits(pending.method)?'A intenção foi preservada; confirme a sessão, a organização e as permissões antes de continuar.':<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>send(null,null,true)}>Repetir o mesmo envio</button>}</p>}
   {pendingUpload&&<p role="status">{canUpload?'Upload por confirmar. Selecione novamente o mesmo ficheiro e repita a operação com a chave preservada.':'Upload por confirmar preservado. Confirme as permissões antes de continuar.'}</p>}
-  {!snapshot?<><p>Carregar documentos e revisão…</p><button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar documentos e revisão</button></>:<>
+  {!snapshot?<>{!error&&<LoadingIndicator>A carregar documentos e revisão…</LoadingIndicator>}<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar documentos e revisão</button></>:<>
    <dl className="document-summary"><div><dt>Versões associadas</dt><dd>{snapshot.documents.length}</dd></div><div><dt>Disponíveis para revisão</dt><dd>{snapshot.documents.length-unavailable}</dd></div><div><dt>Indisponíveis</dt><dd>{unavailable}</dd></div></dl>
    <p>{canEdit?preparationHint:canDecide?'Pode consultar os documentos e decidir os pedidos de revisão disponíveis.':'Consulta documental. Sem permissão atual para editar ou decidir revisões.'}</p>
    <section className="linked-files" aria-label="Versões associadas"><h3>Versões associadas</h3>

@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, CalendarDays, ChevronDown, ChevronRight, ListChecks } from 'lucide-react'
@@ -73,6 +74,7 @@ function Work({ organization, scope }) {
       <div className="my-work-filter-actions"><button className="btn btn-primary" type="submit">Aplicar filtros</button><button className="btn btn-secondary" type="button" onClick={() => { setDraft(initial); reset(initial) }}>Limpar</button></div>
     </form>
     <p className="my-work-summary" role="status">{loading ? 'A carregar tarefas…' : data ? `${data.items.length} de ${data.total} tarefas · Prazos em hora de Lisboa` : ''}</p>
+    {loading && !data && <LoadingIndicator />}
     {error && <div role="alert" className="my-work-error"><p>{error}</p><button className="btn btn-outline" onClick={() => reset(filters)}>Repetir consulta</button></div>}
     {data?.total === 0 && <div className="my-work-empty"><ListChecks size={32} aria-hidden="true" data-icon-tone="violet" /><h2>Sem tarefas com estes filtros</h2><p>Esta vista apresenta apenas tarefas atribuídas a si nas candidaturas a que tem acesso.</p></div>}
     {data && data.total > 0 && groups.filter(([key]) => data.counts[key] > 0).map(([key, label]) => {

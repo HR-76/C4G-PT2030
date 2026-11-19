@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import FormModal from '../../components/FormModal'
 import {useEffect,useMemo,useRef,useState} from 'react'
 import {UserPlus,ArrowLeft} from 'lucide-react'
@@ -31,7 +32,7 @@ export default function EntityUsers({organizationId,organizationName,platform=fa
  return <div className="entity-users">
   <div className="entity-users-heading"><div><p className="member-org-name">{organizationName}</p><Heading>Utilizadores e acessos</Heading><p>Adicione pessoas à entidade e acompanhe as suas ativações.</p></div><button ref={addTrigger} className="btn btn-primary btn-create" disabled={locked||!data?.profileOptions?.length||Boolean(form)} onClick={start}><UserPlus size={17} aria-hidden="true"/> Adicionar utilizador</button></div>
   {!form&&error&&<div role="alert" className="alert alert-error">{error}</div>}
-  {!form&&busy&&<p role="status">A processar o pedido…</p>}
+  {!form&&busy&&(data?<p role="status">A processar o pedido…</p>:<LoadingIndicator>A carregar utilizadores…</LoadingIndicator>)}
   {!form&&pending&&!busy&&<button className="btn btn-primary" onClick={()=>execute(pending)}>Repetir o mesmo pedido</button>}
   {!data&&!busy&&<button className="btn btn-outline" onClick={()=>load()}>Atualizar ativações</button>}
   {form&&<FormModal returnFocusRef={addTrigger} title="Adicionar utilizador" locked={locked} step={review} onClose={()=>{setForm(null);setReview(false)}}><section className="entity-user-form">

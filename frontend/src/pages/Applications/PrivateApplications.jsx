@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import ApplicationTimeline from './ApplicationTimeline'
 import FormModal from '../../components/FormModal'
 import ApplicationSections from './ApplicationSections'
@@ -228,7 +229,7 @@ export function ApplicationRecord() {
       return (<>
       {interest&&interest.centralRevisionId!==centralRevisionId&&<p role="status">A oportunidade foi atualizada desde o registo de interesse. Reveja os dados atuais antes de criar a candidatura.</p>}
       <div className="application-create-layout"><div className="application-create-context">
-      <section className="application-create-source" aria-label="Oportunidade de origem"><h2>Oportunidade</h2>{opportunity?<ApplicationOpportunityContext opportunity={opportunity} showLabel={false}/>:<p>A carregar oportunidade…</p>}</section>
+      <section className="application-create-source" aria-label="Oportunidade de origem"><h2>Oportunidade</h2>{opportunity?<ApplicationOpportunityContext opportunity={opportunity} showLabel={false}/>:<LoadingIndicator compact>A carregar oportunidade…</LoadingIndicator>}</section>
       {interest&&<section className="interest-application-context" aria-label="Análise do interesse de origem">
         <h2>Análise do interesse</h2>
         {interest.notes?<><div className="application-interest-notes pre-wrap" tabIndex={0} role="region" aria-label="Notas do interesse">{interest.notes}</div><button type="button" className="btn btn-outline" disabled={locked||Boolean(form.notes)} onClick={()=>{if(!locked&&!form.notes)setForm(previous=>previous.notes?previous:{...previous,notes:interest.notes})}}>Usar análise nas notas da candidatura</button></>:<p>Sem notas guardadas no interesse.</p>}
@@ -294,7 +295,7 @@ export function ApplicationRecord() {
         {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview onActionCompleted={()=>nextStep.complete('documents')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
         {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork onActionCompleted={()=>nextStep.complete('team')} takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
         {id:'partners',label:'Parceiros',render:visited=>visited&&<ApplicationPartners onActionCompleted={()=>nextStep.complete('partners')} applicationId={id} userId={userId} organizationId={org}/>},
-        {id:'history',label:'Histórico',content:<>      <section id="historico-candidatura" tabIndex={-1} className="detail-section"><h2>Histórico</h2><p>Revisão atual: {record.revision} · Data do estado: {dateLabel(record.statusChangedAt)}</p>{historyLoading?<p role="status">A carregar histórico…</p>:historyError?<p role="alert">{historyError} <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>:<ApplicationTimeline history={history} record={record} responsibles={responsibles}/>}
+        {id:'history',label:'Histórico',content:<>      <section id="historico-candidatura" tabIndex={-1} className="detail-section"><h2>Histórico</h2><p>Revisão atual: {record.revision} · Data do estado: {dateLabel(record.statusChangedAt)}</p>{historyLoading?<LoadingIndicator compact>A carregar histórico…</LoadingIndicator>:historyError?<p role="alert">{historyError} <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>:<ApplicationTimeline history={history} record={record} responsibles={responsibles}/>}
         {historyNext&&<button type="button" onClick={async()=>{try{const r=await api.history(id,{cursor:historyNext});if(!alive.current)return;setHistory(h=>[...h,...r.data.items]);setHistoryNext(r.data.nextCursor)}catch(e){if(alive.current)setError(message(e))}}}>Mais histórico</button>}</section></>}
       ]}/>
     </>)
