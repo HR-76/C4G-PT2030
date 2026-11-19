@@ -3,6 +3,8 @@
 .dashboard-report .dashboard-report-table td { white-space: normal; overflow: visible; text-overflow: clip; max-width: none; min-width: 100px; }
 .dashboard-report .dashboard-report-table th:first-child,
 .dashboard-report .dashboard-report-table td:first-child { min-width: 220px; }
+/* An amount never breaks between its digits and the euro sign. */
+.budget-amount { white-space: nowrap; }
 /* Report tables are dense: a smaller letter keeps more columns in view. */
 .dashboard-report .dashboard-report-table,
 .dashboard-report .dashboard-report-table .chip { font-size: 0.8125rem; }
@@ -22,11 +24,16 @@
 .dashboard-report .dashboard-units-table th,
 .dashboard-report .dashboard-units-table td { min-width: 0; padding: 13px 10px; vertical-align: middle; line-height: 1.4; }
 .dashboard-report .dashboard-units-table th:first-child,
-.dashboard-report .dashboard-units-table td:first-child { width: 21%; min-width: 0; padding-left: 16px; overflow-wrap: anywhere; }
+.dashboard-report .dashboard-units-table td:first-child { width: 20%; min-width: 0; padding-left: 16px; overflow-wrap: anywhere; }
+/* The three amount columns get the room the five counts do not need. */
+.dashboard-report .dashboard-units-table th:nth-child(n+2):nth-child(-n+6) { width: 7%; }
+.dashboard-report .dashboard-units-table th:nth-child(5) { width: 10%; }
+.dashboard-report .dashboard-units-table th:nth-child(n+7) { width: 14%; }
 .dashboard-report .dashboard-units-table th:nth-child(n+2):nth-child(-n+6),
 .dashboard-report .dashboard-units-table td:nth-child(n+2):nth-child(-n+6) { text-align: center; }
 .dashboard-report .dashboard-units-table th:nth-child(n+7),
-.dashboard-report .dashboard-units-table td:nth-child(n+7) { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dashboard-report .dashboard-units-table td:nth-child(n+7) { text-align: right; font-variant-numeric: tabular-nums; }
+.dashboard-report .dashboard-units-table th:nth-child(n+7) { overflow-wrap: anywhere; }
 .dashboard-report .dashboard-units-table th:nth-child(5) { overflow-wrap: normal; }
 .dashboard-report .dashboard-units-table tbody td:first-child { font-weight: 500; }
 .dashboard-report .dashboard-units-table tfoot { border-top: 2px solid var(--color-border, #d9e3e1); }

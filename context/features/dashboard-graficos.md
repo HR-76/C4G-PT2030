@@ -27,3 +27,5 @@ Critérios de aceitação:
 ## Tabela de candidaturas do relatório (19/11/2026)
 
 Pedido do utilizador: no Relatório da organização, os valores de orçamento deixam de quebrar a meio (ficam numa linha, alinhados à direita), tal como o prazo interno e o estado; as tabelas do relatório passam a usar letra mais pequena (13 px, cabeçalhos 12 px). Só CSS e uma classe na tabela.
+
+No mesmo dia: nas tabelas Por unidade e Por estado, cada valor fica numa só linha com o símbolo do euro, e as três colunas de orçamento da tabela Por unidade ganham largura (14 % cada) à custa das colunas de contagem.

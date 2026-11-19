@@ -12,7 +12,7 @@ const emptyState = { total: 0, active: 0, submitted: 0, approved: 0,
   totalBudget: emptyBudget, organizationBudget: emptyBudget, approvedBudget: emptyBudget }
 
 export function BudgetValue({ value }) {
-  return <>{exactMoney(value.total)}{value.missing > 0 && <small className="text-muted" style={{ display: 'block' }}>{value.missing} sem valor</small>}</>
+  return <><span className="budget-amount">{exactMoney(value.total)}</span>{value.missing > 0 && <small className="text-muted" style={{ display: 'block' }}>{value.missing} sem valor</small>}</>
 }
 
 export default function DashboardReport({ dashboard, exporting, exportError, onExport }) {
