@@ -31,7 +31,7 @@ async function run() {
     const origin = `http://127.0.0.1:${server.address().port}`;
     await page.goto(origin + '/catalogo');
     await page.getByText('Sem resultados para estes filtros').waitFor();
-    assert.equal(await page.title(), 'Oportunidades');
+    assert.equal(await page.title(), 'Oportunidades 2030');
     assert.equal(await page.getByRole('link', { name: 'Fontes de oportunidades' }).count(), 0);
     assert.equal(await page.locator('.sidebar').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(7, 91, 89)');
     assert.equal(await page.getByRole('combobox', { name: 'Organização ativa' }).inputValue(), organization.id);
