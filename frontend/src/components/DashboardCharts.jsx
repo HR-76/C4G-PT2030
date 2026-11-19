@@ -120,15 +120,24 @@ function Budgets({ applications }) {
   </section>
 }
 
-export default function DashboardCharts({ dashboard }) {
+// The two charts that open the organization dashboard, above the indicators.
+export function LeadingCharts({ applications }) {
+  return <div className="dashboard-charts dashboard-charts-leading">
+    <ActivePipeline applications={applications}/>
+    <States applications={applications}/>
+  </div>
+}
+
+// `leading` is false where LeadingCharts already shows the first two charts.
+export default function DashboardCharts({ dashboard, leading = true }) {
   const units = dashboard.unit_totals && [...dashboard.unit_totals].sort((a,b)=>b.total-a.total || a.label.localeCompare(b.label,'pt'))
   const max = units?.[0]?.total || 0
   const budgetUnits = units && [...units].sort((a, b) => Number(b.organizationBudget?.total || 0) - Number(a.organizationBudget?.total || 0) || a.label.localeCompare(b.label, 'pt'))
   const maxBudget = Math.max(0, ...(budgetUnits || []).map(unit => Number(unit.organizationBudget?.total || 0)))
   return <div className="dashboard-charts">
     {/* The state of the applications opens the charts; history, strategy and budgets follow. */}
-    <ActivePipeline applications={dashboard.applications}/>
-    <States applications={dashboard.applications}/>
+    {leading && <><ActivePipeline applications={dashboard.applications}/>
+    <States applications={dashboard.applications}/></>}
     <ApprovalTimeline history={dashboard.report?.approvalHistory} year={dashboard.today?.slice(0,4)}/>
     {dashboard.report?.strategyAlignment && <StrategyAlignment alignment={dashboard.report.strategyAlignment} />}
     <Budgets applications={dashboard.applications}/>

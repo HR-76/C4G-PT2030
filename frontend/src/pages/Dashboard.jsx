@@ -6,7 +6,7 @@ import { ArrowRight, BarChart3, CalendarClock, FolderKanban, RefreshCw, Search }
 import { exactMoney } from '../api/organizationDashboard'
 import { readScope } from '../api/confirmedReads'
 import ApprovalTimeline, { approvalSummary, emptyPeriod } from '../components/ApprovalTimeline'
-import DashboardCharts from '../components/DashboardCharts'
+import DashboardCharts, { LeadingCharts } from '../components/DashboardCharts'
 import DashboardReport from '../components/DashboardReport'
 import DashboardBudgetStates from '../components/DashboardBudgetStates'
 import EmptyStatePanel from '../components/EmptyStatePanel'
@@ -78,12 +78,12 @@ function OrganizationDashboard({ user, organization }) {
 
     {loading ? <LoadingIndicator>A carregar os indicadores da organização…</LoadingIndicator>
       : error ? <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={refresh}>Tentar novamente</button></div>
-      : !dashboard ? <EmptyStatePanel title="Indicadores indisponíveis" description="Atualize o Dashboard para consultar os dados da organização." actionLabel="Atualizar" onAction={refresh}/> : view === 'charts' ? <><section className="dashboard-kpis" aria-label="Indicadores principais">
+      : !dashboard ? <EmptyStatePanel title="Indicadores indisponíveis" description="Atualize o Dashboard para consultar os dados da organização." actionLabel="Atualizar" onAction={refresh}/> : view === 'charts' ? <><LeadingCharts applications={dashboard.applications} /><section className="dashboard-kpis" aria-label="Indicadores principais">
         <Kpi tone="portfolio" icon={FolderKanban} value={applications.total} label="Candidaturas acessíveis" detail={`${applications.active || 0} ativas`} to="/candidaturas" />
         <Kpi tone="open" icon={Search} value={opportunities.open} label="Oportunidades abertas" detail="Catálogo e oportunidades privadas" to={catalogLink('all')} />
         <Kpi tone="deadline" icon={CalendarClock} value={opportunities.closing_soon} label="Fecham em 14 dias" detail="Oportunidades abertas com fecho próximo" to={catalogLink('14')} />
         <Kpi icon={BarChart3} value={history ? exactMoney(history.all.total) : null} label="Orçamento global aprovado" detail={current ? `${year} · ${exactMoney(current.total)}` : 'Histórico indisponível'} to="#approval-timeline" />
-      </section><DashboardDeadlines deadlines={deadlines} total={dashboard.deadline_total} /><DashboardCharts dashboard={dashboard} /></> : view === 'report' ? <DashboardReport dashboard={dashboard} exporting={exporting} exportError={exportError} onExport={exportReport} /> : <>
+      </section><DashboardDeadlines deadlines={deadlines} total={dashboard.deadline_total} /><DashboardCharts dashboard={dashboard} leading={false} /></> : view === 'report' ? <DashboardReport dashboard={dashboard} exporting={exporting} exportError={exportError} onExport={exportReport} /> : <>
       <div className="dashboard-indicator-context"><span>Indicadores da entidade</span><InfoTooltip label="Âmbito dos indicadores">O catálogo da plataforma inclui todos os estados do catálogo central. As oportunidades abertas incluem as acessíveis do catálogo e privadas. As candidaturas e os respetivos orçamentos consideram apenas os registos acessíveis nesta entidade. O orçamento aprovado é o valor dos projetos no momento da aprovação; não representa financiamento recebido. Valores em falta são indicados.</InfoTooltip></div>
       <section className="stats-strip dashboard-stats">
         <Stat label="Orçamento global aprovado" value={exactMoney(history?.all?.total)}

@@ -106,3 +106,11 @@ it('opens the charts with the applications in progress and by status', () => {
   expect(titles.slice(0, 2)).toEqual(['Candidaturas em curso', 'Candidaturas por estado'])
   expect(titles.indexOf('Alinhamento estratégico')).toBeGreaterThan(1)
 })
+
+it('leaves the first two charts to the top of the page when asked', () => {
+  const dashboard = { ...alignmentDashboard({ state: 'NO_PREPARATION', total: 0, aligned: null }), today: '2026-11-19' }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard} leading={false}/></MemoryRouter>)
+  expect(screen.queryByRole('heading', { name: 'Candidaturas em curso' })).toBeNull()
+  expect(screen.queryByRole('heading', { name: 'Candidaturas por estado' })).toBeNull()
+  expect(screen.getByRole('region', { name: 'Alinhamento estratégico' })).toBeTruthy()
+})

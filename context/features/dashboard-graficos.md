@@ -5,3 +5,5 @@ Adicionar o separador Gráficos ao Dashboard da organização. Apresentar distri
 ## Ordem dos gráficos (19/11/2026)
 
 Pedido do utilizador: na vista Gráficos do Dashboard da organização (Administrador e Gestor), **Candidaturas em curso** e **Candidaturas por estado** passam a ser os dois primeiros gráficos, lado a lado. Seguem-se o histórico de aprovações, o alinhamento estratégico, os orçamentos e os gráficos por unidade. Os indicadores e os prazos continuam acima dos gráficos. Só frontend.
+
+Correção no mesmo dia, a pedido do utilizador: os dois gráficos sobem para o topo da vista, logo abaixo dos separadores e acima dos indicadores e dos prazos.
