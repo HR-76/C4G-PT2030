@@ -109,6 +109,28 @@ function StrategyAlignment({ alignment }) {
   </section>
 }
 
+const ratePercent = new Intl.NumberFormat('pt-PT', { style: 'percent', maximumFractionDigits: 0 })
+
+// Approved over decided applications. Applications still without a decision do not count,
+// and a unit only appears once it has a decision.
+function ApprovalRate({ applications, units }) {
+  const decided = applications.decisions || 0, approved = applications.approved || 0
+  const rows = (units || []).filter(unit => unit.decisions > 0)
+    .sort((a, b) => b.approved / b.decisions - a.approved / a.decisions || b.decisions - a.decisions || a.label.localeCompare(b.label, 'pt'))
+  return <section className="chart-panel chart-approval-rate"><h2>Taxa de aprovação</h2>
+    {!decided ? <p className="chart-caption">Ainda não há candidaturas com decisão.</p> : <>
+      <p className="chart-rate"><strong>{ratePercent.format(approved / decided)}</strong>
+        <span>{approved} {approved === 1 ? 'aprovada' : 'aprovadas'} em {decided} {decided === 1 ? 'decidida' : 'decididas'}</span></p>
+      <Bar value={approved} max={decided} color="var(--application-approved)"/>
+      {rows.length > 0 && <><p className="chart-caption chart-rate-units">Por unidade principal do responsável.</p>
+        {rows.map(unit => <div className="chart-budget" key={unit.unitId || 'unassigned'}>
+          <div><span>{unit.label}{unit.lifecycle === 'ARCHIVED' ? ' (arquivada)' : ''}</span><strong>{ratePercent.format(unit.approved / unit.decisions)} · {unit.approved} de {unit.decisions}</strong></div>
+          <Bar value={unit.approved} max={unit.decisions} color="var(--application-approved)"/>
+        </div>)}</>}
+    </>}
+  </section>
+}
+
 function Budgets({ applications }) {
   const rows = [['Total dos projetos',applications.totalBudget,'var(--dashboard-blue)'],['Parcela da organização',applications.organizationBudget,'var(--dashboard-violet)']]
   const maximum = Math.max(0,...rows.map(([,budget])=>Number(budget?.total ?? 0)))
@@ -139,6 +161,7 @@ export default function DashboardCharts({ dashboard, leading = true }) {
     {leading && <><ActivePipeline applications={dashboard.applications}/>
     <States applications={dashboard.applications}/></>}
     <ApprovalTimeline history={dashboard.report?.approvalHistory} year={dashboard.today?.slice(0,4)}/>
+    <ApprovalRate applications={dashboard.applications} units={dashboard.unit_totals}/>
     {dashboard.report?.strategyAlignment && <StrategyAlignment alignment={dashboard.report.strategyAlignment} />}
     <Budgets applications={dashboard.applications}/>
     <section className="chart-panel chart-units"><h2>Candidaturas por unidade</h2><p className="chart-caption">Cada candidatura conta na unidade principal do responsável.</p>

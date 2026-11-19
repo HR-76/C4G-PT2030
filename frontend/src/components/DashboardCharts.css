@@ -19,6 +19,9 @@
 .chart-budget > div { display:flex; flex-wrap:wrap; gap:4px 12px; justify-content:space-between; margin-bottom:7px; }
 .chart-budget strong,.chart-units strong { color:var(--color-text-primary); font-variant-numeric:tabular-nums; }
 .chart-budget small { display:block; }
+.chart-rate { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px; margin:16px 0 10px; color:var(--color-text-secondary); font-size:.9rem; }
+.chart-rate strong { color:var(--color-text-primary); font-size:2.2rem; line-height:1.05; font-variant-numeric:tabular-nums; }
+.chart-panel .chart-rate-units { margin:20px 0 0; }
 .chart-alignment { grid-column:1/-1; }
 .alignment-heading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px 24px; }
 .alignment-heading .chart-caption { margin-bottom:0; }

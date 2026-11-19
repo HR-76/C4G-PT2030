@@ -114,3 +114,25 @@ it('leaves the first two charts to the top of the page when asked', () => {
   expect(screen.queryByRole('heading', { name: 'Candidaturas por estado' })).toBeNull()
   expect(screen.getByRole('region', { name: 'Alinhamento estratégico' })).toBeTruthy()
 })
+
+it('shows the approval rate over decided applications, overall and per unit with decisions', () => {
+  const dashboard = { applications: { total: 20, by_status: {}, approved: 5, rejected: 3, decisions: 8 }, unit_totals: [
+    { unitId: 'a', label: 'Unidade A', total: 6, approved: 1, rejected: 3, decisions: 4 },
+    { unitId: 'b', label: 'Unidade B', total: 9, approved: 4, rejected: 0, decisions: 4 },
+    { unitId: 'c', label: 'Unidade C', total: 5, approved: 0, rejected: 0, decisions: 0 },
+  ] }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const panel = within(screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section'))
+  expect(panel.getByText(/^63\s?%$/)).toBeTruthy()
+  expect(panel.getByText('5 aprovadas em 8 decididas')).toBeTruthy()
+  const rows = [...screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section').querySelectorAll('.chart-budget')].map(row => row.textContent.replace(/\s/g, ' '))
+  expect(rows.map(row => row.replace(/ /g, ''))).toEqual(['UnidadeB100%·4de4', 'UnidadeA25%·1de4'])
+  expect(panel.queryByText(/Unidade C/)).toBeNull()
+})
+
+it('says there are no decisions yet instead of a zero rate', () => {
+  render(<MemoryRouter><DashboardCharts dashboard={{ applications: { total: 2, by_status: {}, decisions: 0 }, unit_totals: null }}/></MemoryRouter>)
+  const panel = within(screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section'))
+  expect(panel.getByText('Ainda não há candidaturas com decisão.')).toBeTruthy()
+  expect(panel.queryByText(/%/)).toBeNull()
+})
