@@ -23,3 +23,7 @@ Critérios de aceitação:
 2. Uma unidade sem decisões não aparece na lista por unidade; sem acesso ao diretório, a taxa global aparece sozinha.
 3. O indicador de prazos mostra o total do servidor e abre Indicadores operacionais.
 4. Só frontend: nenhum contrato do servidor muda.
+
+## Tabela de candidaturas do relatório (19/11/2026)
+
+Pedido do utilizador: no Relatório da organização, os valores de orçamento deixam de quebrar a meio (ficam numa linha, alinhados à direita), tal como o prazo interno e o estado; as tabelas do relatório passam a usar letra mais pequena (13 px, cabeçalhos 12 px). Só CSS e uma classe na tabela.

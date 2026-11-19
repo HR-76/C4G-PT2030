@@ -3,6 +3,20 @@
 .dashboard-report .dashboard-report-table td { white-space: normal; overflow: visible; text-overflow: clip; max-width: none; min-width: 100px; }
 .dashboard-report .dashboard-report-table th:first-child,
 .dashboard-report .dashboard-report-table td:first-child { min-width: 220px; }
+/* Report tables are dense: a smaller letter keeps more columns in view. */
+.dashboard-report .dashboard-report-table,
+.dashboard-report .dashboard-report-table .chip { font-size: 0.8125rem; }
+.dashboard-report .dashboard-report-table th { font-size: 0.75rem; }
+/* In the list of applications, amounts, dates and states stay on one line. */
+.dashboard-report .dashboard-applications-table { min-width: 1120px; }
+.dashboard-report .dashboard-applications-table th,
+.dashboard-report .dashboard-applications-table td { min-width: 0; padding: 11px 10px; vertical-align: middle; }
+.dashboard-report .dashboard-applications-table td:first-child { min-width: 200px; }
+.dashboard-report .dashboard-applications-table td:nth-child(2) { min-width: 220px; }
+.dashboard-report .dashboard-applications-table td:nth-child(n+6),
+.dashboard-report .dashboard-applications-table .chip { white-space: nowrap; }
+.dashboard-report .dashboard-applications-table th:nth-child(n+7),
+.dashboard-report .dashboard-applications-table td:nth-child(n+7) { text-align: right; font-variant-numeric: tabular-nums; }
 .dashboard-report .dashboard-report-table tfoot { background: var(--bg); font-weight: 600; }
 .dashboard-report .dashboard-units-table { min-width: 1050px; table-layout: fixed; }
 .dashboard-report .dashboard-units-table th,
