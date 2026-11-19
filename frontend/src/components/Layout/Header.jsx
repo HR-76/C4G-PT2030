@@ -82,7 +82,7 @@ function ProfileMenu({user,organization,logout}) {
   const admin=user?.platformRoles?.includes('C4G_ADMIN')
   return <details ref={details} className="header-profile" onKeyDown={event=>{if(event.key==='Escape'){details.current.open=false;details.current.querySelector('summary')?.focus()}}}>
     <summary aria-label="Menu de perfil"><span className="header-avatar">{user?.name?.[0]?.toUpperCase() || '?'}</span></summary>
-    <div className="header-profile-menu"><div className="header-profile-identity"><strong>{user?.name || 'Utilizador'}</strong><span>{admin?'Administração C4G':organization?.profileLabel || (organization?'Membro da organização':'Sem entidade selecionada')}</span></div>
+    <div className="header-profile-menu"><div className="header-profile-identity"><strong>{user?.name || 'Utilizador'}</strong><span>{admin?'Administração C4G':organization?.profileLabel || (organization?'Membro da organização':'Sem entidade selecionada')}</span>{organization&&<span className="header-profile-entity">{organization.displayName||organization.name}</span>}</div>
       {organization && <Link to="/perfil" onClick={()=>{details.current.open=false}}><UserRound size={17}/>Perfil pessoal</Link>}
       <Link to="/conta/seguranca" onClick={()=>{details.current.open=false}}><ShieldCheck size={17}/>Segurança da conta</Link>
       <button type="button" onClick={logout}><LogOut size={17}/>Sair</button>
