@@ -11,13 +11,18 @@ function closed(value,keys){return value&&Object.getPrototypeOf(value)===Object.
 // The binding verifier still checks the login, its roles and the physical
 // database on every phase. Workers and scripts have no request scope.
 function observeTenantRuntimeMetadata(client,expected,{observe=observeFreshTenantMetadata}={}){
-  return require('./requestAdmissionScope').admitWithinRequest(
-    `tenant:${client.host}:${client.port}/${client.database}:${expected.tenantId}:${expected.databaseGenerationId}`,()=>require('../observability/requestPhaseTiming').measurePhase('tenant.metadata',()=>observe(client,expected)));
+  // Between requests a successful observation is reused only while the catalog
+  // signature and the runtime metadata are unchanged, and only when
+  // SCHEMA_ADMISSION_REUSE=signature (context/decisions/2026-11-20-schema-admission-catalog-signature.md).
+  const key=`tenant:${client.host}:${client.port}/${client.database}:${expected.tenantId}:${expected.databaseGenerationId}`;
+  const reuse=require('./schemaAdmissionSignature');
+  return require('./requestAdmissionScope').admitWithinRequest(key,()=>reuse.admitBySignature(key,{phase:'tenant.signature',
+    signature:()=>reuse.tenantSignature(client,()=>readRuntimeMetadata(client,expected)),
+    verify:()=>require('../observability/requestPhaseTiming').measurePhase('tenant.metadata',()=>observe(client,expected))}));
 }
-async function observeFreshTenantMetadata(client,expected){
-  const observedFingerprint=tenantSchemaFingerprint(await tenantSchemaSnapshot(client));
-  const pinned=manifest.find(entry=>entry.schemaFingerprint===observedFingerprint);
-  if(!pinned?.capabilities.includes('F4_RUNTIME_METADATA_ACCESS'))throw new Error('F4_METADATA_DRIFT');
+// The marker, ledger and flags, read through the metadata executor role and
+// with the previous role restored and confirmed.
+async function readRuntimeMetadata(client,expected){
   const previous=(await client.query('SELECT current_user AS role')).rows[0]?.role;
   if(!/^[a-z][a-z0-9_]{0,62}$/.test(previous||''))throw new Error('F4_METADATA_ROLE_INVALID');
   let metadata;
@@ -31,6 +36,13 @@ async function observeFreshTenantMetadata(client,expected){
   }
   const restored=(await client.query('SELECT current_user AS role')).rows[0]?.role;
   if(restored!==previous)throw new Error('F4_METADATA_ROLE_RESTORE_FAILED');
+  return metadata;
+}
+async function observeFreshTenantMetadata(client,expected){
+  const observedFingerprint=tenantSchemaFingerprint(await tenantSchemaSnapshot(client));
+  const pinned=manifest.find(entry=>entry.schemaFingerprint===observedFingerprint);
+  if(!pinned?.capabilities.includes('F4_RUNTIME_METADATA_ACCESS'))throw new Error('F4_METADATA_DRIFT');
+  const metadata=await readRuntimeMetadata(client,expected);
   if(!closed(metadata,['marker','ledger','flags'])
     ||!closed(metadata.marker,['product_code','database_role','marker_format_version','tenant_id','database_generation_id','identity_revision'])
     ||metadata.marker.product_code!=='C4G'||metadata.marker.database_role!=='TENANT'||metadata.marker.marker_format_version!==1

@@ -8,6 +8,8 @@ const { AsyncLocalStorage } = require('node:async_hooks');
 const PHASES = new Set([
   ...['authority', 'sessionRead'].flatMap(category => ['pool', 'admission', 'lock', 'verify'].map(phase => `${category}.${phase}`)),
   'authority.setup', 'authority.work', 'authority.commit',
+  // Schema admission reuse: signature reads, and the full verifications that still ran.
+  'authority.signature', 'authority.preflight', 'tenant.signature',
   'touch.get', 'touch.validate', 'touch.set', 'touch.total', 'touch.joined',
   // Tenant phases overlap (resolve and transaction contain the others, and
   // revalidate/guard contain authority transactions): read them, do not add them.

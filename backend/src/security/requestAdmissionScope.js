@@ -20,7 +20,9 @@ function createRequestAdmissionScope({ now = () => performance.now(), maxAgeMs =
     held.set(key, { value, at: now() });
     return value;
   }
-  return Object.freeze({ run, admit });
+  // True only while an HTTP request's scope is current.
+  const within = () => requests.getStore() !== undefined;
+  return Object.freeze({ run, admit, within });
 }
 
 const scope = createRequestAdmissionScope();
@@ -29,5 +31,5 @@ const requestAdmissionMiddleware = (req, res, next) => scope.run(next);
 
 module.exports = {
   createRequestAdmissionScope, requestAdmissionMiddleware,
-  runInRequestAdmissionScope: scope.run, admitWithinRequest: scope.admit
+  runInRequestAdmissionScope: scope.run, admitWithinRequest: scope.admit, withinRequest: scope.within
 };

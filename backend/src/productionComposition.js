@@ -55,6 +55,8 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   // REQUEST_PHASE_TIMING=log: per-request phase diagnostic. An observer given by an isolated harness keeps precedence.
   const phaseTiming=observeSessionTiming?null:require('./observability/requestPhaseTiming').configuredRequestPhaseTiming(env);
   if(phaseTiming)observeSessionTiming=phaseTiming.observe;
+  // SCHEMA_ADMISSION_REUSE=signature: off by default; an unknown value refuses to start.
+  require('./security/schemaAdmissionSignature').configureSchemaAdmissionReuse(env);
   const productionProfile=require("./security/productionCentralProfile").configuration(env);
   if(productionProfile&&!dependencies.capabilityPools)throw Error("PRODUCTION_POOLS_REQUIRED");
   const readyAccountLifecycle=require('./platformOnboarding/productionReadiness').createProductionAccountReadiness({env,pool:centralPool});

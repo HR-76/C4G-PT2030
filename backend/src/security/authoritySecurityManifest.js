@@ -127,7 +127,14 @@ async function assertAuthorityAdmission(client){
   // same database and for at most one authority deadline; the login above is
   // checked on every connection. Outside a request every call verifies.
   // Run before BEGIN of the protected metadata transaction, never nested.
-  return require('./requestAdmissionScope').admitWithinRequest(`central:${client.host}:${client.port}/${client.database}`,async()=>{
+  // Between requests a successful preflight is reused only while the catalog
+  // signature is unchanged, and only when SCHEMA_ADMISSION_REUSE=signature
+  // (context/decisions/2026-11-20-schema-admission-catalog-signature.md).
+  const key=`central:${client.host}:${client.port}/${client.database}`,reuse=require('./schemaAdmissionSignature');
+  return require('./requestAdmissionScope').admitWithinRequest(key,()=>reuse.admitBySignature(key,{phase:'authority.signature',
+    signature:()=>reuse.centralSignature(client),verify:()=>require('../observability/requestPhaseTiming').measurePhase('authority.preflight',()=>preflightAuthoritySchema(client))}));
+}
+async function preflightAuthoritySchema(client){
     const schema = await require('./centralMigrationPreflight').preflightCentral({connect:async()=>({query:(...args)=>client.query(...args),release(){}})});
     // The preflight compared the security snapshot embedded in its schema against
     // this revision's exact fingerprint. Do not recollect it within admission.
@@ -136,6 +143,5 @@ async function assertAuthorityAdmission(client){
     if(!authorityFingerprint(schema.currentVersion))
       throw Object.assign(new Error('AUTHORITY_SECURITY_DRIFT'),{code:'AUTHORITY_SECURITY_DRIFT'});
     return schema;
-  });
 }
 module.exports={SQL,get COMPACT_SQL(){return require('./catalogMetadataTransport').compactAuthoritySql(SQL);},digest,authoritySecuritySnapshot,assertAuthoritySecuritySnapshot,assertAuthoritySecurity,assertAuthorityAdmission};

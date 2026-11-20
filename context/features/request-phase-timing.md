@@ -50,3 +50,16 @@ Acrescentar `REQUEST_PHASE_TIMING=log` a `/srv/c4g-staging/api-private.env`, rec
 ## Primeira recolha no staging (20/11/2026)
 
 Um utilizador, sessão real. A admissão do schema da Central custa 240–390 ms em cada pedido, quase independente do número de transações (3 a 65). Espera de lock: 1–7 ms em pedidos isolados, 100–225 ms com pedidos em paralelo. Renovação da sessão: 7–19 ms. Nos pedidos ao tenant, 0,9 a 4,3 s ficaram fora das fases então medidas, o que motivou a segunda volta.
+
+## Segunda recolha no staging (20/11/2026, commit c66bafb)
+
+Um utilizador (Técnico), sessão real, pedidos concluídos.
+
+- **Observação do schema do tenant (`tenant.metadata`): 525–860 ms, tipicamente 600 ms, uma vez em cada pedido que vai ao tenant.** É a maior parcela isolada.
+- **Admissão do schema da Central: 230–330 ms em todos os pedidos.**
+- As duas somam cerca de 870 ms fixos por pedido ao tenant, de totais entre 1,0 e 1,6 s. Exemplo `applications/my-work`: total 994 ms, dos quais 525 + 239 de verificações de schema e 66 ms de consultas da operação (`tenant.work`).
+- Por transação de autoridade: preparação ~1,6 ms, commit ~0,6 ms; espera de lock 1–20 ms isolado e 100–165 ms com pedidos em paralelo. Renovação da sessão 7–24 ms.
+- Fora das fases medidas: `organization-directory/matching` (cerca de 3,5 s de 5,5 s) e `central-opportunities` (250–700 ms), ambos na leitura do catálogo.
+- Muitas linhas `aborted`: o browser cancela pedidos e o servidor continua a executá-los.
+
+Por decidir: reutilização das duas verificações de schema entre pedidos (hoje só dentro do mesmo pedido, [decisão de 11/11](../decisions/request-scoped-central-admission.md)).
