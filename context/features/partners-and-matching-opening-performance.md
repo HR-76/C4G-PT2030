@@ -32,3 +32,14 @@ Alteração (servidor): `listForMatching` no repositório e no leitor do catálo
 Fases novas na medição: `catalog.list` (o número de vezes é o número de páginas lidas), `catalog.programmes`, `matching.central`, `matching.private` e `matching.match`.
 
 Validação: `catalogMatchingRead.test.js` (5, RED antes e GREEN depois), incluindo a igualdade da projeção do Matching entre a listagem e a leitura nova em 60 oportunidades; `catalogReader.test.js` atualizado para o método novo de leitura. Sem medição do ganho: a confirmar no staging. O limite de 1000 itens e a paginação do Matching (PERF-03) continuam abertos.
+
+### Medição no staging e segunda correção (20/11/2026, commit 8eb026e) — Review
+
+Catálogo com 29 páginas (cerca de 725 oportunidades). A leitura dedicada baixou a leitura fria do catálogo de cerca de 3,9 s para 2,9–4,1 s: menos do que o previsto, porque a lista de programas custava só 36 ms por página. O pedido ficou em 4,0 s a frio e 1,0–1,2 s dentro dos 30 s de reutilização. As fases mostraram dois custos que a primeira correção não tocou:
+
+1. **Cruzamento de áreas (`matching.match`): 545–660 ms em todos os pedidos**, mesmo com o catálogo reutilizado. A sugestão de áreas por palavras-chave de cada oportunidade era recalculada em cada pedido, embora só dependa dos textos da oportunidade e nunca da pessoa. Passa a ser calculada uma vez por texto distinto (`thematicAreas.classify`, até 4000 entradas, resultado imutável).
+2. **Validação de cada oportunidade em cada leitura.** A cache de factos por revisão tem 500 entradas e o catálogo tem mais: uma leitura completa em sequência nunca a aproveita. A leitura do Matching passa a ter a sua própria (1500 entradas, só o snapshot validado, comparado por resumo do conteúdo); uma revisão é validada de novo apenas quando o snapshot guardado muda.
+
+Fase nova: `catalog.query` (a consulta SQL de cada página), para separar a base de dados do trabalho no processo.
+
+Validação: `catalogMatchingRead.test.js` (+2, RED antes e GREEN depois). Ganho por medir no staging. Por decidir, consoante essa medição: a leitura fria do catálogo, que continua a ser de 29 páginas em série.

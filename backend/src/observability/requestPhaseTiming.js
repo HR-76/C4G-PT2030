@@ -16,7 +16,7 @@ const PHASES = new Set([
   'tenant.resolve', 'tenant.acquire', 'tenant.metadata', 'tenant.verify', 'tenant.revalidate',
   'tenant.transaction', 'tenant.work', 'tenant.guard', 'tenant.commit',
   // Central catalogue reads (count of catalog.list = pages read) and the steps of a matching.
-  'catalog.list', 'catalog.programmes', 'matching.central', 'matching.private', 'matching.match'
+  'catalog.list', 'catalog.query', 'catalog.programmes', 'matching.central', 'matching.private', 'matching.match'
 ]);
 const round = value => Math.round(value * 10) / 10;
 

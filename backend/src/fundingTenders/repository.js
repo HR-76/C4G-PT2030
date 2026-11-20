@@ -320,6 +320,22 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     const presentation=prepared.sourceVersion===2?(catalogPresentation ||= require('../opportunities/catalogRead/presentation').loadPresentation()).presentSnapshot(snapshot,{detail}):require('../opportunities/manualClassification').manualPresentation(snapshot);
     return {prepared,presentation,interventionClassification:require('../opportunities/interventionAreas').classifyInterventionAreas(snapshot,presentation)};
   }
+  // The matching read needs only the validated snapshot, for the whole catalogue at once. It keeps
+  // its own entries, enough for every opportunity a matching accepts, and compares a digest of the
+  // stored snapshot instead of keeping its text.
+  const matchingPrepared=new Map(),MATCHING_PREPARED_LIMIT=1500;
+  function preparedForMatching(row,snapshot){
+    if(!row.revisionId)return prepareOpportunitySnapshot(snapshot);
+    const digest=require('node:crypto').createHash('sha256').update(JSON.stringify(snapshot)).digest('base64');
+    let entry=matchingPrepared.get(row.revisionId);
+    if(entry)matchingPrepared.delete(row.revisionId);
+    if(entry?.digest!==digest){
+      entry={digest,prepared:require('../opportunities/v2/data').deepFreeze(prepareOpportunitySnapshot(snapshot))};
+      if(matchingPrepared.size>=MATCHING_PREPARED_LIMIT)matchingPrepared.delete(matchingPrepared.keys().next().value);
+    }
+    matchingPrepared.set(row.revisionId,entry);
+    return entry.prepared;
+  }
   function revisionFactsFor(row,snapshot,detail){
     if(detail||!row.revisionId)return computeRevisionFacts(snapshot,detail);
     const source=JSON.stringify(snapshot);
@@ -337,7 +353,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
   function readRow(row,snapshot,asOf,detail=false,forMatching=false){
     const {corrections,temporalSnapshot,canonicalObservedAt,...value}=row;
     const observedAt=snapshot.schemaVersion===2?canonicalObservedAt||null:row.observedAt instanceof Date?row.observedAt.toISOString():row.observedAt;
-    const {prepared,presentation,interventionClassification}=forMatching?{prepared:prepareOpportunitySnapshot(snapshot)}:revisionFactsFor(row,snapshot,detail);
+    const {prepared,presentation,interventionClassification}=forMatching?{prepared:preparedForMatching(row,snapshot)}:revisionFactsFor(row,snapshot,detail);
     const readModel=createOpportunityReadModel(snapshot,{revisionId:row.revisionId,asOf,observedAt,sourceReview:row.sourceReview||null,corrections:corrections||{},prepared});
     const v2=readModel.sourceVersion===2;
     const namespaces=[...new Set(readModel.sourceRecords.map(source=>source.namespace))];
@@ -391,7 +407,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     }
     const candidates=[]; let scanCursor=query.cursor||null, scannedPages=0;
     for (;;) {
-    const rows = (await client.query(pageSql, [scanCursor, query.q || null, query.programme || null, query.closingFrom || null, query.closingTo || null,query.temporalState||null,asOf,query.source?sourceNamespaces(query.source):null])).rows;
+    const rows = (await measurePhase('catalog.query', () => client.query(pageSql, [scanCursor, query.q || null, query.programme || null, query.closingFrom || null, query.closingTo || null,query.temporalState||null,asOf,query.source?sourceNamespaces(query.source):null]))).rows;
     for(const row of rows){
       const item=readRow(row,row.temporalSnapshot,asOf,false,forMatching);
       const matchesSource=!query.source || (item.readModel.sourceVersion===2
