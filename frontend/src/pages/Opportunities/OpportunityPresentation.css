@@ -52,8 +52,11 @@
 .opportunity-calendar .text-muted { color: var(--color-border); }
 .opportunity-calendar .enrichment-warning { color: var(--color-warning-soft); }
 .opportunity-overview #descricao-oportunidade { margin-top: 24px; padding-top: 24px; }
-.opportunity-overview .catalog-description { width: 100%; max-width: 78ch; text-align: left; font-size: 14px; line-height: 1.85; margin: 16px 0 20px; }
+/* The description fills its frame, so both text edges line up with the frames above and below. */
+.opportunity-overview .catalog-description { width: 100%; max-width: none; text-align: justify; font-size: 14px; line-height: 1.85; margin: 16px 0 20px; }
 .opportunity-overview .opportunity-description { white-space: normal; line-height: 1.7; }
+.opportunity-description h3, .opportunity-description li { text-align: left; }
+@media (max-width: 768px) { .opportunity-overview .catalog-description { text-align: left; } }
 .opportunity-description > * { margin: 0; }
 .opportunity-description > * + * { margin-top: 12px; }
 .opportunity-description h3 { font-size: 14px; font-weight: 600; line-height: 1.4; color: inherit; }

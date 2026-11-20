@@ -34,7 +34,7 @@ function parseTrustProxyHops(value) {
   return hops;
 }
 
-function createApp({ express, cors, config, pool, routes, security = null, databaseReadiness = null, reportError = () => {}, observability = null, platformLogs = null, admissionBoundary = null, admissionRoutes = null }) {
+function createApp({ express, cors, config, pool, routes, security = null, databaseReadiness = null, reportError = () => {}, observability = null, platformLogs = null, admissionBoundary = null, admissionRoutes = null, phaseTiming = null }) {
   if (!express || !cors || !config || !pool || !routes) {
     throw new TypeError("createApp requires express, cors, config, pool and routes dependencies.");
   }
@@ -103,6 +103,8 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   app.use(express.json({ limit: '100kb' }));
 
   if (security) {
+    // Opt-in diagnostic; after the parsers for the same reason as the admission scope.
+    if (phaseTiming) app.use('/api', phaseTiming);
     // One Central schema preflight per request; see requestAdmissionScope.
     app.use(require('./security/requestAdmissionScope').requestAdmissionMiddleware);
     app.use(security.sessionMiddleware);

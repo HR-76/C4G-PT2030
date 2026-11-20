@@ -6,7 +6,7 @@ Pedido autorizado em 29/10/2026, após análise visual com frontend-design.
 
 - Aplicar ao componente partilhado pelas fichas centrais e privadas; preservar dados, estados, ações e permissões.
 - Paleta: fundo #f5f7f7, branco #ffffff, cabeçalhos #edf5f2, petróleo #075b59, texto #123247, bordas #cbdad6. Tipografia de sistema existente, títulos 17px, corpo 14px, rótulos 12px.
-- Informação num quadro branco com cabeçalho verde suave, grelha de campos delimitada; prazos num painel lateral petróleo com datas brancas. Descrição num quadro separado, alinhada à esquerda e limitada a 78ch.
+- Informação num quadro branco com cabeçalho verde suave, grelha de campos delimitada; prazos num painel lateral petróleo com datas brancas. Descrição num quadro separado, a toda a largura do quadro e justificada (pedido de 20/11/2026; antes alinhada à esquerda e limitada a 78ch). Em ecrãs até 768px fica alinhada à esquerda. O excerto de 800 caracteres termina numa palavra inteira.
 - Resolução documental com quadro próprio, conservando avisos; candidaturas associadas com cabeçalho e tabela delimitados.
 - Evitar cartões por campo: agrupar a informação em quadros funcionais e concentrar o contraste forte no calendário. Âmbar apenas para avisos existentes.
 - Manter leitura mobile, links, tooltips por teclado e expansão da descrição. Sem overflow a 390px.

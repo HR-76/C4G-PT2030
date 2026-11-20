@@ -84,7 +84,7 @@ export default function OpportunityReadModelOverview({ fields = {}, readModel, s
     <section ref={description} id="descricao-oportunidade" tabIndex={-1} className="detail-section shell-scroll-target" aria-label="Descrição da fonte">
       <h2 className="opportunity-section-title">Descrição da call</h2>
       {data.description
-        ? <OpportunityDescription id="opportunity-description-text" text={expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800)}…`} />
+        ? <OpportunityDescription id="opportunity-description-text" text={expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800).replace(/\s+\S*$/, '')}…`} />
         : <p id="opportunity-description-text" className="catalog-description">{data.descriptionFallback}</p>}
       {data.descriptionSource && data.descriptionSource.origin !== 'EDITORIAL' && <p className="opportunity-source opportunity-description-origin">{data.descriptionSource.truncated ? 'Resumo parcial publicado em ' : 'Resumo publicado em '}<DescriptionSource url={data.descriptionSource.sourceUrl} />.</p>}
       {data.description?.length > 800 && <button className="btn btn-outline btn-sm" aria-expanded={expanded} aria-controls="opportunity-description-text" onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher descrição' : 'Ler descrição completa'}</button>}

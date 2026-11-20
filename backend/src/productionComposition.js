@@ -52,6 +52,9 @@ function selectAuthRoutes(mode, routes, oidcAuth = null) {
 function createProductionComposition({ dependencies, env, logger = null, isolatedCatalogAdmission = null, isolatedSessionReadConcurrency = false, observeSessionTiming = null, isolatedSessionTouchCoalescing = false }) {
   if(isolatedSessionTouchCoalescing&&!require('./opportunities/catalogRead/isolatedAdmission').isIsolatedAdmission(isolatedCatalogAdmission))throw new TypeError('Isolated admission required for session touch coalescing');
   const { express, cors, centralPool, routes = {} } = dependencies;
+  // REQUEST_PHASE_TIMING=log: per-request phase diagnostic. An observer given by an isolated harness keeps precedence.
+  const phaseTiming=observeSessionTiming?null:require('./observability/requestPhaseTiming').configuredRequestPhaseTiming(env);
+  if(phaseTiming)observeSessionTiming=phaseTiming.observe;
   const productionProfile=require("./security/productionCentralProfile").configuration(env);
   if(productionProfile&&!dependencies.capabilityPools)throw Error("PRODUCTION_POOLS_REQUIRED");
   const readyAccountLifecycle=require('./platformOnboarding/productionReadiness').createProductionAccountReadiness({env,pool:centralPool});
@@ -361,6 +364,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     routes: {...composedRoutes,catalogRead:catalogReadConnection.router},
     platformLogs,
     security,
+    phaseTiming:phaseTiming?.middleware,
     ...(admissionService?{
       admissionBoundary:require('./entityAdmission/http').createAdmissionBoundary({service:admissionService,authenticate}),
       admissionRoutes:require('./entityAdmission/http').createAdmissionRoutes({express,service:admissionService,authenticate})
