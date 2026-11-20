@@ -50,3 +50,17 @@ Validação: `catalogMatchingRead.test.js` (+2, RED antes e GREEN depois). Ganho
 - Pedido com o catálogo reutilizado (dentro dos 30 s): de 1,0–1,2 s para 0,53–0,68 s.
 - Primeira leitura do catálogo depois de reiniciar a API (caches vazias): 3,3 s em 27 páginas, das quais 1,04 s em SQL (`catalog.query`, cerca de 37 ms por página) e o resto em validação no processo.
 - **Por medir:** uma leitura do catálogo com as validações já em cache (as três aberturas seguintes caíram todas dentro dos 30 s de reutilização). O mínimo esperado é o tempo de SQL, cerca de 1 s.
+
+### Terceira correção: validação repetida no modelo de leitura (20/11/2026) — Review
+
+Nova medição no staging (commit 7f1bad3): relendo o catálogo com as validações em cache, `catalog.list` ainda demorou 2,8 s em 27 páginas, dos quais 1,33 s em SQL. Sobravam cerca de 1,45 s de trabalho no processo.
+
+Reproduzido localmente com 725 oportunidades sintéticas e as caches quentes: 2,2 s por leitura completa. O perfil de CPU atribuiu metade do tempo a `cloneData`, chamado por `validateSnapshotV2` a partir de `projectTemporalV2` dentro de `createOpportunityReadModel`: o cálculo temporal **validava de novo o snapshot que `readOpportunitySnapshot` acabara de validar e congelar**, em todas as leituras de todas as oportunidades.
+
+Alteração (`opportunities/v2/readModel.js`): quando o snapshot é o resultado congelado do validador, os factos temporais são calculados com `projectTemporalFacts`, sem segunda validação. Um valor que não seja esse resultado congelado continua a ser validado antes de ser usado. O resultado é idêntico.
+
+Abrange todas as leituras de oportunidades da versão 2 (listagem e detalhe do catálogo, dashboards, Matching), não só o Matching.
+
+Medição local, mesma máquina e mesmos dados: leitura completa com caches quentes de 2,2 s para 0,16 s; primeira leitura de 3,45 s para 1,56 s. No staging, por medir.
+
+Validação: `readModelTemporalValidation.test.js` (3; o primeiro RED antes e GREEN depois): sem segunda validação, igualdade do modelo de leitura com e sem snapshot preparado em três instantes, e validação mantida para um valor não congelado.
