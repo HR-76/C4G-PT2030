@@ -43,3 +43,10 @@ Catálogo com 29 páginas (cerca de 725 oportunidades). A leitura dedicada baixo
 Fase nova: `catalog.query` (a consulta SQL de cada página), para separar a base de dados do trabalho no processo.
 
 Validação: `catalogMatchingRead.test.js` (+2, RED antes e GREEN depois). Ganho por medir no staging. Por decidir, consoante essa medição: a leitura fria do catálogo, que continua a ser de 29 páginas em série.
+
+### Medição da segunda correção (20/11/2026, commit 7f1bad3)
+
+- `matching.match`: de 545–660 ms para 16–21 ms.
+- Pedido com o catálogo reutilizado (dentro dos 30 s): de 1,0–1,2 s para 0,53–0,68 s.
+- Primeira leitura do catálogo depois de reiniciar a API (caches vazias): 3,3 s em 27 páginas, das quais 1,04 s em SQL (`catalog.query`, cerca de 37 ms por página) e o resto em validação no processo.
+- **Por medir:** uma leitura do catálogo com as validações já em cache (as três aberturas seguintes caíram todas dentro dos 30 s de reutilização). O mínimo esperado é o tempo de SQL, cerca de 1 s.
