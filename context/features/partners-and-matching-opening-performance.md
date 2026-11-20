@@ -22,3 +22,13 @@ Sexto bloco da revisão de desempenho página a página (14/11/2026). Bloco ante
 
 - Cada página do catálogo lida por `central.list` recalcula a lista de programas, que o Matching não usa. Com a reutilização passa a acontecer no máximo uma vez a cada 30 s; removê-lo exigiria uma leitura própria do catálogo para o Matching.
 - O limite de 1000 itens e a paginação do Matching (PERF-03) continuam abertos.
+
+## Leitura própria do catálogo para o Matching (20/11/2026) — Review
+
+Medido no staging com a [medição por fase](request-phase-timing.md): `organization-directory/matching` demorava 4,9–5,5 s, dos quais cerca de 1 s nas fases de autoridade e do tenant. O resto era a leitura do catálogo central inteiro em páginas de 25: cada página recalculava a lista de programas de todo o catálogo (uma leitura de todas as revisões por página) e a apresentação e classificação de cada oportunidade. O Matching não usa nenhuma das duas. A reutilização de 30 s só evita este custo a quem volta a abrir dentro desse período.
+
+Alteração (servidor): `listForMatching` no repositório e no leitor do catálogo — as mesmas linhas, a mesma ordem, o mesmo cursor e o mesmo modelo de leitura que a listagem, sem a lista de programas e sem apresentação/classificação. Aceita só o cursor. O Matching usa-a quando o leitor a oferece; a listagem do catálogo não muda. Fecha o primeiro ponto de «Por fazer» acima.
+
+Fases novas na medição: `catalog.list` (o número de vezes é o número de páginas lidas), `catalog.programmes`, `matching.central`, `matching.private` e `matching.match`.
+
+Validação: `catalogMatchingRead.test.js` (5, RED antes e GREEN depois), incluindo a igualdade da projeção do Matching entre a listagem e a leitura nova em 60 oportunidades; `catalogReader.test.js` atualizado para o método novo de leitura. Sem medição do ganho: a confirmar no staging. O limite de 1000 itens e a paginação do Matching (PERF-03) continuam abertos.

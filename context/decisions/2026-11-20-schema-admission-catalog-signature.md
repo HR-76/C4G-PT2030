@@ -69,3 +69,24 @@ Não há janela temporal: a assinatura é lida em todos os pedidos.
 - **Custo**: mediana 4,7 ms, p90 5,5 ms, máximo 10,3 ms, com 7 716 linhas nos quatro maiores catálogos.
 
 Por provar: PostgreSQL 17; o login limitado do tenant e o `c4g_authority_runtime` reais (se algum catálogo não lhes for legível, a reutilização desliga-se sozinha para essa base e a medição por fase mostra-o: `tenant.metadata` ou `authority.preflight` em todos os pedidos); o custo com os catálogos do staging; a leitura de `runtime_metadata_v1` dentro do savepoint.
+
+## Medição no staging (20/11/2026, commit e6ffd88, `SCHEMA_ADMISSION_REUSE=signature`)
+
+Um utilizador (Técnico), sessão real, PostgreSQL e logins reais do staging. A reutilização ligou para as duas bases: a verificação completa correu só no primeiro pedido (`authority.preflight` 345 ms e `tenant.metadata` 846 ms, uma vez cada); nos seguintes só a assinatura.
+
+- Custo da assinatura: Central 14–25 ms, tenant 17–33 ms (inclui a leitura de `runtime_metadata_v1` no savepoint).
+- Admissão da Central por pedido: de 230–330 ms para 16–40 ms.
+
+| Pedido | Antes | Depois |
+|---|---:|---:|
+| `auth/session` | 290–350 ms | 75–110 ms |
+| `billing/access` | 355–480 ms | 140–190 ms |
+| `applications/my-work` | 0,99–1,18 s | 0,33–0,39 s |
+| `organization-directory/me` | 1,05–1,24 s | 0,30–0,35 s |
+| `notifications` | 1,45–1,51 s | 0,47 s |
+| `opportunity-interests/context` | 1,42–1,92 s | 0,38–0,59 s |
+| `opportunity-interests` (lista) | 1,57–1,76 s | 0,95 s |
+| `applications/browse-page` | 1,61 s | 0,90–1,15 s |
+| `organization-directory/matching` | 5,5 s | 4,9 s |
+
+Fica provado no staging o que estava por provar sobre os logins reais, o custo com os catálogos reais e o savepoint. Continua por provar: PostgreSQL 17, se for essa a versão de produção. Não medido: vários utilizadores em simultâneo.

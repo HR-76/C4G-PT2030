@@ -4,6 +4,7 @@ const {match,version}=require('./thematicAreas');
 const dayFormatter=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit'});
 function civilToday(value){return dayFormatter.format(value);}
 const {projectMatchOpportunity,currentForMatching}=require('./matchingProjection');
+const {measurePhase}=require('../observability/requestPhaseTiming');
 async function pages(read){
  const all=[],seen=new Set();let cursor,pageCount=0;
  do{const page=await read(cursor?{cursor}:{});pageCount++;if(!Array.isArray(page?.items))fail('SERVICE_UNAVAILABLE');
@@ -30,7 +31,9 @@ function reuseCentralPages(read,reuseMs,now){
  };
 }
 function createOrganizationMatching({directory,opportunities,central,clock=()=>new Date(),centralPagesReuseMs=0,centralPagesNow=()=>Date.now()}){
- const centralPages=reuseCentralPages(()=>pages(q=>central.list(q)),centralPagesReuseMs,centralPagesNow);
+ // A reader with a dedicated matching read skips what the catalogue listing computes only for its own page.
+ const centralList=q=>typeof central.listForMatching==='function'?central.listForMatching(q):central.list(q);
+ const centralPages=reuseCentralPages(()=>pages(centralList),centralPagesReuseMs,centralPagesNow);
  return {async execute(query,request){
   if(Object.keys(query).some(k=>!['personId','opportunityId','origin'].includes(k)))fail('INVALID_INPUT');
   const byOpportunity=Boolean(query.opportunityId);
@@ -68,12 +71,12 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    // A technician has no organization-wide read of private opportunities: match against the catalog only.
    privateIncluded=typeof directory.canReadPrivateOpportunities==='function'?await directory.canReadPrivateOpportunities(request)===true:true;
    const privateList=typeof opportunities.listForMatching==='function'?opportunities.listForMatching.bind(opportunities):opportunities.list.bind(opportunities);
-   const [publicItems,privateItems]=await Promise.all([centralPages(),privateIncluded?pages(q=>privateList(q,request)):Promise.resolve([])]),all=[];
+   const [publicItems,privateItems]=await Promise.all([measurePhase('matching.central',()=>centralPages()),privateIncluded?measurePhase('matching.private',()=>pages(q=>privateList(q,request))):Promise.resolve([])]),all=[];
    for(const [origin,list] of [['CENTRAL',publicItems],['PRIVATE',privateItems]]){
     for(const item of list){if(currentForMatching(item,today))all.push(item.snapshot||item.readModel?
       projectMatchOpportunity(item,{origin,opportunityId:item.opportunityId,asOf}):await load(origin,item.opportunityId));}
    }
-   items=match({...initial.person,areaIds:initial.profile.areaIds},all,today);
+   items=measurePhase('matching.match',()=>match({...initial.person,areaIds:initial.profile.areaIds},all,today));
   }
   // Revalidate authority after all source reads; never publish a result from an old context.
   const current=await directory.execute(byOpportunity?'context':id?'person':'self',{},id,request);
