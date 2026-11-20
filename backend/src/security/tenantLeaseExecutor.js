@@ -4,6 +4,7 @@ const { transactionControlStatements } = require('./sqlTransactionControl');
 const preparedTransactions = new WeakMap();
 const { randomUUID } = require('node:crypto');
 const { snapshotDigest } = require('./tenantAuthorityRecovery');
+const { measurePhase } = require('../observability/requestPhaseTiming');
 
 const READ_AUDIT_POLICIES = Object.freeze({
   DIRECTORY_CONTEXT: ['ORGANIZATION_DIRECTORY', 'ORGANIZATION_DIRECTORY_READ', 'ACCESS'],
@@ -116,8 +117,8 @@ async function executeTransaction(record, input, assertLeaseCurrent, revalidateA
     await client.query(readOnly ? 'BEGIN TRANSACTION READ ONLY' : 'BEGIN TRANSACTION READ WRITE');
     began = true;
     await client.query(`SET LOCAL statement_timeout TO '${Math.max(1, Math.trunc(remainingMs))}ms'`);
-    const verifyPhysical = () => bindingVerifier?.verify({ client, snapshot: record.snapshot,
-      requiredCapabilities: record.operation.requiredCapabilities, correlationId: record.correlationId });
+    const verifyPhysical = () => measurePhase('tenant.verify', () => bindingVerifier?.verify({ client, snapshot: record.snapshot,
+      requiredCapabilities: record.operation.requiredCapabilities, correlationId: record.correlationId }));
     await verifyPhysical();
     preparedClient = transactionClient(client, record, assertLeaseCurrent, Boolean(bindingVerifier));
     if (['F13_PQ1_EFFECTIVE','OPPORTUNITY_CRITERIA','F12_PRIVATE_HTTP_RUNTIME','F13_TAXONOMY','F13_PROFILE_AUTHORING','F13_COMPETENCIES_AND_EXPERIENCE','F13_FINANCIAL_CAPACITY','F13_OPERATIONAL_CAPACITY','F13_TERRITORIES_AND_POPULATIONS','F13_EDITORIAL_BASELINE','APPLICATION_FIRST_SLICE','ORGANIZATION_DIRECTORY','ORGANIZATIONAL_OPPORTUNITY_INTERESTS'].includes(record.operation.ownerModule)) {
@@ -132,7 +133,7 @@ async function executeTransaction(record, input, assertLeaseCurrent, revalidateA
         organizationId:record.snapshot.organizationId,tenantId:record.snapshot.tenantId,
         sourceBinding:Object.freeze({snapshotDigest:snapshotDigest(record.snapshot),backendPid:backend.pid,backendStart:backend.backend_start})});
     }
-    const result = await record.operation.queryModule.execute(Object.freeze({ client: preparedClient, input }));
+    const result = await measurePhase('tenant.work', () => record.operation.queryModule.execute(Object.freeze({ client: preparedClient, input })));
     validateOperationValue(record.operation.resultSchema, result, 'RESULT_CONTRACT_MISMATCH', record.correlationId);
     enforceResultLimits(record.operation, result, record.correlationId);
     assertLeaseCurrent();
@@ -158,14 +159,14 @@ async function executeTransaction(record, input, assertLeaseCurrent, revalidateA
     await revalidateAuthority();
     assertLeaseCurrent();
     if (record.operation.queryModule.authorityGuard) {
-      await record.operation.queryModule.authorityGuard.assert({client:preparedClient,input});
+      await measurePhase('tenant.guard', () => record.operation.queryModule.authorityGuard.assert({client:preparedClient,input}));
       assertLeaseCurrent();
     }
     if (auditBinding.readAuditFailure) throw auditBinding.readAuditFailure;
     auditBinding.readAudit?.assertComplete();
     if(connectionError)throw connectionError;
     commitAttempted = true;
-    await client.query('COMMIT');
+    await measurePhase('tenant.commit', () => client.query('COMMIT'));
     began = false;
     if (record.operation.queryModule.authorityGuard) await record.operation.queryModule.authorityGuard.complete({input,outcome:readOnly?'READ_TERMINAL':'COMMITTED'});
     return result;
@@ -247,7 +248,7 @@ function createTenantLeaseExecutor({ membershipRepository, directoryRepository, 
               throw tenantFailure('TRANSITION_CONFLICT', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
             }
           }
-          async function revalidateAuthority() {
+          const revalidateAuthority = () => measurePhase('tenant.revalidate', async () => {
             let eligible;
             try { eligible = await membershipRepository.revalidateContext(record.organizationContext, milliseconds(clock)); }
             catch {
@@ -266,7 +267,7 @@ function createTenantLeaseExecutor({ membershipRepository, directoryRepository, 
             if (!sameSnapshot(record.snapshot, current)) {
               throw tenantFailure('TRANSITION_CONFLICT', 'TENANT_NOT_AVAILABLE', { correlationId: record.correlationId });
             }
-          }
+          });
           try {
             validateOperationValue(record.operation.inputSchema, input, 'INPUT_CONTRACT_MISMATCH', record.correlationId);
             let inputBytes;
@@ -308,10 +309,10 @@ function createTenantLeaseExecutor({ membershipRepository, directoryRepository, 
                       correlationId: record.correlationId
                     });
                   }
-                  return await executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier);
+                  return await measurePhase('tenant.transaction', () => executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier));
                 }
                 if (['READ', 'WRITE'].includes(record.operation.accessMode)) {
-                  return await executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier);
+                  return await measurePhase('tenant.transaction', () => executeTransaction(record, input, assertLeaseCurrent, revalidateAuthority, remaining, bindingVerifier));
                 }
                 return await record.operation.queryModule.execute(Object.freeze({ client: record.allocation.client, input }));
               } catch (cause) {

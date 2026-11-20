@@ -120,3 +120,58 @@ test('phases observed by the session store, including the touch at the end of th
   assert.equal(lines[1].route, '/api/things/:id');
   assert.deepEqual(Object.keys(lines[1].phases).sort(), ['authority.lock', 'authority.verify', 'touch.total']);
 });
+
+test('measurePhase is a plain call while the diagnostic is off and records success and failure while on', async () => {
+  const { measurePhase, setActiveRequestPhaseTiming } = require('../src/observability/requestPhaseTiming');
+  const previous = setActiveRequestPhaseTiming(null);
+  try {
+    const pending = Promise.resolve(1);
+    assert.equal(measurePhase('tenant.work', () => pending), pending);
+    assert.equal(measurePhase('tenant.work', () => undefined), undefined);
+    assert.throws(() => measurePhase('tenant.work', () => { throw new Error('sync'); }), /sync/);
+
+    const lines = [];
+    const timing = createRequestPhaseTiming({ write: line => lines.push(JSON.parse(line)) });
+    setActiveRequestPhaseTiming(timing);
+    const { req, res } = exchange('/api/applications/my-work');
+    const failure = new Error('work failed');
+    await new Promise(resolve => timing.middleware(req, res, async () => {
+      assert.equal(await measurePhase('tenant.work', async () => 7), 7);
+      assert.equal(measurePhase('tenant.verify', () => undefined), undefined);
+      await assert.rejects(measurePhase('tenant.commit', async () => { throw failure; }), error => error === failure);
+      assert.throws(() => measurePhase('tenant.guard', () => { throw failure; }), error => error === failure);
+      resolve();
+    }));
+    res.emit('finish');
+    assert.deepEqual(Object.fromEntries(Object.entries(lines[0].phases).map(([name, phase]) => [name, phase.count])),
+      { 'tenant.work': 1, 'tenant.verify': 1, 'tenant.commit': 1, 'tenant.guard': 1 });
+    assert.equal('aborted' in lines[0], false);
+  } finally { setActiveRequestPhaseTiming(previous); }
+});
+
+test('a response the client abandoned is marked aborted', async () => {
+  const lines = [];
+  const timing = createRequestPhaseTiming({ write: line => lines.push(JSON.parse(line)) });
+  const { req, res } = exchange('/api/applications/browse-page');
+  res.writableFinished = false;
+  await new Promise(resolve => timing.middleware(req, res, resolve));
+  res.emit('close');
+  assert.equal(lines[0].aborted, true);
+});
+
+test('the authority transaction reports its setup, work and commit', async () => {
+  const seen = [];
+  const { createAuthorityCoordinator } = require('../src/security/authorityCoordinator');
+  const client = { host: 'h', port: 1, database: 'd', query: async sql => /session_user/.test(sql) ? { rows: [{ session_user: 'c4g_authority_runtime', current_user: 'c4g_authority_runtime' }] }
+    : /c4g_database_identity/.test(sql) ? { rows: [{ valid: true }] } : { rows: [] }, release() {} };
+  // The schema admission and the security snapshot need a real Central; only the phases around them are under test.
+  const manifest = require('../src/security/authoritySecurityManifest');
+  const { assertAuthorityAdmission, assertAuthoritySecurity } = manifest;
+  manifest.assertAuthorityAdmission = async () => ({}); manifest.assertAuthoritySecurity = async () => {};
+  try {
+    const coordinator = createAuthorityCoordinator({ pool: { connect: async () => client, query: async () => ({ rows: [] }) },
+      permitSecret: 'a'.repeat(64), observeTiming: name => seen.push(name) });
+    await coordinator.withAuthority(async () => {});
+  } finally { Object.assign(manifest, { assertAuthorityAdmission, assertAuthoritySecurity }); }
+  for (const name of ['authority.setup', 'authority.work', 'authority.commit']) assert.ok(seen.includes(name), name);
+});

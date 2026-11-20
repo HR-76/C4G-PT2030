@@ -1,5 +1,6 @@
 const { tenantFailure, aggregateCleanup } = require('./tenantRuntimeErrors');
 const { sameSnapshot } = require('./tenantLeaseExecutor');
+const { measurePhase } = require('../observability/requestPhaseTiming');
 const { types: { isProxy } } = require('node:util');
 
 const INPUT_KEYS = Object.freeze(['correlationId', 'operationAdapter', 'organizationContext']);
@@ -111,7 +112,10 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
   }
 
   return Object.freeze({
-    async resolve(input) {
+    // Timed as a whole for the opt-in phase diagnostic; the body is unchanged.
+    resolve(input) { return measurePhase('tenant.resolve', () => resolveLease(input)); }
+  });
+  async function resolveLease(input) {
       if (!closedObject(input, INPUT_KEYS) || !validateOrganizationContext(input.organizationContext)
           || typeof input.correlationId !== 'string' || input.correlationId.trim() === '') {
         throw new TypeError('Tenant resolution input is invalid.');
@@ -143,11 +147,11 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
             workload:operationWorkload,connectionVersion: snapshot.connectionVersion, correlationId: input.correlationId });
           const credentialLease = secret;
           secret = null;
-          allocation = await poolManager.acquire({ tenantId: snapshot.tenantId, workload:operationWorkload,connectionVersion: snapshot.connectionVersion,
-            workloadClass: operation.workloadClass, credentialLease, correlationId: input.correlationId });
+          allocation = await measurePhase('tenant.acquire', () => poolManager.acquire({ tenantId: snapshot.tenantId, workload:operationWorkload,connectionVersion: snapshot.connectionVersion,
+            workloadClass: operation.workloadClass, credentialLease, correlationId: input.correlationId }));
           const current = await withinAllocationDeadline(allocation, async () => {
-            await bindingVerifier.verify({ client: allocation.client, snapshot, phase:'PREPARATION',
-              requiredCapabilities: operation.requiredCapabilities, correlationId: input.correlationId });
+            await measurePhase('tenant.verify', () => bindingVerifier.verify({ client: allocation.client, snapshot, phase:'PREPARATION',
+              requiredCapabilities: operation.requiredCapabilities, correlationId: input.correlationId }));
             return directoryRepository.resolveSnapshotByOrganization(snapshot.organizationId, operationWorkload);
           }, input.correlationId);
           if (!sameSnapshot(snapshot, current)) {
@@ -181,8 +185,7 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
         }
       }
       throw tenantFailure('RECONCILIATION_REQUIRED', 'TENANT_NOT_AVAILABLE', { correlationId: input.correlationId });
-    }
-  });
+  }
 }
 
 module.exports = { capabilitiesAllow, createTenantResolver, operationAllowsSnapshot, snapshotEligible };

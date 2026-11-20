@@ -7,7 +7,12 @@ const { AsyncLocalStorage } = require('node:async_hooks');
 // changes no response, and a failure here never reaches the request.
 const PHASES = new Set([
   ...['authority', 'sessionRead'].flatMap(category => ['pool', 'admission', 'lock', 'verify'].map(phase => `${category}.${phase}`)),
-  'touch.get', 'touch.validate', 'touch.set', 'touch.total', 'touch.joined'
+  'authority.setup', 'authority.work', 'authority.commit',
+  'touch.get', 'touch.validate', 'touch.set', 'touch.total', 'touch.joined',
+  // Tenant phases overlap (resolve and transaction contain the others, and
+  // revalidate/guard contain authority transactions): read them, do not add them.
+  'tenant.resolve', 'tenant.acquire', 'tenant.metadata', 'tenant.verify', 'tenant.revalidate',
+  'tenant.transaction', 'tenant.work', 'tenant.guard', 'tenant.commit'
 ]);
 const round = value => Math.round(value * 10) / 10;
 
@@ -31,11 +36,13 @@ function createRequestPhaseTiming({ write = line => { process.stdout.write(line 
   function middleware(req, res, next) {
     const phases = new Map(), start = now();
     let written = false;
-    const finish = () => {
+    const finish = aborted => {
       if (written) return;
       written = true;
       try {
         write(JSON.stringify({
+          // The browser gave up before the response ended; the phases are partial.
+          ...(aborted ? { aborted: true } : {}),
           signalCode: 'c4g.api.request_phases', timestamp: clock().toISOString(), method: String(req.method || ''),
           route: routeTemplate(req.originalUrl), status: res.statusCode, totalMs: round(now() - start),
           phases: Object.fromEntries([...phases].map(([name, phase]) => [name, { count: phase.count, ms: round(phase.ms) }]))
@@ -43,17 +50,34 @@ function createRequestPhaseTiming({ write = line => { process.stdout.write(line 
       } catch { /* diagnostic only */ }
     };
     // 'finish' follows the session touch; 'close' covers an aborted response.
-    res.once('finish', finish); res.once('close', finish);
+    res.once('finish', () => finish(false)); res.once('close', () => finish(res.writableFinished === false));
     requests.run(phases, next);
   }
   return Object.freeze({ observe, middleware });
+}
+
+// The one instance of this process, so code far from the composition (tenant
+// resolution and execution) can time a step without new dependencies. With the
+// diagnostic off, measurePhase calls the work and nothing else.
+let active = null;
+function setActiveRequestPhaseTiming(timing) { const previous = active; active = timing || null; return previous; }
+function measurePhase(name, work) {
+  const timing = active;
+  if (!timing) return work();
+  const start = performance.now(), done = () => timing.observe(name, performance.now() - start);
+  let result;
+  try { result = work(); } catch (error) { done(); throw error; }
+  if (!result || typeof result.then !== 'function') { done(); return result; }
+  return result.then(value => { done(); return value; }, error => { done(); throw error; });
 }
 
 function configuredRequestPhaseTiming(env = process.env) {
   const mode = env.REQUEST_PHASE_TIMING;
   if (mode === undefined || mode === '' || mode === 'off') return null;
   if (mode !== 'log') throw new TypeError('REQUEST_PHASE_TIMING must be "log" or "off".');
-  return createRequestPhaseTiming();
+  const timing = createRequestPhaseTiming();
+  setActiveRequestPhaseTiming(timing);
+  return timing;
 }
 
-module.exports = { createRequestPhaseTiming, configuredRequestPhaseTiming, routeTemplate, PHASES };
+module.exports = { createRequestPhaseTiming, configuredRequestPhaseTiming, setActiveRequestPhaseTiming, measurePhase, routeTemplate, PHASES };

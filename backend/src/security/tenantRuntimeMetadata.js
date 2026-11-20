@@ -12,7 +12,7 @@ function closed(value,keys){return value&&Object.getPrototypeOf(value)===Object.
 // database on every phase. Workers and scripts have no request scope.
 function observeTenantRuntimeMetadata(client,expected,{observe=observeFreshTenantMetadata}={}){
   return require('./requestAdmissionScope').admitWithinRequest(
-    `tenant:${client.host}:${client.port}/${client.database}:${expected.tenantId}:${expected.databaseGenerationId}`,()=>observe(client,expected));
+    `tenant:${client.host}:${client.port}/${client.database}:${expected.tenantId}:${expected.databaseGenerationId}`,()=>require('../observability/requestPhaseTiming').measurePhase('tenant.metadata',()=>observe(client,expected)));
 }
 async function observeFreshTenantMetadata(client,expected){
   const observedFingerprint=tenantSchemaFingerprint(await tenantSchemaSnapshot(client));

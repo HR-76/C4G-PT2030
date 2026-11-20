@@ -16,6 +16,9 @@ Com `REQUEST_PHASE_TIMING=log`, a API escreve no stdout uma linha JSON por pedid
 
 - `count` de `authority.lock` é o número de transações de autoridade do pedido; `ms` é o tempo à espera do lock.
 - Fases: `authority.pool|admission|lock|verify`, `sessionRead.pool|admission|lock|verify`, `touch.get|validate|set|total|joined`.
+- Por transação de autoridade (20/11, segunda volta): `authority.setup` (BEGIN, limites e identidade), `authority.work` (o trabalho dentro da transação) e `authority.commit`.
+- Lado do tenant (20/11, segunda volta): `tenant.resolve` (da revalidação à emissão do lease), `tenant.acquire` (ligação ao tenant), `tenant.metadata` (observação do schema do tenant, uma vez por pedido), `tenant.verify` (verificação física), `tenant.revalidate` (membership e diretório na Central), `tenant.transaction` (a transação inteira), `tenant.work` (as consultas da operação), `tenant.guard` e `tenant.commit`. **Estas fases sobrepõem-se**: `resolve` e `transaction` contêm as outras, e `revalidate` e `guard` contêm transações de autoridade. Leem-se lado a lado; não se somam.
+- `aborted: true` marca um pedido que o browser abandonou antes de a resposta terminar; as fases dessa linha são parciais.
 - `totalMs` conta desde a entrada no middleware (depois dos parsers) até a resposta terminar, incluindo a renovação da sessão.
 
 ## Limites
@@ -40,4 +43,10 @@ Acrescentar `REQUEST_PHASE_TIMING=log` a `/srv/c4g-staging/api-private.env`, rec
 
 ## Validação
 
-- `backend/test/requestPhaseTiming.test.js`.
+- `backend/test/requestPhaseTiming.test.js` (10).
+- Os cronómetros do tenant e da autoridade são invólucros à volta de chamadas existentes (`measurePhase`): com a medição desligada chamam o trabalho e mais nada. Ficheiros tocados: `security/authorityCoordinator.js`, `security/tenantResolver.js`, `security/tenantLeaseExecutor.js`, `security/tenantRuntimeMetadata.js`.
+- Suite do backend: 3553 aprovados, 9 ignorados, 2 falhas anteriores e alheias em `f2Security.test.js` (SEC-AC-01, leem ficheiros do frontend). Lint aprovado.
+
+## Primeira recolha no staging (20/11/2026)
+
+Um utilizador, sessão real. A admissão do schema da Central custa 240–390 ms em cada pedido, quase independente do número de transações (3 a 65). Espera de lock: 1–7 ms em pedidos isolados, 100–225 ms com pedidos em paralelo. Renovação da sessão: 7–19 ms. Nos pedidos ao tenant, 0,9 a 4,3 s ficaram fora das fases então medidas, o que motivou a segunda volta.
