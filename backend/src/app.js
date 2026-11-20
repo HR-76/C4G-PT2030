@@ -14,6 +14,7 @@ function billingEndpointCatalog() {
     'GET /api/admin/billing/summary', 'GET /api/admin/billing/cycles',
     'GET /api/admin/billing/cycles/:cycleId',
     'GET/PUT /api/admin/billing/organizations/:organizationId/account',
+    'GET/POST /api/admin/billing/organizations/:organizationId/account/validation',
     'POST /api/admin/billing/cycles', 'PUT /api/admin/billing/cycles/:cycleId',
     'POST /api/admin/billing/cycles/:cycleId/transitions',
     'POST /api/admin/billing/cycles/:cycleId/documents',
@@ -33,7 +34,7 @@ function parseTrustProxyHops(value) {
   return hops;
 }
 
-function createApp({ express, cors, config, pool, routes, security = null, databaseReadiness = null, reportError = () => {}, observability = null, platformLogs = null, admissionBoundary = null, admissionRoutes = null }) {
+function createApp({ express, cors, config, pool, routes, security = null, databaseReadiness = null, reportError = () => {}, observability = null, platformLogs = null, admissionBoundary = null, admissionRoutes = null, phaseTiming = null }) {
   if (!express || !cors || !config || !pool || !routes) {
     throw new TypeError("createApp requires express, cors, config, pool and routes dependencies.");
   }
@@ -89,6 +90,8 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
     app.use(['/api/auth/oidc/login', '/api/auth/oidc/callback'], createRateLimiter({ limit: limits.authPerMinute }));
     app.use('/api', createRateLimiter({ limit: limits.apiPerMinute }));
   }
+  // Email logos, by unguessable name. Before the parsers and the session: no body is read, no cookie is read or set.
+  if (routes.publicEmailLogos) app.use('/api/public/email-logos', routes.publicEmailLogos);
   app.use('/api/organizational-profile/pq1-activation', (req,res,next)=>{res.setHeader('Cache-Control','no-store');next();},express.json({limit:'64kb'}));
   app.use('/api/organizational-profile/pq1-publication', (req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); }, express.json({ limit: '256kb' }));
   app.use('/api/organization-profile/editorial-ui', express.json({ limit: '256kb' }));
@@ -100,6 +103,8 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   app.use(express.json({ limit: '100kb' }));
 
   if (security) {
+    // Opt-in diagnostic; after the parsers for the same reason as the admission scope.
+    if (phaseTiming) app.use('/api', phaseTiming);
     // One Central schema preflight per request; see requestAdmissionScope.
     app.use(require('./security/requestAdmissionScope').requestAdmissionMiddleware);
     app.use(security.sessionMiddleware);
@@ -115,6 +120,8 @@ function createApp({ express, cors, config, pool, routes, security = null, datab
   if (routes.platformDirectory) app.use('/api/admin/directory',routes.platformDirectory);
   if (routes.customerBilling) app.use('/api/billing',routes.customerBilling);
   if (routes.platformBilling) app.use('/api/admin/billing',routes.platformBilling);
+  if (routes.platformEmail) app.use('/api/admin/email',routes.platformEmail);
+  if (routes.opportunityComplements) app.use('/api/admin/opportunity-complements',routes.opportunityComplements);
   app.use('/api/admin/opportunity-activation',routes.opportunityActivation||((req,res)=>res.status(503).set('Cache-Control','no-store').json({error:{code:'OPPORTUNITY_V2_NOT_CONFIGURED'}})));
   if(routes.pq1Consumer)app.use('/api/opportunities',routes.pq1Consumer);
   app.use('/api/organizational-profile/pq1-activation',routes.pq1Activation||((req,res)=>res.status(503).json({error:{code:'SERVICE_UNAVAILABLE'}})));

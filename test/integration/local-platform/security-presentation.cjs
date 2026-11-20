@@ -24,7 +24,7 @@ async function main(){
   stage='account';await page.goto(origin+'/conta/seguranca');await page.getByRole('link',{name:'Gerir password e MFA'}).waitFor();await page.getByText('Administra\u00e7\u00e3o da plataforma C4G',{exact:true}).waitFor();await capture('platform-security');await page.getByRole('link',{name:'Gerir password e MFA'}).click();await page.locator('body[data-page-id="account"] .pf-v5-c-masthead').waitFor();await page.waitForLoadState('networkidle');
   const appearance=await page.evaluate(()=>({header:getComputedStyle(document.querySelector('.pf-v5-c-masthead')).backgroundColor,logo:document.querySelector('.pf-v5-c-masthead img[src$="/logo-c4g.png"]')?.getAttribute('src'),images:[...document.querySelectorAll('.pf-v5-c-masthead img')].map(i=>({class:i.className,parent:i.parentElement.className})),title:document.title,links:[...document.querySelectorAll('nav a')].map(a=>({text:a.textContent,path:new URL(a.href).pathname}))}));
   fs.writeFileSync(path.join(out,'account-structure.json'),JSON.stringify(await page.locator('main').evaluate(el=>[...el.querySelectorAll('*')].filter(e=>e.className&&typeof e.className==='string').map(e=>({tag:e.tagName,class:e.className}))),null,2));
-  assert.equal(appearance.header,'rgb(7, 91, 89)');assert(appearance.logo?.endsWith('/logo-c4g.png'));assert.equal(appearance.title,'Conta C4G');
+  assert.equal(appearance.header,'rgb(7, 91, 89)');assert(appearance.logo?.endsWith('/logo-c4g.png'));assert.equal(appearance.title,'Oportunidades 2030');
   await capture('keycloak-account');
   assert.equal(new URL(page.url()).pathname,`/realms/${state.identity.realm}/account/account-security/signing-in`);
   assert(await page.getByRole('heading',{name:'Autenticação de Dois Fatores',exact:true}).isVisible());

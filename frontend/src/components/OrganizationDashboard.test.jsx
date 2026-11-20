@@ -366,9 +366,11 @@ it('mostra quatro indicadores principais na vista de gráficos', async () => {
   expect(links[3].getAttribute('href')).toBe('#approval-timeline')
 })
 
-it('destaca prazos autorizados na vista inicial e liga à candidatura',async()=>{
+it('mostra prazos autorizados nos indicadores operacionais, com ligação à candidatura, e não nos gráficos',async()=>{
  state.auth={user:{id:'u'},organization:{id:'a',displayName:'Entidade A'}};const response=dashboardResponse();response.data.deadlines=[{id:'app-1',title:'Preparar candidatura',days_left:2}];state.organization.mockResolvedValue(response)
- render(<MemoryRouter><Dashboard/></MemoryRouter>);const link=await screen.findByRole('link',{name:'Preparar candidatura'});expect(link.getAttribute('href')).toBe('/candidaturas/app-1');expect(screen.getByText('Faltam 2 dias')).toBeTruthy()
+ const first=render(<MemoryRouter><Dashboard/></MemoryRouter>);await screen.findByRole('heading',{name:'Candidaturas por estado'});expect(screen.queryByRole('link',{name:'Preparar candidatura'})).toBeNull()
+ const risk=screen.getByRole('link',{name:/Prazos internos em risco/});expect(risk.getAttribute('href')).toBe('/dashboard?vista=indicadores');expect(risk.textContent).toContain('0 em atraso');expect(screen.queryByRole('link',{name:/Catálogo e oportunidades privadas/})).toBeNull();first.unmount()
+ render(<MemoryRouter initialEntries={['/dashboard?vista=indicadores']}><Dashboard/></MemoryRouter>);const link=await screen.findByRole('link',{name:'Preparar candidatura'});expect(link.getAttribute('href')).toBe('/candidaturas/app-1');expect(screen.getByText('Faltam 2 dias')).toBeTruthy()
 })
 
 it('explica o âmbito dos indicadores sem alterar os valores',async()=>{

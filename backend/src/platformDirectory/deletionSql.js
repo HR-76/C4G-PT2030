@@ -1,0 +1,28 @@
+'use strict';
+const statements={
+ target:`SELECT id,status,session_revocation_version FROM public.global_user WHERE id=$1 FOR UPDATE`,
+ operation:`SELECT * FROM public.platform_user_deletion WHERE global_user_id=$1 FOR UPDATE`,
+ identities:`SELECT issuer,subject FROM public.auth_identity_ref WHERE global_user_id=$1 ORDER BY issuer,subject`,
+ memberships:`SELECT id AS "membershipId",organization_id AS "organizationId" FROM public.organization_membership WHERE global_user_id=$1 ORDER BY organization_id,id`,
+ pending:`SELECT EXISTS(SELECT 1 FROM public.platform_member_operation WHERE global_user_id=$1 AND phase<>'COMPLETE' UNION ALL SELECT 1 FROM public.platform_onboarding_operation WHERE global_user_id=$1 AND phase<>'COMPLETE' UNION ALL SELECT 1 FROM public.entity_admission WHERE global_user_id=$1 AND phase NOT IN ('COMPLETE','CANCELLED')) AS pending`,
+ protected:`SELECT EXISTS(SELECT 1 FROM public.platform_admin_assignment a WHERE a.global_user_id=$1 AND a.role_code='C4G_ADMIN' AND a.status='ACTIVE' AND NOT EXISTS(SELECT 1 FROM public.platform_admin_assignment b JOIN public.global_user u ON u.id=b.global_user_id WHERE b.global_user_id<>$1 AND b.role_code='C4G_ADMIN' AND b.status='ACTIVE' AND u.status='ACTIVE')) OR EXISTS(SELECT 1 FROM public.organization_membership a JOIN public.organization o ON o.id=a.organization_id WHERE a.global_user_id=$1 AND a.base_role_code='ORG_ADMIN' AND a.status='ACTIVE' AND o.status='ACTIVE' AND NOT EXISTS(SELECT 1 FROM public.organization_membership b JOIN public.global_user u ON u.id=b.global_user_id WHERE b.organization_id=a.organization_id AND b.global_user_id<>$1 AND b.base_role_code='ORG_ADMIN' AND b.status='ACTIVE' AND u.status='ACTIVE' AND b.valid_from<=clock_timestamp() AND (b.valid_until IS NULL OR b.valid_until>clock_timestamp()))) AS protected`,
+ start:`INSERT INTO public.platform_user_deletion(global_user_id,request_key,requested_by,identities,memberships) VALUES($1,$2,$3,$4,$5) RETURNING *`,
+ archive:`UPDATE public.global_user SET status='ARCHIVED',session_revocation_version=session_revocation_version+1,updated_at=clock_timestamp() WHERE id=$1`,
+ sessions:`UPDATE public.application_session SET status='REVOKED',revoked_at=clock_timestamp(),revocation_reason='ACCOUNT_DELETED' WHERE global_user_id=$1 AND status='ACTIVE'`,
+ sessionPayloads:`DELETE FROM public.application_session_store WHERE sid IN(SELECT sid FROM public.application_session WHERE global_user_id=$1)`,
+ roles:`UPDATE public.platform_admin_assignment SET status='REVOKED',revoked_at=clock_timestamp() WHERE global_user_id=$1 AND status='ACTIVE'`,
+ removeMemberships:`UPDATE public.organization_membership SET status='REMOVED',removed_at=clock_timestamp(),membership_version=membership_version+1,status_reason='ACCOUNT_DELETED',updated_at=clock_timestamp() WHERE global_user_id=$1 AND status<>'REMOVED'`,
+ revokeMemberInvites:`UPDATE public.platform_member_invitation SET status='REVOKED',revision=revision+1 WHERE status='OPEN' AND operation_id IN(SELECT id FROM public.platform_member_operation WHERE global_user_id=$1)`,
+ revokeFirstInvites:`UPDATE public.platform_onboarding_invitation SET status='REVOKED',revision=revision+1 WHERE status='OPEN' AND operation_id IN(SELECT id FROM public.platform_onboarding_operation WHERE global_user_id=$1)`,
+ phase:`UPDATE public.platform_user_deletion SET phase=$3,updated_at=clock_timestamp() WHERE global_user_id=$1 AND request_key=$2 RETURNING *`,
+ anonymize:`UPDATE public.global_user SET display_name='Utilizador eliminado',primary_email=$2,updated_at=clock_timestamp() WHERE id=$1 AND status='ARCHIVED'`,
+ references:`UPDATE public.auth_identity_ref SET subject='deleted:'||id::text WHERE global_user_id=$1`,
+ memberInputs:`UPDATE public.platform_member_operation SET input=jsonb_set(jsonb_set(input-'expectedSubject','{adminName}','"Utilizador eliminado"'),'{adminEmail}',to_jsonb($2::text)),receipt=receipt-'subject'-'activationEmail',revision=revision+1 WHERE global_user_id=$1`,
+ firstInputs:`UPDATE public.platform_onboarding_operation SET input=jsonb_set(jsonb_set(input-'expectedSubject','{adminName}','"Utilizador eliminado"'),'{adminEmail}',to_jsonb($2::text)),receipt=receipt-'subject'-'activationEmail',revision=revision+1 WHERE global_user_id=$1`,
+ memberProofs:`UPDATE public.platform_member_invitation SET verified_identity=NULL,exchange_digest=NULL,binding_digest=NULL,exchange_until=NULL,revision=revision+1 WHERE operation_id IN(SELECT id FROM public.platform_member_operation WHERE global_user_id=$1)`,
+ firstProofs:`UPDATE public.platform_onboarding_invitation SET verified_identity=NULL,exchange_digest=NULL,binding_digest=NULL,exchange_until=NULL,revision=revision+1 WHERE operation_id IN(SELECT id FROM public.platform_onboarding_operation WHERE global_user_id=$1)`,
+ admissionInputs:`UPDATE public.entity_admission SET input=jsonb_set(jsonb_set(input-'expectedSubject','{adminName}','"Utilizador eliminado"'),'{adminEmail}',to_jsonb($2::text)),receipt=receipt-'subject'-'activationEmail',revision=revision+1 WHERE global_user_id=$1`,
+ admissionProofs:`UPDATE public.entity_admission_invitation SET verified_identity=NULL,exchange_digest=NULL,binding_digest=NULL,exchange_until=NULL,revision=revision+1,status=CASE WHEN status='OPEN' THEN 'REVOKED' ELSE status END WHERE operation_id IN(SELECT id FROM public.entity_admission WHERE global_user_id=$1)`,
+ finish:`UPDATE public.platform_user_deletion SET phase='COMPLETE',identities='[]',completed_at=clock_timestamp(),updated_at=clock_timestamp() WHERE global_user_id=$1 AND request_key=$2 RETURNING *`
+};
+module.exports=Object.freeze(Object.fromEntries(Object.entries(statements).map(([key,sql])=>[key,sql.replace(/\s+/g,' ').trim()])));

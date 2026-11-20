@@ -14,4 +14,8 @@ test('customer HTTP routes authenticate, require organization and reject mutatio
   for(const method of ['POST','PUT','DELETE','HEAD'])assert.equal((await fetch(root+'/invoices',{method})).status,405);
   for(const path of ['/summary?organizationId=other','/access?q=other','/invoices/id?x=1'])assert.equal((await fetch(root+path)).status,400);
   assert.equal(calls.length,1);
+  assert.equal((await fetch(root+'/account')).status,200);assert.equal(calls[1][0],'account');
+  assert.equal((await fetch(root+'/account?organizationId=other')).status,400);
+  for(const method of ['POST','PUT','DELETE'])assert.equal((await fetch(root+'/account',{method})).status,405);
+  assert.equal(calls.length,2);
 });

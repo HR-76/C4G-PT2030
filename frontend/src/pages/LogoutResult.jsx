@@ -6,7 +6,7 @@ export default function LogoutResult({ status }) {
   const complete = status === 'complete', incomplete = status === 'incomplete'
   const Icon = complete ? CheckCircle2 : incomplete ? AlertTriangle : LogOut
   return <main className="logout-result">
-    <div className="logout-result-brand">C4G <span>Funding Platform</span></div>
+    <div className="logout-result-brand"><img src="/logo-c4g.png" alt="C4G" /></div>
     <section className="logout-result-card" aria-labelledby="logout-result-title" data-state={status}>
       <span className="logout-result-icon"><Icon size={34} aria-hidden="true"/></span>
       <h1 id="logout-result-title">{complete ? 'Saída concluída' : incomplete ? 'Saída incompleta' : 'Resultado da saída não confirmado'}</h1>

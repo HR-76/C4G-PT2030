@@ -1,8 +1,9 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { privateApplicationsApi as api } from '../../api/api'
 import { useConfirmDialog } from '../../components/ConfirmDialog'
-import { PartnerForm, PartnerCards, EMPTY_PARTNER } from './PartnerComponents'
+import { PartnerForm, PartnerCards, PartnerTable, EMPTY_PARTNER } from './PartnerComponents'
 import { applicationPartnerIntentKey } from './intentions'
 import FormModal from '../../components/FormModal'
 import './partner-modal.css'
@@ -69,10 +70,10 @@ export default function ApplicationPartners({applicationId,userId,organizationId
     {(!editorOpen||!canEdit)&&feedback}
     {data && !canEdit && !pending && <p className="text-muted">Acesso de consulta aos parceiros da candidatura.</p>}
     {data&&pending&&!canEdit&&<button className="btn btn-outline" disabled={busy} onClick={()=>{setCursor(null);setRefresh(v=>v+1)}}>Recarregar parceiros</button>}
-    {!data?(loading ? <p role="status">A carregar parceiros…</p> : <button type="button" className="btn btn-outline" onClick={()=>{setCursor(null);setRefresh(v=>v+1)}} disabled={busy}>Recarregar parceiros</button>):<>
+    {!data?(loading ? <LoadingIndicator>A carregar parceiros…</LoadingIndicator> : <button type="button" className="btn btn-outline" onClick={()=>{setCursor(null);setRefresh(v=>v+1)}} disabled={busy}>Recarregar parceiros</button>):<>
       {canEdit&&editorOpen&&<FormModal title={editing?'Editar parceiro':'Adicionar parceiro'} locked={busy||!!pending} returnFocusRef={editorTrigger} onClose={()=>setEditorOpen(false)}><div className="application-partner-editor">{feedback}<fieldset disabled={busy||!!pending} className="partner-fields"><PartnerForm form={form} saving={busy} editing={!!editing} onChange={setForm} onCancel={()=>setEditorOpen(false)} onSubmit={e=>{e.preventDefault();send(editing?'partnerEdit':'partnerCreate',{partner:clean(form),...(editing?{partnerId:editing}:{})})}}/></fieldset></div></FormModal>}
       {canEdit&&hasDraft&&!editorOpen&&!pending&&<p className="partner-draft-notice">A ficha por guardar está preservada nesta página. <button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={()=>{setForm(EMPTY_PARTNER);setEditing(null)}}>Descartar rascunho</button></p>}
-      {data.items.length?<PartnerCards partners={data.items} canEditPartners={canEdit&&!busy&&!pending&&!hasDraft} editPartner={p=>{editorTrigger.current=null;setEditing(p.id);setForm(clean(p));setEditorOpen(true)}} removePartner={remove}/>:<p className="empty-row">Sem parceiros nesta candidatura.</p>}
+      {data.items.length?<PartnerTable partners={data.items} canEditPartners={canEdit&&!busy&&!pending&&!hasDraft} editPartner={p=>{editorTrigger.current=null;setEditing(p.id);setForm(clean(p));setEditorOpen(true)}} removePartner={remove}/>:<p className="empty-row">Sem parceiros nesta candidatura.</p>}
       {(data.previousCursor||data.nextCursor)&&<nav aria-label="Paginação dos parceiros da candidatura"><button disabled={!data.previousCursor||busy} onClick={()=>setCursor(data.previousCursor)}>Anterior</button> Página {data.page} <button disabled={!data.nextCursor||busy} onClick={()=>setCursor(data.nextCursor)}>Seguinte</button></nav>}
       <h3>Histórico de parceiros</h3>
       {historyLoading&&<p role="status">A carregar histórico de parceiros…</p>}

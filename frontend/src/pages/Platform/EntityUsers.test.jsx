@@ -26,6 +26,31 @@ it('keeps uncertain submission feedback and retry inside the modal',async()=>{
 });
 const roles=[{code:'ORG_ADMIN',label:'Administrador'},{code:'FUNDING_MANAGER',label:'Gestor de candidaturas'},{code:'CONTRIBUTOR',label:'Técnico'}]
 const op={id:'operation',name:'Pessoa nova',email:'nova@example.invalid',profileCode:'CONTRIBUTOR',phase:'READY'}
+it('keeps completed activation details without pending activation actions',async()=>{
+ const client=api(),complete={...op,phase:'COMPLETE',status:'COMPLETE'};
+ client.invitations.mockResolvedValue({data:{items:[complete],profileOptions:roles}});
+ client.get.mockResolvedValue({data:complete});
+ render(<EntityUsers organizationId="org-a" organizationName="Entidade A" platform api={client}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Ver detalhes'}));
+ await screen.findByRole('heading',{name:'Acesso ativado'});
+ expect(client.get).toHaveBeenCalledWith('operation');
+ expect(screen.queryByRole('button',{name:'Verificar ativação'})).toBeNull();
+ expect(screen.queryByRole('button',{name:'Reenviar email de ativação'})).toBeNull();
+ expect(screen.queryByRole('button',{name:'Revogar ligação'})).toBeNull();
+ for(const method of ['create','resume','sendEmail','issue','revoke'])expect(client[method]).not.toHaveBeenCalled();
+});
+it('allows verification while pending and removes it when activation completes',async()=>{
+ const client=api();
+ client.invitations.mockResolvedValue({data:{items:[op],profileOptions:roles}});
+ render(<EntityUsers organizationId="org-a" organizationName="Entidade A" api={client}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Consultar ativação'}));
+ const verify=await screen.findByRole('button',{name:'Verificar ativação'});
+ await waitFor(()=>expect(verify.disabled).toBe(false));
+ client.get.mockResolvedValue({data:{...op,phase:'COMPLETE'}});
+ fireEvent.click(verify);
+ await screen.findByRole('heading',{name:'Acesso ativado'});
+ expect(screen.queryByRole('button',{name:'Verificar ativação'})).toBeNull();
+});
 function api(options=roles){return {invitations:vi.fn().mockResolvedValue({data:{items:[],profileOptions:options}}),access:vi.fn().mockResolvedValue({data:{items:[]}}),create:vi.fn().mockResolvedValue({data:{...op,phase:'IDENTITY'}}),resume:vi.fn().mockResolvedValue({data:op}),sendEmail:vi.fn().mockResolvedValue({data:{status:'ACCEPTED'}}),get:vi.fn().mockResolvedValue({data:op}),issue:vi.fn().mockResolvedValue({data:{id:'invite',status:'OPEN',secret:'a'.repeat(64),expiresAt:'2027-01-01'}}),revoke:vi.fn().mockResolvedValue({data:{status:'REVOKED'}})}}
 async function prepare(client){render(<EntityUsers organizationId="org-a" organizationName="Entidade A" api={client}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'Adicionar utilizador'}).disabled).toBe(false));fireEvent.click(screen.getByRole('button',{name:'Adicionar utilizador'}));fireEvent.change(screen.getByLabelText('Nome'),{target:{value:'Pessoa nova'}});fireEvent.change(screen.getByLabelText('Email'),{target:{value:'nova@example.invalid'}});fireEvent.change(screen.getByLabelText('Perfil'),{target:{value:'CONTRIBUTOR'}});fireEvent.click(screen.getByRole('button',{name:'Rever acesso'}));}
 it('reviews destination and profile before requesting automatic activation email',async()=>{const client=api();await prepare(client);expect(client.create).not.toHaveBeenCalled();expect(screen.getByText(/participação numa candidatura/)).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Criar acesso por ativar'}));await screen.findByRole('heading',{name:'Pronto para ativar'});expect(client.create).toHaveBeenCalledWith(expect.objectContaining({name:'Pessoa nova',email:'nova@example.invalid',profileCode:'CONTRIBUTOR'}));expect(client.issue).not.toHaveBeenCalled();});

@@ -35,11 +35,17 @@ async function read(client,{organizationId:org,actor,authority,cursor,clock,task
  ) SELECT COALESCE((SELECT jsonb_agg(to_jsonb(page) ORDER BY deadline,task_id) FROM page),'[]') AS items,
   (SELECT count(*)::int FROM filtered) AS total,
   (SELECT encode(sha256(convert_to(COALESCE(string_agg(to_jsonb(f)::text,'' ORDER BY task_id),''),'UTF8')),'hex') FROM filtered f) AS digest,
-  (SELECT jsonb_object_agg(bucket,n) FROM (SELECT bucket,count(*)::int AS n FROM filtered GROUP BY bucket) counts) AS counts`,params)).rows[0];
+  (SELECT jsonb_object_agg(bucket,n) FROM (SELECT bucket,count(*)::int AS n FROM filtered GROUP BY bucket) counts) AS counts,
+  (SELECT count(DISTINCT application_id)::int FROM filtered) AS workload_total,
+  COALESCE((SELECT jsonb_agg(w ORDER BY w.total DESC,lower(w.title),w.application_id) FROM (
+   SELECT application_id,application_title AS title,count(*)::int AS total,(count(*) FILTER(WHERE bucket='overdue'))::int AS overdue
+   FROM filtered GROUP BY application_id,application_title ORDER BY count(*) DESC,lower(application_title),application_id LIMIT 8) w),'[]') AS workload`,params)).rows[0];
  if(!row||!Array.isArray(row.items))fail('SERVICE_UNAVAILABLE');
  if(after&&after.digest!==row.digest)fail('INVALID_CURSOR');
  const items=row.items.slice(0,25).map(t=>({taskId:t.task_id,applicationId:t.application_id,applicationTitle:t.application_title,title:t.title,description:t.description??null,deadline:day(t.deadline),status:t.status,group:t.bucket}));
  const last=items.at(-1);
- return {today,items,total:row.total,counts:row.counts||{},nextCursor:row.items.length>25?cursor.cursor({deadline:last.deadline,taskId:last.taskId,digest:row.digest},bind):null};
+ // The applications holding most of these tasks, for the Técnico dashboard.
+ const byApplication={total:row.workload_total||0,items:(row.workload||[]).map(w=>({applicationId:w.application_id,title:w.title,total:w.total,overdue:w.overdue}))};
+ return {today,items,total:row.total,counts:row.counts||{},byApplication,nextCursor:row.items.length>25?cursor.cursor({deadline:last.deadline,taskId:last.taskId,digest:row.digest},bind):null};
 }
 module.exports={parse,read};

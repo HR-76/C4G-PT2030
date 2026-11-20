@@ -21,6 +21,28 @@ function oidcEnvironment() {
   };
 }
 
+for (const version of ['c4g-user-mfa-v1', 'c4g-assurance-v1']) {
+  test(`Central access composition uses the configured privileged category: ${version}`, t => {
+    const manifest = require('../src/security/authConfig').RECOGNIZED_ASSURANCE_POLICIES[version];
+    const sentinel = new Error('Access composition captured');
+    let options;
+    t.mock.method(require('../src/platformDirectory/access'), 'createPlatformAccess', value => {
+      options = value;
+      // Stop before composing unrelated features; no database or OIDC I/O is needed.
+      throw sentinel;
+    });
+    const pool = () => ({query() { throw Error('Unexpected database access'); }, connect() { throw Error('Unexpected database connection'); }});
+    assert.throws(() => createProductionComposition({
+      dependencies: {express: require('express'), cors: require('cors'), centralPool: pool(), authorityPool: pool(), enableRegistration: false},
+      env: {...oidcEnvironment(), PLATFORM_ACCESS_RUNTIME: 'central', AUTH_POLICY_VERSION: version,
+        PRIVILEGED_LOGIN_ASSURANCE_CATEGORY: manifest.privilegedCategory, AUTH_ASSURANCE_POLICY_JSON: JSON.stringify(manifest.policy)}
+    }), error => error === sentinel);
+    assert.equal(options.policyVersion, version);
+    assert.deepEqual(options.recentMfaRequirement, manifest.policy[manifest.privilegedCategory]);
+    assert.deepEqual(options.assuranceRequirements, options.recentMfaRequirement);
+  });
+}
+
 test('OIDC is the only selectable authentication route', () => {
   const oidc = {};
   assert.deepEqual(selectAuthRoutes('oidc', {}, oidc), { oidcAuth: oidc });

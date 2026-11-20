@@ -1,6 +1,6 @@
 # Dashboard da administração C4G
 
-Estado: Review. Implementado e validado em 18/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Não repetido: o gate PostgreSQL e a revisão no Chrome. Estado anterior: Review. Implementado e validado em 18/10/2026.
 
 ## Contrato e critérios
 

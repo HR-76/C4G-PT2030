@@ -14,7 +14,7 @@ export function SidebarHeader({ onClose }) {
 
 export function SectionBreadcrumb({ section, detail, title }) {
   const applications = section === "candidaturas"
-  const label = applications ? "Candidaturas" : section === "catalogo" ? "Catálogo" : title
+  const label = applications ? "Candidaturas" : section === "catalogo" ? "Oportunidades" : title
   return <nav data-slot="breadcrumb" aria-label="Percurso">
     <ol data-slot="breadcrumb-list">
       <li data-slot="breadcrumb-item">C4G</li>

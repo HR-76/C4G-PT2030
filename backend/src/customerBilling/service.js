@@ -23,13 +23,14 @@ function createCustomerBillingService({coordinator,authority,authorizationDataPo
       if(method==='access') result={canRead:allowed};
       else if(method==='authorizePdf') result={organizationId:org};
       else {
-        if(!['list','summary','detail'].includes(method)) fail('INVALID_INPUT');
+        if(!['list','summary','detail','account'].includes(method)) fail('INVALID_INPUT');
         const client=await centralPool.connect();
         try {
           await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
           await client.query("SET LOCAL statement_timeout='5s'");
           if(method==='list') result=await repository.list(client,org,raw,today);
           else if(method==='summary') result=await repository.summary(client,org,today);
+          else if(method==='account') result=await repository.account(client,org);
           else result=await repository.detail(client,org,id,today);
           await client.query('COMMIT');
         }catch(error){await client.query('ROLLBACK').catch(()=>{});throw error}

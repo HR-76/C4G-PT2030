@@ -1,6 +1,6 @@
 # Login em português de Portugal
 
-Estado: Review — 29/10/2026. Correção pedida pelo utilizador a partir do formulário de login em inglês, implementada e validada no Keycloak local ativo.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. As falhas de suíte registadas em 29/10 noutras áreas já não existem. Não repetida: a verificação do formulário real no Keycloak local. Estado anterior: Review — 29/10/2026. Correção pedida pelo utilizador a partir do formulário de login em inglês, implementada e validada no Keycloak local ativo.
 
 ## Contrato e aceitação
 

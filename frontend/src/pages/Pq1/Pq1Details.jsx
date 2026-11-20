@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useEffect, useRef, useState } from 'react'
 import { pq1Api } from '../../api/api'
 import InfoTooltip from '../../components/InfoTooltip'
@@ -97,7 +98,7 @@ export default function Pq1Details({ record, editable, disabled, onAction, onMfa
         <label>Declaração guardada<select value={assertion} onChange={e=>setAssertion(e.target.value)}><option value="">Selecione</option>{record.assertions?.filter(a=>a.knowledgeStatus==='KNOWN').map(a=><option key={a.versionId} value={a.versionId}>{a.conceptRef.conceptId}</option>)}</select></label>
         <label>Experiência guardada<select value={experience} onChange={e=>selectExperience(e.target.value)}><option value="">Selecione</option>{record.experiences?.map(e=><option key={e.versionId} value={e.versionId}>{e.experienceId}</option>)}</select></label>
         <label>Documento autorizado<select value={document} onChange={e=>setDocument(e.target.value)}><option value="">Sem documento</option>{documents.map(d=><option key={d.documentVersionId} value={d.documentVersionId}>{d.documentVersionId}</option>)}</select></label>
-        {documentsLoading && <p role="status">A consultar documentos…</p>}
+        {documentsLoading && <LoadingIndicator compact>A consultar documentos…</LoadingIndicator>}
         {documentCursor && <button disabled={disabled || documentsLoading} onClick={() => loadDocuments(experience,documentCursor,documentGeneration.current)}>Mais documentos</button>}
         <button disabled={!assertion||!experience} onClick={()=>action('ATTACH_EVIDENCE','attach',{expectedRevision:record.revision,linkId:crypto.randomUUID(),assertionVersionId:assertion,experienceVersionId:experience,documentVersionId:document||null})}>Associar evidência</button>
         <label>Método de verificação<select value={method} onChange={e=>{setMethod(e.target.value);setUntil('')}}><option value="">Selecione</option>{catalog.VERIFICATION_METHOD?.map(m=><option key={m.entryId} value={m.entryId}>{m.label}</option>)}</select></label>

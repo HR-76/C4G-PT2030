@@ -6,15 +6,16 @@ const {createOnboardingAudit}=require('./audit');
 const {fail,uuid,hash,token}=require('./contracts');
 const q=require('./memberSql');
 const {profiles}=require('../organizationDirectory/accessProfiles');
+const {deliveryView}=require('../emailTemplates/invitation');
 function input(value){
  if(!value||Object.keys(value).sort().join(',')!=='email,name,organizationId,profileCode,requestId')fail('ONBOARDING_INPUT_INVALID');
  if(typeof value.name!=='string'||!value.name.trim()||value.name.length>200||/[\x00-\x1f]/.test(value.name)||typeof value.email!=='string'||value.email.length>254||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email)||!profiles.some(p=>p.code===value.profileCode))fail('ONBOARDING_INPUT_INVALID');
  return {organizationId:uuid(value.organizationId),requestId:uuid(value.requestId),adminName:value.name.trim().normalize('NFC'),adminEmail:value.email.toLowerCase(),profileCode:value.profileCode};
 }
-function view(row){return {id:row.id,organizationId:row.organization_id,name:row.input.adminName,email:row.input.adminEmail,profileCode:row.profile_code,phase:row.phase,status:row.status,revision:Number(row.revision),errorCode:row.error_code||null,emailDelivery:row.receipt?.activationEmail||null};}
+function view(row){return {id:row.id,organizationId:row.organization_id,name:row.input.adminName,email:row.input.adminEmail,profileCode:row.profile_code,phase:row.phase,status:row.status,revision:Number(row.revision),errorCode:row.error_code||null,emailDelivery:deliveryView(row.receipt?.activationEmail)};}
 
 // Composition-only ports. No provider credentials, arbitrary SQL or HTTP claims enter this service.
-function createMemberOnboardingService({coordinator,identity,projection,verification,issuer,policyVersion,assuranceRequirements,mfaPolicyCode,dataResidencyCode,email,audit=createOnboardingAudit()}){
+function createMemberOnboardingService({coordinator,identity,projection,verification,issuer,policyVersion,assuranceRequirements,mfaPolicyCode,dataResidencyCode,email,prepareEmail,deliveryHistory,audit=createOnboardingAudit()}){
  if(!isAuthorityCoordinator(coordinator)||![identity,projection].every(p=>typeof p?.ensure==='function')||typeof verification?.verify!=='function'||typeof issuer!=='string'||!issuer.startsWith('https://')||!policyVersion||!assuranceRequirements||!mfaPolicyCode||!dataResidencyCode)fail('ONBOARDING_COMPOSITION_INVALID');
  const first=async(c,s,p)=>(await c.query(s,p)).rows[0];
  async function admin(c,request,organizationId,profileCode){
@@ -138,16 +139,39 @@ function createMemberOnboardingService({coordinator,identity,projection,verifica
    let invitation;
    try{invitation=await service.issue(id,intention,request,true);}
    catch(error){if(error.code==='EMAIL_NOT_CONFIGURED')return {status:'NOT_CONFIGURED'};throw error;}
+   // Persist the secret-free payload before contacting the provider. The operation
+   // lock serializes concurrent preparations, and survives process restarts.
+   const pinned=await write(async c=>{
+    const row=await operation(c,id);await admin(c,request,row.organization_id,row.profile_code);
+    const prior=row.receipt?.activationEmail;
+    if(prior?.invitationId===invitation.id)return prior;
+    // An already-issued invitation without a receipt may have been sent by an
+    // older process that crashed before recording its result. Keep its old body.
+    const existingUnpinned=value.invitations.some(item=>item.id===invitation.id);
+    const content=prepareEmail&&!existingUnpinned?await prepareEmail({organizationId:row.organization_id,expiresAt:invitation.expiresAt}):{};
+    const previous=prior?[...(prior.previous||[]),{...deliveryView(prior),logo:prior.logo||null}]:[];
+    const record={invitationId:invitation.id,status:'UNCONFIRMED',...content,previous};
+    const saved=await c.query(q.emailDelivery,[id,JSON.stringify(record),invitation.id]);
+    if(saved.rowCount===0)fail('ACTIVATION_INVALID');
+    return record;
+   });
+   if(pinned.status==='ACCEPTED')return deliveryView(pinned);
    // Never expose the activation secret to the browser or persist it in plaintext.
    let delivery;
-   try{delivery=await email.send({invitationId:invitation.id,to:value.email,secret:invitation.secret,expiresAt:invitation.expiresAt});}
+   const send=()=>email.send({invitationId:invitation.id,to:value.email,secret:invitation.secret,expiresAt:invitation.expiresAt,...(pinned.message?{message:pinned.message}:{})});
+   try{delivery=deliveryHistory?await deliveryHistory.deliver({id:invitation.id,organizationId:value.organizationId,recipient:value.email},send):await send();}
    catch{delivery={status:'UNCONFIRMED'};}
    const result={invitationId:invitation.id,status:delivery?.status==='ACCEPTED'?'ACCEPTED':delivery?.status==='NOT_CONFIGURED'?'NOT_CONFIGURED':'UNCONFIRMED'};
    await write(async c=>{
     const row=await operation(c,id);await admin(c,request,row.organization_id,row.profile_code);
-    await c.query(q.emailDelivery,[id,JSON.stringify(result),invitation.id]);
+    await c.query(q.emailDelivery,[id,JSON.stringify({...pinned,...result}),invitation.id]);
    });
-   return result;
+   return deliveryView({...pinned,...result});
+  },
+  // Composition-only port; the template service authorizes and resolves the recipient.
+  async testEmail(value){
+   const send=()=>email?.test?email.test(value):Promise.resolve({status:'NOT_CONFIGURED'});
+   return deliveryHistory?deliveryHistory.deliver({id:value.idempotencyKey,recipient:value.to,test:true},send):send();
   },
   async revoke(id,invitationId,request){
    uuid(invitationId);

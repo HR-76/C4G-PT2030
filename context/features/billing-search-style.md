@@ -1,6 +1,6 @@
 # Pesquisa nos filtros de faturação
 
-Estado: Review. Pedido visual de 28/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Os estilos deste pedido foram depois absorvidos pelo componente SearchInput (ver homogeneous-search-bars.md), que a faturação usa. Não repetida: a verificação de estilos no Chrome. Estado anterior: Review. Pedido visual de 28/10/2026.
 
 Causa: seletor base de controlos em index.css omite input[type=search], deixando o controlo nativo mais baixo e sem os estilos dos restantes filtros.
 

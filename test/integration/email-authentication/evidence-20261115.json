@@ -1,0 +1,31 @@
+{
+  "keycloak": "26.8.0",
+  "distributionSha256": "7ed1de3fda2598369262613bf682aab7e233d80a38c405e91588f7a7454370a1",
+  "database": "isolated H2 dev-file",
+  "smtp": "loopback memory capture, no relay",
+  "checks": [
+    "isolated_keycloak_started",
+    "default_subject_and_multipart",
+    "duration_from_keycloak",
+    "unknown_account_same_response_no_email",
+    "new_password_authenticates_old_password_refused",
+    "reset_link_single_use",
+    "custom_subject_quotes_braces",
+    "custom_body_literal_arguments",
+    "html_sanitized_at_delivery",
+    "platform_logo_survives_keycloak_sanitizer",
+    "user_locale_selects_native_messages",
+    "expired_link_refused",
+    "unprivileged_service_cannot_publish",
+    "failed_publication_preserves_template"
+  ],
+  "failedChecks": [],
+  "passed": true,
+  "credentialHttpStatus": {
+    "new": 200,
+    "old": 400
+  },
+  "capturedMessages": 4,
+  "servicesStopped": true,
+  "databaseRemoved": true
+}

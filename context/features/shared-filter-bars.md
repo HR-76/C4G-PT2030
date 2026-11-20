@@ -20,7 +20,7 @@ Revisão: não transformar todas as barras em formulários idênticos. Uma estru
 - Preservar isolamento, permissões, dados e contratos HTTP; não usar fixtures como dados reais.
 - Testes focados, suite frontend, build e verificação Chrome de todos os tipos de barra em desktop/mobile. Registar limitações/falhas separadamente.
 
-Estado: Review — implementação e validação concluídas em 29/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. FilterBar em uso em 13 ficheiros. As falhas de backend registadas em 29/10 noutra área já não existem. Não repetida: a verificação no Chrome. Estado anterior: Review — implementação e validação concluídas em 29/10/2026.
 
 ## Resultado
 

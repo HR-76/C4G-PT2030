@@ -1,5 +1,6 @@
 const { tenantFailure, aggregateCleanup } = require('./tenantRuntimeErrors');
 const { sameSnapshot } = require('./tenantLeaseExecutor');
+const { measurePhase } = require('../observability/requestPhaseTiming');
 const { types: { isProxy } } = require('node:util');
 
 const INPUT_KEYS = Object.freeze(['correlationId', 'operationAdapter', 'organizationContext']);
@@ -20,15 +21,16 @@ function capabilitiesAllow(snapshot, required) {
 
 function operationAllowsSnapshot(snapshot, operation) {
   const state = snapshot.schema.compatibilityState;
-  const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest } = require('./tenantMigrationManifest');
+  const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest, accountIdentityErasureManifest } = require('./tenantMigrationManifest');
   const assignment = assignedReviewManifest.at(-1);
   const chat = applicationChatManifest.at(-1);
   const strategy = organizationStrategyManifest.at(-1);
   const taskDetails = applicationTaskDetailsManifest.at(-1);
   const deletion = documentDeletionManifest.at(-1);
   const retention = chatRetentionManifest.at(-1);
+  const erasure=accountIdentityErasureManifest.at(-1);
   const current = snapshot.schema.currentVersion;
-  const currentEntry = [chat, strategy, taskDetails, deletion, retention].find(entry => entry.version === current);
+  const currentEntry = [chat, strategy, taskDetails, deletion, retention, accountIdentityErasureManifest.at(-1)].find(entry => entry.version === current);
   const receipt = [receiptManifest.at(-1), failureReceiptManifest.at(-1)]
     .find(entry => entry.version === snapshot.schema.currentVersion);
   const compatibleVersion = receipt
@@ -40,11 +42,12 @@ function operationAllowsSnapshot(snapshot, operation) {
     : currentEntry
       ? snapshot.schema.schemaFingerprint === currentEntry.schemaFingerprint
         && snapshot.schema.verifiedCapabilities?.APPLICATION_TEAM_CHAT === true
+        && (currentEntry !== erasure || erasure.capabilities.every(code=>snapshot.schema.verifiedCapabilities?.[code]===true))
         && (currentEntry === chat || snapshot.schema.verifiedCapabilities?.ORGANIZATION_STRATEGY === true)
         && (currentEntry !== taskDetails && currentEntry !== deletion && currentEntry !== retention || snapshot.schema.verifiedCapabilities?.APPLICATION_TASK_DETAILS === true)
         && (currentEntry !== deletion && currentEntry !== retention || snapshot.schema.verifiedCapabilities?.DOCUMENT_DELETION === true)
         && (currentEntry !== retention || snapshot.schema.verifiedCapabilities?.APPLICATION_CHAT_RETENTION === true)
-        && [current, ...(currentEntry === taskDetails || currentEntry === deletion || currentEntry === retention ? [strategy.version] : []), chat.version, assignment.version, assignedReviewManifest.at(-2).version]
+        && [current, ...(currentEntry===erasure?[retention.version,deletion.version,taskDetails.version,strategy.version]:[]), ...(currentEntry === taskDetails || currentEntry === deletion || currentEntry === retention ? [strategy.version] : []), chat.version, assignment.version, assignedReviewManifest.at(-2).version]
           .some(version => operation.compatibleSchemaVersions.includes(version))
     : snapshot.schema.currentVersion === assignment.version
       ? snapshot.schema.schemaFingerprint === assignment.schemaFingerprint
@@ -109,7 +112,10 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
   }
 
   return Object.freeze({
-    async resolve(input) {
+    // Timed as a whole for the opt-in phase diagnostic; the body is unchanged.
+    resolve(input) { return measurePhase('tenant.resolve', () => resolveLease(input)); }
+  });
+  async function resolveLease(input) {
       if (!closedObject(input, INPUT_KEYS) || !validateOrganizationContext(input.organizationContext)
           || typeof input.correlationId !== 'string' || input.correlationId.trim() === '') {
         throw new TypeError('Tenant resolution input is invalid.');
@@ -141,11 +147,11 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
             workload:operationWorkload,connectionVersion: snapshot.connectionVersion, correlationId: input.correlationId });
           const credentialLease = secret;
           secret = null;
-          allocation = await poolManager.acquire({ tenantId: snapshot.tenantId, workload:operationWorkload,connectionVersion: snapshot.connectionVersion,
-            workloadClass: operation.workloadClass, credentialLease, correlationId: input.correlationId });
+          allocation = await measurePhase('tenant.acquire', () => poolManager.acquire({ tenantId: snapshot.tenantId, workload:operationWorkload,connectionVersion: snapshot.connectionVersion,
+            workloadClass: operation.workloadClass, credentialLease, correlationId: input.correlationId }));
           const current = await withinAllocationDeadline(allocation, async () => {
-            await bindingVerifier.verify({ client: allocation.client, snapshot, phase:'PREPARATION',
-              requiredCapabilities: operation.requiredCapabilities, correlationId: input.correlationId });
+            await measurePhase('tenant.verify', () => bindingVerifier.verify({ client: allocation.client, snapshot, phase:'PREPARATION',
+              requiredCapabilities: operation.requiredCapabilities, correlationId: input.correlationId }));
             return directoryRepository.resolveSnapshotByOrganization(snapshot.organizationId, operationWorkload);
           }, input.correlationId);
           if (!sameSnapshot(snapshot, current)) {
@@ -179,8 +185,7 @@ function createTenantResolver({ membershipRepository, directoryRepository, opera
         }
       }
       throw tenantFailure('RECONCILIATION_REQUIRED', 'TENANT_NOT_AVAILABLE', { correlationId: input.correlationId });
-    }
-  });
+  }
 }
 
 module.exports = { capabilitiesAllow, createTenantResolver, operationAllowsSnapshot, snapshotEligible };

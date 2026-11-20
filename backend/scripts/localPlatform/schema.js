@@ -27,8 +27,14 @@ async function inspect(pool) {
       WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema' AND c.relkind IN('r','p','v','m','S','f')) AS objects
     FROM pg_database d WHERE d.datname=current_database()`)).rows[0];
 }
-async function installSchemas(config, state, persist = () => {}) {
+// options re-address the identities and the credentials recorded for the tenant, so the same installation
+// can serve a database that the API reaches under another name (container network) and over TLS.
+const LOCAL_TARGET = Object.freeze({ apiLogin: 'c4g_local_api', workerLogin: 'c4g_local_worker', credentialRefPrefix: 'local-api',
+  credentialHost: null, credentialPort: null, credentialSsl: false, regionCode: 'LOCAL', residencyPolicyVersion: 'local-development-v1' });
+async function installSchemas(config, state, persist = () => {}, options = {}) {
   assertTarget(config);
+  const target = { ...LOCAL_TARGET, ...options };
+  const apiLogin = identifier(target.apiLogin), workerLogin = identifier(target.workerLogin);
   if (state.formatVersion !== 1 || !['PREPARED', 'INSTALLING', 'SCHEMAS_READY', 'READY'].includes(state.phase)) {
     throw Error('LOCAL_INSTALLATION_STATE_INVALID');
   }
@@ -88,24 +94,24 @@ async function installSchemas(config, state, persist = () => {}) {
     await ensureAuditPartitionsWithPool(tenant);
     await central.query(`ALTER ROLE c4g_authority_runtime PASSWORD '${state.authorityPassword}'`);
     const provisioner = await createLocalTenantIdentityProvisioner(tenant);
-    await provisioner.reconcile({ apiLogin: 'c4g_local_api', workerLogin: 'c4g_local_worker',
+    await provisioner.reconcile({ apiLogin: target.apiLogin, workerLogin: target.workerLogin,
       apiPassword: state.tenantPassword, workerPassword: state.workerPassword,
       apiRoles: ['c4g_opportunity_tenant_runtime'], workerRoles: ['c4g_import_worker_runtime'] });
-    await tenant.query(`GRANT CONNECT ON DATABASE ${database} TO c4g_local_api,c4g_local_worker`);
+    await tenant.query(`GRANT CONNECT ON DATABASE ${database} TO ${apiLogin},${workerLogin}`);
     await central.query(`REVOKE CONNECT ON DATABASE ${identifier(config.centralDatabase)} FROM PUBLIC`);
     await central.query(`GRANT CONNECT ON DATABASE ${identifier(config.centralDatabase)} TO c4g_authority_runtime`);
-    await central.query('GRANT USAGE ON SCHEMA opportunity_catalog TO c4g_f12_admin');
     await preflightCentral(central);
     const evidence = await preflightTenant(tenant, { tenantId: state.tenantId, databaseGenerationId: state.generationId }, undefined, { timeoutMs: 15000 });
-    const credentials = { tenantId: state.tenantId, credentialRef: `local-api-${state.installationId}`, connectionVersion: 1,
-      host: config.host, port: config.port, database: config.tenantDatabase, login: 'c4g_local_api', password: state.tenantPassword, ssl: false };
+    const credentials = { tenantId: state.tenantId, credentialRef: `${target.credentialRefPrefix}-${state.installationId}`, connectionVersion: 1,
+      host: target.credentialHost ?? config.host, port: target.credentialPort ?? config.port, database: config.tenantDatabase,
+      login: target.apiLogin, password: state.tenantPassword, ssl: target.credentialSsl };
     state.credentials = credentials;
     state.snapshot = { organizationId: state.organizationId, tenantId: state.tenantId, workload: 'API',
       deploymentMode: 'DATABASE_PER_ORGANIZATION', provisioningStatus: 'READY', connectionState: 'AVAILABLE',
       connectionVersion: 1, connectionRevision: 1, versionState: 'VALIDATED', databaseGenerationId: state.generationId,
       databaseRef: config.tenantDatabase, credentialRef: credentials.credentialRef,
       bindingDigest: bindingDigest({ ...credentials, workload: 'API' }), observedSystemIdentifier: evidence.systemIdentifier,
-      regionCode: 'LOCAL', residencyPolicyVersion: 'local-development-v1', fence: 0,
+      regionCode: target.regionCode, residencyPolicyVersion: target.residencyPolicyVersion, fence: 0,
       schema: { compatibilityState: 'COMPATIBLE', currentVersion: evidence.currentVersion,
         schemaFingerprint: evidence.schemaFingerprint, revision: 1,
         verifiedCapabilities: Object.fromEntries(evidence.capabilities.map(code => [code, true])) } };

@@ -3,8 +3,10 @@ import {useEffect,useMemo,useRef,useState} from 'react'
 import {Link,useParams,useLocation} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {organizationDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import {clearDirectoryCache} from './directoryCache'
 import {AreaOptions} from './OrganizationStrategy'
+import DepartmentContext,{departmentsWithProfile} from './DepartmentContext'
 import './organization-people.css'
 import './personal-profile.css'
 
@@ -12,25 +14,24 @@ const clean=value=>value.trim().normalize('NFC')
 export default function PersonalProfile(){
  const {organization,user}=useAuth(),{personId}=useParams()
  if(!organization?.id)return <p>Esta conta não tem uma entidade associada para consultar o perfil pessoal.</p>
- return <ProfileForm key={`${user?.id}:${organization.id}:${personId||'me'}`} organizationId={organization.id} personId={personId}/>
+ return <ProfileForm key={`${user?.id}:${organization.id}:${personId||'me'}`} organizationId={organization.id} personId={personId} scope={user?.id?readScope(user.id,organization.id):null}/>
 }
-export function ProfileForm({organizationId,personId,api:providedApi}){
+const formOf=profile=>profile?{biography:profile.biography,keywords:profile.keywords,thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])]}:null
+// The profile this user and organization last received is shown at once and read again. `scope` is absent where nothing may be kept.
+export function ProfileForm({organizationId,personId,api:providedApi,scope=null}){
+ const readName=`person:${personId||'me'}`,[held]=useState(()=>startConfirmedRead(scope,readName).held)
  const {search}=useLocation()
  const api=useMemo(()=>providedApi||organizationDirectoryApi(organizationId),[organizationId,providedApi])
- const [data,setData]=useState(null),[form,setForm]=useState(null),[members,setMembers]=useState(null),[membershipId,setMembershipId]=useState('')
- const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[pending,setPending]=useState(null)
+ const [data,setData]=useState(held),[form,setForm]=useState(()=>formOf(held?.profile)),[members,setMembers]=useState(null),[membershipId,setMembershipId]=useState(held?.profile?.membershipId||'')
+ const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(!held),[pending,setPending]=useState(null)
  const alive=useRef(true),generation=useRef(0)
- async function load(){const gen=++generation.current;setLoading(true);setError('');try{
-  const {data:value}=await (personId?api.person(personId):api.self());if(!alive.current||gen!==generation.current)return
+ async function load(){const gen=++generation.current,read=startConfirmedRead(scope,readName),shown=read.held;setLoading(!shown);setError('');try{
+  const {data:value}=await (personId?api.person(personId):api.self());read.keep(value);if(!alive.current||gen!==generation.current)return
   const profile=value.profile
   setData(value)
-  setForm(profile?{
-   biography:profile.biography,
-   keywords:profile.keywords,
-   thematicAreaIds:[...new Set([...profile.areaIds,...(profile.interestAreaIds??[])])]
-  }:null)
-  setMembershipId(profile?.membershipId||'')
- }catch{if(alive.current&&gen===generation.current){setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
+  // A form being edited is not replaced when the answer is the profile already on screen.
+  if(!shown||JSON.stringify(shown.profile)!==JSON.stringify(profile)){setForm(formOf(profile));setMembershipId(profile?.membershipId||'')}
+ }catch{if(alive.current&&gen===generation.current){read.drop();setData(null);setError('Não foi possível consultar o perfil. Verifique o acesso ou tente novamente.')}}finally{if(alive.current&&gen===generation.current)setLoading(false)}}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
  useEffect(()=>{alive.current=true;let active=true;Promise.resolve().then(()=>{if(active)load()});return()=>{active=false;alive.current=false;generation.current += 1}},[api,personId])
  async function send(command){setBusy(true);setError('');setNotice('');setPending(command);try{
@@ -65,6 +66,7 @@ export function ProfileForm({organizationId,personId,api:providedApi}){
   {pending&&!busy&&<button className="btn btn-primary" onClick={()=>send(pending)}>Repetir o mesmo envio</button>}
   {loading?<LoadingIndicator>A carregar o perfil…</LoadingIndicator>:data&&!data.person?<section className="detail-section"><h3>Perfil ainda não associado</h3><p>A sua conta ainda não está associada a uma pessoa nesta organização. O gestor pode fazer essa associação na ficha da pessoa.</p><Link to="/catalogo">Continuar no catálogo</Link><p>Não precisa de completar o perfil para criar uma candidatura.</p></section>:data&&<>
    <section className="detail-section"><h3>Dados pessoais</h3><dl className="dl-list"><div className="dl-row"><dt>Nome</dt><dd>{data.person.name}</dd></div><div className="dl-row"><dt>Email</dt><dd>{data.person.email||'Por indicar'}</dd></div><div className="dl-row"><dt>Função</dt><dd>{data.person.functionLabel||'Por indicar'}</dd></div><div className="dl-row"><dt>Departamentos / Unidades</dt><dd>{data.units.length?data.units.map(u=><div key={u.scopeId}>{u.label}{u.isPrimary?' · Principal':''}</div>):'Afeta à organização'}</dd></div></dl></section>
+   {departmentsWithProfile(data.departments).length>0&&<section className="detail-section" aria-label="Objetivos dos departamentos"><h3>Objetivos dos departamentos</h3><DepartmentContext departments={data.departments} areas={data.areas}/></section>}
    {!data.permissions.edit&&<p>Acesso de consulta. Sem permissão para editar este perfil.</p>}
    <form onSubmit={save}><fieldset disabled={busy||Boolean(pending)||!data.permissions.edit}>
     <section className="detail-section personal-competencies"><h3>Apresentação</h3><div className="field-grid"><label className="field field-full">Biografia<textarea rows={3} maxLength={4000} value={form.biography} onChange={e=>setForm(f=>({...f,biography:e.target.value}))}/></label><label className="field field-full">Palavras-chave<textarea rows={2} maxLength={1000} value={form.keywords} onChange={e=>setForm(f=>({...f,keywords:e.target.value}))}/></label></div></section>

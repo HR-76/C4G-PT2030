@@ -9,4 +9,11 @@ function coverageConfig(mode,currentVersion,enrichmentMode){
  if(enrichmentMode&&!enabled||enrichmentMode&&!resolutionSupported)throw Error('FUNDING_ENRICHMENT_REQUIRES_COVERAGE_AND_RESOLUTION');
  return {supported,enabled,...(require('../security/centralMigrationManifest').supportsCentralVersion(currentVersion,'034_funding_temporal_refresh')?{temporalSupported:true}:{}),...(resolutionSupported?{resolutionSupported:true}:{}),...(enrichmentMode?{enrichmentEnabled:true}:{})};
 }
-module.exports={coverageConfig};
+// The production entry point learns the coverage mode from the Central ledger, as the local runtime does at startup.
+// It only does so when the central funding runtime and an explicit coverage mode are configured; otherwise nothing changes.
+async function configuredCoverage({env,pool,preflight=db=>require('../security/centralMigrationPreflight').preflightCentral(db)}){
+ if(env.FUNDING_TENDERS_RUNTIME!=='central'||env.FUNDING_TENDERS_COVERAGE===undefined)return undefined;
+ const ready=await preflight(pool);
+ return coverageConfig(env.FUNDING_TENDERS_COVERAGE,ready.currentVersion,env.FUNDING_TENDERS_ENRICHMENT);
+}
+module.exports={coverageConfig,configuredCoverage};

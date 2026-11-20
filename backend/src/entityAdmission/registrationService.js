@@ -27,6 +27,32 @@ function createRegistrationService({coordinator,organizationReader=null,audit=re
    if(!row)fail('ONBOARDING_STALE');const result=view(row);await event(c,org,actor,input.requestId,revision,Number(row.revision));await c.query(q.remember,[org,input.requestId,actor,digest,JSON.stringify(result)]);return result;
   });}catch(error){if(error.code==='23505')fail(error.constraint==='organization_registration_pkey'?'ONBOARDING_STALE':'FISCAL_IDENTITY_REVIEW_REQUIRED');throw error;}
  }
+ async function entityWrite(write,org,value,req,trusted,authorize){
+    const actor=req.user?.id;
+    return write(org,value,actor,async c=>{if(req.authContext?.sessionId!==req.sessionID||!actor)fail('NOT_AUTHORIZED');const current=await first(c,q.session,[req.sessionID,uuid(actor)]);if(!current||current.selected_organization_id!==org||current.selected_membership_id!==trusted.actor.membershipId||Number(current.selected_membership_version)!==trusted.actor.membershipVersion||trusted.actor.id!==actor||trusted.actor.organizationId!==org||!await authorize(c,trusted,org))fail('NOT_AUTHORIZED');});
+ }
+ async function platformWrite(write,org,value,req){
+    const actor=req.user?.id;
+    return write(org,value,actor,async c=>{if(req.authContext?.sessionId!==req.sessionID||!actor||!await first(c,require('../platformOnboarding/sql').admin,[req.sessionID,uuid(actor)])||!await first(c,require('../platformOnboarding/sql').orgActive,[org]))fail('C4G_ADMIN_REQUIRED');});
+ }
+ async function changeType(org,value,actor,authorize){
+  uuid(org);const input=contract.typeCommand(value),digest=hash(JSON.stringify({operation:'TYPE',...input}));
+  return coordinator.write(['POLICY',`ORG:${org}`],async c=>{
+   await authorize(c);await identity(org);
+   const prior=await first(c,q.receipt,[org,input.requestId]);
+   if(prior){if(prior.actor_id!==actor||prior.intent_digest!==digest)fail('ONBOARDING_CONFLICT');return prior.result;}
+   const old=await first(c,q.get,[org]),revision=Number(old?.revision||0);
+   if(revision!==input.expectedRevision)fail('ONBOARDING_STALE');
+   if(!await first(c,q.changeType,[org,input.typeCode,input.expectedTypeCode]))fail('ONBOARDING_STALE');
+   const fields=JSON.stringify({typeCode:input.typeCode});
+   const row=old?await first(c,q.save,[org,fields,revision]):await first(c,q.seed,[org,fields,0,digest]);
+   if(!row)fail('ONBOARDING_STALE');
+   const result=view(row);
+   await audit(c,{actorId:actor,eventCode:'PLATFORM_REGISTRATION_CHANGED',operationId:org,resourceType:'ORGANIZATION',key:`registration:${org}:${input.requestId}`,detailCode:'ENTITY_TYPE_CHANGED',previousVersion:input.expectedTypeCode,newVersion:input.typeCode});
+   await c.query(q.remember,[org,input.requestId,actor,digest,JSON.stringify(result)]);
+   return result;
+  });
+ }
  return Object.freeze({
   // Internal composition port, never mounted as an unauthenticated HTTP handler.
   read:org=>coordinator.withAuthority(async()=>view(await first(coordinator.pool,q.get,[uuid(org)]))),
@@ -49,14 +75,10 @@ function createRegistrationService({coordinator,organizationReader=null,audit=re
    });
   },
    async profile(org){const organization=await identity(uuid(org)),row=await coordinator.withAuthority(async()=>first(coordinator.pool,q.get,[org]));return {organization,registration:view(row)||{fields:{},revision:0,updatedAt:null,source:'CENTRAL',sourceRevision:0,complete:false}};},
-   async saveForEntity(org,value,req,trusted,authorize){
-    const actor=req.user?.id;
-    return save(org,value,actor,async c=>{if(req.authContext?.sessionId!==req.sessionID||!actor)fail('NOT_AUTHORIZED');const current=await first(c,q.session,[req.sessionID,uuid(actor)]);if(!current||current.selected_organization_id!==org||current.selected_membership_id!==trusted.actor.membershipId||Number(current.selected_membership_version)!==trusted.actor.membershipVersion||trusted.actor.id!==actor||trusted.actor.organizationId!==org||!await authorize(c,trusted,org))fail('NOT_AUTHORIZED');});
-   },
-   async saveForPlatform(org,value,req){
-    const actor=req.user?.id;
-    return save(org,value,actor,async c=>{if(req.authContext?.sessionId!==req.sessionID||!actor||!await first(c,require('../platformOnboarding/sql').admin,[req.sessionID,uuid(actor)])||!await first(c,require('../platformOnboarding/sql').orgActive,[org]))fail('C4G_ADMIN_REQUIRED');});
-   },
+   saveForEntity:(org,value,req,trusted,authorize)=>entityWrite(save,org,value,req,trusted,authorize),
+   saveForPlatform:(org,value,req)=>platformWrite(save,org,value,req),
+   typeForEntity:(org,value,req,trusted,authorize)=>entityWrite(changeType,org,value,req,trusted,authorize),
+   typeForPlatform:(org,value,req)=>platformWrite(changeType,org,value,req),
   // Administrative migration caller must hold the tenant profile lock through this call.
   async adoptContacts(org,snapshot,req){
    uuid(org);if(!snapshot||!Number.isSafeInteger(snapshot.revision)||snapshot.revision<0||typeof snapshot.email!=='string'||typeof snapshot.website!=='string')fail('ONBOARDING_INPUT_INVALID');

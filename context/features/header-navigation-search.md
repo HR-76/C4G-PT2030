@@ -13,3 +13,7 @@ Estado: Review. Pedido de 10/11/2026: barra inspirada no Metronic, com menu pess
 5 testes focados de cabeçalho e perfil lateral e build frontend passaram em 10/11/2026. Validação visual em navegador e teclado real pendente. A pesquisa não inclui faturação de cliente, cuja visibilidade depende de uma verificação de acesso própria.
 
 10/11/2026 — Revisão transversal: Pesquisa centrada, fecho por Escape, regresso ao botão com foco visível e menu pessoal confirmados em Chrome. Administração de fontes fica disponível apenas na pesquisa da Administração C4G. Ver [relatório](../reviews/metronic-shared-surfaces-20261110.md).
+
+## Nome da entidade em ecrãs estreitos (19/11/2026)
+
+Pedido do utilizador: até 768 px, o rótulo «Entidade» deixa a barra superior, onde ficava encostado à pesquisa, ao sino e ao menu pessoal. O nome da entidade passa a aparecer dentro do menu pessoal nessa largura. Acima de 768 px nada muda. Só CSS e uma linha no menu; lint, build e suite frontend aprovados; sem browser.

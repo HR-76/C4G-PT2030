@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { opportunityInterestsApi as api } from '../../api/api'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import FormModal from '../../components/FormModal'
 import { opportunityDisplay } from '../Opportunities/opportunityReadModel'
 import UnitSelector from './UnitSelector'
@@ -11,26 +12,51 @@ import './interests.css'
 
 const InterestContext = createContext(null)
 export const useCatalogInterests = () => useContext(InterestContext)
-export default function CatalogInterests({ organization, items, catalogApi, children }) {
+export default function CatalogInterests({ organization, items, catalogApi, handOver = false, children }) {
   const { user } = useAuth()
   if (!organization) return children
-  return <CatalogContext key={`${user?.id}:${organization.id}`} userId={user?.id} organizationId={organization.id} items={items} catalogApi={catalogApi}>{children}</CatalogContext>
+  return <CatalogContext key={`${user?.id}:${organization.id}`} userId={user?.id} organizationId={organization.id} items={items} catalogApi={catalogApi} handOver={handOver}>{children}</CatalogContext>
 }
-function CatalogContext({ userId, organizationId, items, catalogApi, children }) {
-  const [summaries, setSummaries] = useState({}), [capabilities, setCapabilities] = useState(null), [state, setState] = useState('loading'), [refresh, setRefresh] = useState(0)
+function CatalogContext({ userId, organizationId, items, catalogApi, handOver, children }) {
+  // What this user and organization last received is shown at once and read again.
+  const scope = userId ? readScope(userId, organizationId) : null
+  const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
+  const summariesName = ids ? `interest-summaries:${ids}` : null
+  const [heldSummaries] = useState(() => startConfirmedRead(scope, summariesName).held)
+  const [summaries, setSummaries] = useState(heldSummaries || {}), [capabilities, setCapabilities] = useState(() => startConfirmedRead(scope, 'interest-capabilities').held), [state, setState] = useState(heldSummaries ? 'ready' : 'loading'), [refresh, setRefresh] = useState(0)
+  // True once the server answered the permissions during this entry.
+  const confirmed = useRef(false), contextRequest = useRef(null)
   const [selection, setSelection] = useState(null), [units, setUnits] = useState([]), [unitIds, setUnitIds] = useState([]), [opening, setOpening] = useState(false), [openError, setOpenError] = useState('')
   const [transversal,setTransversal]=useState(false), [notes,setNotes]=useState('')
   const scopeChosen=transversal || unitIds.length>0
-  const alive = useRef(true), epoch = useRef(0), openMutex = useRef(false), location = useLocation()
+  const alive = useRef(true), epoch = useRef(0), openMutex = useRef(false), location = useLocation(), navigate = useNavigate()
   const returnFocusRef = useRef(null)
-  const ids = [...new Set(items.map(item => item.opportunityId).filter(Boolean))].join(',')
   const command = useInterestCommand(userId, organizationId, data => { setSelection(null); setSummaries(previous => ({ ...previous, [data.opportunityId]: data })) })
   useEffect(() => { alive.current = true; return () => { alive.current = false; epoch.current += 1 } }, [])
   useEffect(() => { epoch.current += 1; openMutex.current = false; setOpening(false); setSelection(null); setOpenError('') }, [ids, location.pathname, location.search])
+  // The permissions do not depend on the rows, so they are asked for together
+  // with the list and «Iniciar candidatura» appears with the table. Permissions
+  // already confirmed are shown at once; the summaries answer confirms them again.
   useEffect(() => {
-    let active = true; const controller = new AbortController(); setState('loading'); setSummaries({}); setCapabilities(null)
+    const read = startConfirmedRead(scope, 'interest-capabilities')
+    if (read.held) { setCapabilities(read.held); return }
+    let active = true; const controller = new AbortController()
+    const request = Promise.resolve().then(() => api.context(organizationId, controller.signal)).then(({ data }) => {
+      const value = data?.capabilities || data
+      if (typeof value?.canRegister !== 'boolean') return null
+      read.keep(value)
+      if (active && !confirmed.current) { confirmed.current = true; setCapabilities(value) }
+      return value
+    }).catch(() => null)
+    contextRequest.current = request
+    return () => { active = false; controller.abort(); if (contextRequest.current === request) contextRequest.current = null }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
+  }, [organizationId, refresh])
+  useEffect(() => {
+    let active = true; const controller = new AbortController(), read = startConfirmedRead(scope, summariesName), known = startConfirmedRead(scope, 'interest-capabilities')
+    setState(read.held ? 'ready' : 'loading'); setSummaries(read.held || {})
     if (!ids) return
-    async function read() {
+    async function load() {
       try {
         let permissions
         const expected = ids ? ids.split(',') : [], result = {}
@@ -48,15 +74,38 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
           }
         }
         // Older API versions return only the items in a summaries response.
+        if (!permissions) permissions = await contextRequest.current
         if (!permissions) {
           const context = (await api.context(organizationId, controller.signal)).data
           permissions = context.capabilities || context
         }
-        if (active) { setCapabilities(permissions); setSummaries(result); setState('ready') }
-      } catch { if (active) setState('error') }
+        known.keep(permissions); read.keep(result)
+        if (active) { confirmed.current = true; setCapabilities(permissions); setSummaries(result); setState('ready') }
+      } catch {
+        if (!active) return
+        // Permissions the server did not confirm in this entry are not kept.
+        read.drop(); setSummaries({})
+        if (!confirmed.current) { known.drop(); setCapabilities(null) }
+        setState('error')
+      }
     }
-    read(); return () => { active = false; controller.abort() }
+    load(); return () => { active = false; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the read name follow ids.
   }, [ids, organizationId, refresh])
+  // Starts an application straight from the opportunities table, without a registered interest.
+  async function startApplication(item) {
+    if (openMutex.current || command.pending || command.blocked || !capabilities?.canCreateApplication) return
+    openMutex.current = true; setOpening(true); setOpenError(''); const token = ++epoch.current
+    try {
+      const { data } = await catalogApi.get(item.opportunityId)
+      if (!alive.current || token !== epoch.current) return
+      if (data.opportunityId !== item.opportunityId || !data.revisionId || (data.lifecycleState || data.snapshot?.lifecycleState) === 'ARCHIVED') throw Error('Unavailable')
+      navigate('/candidaturas?' + new URLSearchParams({ nova: '1', origem: 'CENTRAL', oportunidade: item.opportunityId, revisao: data.revisionId, retorno: safeInterestReturn(location.pathname + location.search, '/catalogo') }),
+        // The form shows the record just read instead of reading it again; the server still checks the revision on creation.
+        handOver ? { state: { centralOpportunity: { record: data, readAt: Date.now() } } } : undefined)
+    } catch { if (alive.current && token === epoch.current) setOpenError('Não foi possível preparar a candidatura. Tente novamente.') }
+    finally { openMutex.current = false; if (alive.current && token === epoch.current) setOpening(false) }
+  }
   async function open(item) {
     if (openMutex.current || command.pending || command.blocked || !capabilities?.canRegister || state !== 'ready') return
     returnFocusRef.current = document.activeElement
@@ -70,7 +119,7 @@ function CatalogContext({ userId, organizationId, items, catalogApi, children })
     finally { if (alive.current && token === epoch.current) { openMutex.current = false; setOpening(false) } }
   }
   const returnTo = safeInterestReturn(location.pathname + location.search, '/catalogo')
-  const value = { summaries, capabilities, state, open, busy: opening || command.busy || Boolean(command.pending) || command.blocked, returnTo }
+  const value = { summaries, capabilities, state, open, startApplication, busy: opening || command.busy || Boolean(command.pending) || command.blocked, returnTo }
   const feedback = <>{command.error && <p role="alert">{command.error}</p>}{command.pending && <p role="status">Existe um envio por confirmar. <button type="button" className="btn btn-outline" disabled={command.busy || state !== 'ready'} onClick={command.retry}>Confirmar envio pendente</button></p>}</>
   return <InterestContext.Provider value={value}>
     {state === 'error' && <p role="alert">Não foi possível consultar os interesses da organização. <button className="btn btn-outline btn-sm" onClick={() => setRefresh(value => value + 1)}>Repetir consulta de interesses</button></p>}

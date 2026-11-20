@@ -15,8 +15,27 @@ function dashboardProjection(report,central,privateSummary,catalogDay=report.tod
   recent_opportunities:[...central.recent,...privateSummary.recent].sort((a,b)=>(a.closing_date==null)-(b.closing_date==null)||String(a.closing_date||'').localeCompare(String(b.closing_date||''))||a.id.localeCompare(b.id)).slice(0,10),
   unit_totals:report.unitsAvailable?report.units.map(unit=>({...unit,...(report.unitMetrics.find(row=>row.unitId===unit.unitId)?.metrics||emptyMetrics())})):null};
 }
-function createOrganizationDashboardRouter({express,applications,opportunities,central,authenticate,organizationMiddleware,clock=()=>new Date()}){
+// The central catalogue summary is public catalogue data: the same answer for
+// every organization and user. One answer per reference day is reused for a
+// short period, and simultaneous dashboards share one read, so each opening
+// does not scan the whole catalogue again. A failed read is never kept. The
+// organization's own data is never reused: it is read on every request.
+function reuseCentralSummary(read,reuseMs,now){
+ if(!(reuseMs>0))return read;
+ let held=null,pending=null;
+ return (today,asOf)=>{
+  if(held&&held.today===today&&now()-held.at<reuseMs)return Promise.resolve(held.value);
+  if(pending&&pending.today===today)return pending.promise;
+  const promise=Promise.resolve().then(()=>read(today,asOf)).then(value=>{held={today,value,at:now()};return value;})
+   .finally(()=>{if(pending&&pending.promise===promise)pending=null;});
+  pending={today,promise};
+  return promise;
+ };
+}
+function createOrganizationDashboardRouter({express,applications,opportunities,central,authenticate,organizationMiddleware,clock=()=>new Date(),
+ centralSummaryReuseMs=0,centralSummaryNow=()=>Date.now()}){
  const router=express.Router();
+ const centralSummary=reuseCentralSummary((today,asOf)=>central.dashboardSummary(today,asOf),centralSummaryReuseMs,centralSummaryNow);
  router.use(authenticate,organizationMiddleware.requireServerSession,organizationMiddleware.resolveOrganizationContext,requireApplicationOrganizationContext(organizationMiddleware));
  router.get('/:organizationId/dashboard/summary',async(req,res)=>{
   const disconnected=()=>req.aborted||res.destroyed;
@@ -33,7 +52,7 @@ function createOrganizationDashboardRouter({express,applications,opportunities,c
    // Read the central catalogue first. Both tenant summaries then share one
    // protected lease, including all application/opportunity/directory checks
    // and the existing final authority guard. Never leave sibling work running.
-   const publicSummary=await central.dashboardSummary(today,asOf);
+   const publicSummary=await centralSummary(today,asOf);
    if(disconnected())return;
    const {report,privateSummary}=await applications.execute('dashboard',{today,asOf},null,req);
    if(disconnected())return;

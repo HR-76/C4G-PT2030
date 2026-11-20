@@ -13,12 +13,14 @@ import { OpportunityReadModelDetails } from '../Opportunities/OpportunityReadMod
 import UnitSelector, { unitLabel } from './UnitSelector'
 import useInterestCommand, { interestError } from './useInterestCommand'
 import { safeInterestReturn } from './intentions'
-import ApplicationAreaNav, { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
+import { ApplicationAreaHeader } from '../Applications/ApplicationAreaNav'
 import './interests.css'
 
 const date = value => value ? new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleDateString('pt-PT') : 'Não indicado'
 const sourceUrl = value => { try { const url = new URL(value); return ['https:','http:'].includes(url.protocol) ? url.href : null } catch { return null } }
 const canPrepareApplication = item => item?.status === 'ACTIVE' && item.capabilities?.canManage === true && item.capabilities?.canCreateApplication === true
+// The form shows what was just read instead of reading it again; the server still checks both revisions on creation.
+const applicationFormState = (interest, interestReadAt, opportunity) => ({ state: { centralOpportunity: { record: opportunity, readAt: Date.now() }, ...(interestReadAt ? { sourceInterest: { record: interest, readAt: interestReadAt } } : {}) } })
 const applicationFormTarget = (interest, opportunity, returnTo) => `/candidaturas?${new URLSearchParams({ nova: '1', origem: 'CENTRAL', oportunidade: interest.opportunityId, revisao: opportunity.revisionId, interesse: interest.interestId, interesseRevisao: String(interest.revision), retorno: safeInterestReturn(returnTo) })}`
 function Units({ unitIds = [], units = [], transversal = false }) {
   if (!unitIds.length) return <span>{transversal?'Interesse transversal à C4G':'Sem unidade atribuída'}</span>
@@ -39,7 +41,7 @@ function InterestList({ userId, organizationId, organization }) {
   const q = params.get('q') || '', unitId = params.get('unitId') || '', status = params.get('status') || 'ACTIVE', cursor = params.get('cursor') || ''
   // The first page of a query already confirmed is shown at once and read again.
   const scope = readScope(userId, organizationId), listName = cursor ? null : `interests:${JSON.stringify([q, unitId, status])}`
-  const [draft, setDraft] = useState({ q, unitId, status }), [data, setData] = useState(() => startConfirmedRead(scope, listName).held), [units, setUnits] = useState([])
+  const [draft, setDraft] = useState({ q, unitId, status }), [data, setData] = useState(() => startConfirmedRead(scope, listName).held), [units, setUnits] = useState(() => startConfirmedRead(scope, 'interest-filter-units').held || [])
   const [loading, setLoading] = useState(!data), [error, setError] = useState(''), [unitError, setUnitError] = useState(''), [refresh, setRefresh] = useState(0)
   const command = useInterestCommand(userId, organizationId, () => setRefresh(value => value + 1))
   const openingRequest = useRef(null), [openingId, setOpeningId] = useState(null), [openingError, setOpeningError] = useState('')
@@ -57,10 +59,12 @@ function InterestList({ userId, organizationId, organization }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; listName, scope are read at that moment.
   }, [organizationId, q, unitId, status, cursor, refresh])
   useEffect(() => {
-    let active = true; const controller = new AbortController(); setUnitError('')
-    api.units({ purpose: 'FILTER' }, organizationId, controller.signal).then(({ data }) => { if (active) { if (!Array.isArray(data.items)) throw Error('Invalid units'); setUnits(data.items) } })
-      .catch(() => { if (active) setUnitError('Não foi possível consultar os filtros de unidades.') })
+    let active = true; const controller = new AbortController(), read = startConfirmedRead(scope, 'interest-filter-units'); setUnitError('')
+    if (read.held) setUnits(read.held)
+    api.units({ purpose: 'FILTER' }, organizationId, controller.signal).then(({ data }) => { if (!Array.isArray(data.items)) throw Error('Invalid units'); read.keep(data.items); if (active) setUnits(data.items) })
+      .catch(() => { if (active) { read.drop(); setUnits([]); setUnitError('Não foi possível consultar os filtros de unidades.') } })
     return () => { active = false; controller.abort() }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   }, [organizationId, refresh])
   function changePage(next) {
     const copy = new URLSearchParams(params), trail = copy.getAll('previous'); copy.delete('previous')
@@ -70,16 +74,14 @@ function InterestList({ userId, organizationId, organization }) {
     setParams(copy)
   }
   function applyFilters(values) {
-    const next = new URLSearchParams(values)
-    if (location.pathname === '/candidaturas') next.set('ver', 'interesses')
-    setParams(next)
+    setParams(new URLSearchParams(values))
   }
   async function prepareApplication(item) {
     if (openingRequest.current || loading || commandLocked || !canPrepareApplication(item)) return
     const controller = new AbortController(), current = () => openingRequest.current === controller && !controller.signal.aborted
     openingRequest.current = controller; setOpeningId(item.interestId); setOpeningError('')
     try {
-      const { data: interest } = await api.get(item.interestId, organizationId, controller.signal)
+      const { data: interest } = await api.get(item.interestId, organizationId, controller.signal), interestReadAt = Date.now()
       if (!current()) return
       if (interest?.interestId !== item.interestId || interest.opportunityId !== item.opportunityId || !Number.isSafeInteger(interest.revision) || interest.revision < 1) throw Error('Unavailable interest')
       setData(previous => previous && ({ ...previous, items: previous.items.map(row => row.interestId === item.interestId ? interest : row) }))
@@ -89,13 +91,12 @@ function InterestList({ userId, organizationId, organization }) {
       const { data: opportunity } = await centralOpportunitiesApi.get(interest.opportunityId, controller.signal)
       if (!current()) return
       if (opportunity?.opportunityId !== interest.opportunityId || !opportunity.revisionId || (opportunity.lifecycleState || opportunity.snapshot?.lifecycleState) === 'ARCHIVED') throw Error('Unavailable opportunity')
-      navigate(applicationFormTarget(interest, opportunity, location.pathname + location.search))
+      navigate(applicationFormTarget(interest, opportunity, location.pathname + location.search), applicationFormState(interest, interestReadAt, opportunity))
     } catch (error) {
       if (current()) setOpeningError([401, 403, 404].includes(error?.response?.status) ? interestError(error) : 'Não foi possível preparar a candidatura. Tente novamente para consultar os dados atuais.')
     } finally { if (current()) { openingRequest.current = null; setOpeningId(null) } }
   }
-  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses da organização"><Link className="btn btn-outline" to="/catalogo">Catálogo C4G</Link></ApplicationAreaHeader>
-    <ApplicationAreaNav/>
+  return <main className="page interests-page"><ApplicationAreaHeader organization={organization} title="Interesses"><Link className="btn btn-outline" to="/catalogo">Oportunidades</Link><Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link></ApplicationAreaHeader>
     <Feedback command={command}/>
     <FilterBar as="form" onSubmit={event => { event.preventDefault(); applyFilters(Object.fromEntries(Object.entries(draft).filter(([,value]) => value))) }}>
       <label className="filter-search">Pesquisar<SearchInput maxLength={200} value={draft.q} onChange={event => setDraft(previous => ({ ...previous, q: event.target.value }))}/></label>
@@ -115,11 +116,17 @@ function InterestList({ userId, organizationId, organization }) {
   </main>
 }
 function InterestDetail({ id, userId, organizationId }) {
+  const { organization: sessionOrganization } = useAuth()
   const [params] = useSearchParams(), location = useLocation(), navigate = useNavigate(), alive = useRef(true), generation = useRef(0), openingMutex = useRef(false)
   const [opening, setOpening] = useState(false)
-  const [record, setRecord] = useState(null), [history, setHistory] = useState([]), [historyNext, setHistoryNext] = useState(null), [historyBusy, setHistoryBusy] = useState(false)
-  const [units, setUnits] = useState([]), [unitsReady, setUnitsReady] = useState(false), [unitsLoading, setUnitsLoading] = useState(false), [notes, setNotes] = useState(''), [unitIds, setUnitIds] = useState([]), [archiveOpen, setArchiveOpen] = useState(false), [reason, setReason] = useState('')
-  const [loading, setLoading] = useState(true), [error, setError] = useState(''), [unitError, setUnitError] = useState(''), [refresh, setRefresh] = useState(0), [notice, setNotice] = useState('')
+  // The record and first history page this user and organization last received are shown at once and read again.
+  const scope = readScope(userId, organizationId), readName = `interest:${id}`
+  const [held] = useState(() => startConfirmedRead(scope, readName).held)
+  // When the server last answered this record during this entry; a record only shown from memory has none.
+  const confirmedAt = useRef(null)
+  const [record, setRecord] = useState(held?.record || null), [history, setHistory] = useState(held?.history.items || []), [historyNext, setHistoryNext] = useState(held?.history.nextCursor || null), [historyBusy, setHistoryBusy] = useState(false)
+  const [units, setUnits] = useState([]), [unitsReady, setUnitsReady] = useState(false), [unitsLoading, setUnitsLoading] = useState(false), [notes, setNotes] = useState(held?.record.notes || ''), [unitIds, setUnitIds] = useState(held?.record.unitIds || []), [archiveOpen, setArchiveOpen] = useState(false), [reason, setReason] = useState('')
+  const [loading, setLoading] = useState(!held), [error, setError] = useState(''), [unitError, setUnitError] = useState(''), [refresh, setRefresh] = useState(0), [notice, setNotice] = useState('')
   const command = useInterestCommand(userId, organizationId, () => { generation.current += 1; setArchiveOpen(false); setNotice('Alteração guardada.'); setRefresh(value => value + 1) })
   async function loadUnits(data, token, signal) {
     const current = () => alive.current && token === generation.current
@@ -133,15 +140,23 @@ function InterestDetail({ id, userId, organizationId }) {
   }
   useEffect(() => { alive.current = true; return () => { alive.current = false; generation.current += 1 } }, [])
   useEffect(() => {
-    const token = ++generation.current, controller = new AbortController(); setLoading(true); setError(''); setUnitError(''); setRecord(null); setUnitsReady(false)
+    const token = ++generation.current, controller = new AbortController(), read = startConfirmedRead(scope, readName), shown = read.held
+    setLoading(!shown); setError(''); setUnitError(''); setUnitsReady(false); confirmedAt.current = null
+    if (shown) { setRecord(shown.record); setNotes(shown.record.notes || ''); setUnitIds(shown.record.unitIds || []); setHistory(shown.history.items); setHistoryNext(shown.history.nextCursor) } else setRecord(null)
     const current = () => alive.current && token === generation.current
     async function load() {
       try {
         const [{ data }, { data: events }] = await Promise.all([api.get(id, organizationId, controller.signal), api.history(id, {}, organizationId, controller.signal)])
+        read.keep({ record: data, history: { items: events.items, nextCursor: events.nextCursor } })
         if (!current()) return
-        setRecord(data); setNotes(data.notes || ''); setUnitIds(data.unitIds || []); setHistory(events.items); setHistoryNext(events.nextCursor)
-        if (data.capabilities?.canManage && data.status === 'ACTIVE') await loadUnits(data, token, controller.signal)
-      } catch (e) { if (current()) setError(interestError(e)) }
+        confirmedAt.current = Date.now()
+        setRecord(data); setHistory(events.items); setHistoryNext(events.nextCursor)
+        // An analysis being edited is not replaced when the answer is the revision already on screen.
+        if (shown?.record.revision !== data.revision) { setNotes(data.notes || ''); setUnitIds(data.unitIds || []) }
+        setLoading(false)
+        // The units only serve the analysis form: the record does not wait for them.
+        if (data.capabilities?.canManage && data.status === 'ACTIVE') loadUnits(data, token, controller.signal)
+      } catch (e) { if (current()) { read.drop(); if (shown) { setRecord(null); setHistory([]); setHistoryNext(null) } setError(interestError(e)) } }
       finally { if (current()) setLoading(false) }
     }
     load(); return () => { controller.abort(); generation.current += 1 }
@@ -162,7 +177,7 @@ function InterestDetail({ id, userId, organizationId }) {
       const { data } = await centralOpportunitiesApi.get(record.opportunityId)
       if (!alive.current || token !== generation.current) return
       if (data.opportunityId !== record.opportunityId || !data.revisionId || (data.lifecycleState || data.snapshot?.lifecycleState) === 'ARCHIVED') throw Error('Unavailable')
-      navigate(applicationFormTarget(record, data, location.pathname + location.search))
+      navigate(applicationFormTarget(record, data, location.pathname + location.search), applicationFormState(record, confirmedAt.current, data))
     } catch { if (alive.current && token === generation.current) setError('Não foi possível consultar a oportunidade atual. Tente novamente antes de abrir a candidatura.') }
     finally { openingMutex.current = false; if (alive.current && token === generation.current) setOpening(false) }
   }
@@ -180,9 +195,9 @@ function InterestDetail({ id, userId, organizationId }) {
       </form> : <><p className="pre-wrap">{record.notes || 'Sem notas.'}</p><Units transversal={record.transversal} unitIds={record.unitIds} units={record.units}/></>}</section>
       <section className="detail-section"><h2>Oportunidade</h2>{model ? <OpportunityReadModelDetails readModel={model} fields={snapshot}/> : <dl className="interest-source"><dt>Referência</dt><dd>{snapshot.callReference || 'Não indicada'}</dd><dt>Programa</dt><dd>{snapshot.programmeName || 'Não indicado'}</dd><dt>Financiador</dt><dd>{snapshot.funderName || 'Não indicado'}</dd><dt>Abertura</dt><dd>{date(snapshot.openingDate)}</dd><dt>Prazo oficial</dt><dd>{date(snapshot.closingDate)}</dd></dl>}
         {snapshot.sourceTemporal?.deadlines?.length > 1 && <><h3>Prazos publicados</h3><ul>{snapshot.sourceTemporal.deadlines.map(value => <li key={value}><time dateTime={value}>{value.length === 10 ? date(value) : new Date(value).toLocaleString('pt-PT')}</time></li>)}</ul></>}
-        <div className="form-actions"><Link className="btn btn-outline" to={`/catalogo/${record.opportunityId}`}>Consultar oportunidade</Link>{official && <a className="btn btn-outline" href={official} target="_blank" rel="noopener noreferrer">Fonte oficial</a>}<Link className="btn btn-outline" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link></div>
+        <div className="form-actions"><Link className="btn btn-outline" to={`/catalogo/${record.opportunityId}`}>Consultar oportunidade</Link>{official && <a className="btn btn-outline" href={official} target="_blank" rel="noopener noreferrer">Fonte oficial</a>}{sessionOrganization?.navigation?.people===true&&<Link className="btn btn-outline" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}</div>
       </section>
-      <div id="candidaturas-do-interesse" tabIndex={-1}><OpportunityApplications organizationId={organizationId} opportunityId={record.opportunityId}/></div>
+      <div id="candidaturas-do-interesse" tabIndex={-1}><OpportunityApplications afterPage organizationId={organizationId} opportunityId={record.opportunityId}/></div>
       <section className="detail-section"><h2>Histórico</h2><ol className="interest-history">{history.map(item => <li key={item.revision}>Revisão {item.revision} · {({ CREATE:'Interesse registado',REGISTER:'Interesse registado',EDIT:'Análise alterada',ARCHIVE:'Interesse arquivado' })[item.action || item.kind] || 'Alteração'} · {date(item.recordedAt || item.createdAt)}{item.reason && <p>{item.reason}</p>}<details><summary>Dados desta revisão</summary><p className="pre-wrap">{item.notes || 'Sem notas.'}</p><Units transversal={item.transversal} unitIds={item.unitIds} units={item.units}/></details></li>)}</ol>{historyNext && <button className="btn btn-secondary" disabled={historyBusy} onClick={moreHistory}>Mais histórico</button>}</section>
     </>}
     {archiveOpen && record && <FormModal title="Arquivar interesse" locked={locked} onClose={() => setArchiveOpen(false)}><form onSubmit={event => { event.preventDefault(); command.submit('archive', id, { reason: reason.trim(), expectedRevision: record.revision }) }}><Feedback command={command}/><p>As candidaturas associadas mantêm-se. O interesse fica disponível no histórico.</p><label>Motivo<textarea required maxLength={500} value={reason} disabled={locked} onChange={event => setReason(event.target.value)}/></label><div className="form-actions"><button type="button" className="btn btn-secondary" disabled={locked} onClick={() => setArchiveOpen(false)}>Cancelar</button><button className="btn btn-primary" disabled={locked || !reason.trim()}>Confirmar arquivo</button></div></form></FormModal>}

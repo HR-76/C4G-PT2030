@@ -4,6 +4,7 @@ const {match,version}=require('./thematicAreas');
 const dayFormatter=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Lisbon',year:'numeric',month:'2-digit',day:'2-digit'});
 function civilToday(value){return dayFormatter.format(value);}
 const {projectMatchOpportunity,currentForMatching}=require('./matchingProjection');
+const {measurePhase}=require('../observability/requestPhaseTiming');
 async function pages(read){
  const all=[],seen=new Set();let cursor,pageCount=0;
  do{const page=await read(cursor?{cursor}:{});pageCount++;if(!Array.isArray(page?.items))fail('SERVICE_UNAVAILABLE');
@@ -12,7 +13,27 @@ async function pages(read){
   if(cursor&&pageCount>=1001)fail('LIMIT_EXCEEDED');
  }while(cursor);return all;
 }
-function createOrganizationMatching({directory,opportunities,central,clock=()=>new Date()}){
+// The central catalogue is public catalogue data, the same for every
+// organization and user. Its pages are read once and reused for a short period,
+// and simultaneous matchings share one read, so each calculation does not read
+// the whole catalogue again. A failed read is never kept. The person, the
+// private opportunities and the final authority revalidation are never reused.
+function reuseCentralPages(read,reuseMs,now){
+ if(!(reuseMs>0))return read;
+ let held=null,pending=null;
+ return ()=>{
+  if(held&&now()-held.at<reuseMs)return Promise.resolve(held.items);
+  if(pending)return pending;
+  const request=Promise.resolve().then(read).then(items=>{held={items:Object.freeze(items),at:now()};return held.items;})
+   .finally(()=>{if(pending===request)pending=null;});
+  pending=request;
+  return request;
+ };
+}
+function createOrganizationMatching({directory,opportunities,central,clock=()=>new Date(),centralPagesReuseMs=0,centralPagesNow=()=>Date.now()}){
+ // A reader with a dedicated matching read skips what the catalogue listing computes only for its own page.
+ const centralList=q=>typeof central.listForMatching==='function'?central.listForMatching(q):central.list(q);
+ const centralPages=reuseCentralPages(()=>pages(centralList),centralPagesReuseMs,centralPagesNow);
  return {async execute(query,request){
   if(Object.keys(query).some(k=>!['personId','opportunityId','origin'].includes(k)))fail('INVALID_INPUT');
   const byOpportunity=Boolean(query.opportunityId);
@@ -31,10 +52,12 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    if(!snapshot)fail('SERVICE_UNAVAILABLE');
    return projectMatchOpportunity(detail,{origin,opportunityId,asOf});
   };
-  let items;
+  let items,privateIncluded=true;
   const today=civilToday(new Date(asOf));
   if(byOpportunity){
-   const opportunity=await load(query.origin,query.opportunityId),people=await pages(q=>directory.execute('peopleWithResearchAreas',q,null,request));
+   const opportunity=await load(query.origin,query.opportunityId);
+   // Without organisation-wide people access the answer is a clear refusal, not a dependency failure.
+   const people=await pages(q=>directory.execute('peopleWithResearchAreas',q,null,request)).catch(error=>{if(['AUTHORITY_DENIED','AUTHORIZATION_DENIED','NOT_AUTHORIZED'].includes(error?.code))fail('NOT_AUTHORIZED');throw error;});
    items=[];
    for(const person of people){
     if(!Array.isArray(person.areaIds))fail('SERVICE_UNAVAILABLE');
@@ -45,18 +68,20 @@ function createOrganizationMatching({directory,opportunities,central,clock=()=>n
    items.sort((a,b)=>b.matchedAreas.length-a.matchedAreas.length||a.name.localeCompare(b.name,'pt')||a.personId.localeCompare(b.personId));
   }else{
    if(!central)fail('SERVICE_UNAVAILABLE');
+   // A technician has no organization-wide read of private opportunities: match against the catalog only.
+   privateIncluded=typeof directory.canReadPrivateOpportunities==='function'?await directory.canReadPrivateOpportunities(request)===true:true;
    const privateList=typeof opportunities.listForMatching==='function'?opportunities.listForMatching.bind(opportunities):opportunities.list.bind(opportunities);
-   const [publicItems,privateItems]=await Promise.all([pages(q=>central.list(q)),pages(q=>privateList(q,request))]),all=[];
+   const [publicItems,privateItems]=await Promise.all([measurePhase('matching.central',()=>centralPages()),privateIncluded?measurePhase('matching.private',()=>pages(q=>privateList(q,request))):Promise.resolve([])]),all=[];
    for(const [origin,list] of [['CENTRAL',publicItems],['PRIVATE',privateItems]]){
     for(const item of list){if(currentForMatching(item,today))all.push(item.snapshot||item.readModel?
       projectMatchOpportunity(item,{origin,opportunityId:item.opportunityId,asOf}):await load(origin,item.opportunityId));}
    }
-   items=match({...initial.person,areaIds:initial.profile.areaIds},all,today);
+   items=measurePhase('matching.match',()=>match({...initial.person,areaIds:initial.profile.areaIds},all,today));
   }
   // Revalidate authority after all source reads; never publish a result from an old context.
   const current=await directory.execute(byOpportunity?'context':id?'person':'self',{},id,request);
   if(!byOpportunity&&(!current?.person||!Array.isArray(current.profile?.areaIds)||JSON.stringify({active:current.person.active,areas:[...current.profile.areaIds].sort()})!==initialMatchingProfile))fail('CONTEXT_CHANGED');
-  return {state:'READY',person:initial.person||null,items,areaCatalogVersion:version,
+  return {state:'READY',person:initial.person||null,items,areaCatalogVersion:version,...(byOpportunity?{}:{privateIncluded}),
    explanation:'Áreas sugeridas por palavras-chave, cruzadas com as áreas da pessoa. Não determina elegibilidade.'};
  }};
 }

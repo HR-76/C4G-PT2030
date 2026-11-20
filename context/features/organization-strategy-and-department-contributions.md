@@ -56,6 +56,68 @@
 - Build Vite aprovado. Suite frontend com 953 testes aprovados. Suite backend com 2930 aprovados e 7 ignorados, seguida de verificação focada do relatório e da consulta SQL.
 - Em 11/11/2026, confirmação no ambiente habitual com sessão OIDC de Admin da entidade (`ORG_ADMIN`), em Chromium a 1440 e 390 px. O modal abriu, a adição em rascunho focou o novo objetivo e Escape devolveu o foco ao botão. O Dashboard devolveu HTTP 200 e o total de 1 candidatura em preparação coincidiu com a lista filtrada. A organização tinha zero objetivos configurados, pelo que o painel apresentou o estado de configuração em falta. A distribuição por objetivo foi validada com os dados fictícios descritos acima. A verificação habitual foi feita em consulta.
 
+### Ligação da candidatura a objetivos (18/11/2026, em Review)
+
+Decisões do utilizador em 18/11/2026: guardar a ligação na estratégia já existente, sem migração nova; a ligação manual soma-se à correspondência automática; uma candidatura pode apoiar vários objetivos.
+
+- No **Resumo** da ficha da candidatura, a secção **Objetivos estratégicos** lista os objetivos da organização. Quem pode editar a estratégia (edição do diretório, hoje o Admin da entidade) marca os que a candidatura apoia e guarda. Quem só consulta o diretório vê os objetivos já ligados. Sem acesso ao diretório, sem estratégia no tenant ou sem nada para mostrar, a secção fica oculta.
+- Cada objetivo da estratégia guarda `applicationIds` (até 200 candidaturas). A gravação usa `PUT /organization-directory/strategy`, com a revisão esperada e idempotência do diretório. Um pedido que omita `applicationIds` num objetivo conserva as ligações já guardadas, pelo que o editor da estratégia e clientes anteriores continuam a funcionar.
+- No Dashboard, uma candidatura em preparação conta para um objetivo quando há correspondência temática ou ligação manual, e entra uma única vez no índice. A lista de cada objetivo identifica a **Ligação manual**. Um objetivo sem áreas mas com candidaturas ligadas passa a ter contagem. Identificadores de candidaturas fora da população autorizada em preparação ficam sem efeito.
+- Limites conhecidos: a ligação segue a permissão de edição da estratégia e não a de edição da candidatura; remover um objetivo remove as suas ligações; o histórico da candidatura não regista a ligação (fica a auditoria `ORGANIZATION_CARD_CHANGED`).
+
+Critérios de aceitação:
+
+1. Um Admin da entidade liga uma candidatura a dois objetivos na ficha e, ao reabrir, encontra ambos marcados.
+2. A candidatura ligada aparece em cada um desses objetivos no painel, com **Ligação manual**, e conta uma vez no índice, mesmo sem correspondência temática.
+3. Desmarcar um objetivo retira apenas essa candidatura e mantém as restantes ligações do objetivo.
+4. Editar a estratégia no Perfil da organização preserva as ligações existentes.
+5. Um utilizador sem edição do diretório não vê controlos de ligação e o servidor recusa o pedido.
+6. Se a estratégia mudar entretanto, a gravação é recusada por revisão e a secção relê os dados.
+
+Validação: 23 testes backend focados e 59 frontend focados aprovados; lint e build aprovados; suite frontend com 1159 aprovados; suite backend com 3540 aprovados, 9 ignorados e 1 falha alheia (SEC-AC-01 recusa o `sessionStorage` em `DirectLogin.jsx`, ficheiro não alterado aqui). O gate isolado `test/integration/partner-portal` fixa o hash de `strategyAlignment.js` em `sources.json` e precisa de o atualizar antes de voltar a correr. Sem PostgreSQL real, sem browser e sem alteração no staging.
+
+### Perfil do departamento (18/11/2026, em Review)
+
+Decisões do utilizador em 18/11/2026: a entidade tem a estratégia; cada departamento tem o seu perfil de interesses e pode ter objetivos e metas próprios, ligados aos objetivos estratégicos; o Técnico insere-se no departamento. O departamento tem de estar nas áreas estratégicas mas pode escolher outras, e a entidade adapta-se depois. A ligação a um objetivo estratégico é opcional ao criar. Nesta versão editam o Administrador e o Gestor. Sem migração: o perfil fica na estratégia existente.
+
+Entrega 1, implementada:
+
+- Em **Departamentos / Unidades**, a ação **Perfil** abre o perfil do departamento: áreas de interesse, escolhidas na taxonomia temática, e objetivos com nome, meta ou indicador, prazo, áreas (entre as do departamento) e objetivos estratégicos da entidade que apoia.
+- Quando a entidade tem áreas estratégicas, um departamento com áreas tem de incluir pelo menos uma delas. As restantes ficam assinaladas como fora da estratégia da entidade e são conservadas.
+- Um objetivo de departamento sem objetivo estratégico associado é aceite e identificado como sem ligação.
+- `PUT /organization-directory/units/:id/profile` recebe `areaIds`, `objectives`, `expectedRevision` (revisão da ficha da organização) e `idempotencyKey`. Exige edição do diretório e um departamento ativo da organização da sessão. O perfil é guardado em `strategy.units[<id do departamento>]`, até 20 objetivos por departamento.
+- Editar a estratégia da entidade conserva os perfis dos departamentos. Retirar um objetivo estratégico retira as ligações que lhe apontavam; retirar uma área estratégica não altera as áreas dos departamentos.
+- Quem só consulta o diretório abre o perfil em leitura.
+
+Entregas seguintes, por implementar: vista da entidade com os contributos por objetivo, os objetivos de departamento sem ligação e as áreas propostas pelos departamentos; contexto do departamento no dashboard e no perfil pessoal do Técnico. Fora de âmbito por agora: responsável de departamento com edição própria, restrição de acesso por departamento e medição de progresso das metas.
+
+Critérios de aceitação da entrega 1:
+
+1. Um Administrador ou Gestor guarda áreas e objetivos de um departamento e encontra-os ao reabrir.
+2. Com áreas estratégicas definidas, guardar um departamento só com áreas fora da estratégia é recusado com explicação; com pelo menos uma estratégica é aceite e as outras ficam assinaladas.
+3. Um objetivo de departamento pode ficar sem ligação ou ligado a vários objetivos estratégicos; ligações a objetivos inexistentes são recusadas.
+4. Editar a estratégia da entidade não apaga perfis de departamento e limpa apenas ligações a objetivos removidos.
+5. Um departamento arquivado ou de outra organização é recusado; um utilizador sem edição do diretório não consegue gravar.
+6. Uma gravação sobre uma revisão antiga é recusada e pede nova leitura.
+
+Validação da entrega 1: backend focado 14 aprovados; suite backend 3543 aprovados, 9 ignorados e 1 falha alheia (SEC-AC-01, `DirectLogin.jsx`); frontend 1164 aprovados em 130 ficheiros; lint e build aprovados. Sem PostgreSQL real, sem browser e sem alteração no staging.
+
+Entregas 2 e 3 (18/11/2026, em Review), a pedido do utilizador:
+
+- **Vista da entidade.** No Perfil da organização, a secção **Contributos dos departamentos** mostra, por objetivo estratégico, os objetivos dos departamentos ativos que o apoiam; lista os objetivos de departamento sem ligação; e apresenta as áreas escolhidas por departamentos que a entidade ainda não tem, com os departamentos de cada uma. Quem edita a estratégia pode **adotar** uma dessas áreas, o que a acrescenta às áreas estratégicas pela edição normal da estratégia. A secção só aparece quando algum departamento ativo tem perfil e o utilizador pode consultar os departamentos.
+- **Contexto do Técnico.** A leitura do perfil pessoal (`GET /organization-directory/me`) e a da ficha da pessoa acrescentam `departments`: para cada departamento ativo da pessoa, as áreas do departamento e os seus objetivos, com o título dos objetivos estratégicos que cada um apoia. O Dashboard do Técnico mostra **Os objetivos dos meus departamentos** e o Perfil pessoal mostra a mesma informação. Sem pessoa associada à conta, sem departamento ou sem perfil preenchido, a secção fica oculta.
+- A leitura pessoal passa a expor ao próprio os títulos dos objetivos estratégicos apoiados pelos seus departamentos; os restantes dados da estratégia continuam reservados a quem consulta o diretório. No dashboard é um pedido adicional, feito depois do pedido principal.
+
+Critérios de aceitação das entregas 2 e 3:
+
+1. Um objetivo de departamento ligado a dois objetivos estratégicos aparece em ambos; sem ligação, aparece na lista própria.
+2. Uma área escolhida por dois departamentos e ausente da estratégia aparece uma vez, com os dois departamentos; depois de adotada, deixa de aparecer como proposta.
+3. Perfis de departamentos arquivados não entram na vista da entidade nem no contexto do Técnico.
+4. O Técnico vê os objetivos, metas e áreas dos seus departamentos no dashboard e no perfil pessoal, sem controlos de edição.
+5. Uma falha na leitura do contexto não afeta o resto do dashboard.
+
+Validação das entregas 2 e 3: suite backend 3544 aprovados, 9 ignorados e 1 falha alheia (SEC-AC-01, `DirectLogin.jsx`); frontend 1167 aprovados em 131 ficheiros; lint e build aprovados. Sem PostgreSQL real, sem browser e sem alteração no staging.
+
 ## Objetivo
 
 Dar à organização uma base para decidir que oportunidades de financiamento procurar, que departamentos mobilizar e que pessoas envolver. A organização define a estratégia. Os departamentos contribuem para a executar e reúnem pessoas com competências e interesses próprios.

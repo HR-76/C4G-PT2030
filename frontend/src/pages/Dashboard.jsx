@@ -2,10 +2,11 @@ import DashboardDeadlines from '../components/DashboardDeadlines'
 import LoadingIndicator from '../components/LoadingIndicator'
 import '../dashboard-palette.css'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ArrowRight, BarChart3, CalendarClock, FolderKanban, RefreshCw, Search } from 'lucide-react'
+import { AlertTriangle, ArrowRight, BarChart3, CalendarClock, FolderKanban, RefreshCw } from 'lucide-react'
 import { exactMoney } from '../api/organizationDashboard'
+import { readScope } from '../api/confirmedReads'
 import ApprovalTimeline, { approvalSummary, emptyPeriod } from '../components/ApprovalTimeline'
-import DashboardCharts from '../components/DashboardCharts'
+import DashboardCharts, { LeadingCharts } from '../components/DashboardCharts'
 import DashboardReport from '../components/DashboardReport'
 import DashboardBudgetStates from '../components/DashboardBudgetStates'
 import EmptyStatePanel from '../components/EmptyStatePanel'
@@ -16,11 +17,19 @@ import { getSourceName } from '../utils/sourceUi'
 import { catalogPeriodDates, catalogFilterParams } from './Opportunities/catalogFilters'
 import useOrganizationDashboard from '../hooks/useOrganizationDashboard'
 import TechnicianDashboard from './TechnicianDashboard'
+import { usesTechnicianDashboard } from '../utils/dashboardVariant'
 
 function Stat({ label, value, detail, to, action }) {
   const content = <><strong className="stat-num">{value ?? '—'}</strong><span className="stat-lbl">{label}</span>{detail && <small>{detail}</small>}{action && <span className="dashboard-stat-action">{action} <ArrowRight size={13} aria-hidden="true"/></span>}</>
   if (to?.startsWith("#")) return <a className="stat-item" href={to}>{content}</a>
   return to ? <Link className="stat-item" to={to}>{content}</Link> : <div className="stat-item">{content}</div>
+}
+
+// Overdue internal deadlines among those received; the server sends the earliest first.
+function deadlineRisk(deadlines, total) {
+  const overdue = deadlines.filter(item => item.days_left < 0).length
+  const partial = total > deadlines.length && overdue === deadlines.length
+  return `${partial ? 'Pelo menos ' : ''}${overdue} em atraso · até aos próximos 30 dias`
 }
 
 function Kpi({ tone, icon: Icon, label, value, detail, to }) {
@@ -39,7 +48,7 @@ function StatusRows({ values = {} }) {
 
 export default function Dashboard() {
   const { user, organization } = useAuth()
-  if (organization?.profileCode === 'CONTRIBUTOR') return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} />
+  if (usesTechnicianDashboard(organization)) return <TechnicianDashboard key={`${user?.id}:${organization.id}`} organization={organization} scope={user?.id ? readScope(user.id, organization.id) : null} />
   return <OrganizationDashboard key={JSON.stringify([user?.id, organization?.id])} user={user} organization={organization} />
 }
 
@@ -76,12 +85,12 @@ function OrganizationDashboard({ user, organization }) {
 
     {loading ? <LoadingIndicator>A carregar os indicadores da organização…</LoadingIndicator>
       : error ? <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={refresh}>Tentar novamente</button></div>
-      : !dashboard ? <EmptyStatePanel title="Indicadores indisponíveis" description="Atualize o Dashboard para consultar os dados da organização." actionLabel="Atualizar" onAction={refresh}/> : view === 'charts' ? <><section className="dashboard-kpis" aria-label="Indicadores principais">
+      : !dashboard ? <EmptyStatePanel title="Indicadores indisponíveis" description="Atualize o Dashboard para consultar os dados da organização." actionLabel="Atualizar" onAction={refresh}/> : view === 'charts' ? <><LeadingCharts applications={dashboard.applications} /><section className="dashboard-kpis" aria-label="Indicadores principais">
         <Kpi tone="portfolio" icon={FolderKanban} value={applications.total} label="Candidaturas acessíveis" detail={`${applications.active || 0} ativas`} to="/candidaturas" />
-        <Kpi tone="open" icon={Search} value={opportunities.open} label="Oportunidades abertas" detail="Catálogo e oportunidades privadas" to={catalogLink('all')} />
-        <Kpi tone="deadline" icon={CalendarClock} value={opportunities.closing_soon} label="Fecham em 14 dias" detail="Oportunidades abertas com fecho próximo" to={catalogLink('14')} />
+        <Kpi tone="deadline" icon={AlertTriangle} value={dashboard.deadline_total ?? deadlines.length} label="Prazos internos em risco" detail={deadlineRisk(deadlines, dashboard.deadline_total)} to="/dashboard?vista=indicadores" />
+        <Kpi tone="open" icon={CalendarClock} value={opportunities.closing_soon} label="Fecham em 14 dias" detail="Oportunidades abertas com fecho próximo" to={catalogLink('14')} />
         <Kpi icon={BarChart3} value={history ? exactMoney(history.all.total) : null} label="Orçamento global aprovado" detail={current ? `${year} · ${exactMoney(current.total)}` : 'Histórico indisponível'} to="#approval-timeline" />
-      </section><DashboardDeadlines deadlines={deadlines} total={dashboard.deadline_total} /><DashboardCharts dashboard={dashboard} /></> : view === 'report' ? <DashboardReport dashboard={dashboard} exporting={exporting} exportError={exportError} onExport={exportReport} /> : <>
+      </section><DashboardCharts dashboard={dashboard} leading={false} /></> : view === 'report' ? <DashboardReport dashboard={dashboard} exporting={exporting} exportError={exportError} onExport={exportReport} /> : <>
       <div className="dashboard-indicator-context"><span>Indicadores da entidade</span><InfoTooltip label="Âmbito dos indicadores">O catálogo da plataforma inclui todos os estados do catálogo central. As oportunidades abertas incluem as acessíveis do catálogo e privadas. As candidaturas e os respetivos orçamentos consideram apenas os registos acessíveis nesta entidade. O orçamento aprovado é o valor dos projetos no momento da aprovação; não representa financiamento recebido. Valores em falta são indicados.</InfoTooltip></div>
       <section className="stats-strip dashboard-stats">
         <Stat label="Orçamento global aprovado" value={exactMoney(history?.all?.total)}

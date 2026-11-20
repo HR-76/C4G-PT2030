@@ -10,7 +10,7 @@ test('reader has no fallback and rejects incomplete configuration without exposi
 test('dedicated reader exposes no write handle and closes only its pool once',async()=>{
   let ends=0;class Pool{end(){ends++;return Promise.resolve();}connect(){throw Error('unexpected connection');}}
   const port=createCatalogReader({env:{CATALOG_DATABASE_URL:'postgres://reader:synthetic@localhost/disposable'},Pool});
-  assert.deepEqual(Object.keys(port).sort(),['close','dashboardSummary','get','list','ready','revision']);
+  assert.deepEqual(Object.keys(port).sort(),['close','dashboardSummary','get','list','listForMatching','ready','revision']);
   await Promise.all([port.close(),port.close()]);assert.equal(ends,1);
   await assert.rejects(()=>port.list(),/CATALOG_READER_CLOSED/);
 });

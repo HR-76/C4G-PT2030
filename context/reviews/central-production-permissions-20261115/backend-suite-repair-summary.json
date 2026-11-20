@@ -1,0 +1,76 @@
+{
+  "backend": {
+    "log": ".tmp/backend-suite-repair-backend-full.log",
+    "sha256": "82cd777cc7b62cbfb063bae345175bd23cc3c1f9171b6f5f9034afc92556362c",
+    "counts": {
+      "tests": 3413,
+      "pass": 3404,
+      "fail": 0,
+      "skipped": 9
+    }
+  },
+  "frontend": {
+    "log": ".tmp/backend-suite-repair-frontend-full.log",
+    "sha256": "d9ae75c50bb53f26876ac870beb933af6bbad3cfd58a2353bc0416e48b81d99e",
+    "counts": {
+      "filesPassed": 128,
+      "testsPassed": 1141
+    }
+  },
+  "securityFocused": {
+    "log": ".tmp/backend-suite-repair-security-green.log",
+    "sha256": "2ec62a50e805e9ab5691c7efabf3fe29f6eca4287ae1708902970989f082103f",
+    "counts": {
+      "tests": 50,
+      "pass": 50,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "allowlistsFocused": {
+    "log": ".tmp/backend-allowlists-green.log",
+    "sha256": "067ddd95b4c79f87347d217cf643ff043d297cdd1dbc62c5b0af1086a9d3b62e",
+    "counts": {
+      "tests": 11,
+      "pass": 11,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "securityBefore": {
+    "log": ".tmp/backend-suite-repair-security-red.log",
+    "sha256": "1bb7e32b6ce1e78556db39f62558b45f002f03a2994bddde428872e868ddfa65",
+    "counts": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "skipped": 0
+    }
+  },
+  "allowlistsBefore": {
+    "log": ".tmp/backend-allowlists-red.log",
+    "sha256": "6171110e233e4b845abd0e8c2f507b554658311ef4f5c8edecdb2ceb952e919c",
+    "counts": {
+      "tests": 11,
+      "pass": 9,
+      "fail": 2,
+      "skipped": 0
+    }
+  },
+  "lint": {
+    "log": ".tmp/backend-suite-repair-lint-confirmed.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "counts": {}
+  },
+  "build": {
+    "log": ".tmp/backend-suite-repair-build.log",
+    "sha256": "3d847b26112279da15c971116fdfb91f0b957997ff51acaef538301fad8ae3e6",
+    "counts": {}
+  },
+  "scope": {
+    "stagingTouched": false,
+    "runtimeChangedInThisCorrection": false,
+    "sqlChangedInThisCorrection": false,
+    "newSkippedTests": 0
+  }
+}

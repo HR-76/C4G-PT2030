@@ -10,6 +10,7 @@ const { SOURCE } = require('./source');
 const { validateSelection } = require('./programmes');
 const { namespaceForIdentity, validateSourceIdentity, OFFICIAL } = require('./sourceIdentity');
 const { catalogQuery } = require('./catalogQuery');
+const { measurePhase } = require('../observability/requestPhaseTiming');
 const { catalogSortSql } = require('./catalogSort');
 const {catalogueProgrammes,sourceNamespaces}=require('./catalogOptions');
 const { createPlatformAudit } = require('./audit');
@@ -51,6 +52,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     finally { client.release(); }
   }
   async function administrator(client, userId, lock = false) {
+    if(client.productionCapability){if(!(await client.query("SELECT c4g_production.active_administrator($1) AS allowed",[userId])).rows[0]?.allowed)fail("FUNDING_FORBIDDEN");return;}
     const user = (await client.query(`SELECT id FROM public.global_user WHERE id=$1 AND status='ACTIVE'${lock ? ' FOR SHARE' : ''}`, [userId])).rows[0];
     const assignment = (await client.query(`SELECT id FROM public.platform_admin_assignment WHERE global_user_id=$1 AND role_code='C4G_ADMIN' AND status='ACTIVE'${lock ? ' FOR SHARE' : ''}`, [userId])).rows[0];
     if (!user || !assignment) fail('FUNDING_FORBIDDEN');
@@ -105,6 +107,7 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
   }
   async function status(userId) { return transaction(async client => {
     await administrator(client, userId);
+    if(pool.productionCapability)return {source:SOURCE,lastRun:null,lastRuns:[],lastCompleteRuns:[],runs:[],runsLimited:false};
     if(coverageEnabled){
       const rows=(await client.query(`SELECT * FROM (${history}) h ORDER BY created_at DESC,run_id DESC LIMIT 101`)).rows;
       const latest=(await client.query(`SELECT DISTINCT ON (source_code) * FROM (${history}) h ORDER BY source_code,created_at DESC,run_id DESC`)).rows;
@@ -317,6 +320,22 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     const presentation=prepared.sourceVersion===2?(catalogPresentation ||= require('../opportunities/catalogRead/presentation').loadPresentation()).presentSnapshot(snapshot,{detail}):require('../opportunities/manualClassification').manualPresentation(snapshot);
     return {prepared,presentation,interventionClassification:require('../opportunities/interventionAreas').classifyInterventionAreas(snapshot,presentation)};
   }
+  // The matching read needs only the validated snapshot, for the whole catalogue at once. It keeps
+  // its own entries, enough for every opportunity a matching accepts, and compares a digest of the
+  // stored snapshot instead of keeping its text.
+  const matchingPrepared=new Map(),MATCHING_PREPARED_LIMIT=1500;
+  function preparedForMatching(row,snapshot){
+    if(!row.revisionId)return prepareOpportunitySnapshot(snapshot);
+    const digest=require('node:crypto').createHash('sha256').update(JSON.stringify(snapshot)).digest('base64');
+    let entry=matchingPrepared.get(row.revisionId);
+    if(entry)matchingPrepared.delete(row.revisionId);
+    if(entry?.digest!==digest){
+      entry={digest,prepared:require('../opportunities/v2/data').deepFreeze(prepareOpportunitySnapshot(snapshot))};
+      if(matchingPrepared.size>=MATCHING_PREPARED_LIMIT)matchingPrepared.delete(matchingPrepared.keys().next().value);
+    }
+    matchingPrepared.set(row.revisionId,entry);
+    return entry.prepared;
+  }
   function revisionFactsFor(row,snapshot,detail){
     if(detail||!row.revisionId)return computeRevisionFacts(snapshot,detail);
     const source=JSON.stringify(snapshot);
@@ -329,10 +348,12 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     revisionFacts.set(row.revisionId,entry);
     return entry.facts;
   }
-  function readRow(row,snapshot,asOf,detail=false){
+  // `forMatching`: matching projects from the read model alone, so the presentation and the
+  // intervention classification of each opportunity are not computed for it.
+  function readRow(row,snapshot,asOf,detail=false,forMatching=false){
     const {corrections,temporalSnapshot,canonicalObservedAt,...value}=row;
     const observedAt=snapshot.schemaVersion===2?canonicalObservedAt||null:row.observedAt instanceof Date?row.observedAt.toISOString():row.observedAt;
-    const {prepared,presentation,interventionClassification}=revisionFactsFor(row,snapshot,detail);
+    const {prepared,presentation,interventionClassification}=forMatching?{prepared:preparedForMatching(row,snapshot)}:revisionFactsFor(row,snapshot,detail);
     const readModel=createOpportunityReadModel(snapshot,{revisionId:row.revisionId,asOf,observedAt,sourceReview:row.sourceReview||null,corrections:corrections||{},prepared});
     const v2=readModel.sourceVersion===2;
     const namespaces=[...new Set(readModel.sourceRecords.map(source=>source.namespace))];
@@ -341,17 +362,25 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
       :require('../opportunities/temporal').temporalState(snapshot,asOf,corrections||{},row.sourceReview);
     const aliases=v2?{observedAt:readModel.freshness.observedAt,programmeName:readModel.projection.programmes.state==='PRESENT'&&readModel.projection.programmes.value.length===1?readModel.projection.programmes.value[0].label:null,
       funderName:null,callReference:null,openingDate:readModel.projection.schedule.opening.value?.value||null,closingDate:readModel.temporal.finalDeadline?.at?.value||null,funding:null}:{};
-    return {...value,...aliases,interventionClassification,...(presentation?{catalogPresentation:presentation}:{}),title:readModel.projection.description.title.value,readModel,temporal,origin:'CENTRAL',
+    return {...value,...aliases,...(forMatching?{}:{interventionClassification}),...(presentation?{catalogPresentation:presentation}:{}),title:readModel.projection.description.title.value,readModel,temporal,origin:'CENTRAL',
       source:v2?(namespaces.length===1?namespaces[0]:'MULTIPLE_SOURCES'):row.externalIdentifier?namespaceForIdentity(row.externalIdentifier):'C4G_MANUAL'};
   }
-  async function list(input = null, platformUserId = null) { const query = catalogQuery(typeof input === 'string' ? { cursor: input } : input || {}); return transaction(async client => {
+  // The whole catalogue for matching, page by page: the same rows, order and read model as the
+  // listing, without the catalogue-wide programme list (one scan of every revision per page) that
+  // matching never shows. Only a cursor is accepted.
+  async function listForMatching(input = {}) {
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => key !== 'cursor')) fail('INVALID_INPUT');
+    return listPage(input, null, true);
+  }
+  function list(input = null, platformUserId = null) { return listPage(input, platformUserId, false); }
+  async function listPage(input, platformUserId, forMatching) { const query = catalogQuery(typeof input === 'string' ? { cursor: input } : input || {}); return measurePhase('catalog.list', () => transaction(async client => {
     if (platformUserId !== null) await administrator(client, platformUserId);
     const asOf=Date.prototype.toISOString.call(clock());
     const closing=`CASE WHEN ${isV2('r.snapshot')} THEN COALESCE(${civilDateSql('left(schedule.next_deadline,10)')},CASE WHEN schedule.final_deadline_at->>'precision' IN ('DATE','INSTANT') THEN ${civilDateSql("left(schedule.final_deadline_at->>'value',10)")} END) ELSE COALESCE(left(schedule.next_deadline,10)::date,o.closing_date) END`;
     const fields=`o.opportunity_id AS "opportunityId",o.current_revision_id AS "revisionId",o.row_version AS "rowVersion",o.title,o.programme_name AS "programmeName",o.funder_name AS "funderName",o.call_reference AS "callReference",o.opening_date::text AS "openingDate",o.closing_date::text AS "closingDate",o.lifecycle_state AS "lifecycleState",o.validation_state AS "validationState",f.external_identifier AS "externalIdentifier",f.observed_at AS "observedAt",to_jsonb(o)->>'last_v2_observed_at' AS "canonicalObservedAt",jsonb_build_object('fundingAmountMin',r.snapshot->'fundingAmountMin','fundingAmountMax',r.snapshot->'fundingAmountMax','currencyCode',r.snapshot->'currencyCode','summary',r.snapshot->'summary') AS funding,r.snapshot AS "temporalSnapshot",f.corrections,to_jsonb(f)->>'source_review' AS "sourceReview"`;
     const joins=`FROM opportunity_catalog.opportunity o JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id LEFT JOIN opportunity_catalog.funding_identity f ON f.opportunity_id=o.opportunity_id`;
     const temporalJoin=require('../opportunities/temporalSql').temporalSql({corrections:'f.corrections',sourceReview:"to_jsonb(f)->>'source_review'",now:'$7::timestamptz',today:"($7::timestamptz AT TIME ZONE 'UTC')::date"});
-    const filters=`($2::text IS NULL OR strpos(lower(${titleExpression()}),lower($2))>0 OR strpos(lower(f.external_identifier),lower($2))>0 OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(${referenceValuesExpression()}) reference(value) WHERE strpos(lower(reference.value),lower($2))>0))
+    const filters=`o.lifecycle_state<>'ARCHIVED' AND ($2::text IS NULL OR strpos(lower(${titleExpression()}),lower($2))>0 OR strpos(lower(f.external_identifier),lower($2))>0 OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(${referenceValuesExpression()}) reference(value) WHERE strpos(lower(reference.value),lower($2))>0))
       AND ($3::text IS NULL OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(${programmeLabelsExpression()}) programme(value) WHERE strpos(lower(programme.value),lower($3))>0))
       AND ($4::date IS NULL OR (${closing}) >= $4)
       AND ($5::date IS NULL OR (${closing}) <= $5)
@@ -378,9 +407,9 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     }
     const candidates=[]; let scanCursor=query.cursor||null, scannedPages=0;
     for (;;) {
-    const rows = (await client.query(pageSql, [scanCursor, query.q || null, query.programme || null, query.closingFrom || null, query.closingTo || null,query.temporalState||null,asOf,query.source?sourceNamespaces(query.source):null])).rows;
+    const rows = (await measurePhase('catalog.query', () => client.query(pageSql, [scanCursor, query.q || null, query.programme || null, query.closingFrom || null, query.closingTo || null,query.temporalState||null,asOf,query.source?sourceNamespaces(query.source):null]))).rows;
     for(const row of rows){
-      const item=readRow(row,row.temporalSnapshot,asOf);
+      const item=readRow(row,row.temporalSnapshot,asOf,false,forMatching);
       const matchesSource=!query.source || (item.readModel.sourceVersion===2
         ? item.readModel.sourceRecords.some(source=>sourceNamespaces(query.source).includes(source.namespace))
         : sourceNamespaces(query.source).includes(item.source));
@@ -392,9 +421,9 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
     if(!(query.interventionArea||query.source) || candidates.length>=26 || rows.length<26)break;
     const last=rows.at(-1).opportunityId; if(last===scanCursor || ++scannedPages>=400)fail('CATALOG_RESPONSE_TOO_LARGE'); scanCursor=last;
     }
-    const programmes = (await client.query(`SELECT DISTINCT programme.value AS name FROM opportunity_catalog.opportunity o JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id CROSS JOIN LATERAL jsonb_array_elements_text(${programmeLabelsExpression()}) programme(value) WHERE programme.value <> '' ORDER BY name`)).rows.map(r => r.name);
+    const programmes = forMatching ? [] : (await measurePhase('catalog.programmes', () => client.query(`SELECT DISTINCT programme.value AS name FROM opportunity_catalog.opportunity o JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id CROSS JOIN LATERAL jsonb_array_elements_text(${programmeLabelsExpression()}) programme(value) WHERE o.lifecycle_state<>'ARCHIVED' AND programme.value <> '' ORDER BY name`))).rows.map(r => r.name);
     return boundedCatalogPage(candidates,{programmes:catalogueProgrammes(programmes),asOf,opportunityTypes:require('../opportunities/manualClassification').OPPORTUNITY_TYPES,interventionAreas:require('../opportunities/interventionAreas').INTERVENTION_AREAS});
-  }, true); }
+  }, true)); }
   async function get(id, platformUserId = null) { if (!UUID.test(id)) fail('INVALID_INPUT'); return transaction(async client => {
     if (platformUserId !== null) await administrator(client, platformUserId);
     const row = (await client.query(`SELECT o.opportunity_id AS "opportunityId",o.current_revision_id AS "revisionId",o.row_version AS "rowVersion",o.lifecycle_state AS "lifecycleState",o.validation_state AS "validationState",o.created_at AS "createdAt",r.snapshot,f.external_identifier AS "externalIdentifier",f.observed_at AS "observedAt",to_jsonb(o)->>'last_v2_observed_at' AS "canonicalObservedAt",f.conflicts,f.corrections,to_jsonb(f)->>'source_review' AS "sourceReview" FROM opportunity_catalog.opportunity o JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id LEFT JOIN opportunity_catalog.funding_identity f ON f.opportunity_id=o.opportunity_id WHERE o.opportunity_id=$1`, [id])).rows[0];
@@ -408,6 +437,6 @@ function createFundingRepository({ pool, audit = createPlatformAudit(), readRole
   function platformList(userId, input) { if (!UUID.test(userId)) fail('FUNDING_FORBIDDEN'); return list(input, userId); }
   function platformGet(userId, id) { if (!UUID.test(userId)) fail('FUNDING_FORBIDDEN'); return get(id, userId); }
   const dashboardSummary=(today,asOf)=>transaction(client=>require('../applications/opportunitySummary').opportunitySummary(client,{today,asOf,central:true}),true);
-  return { euSourceControlEnabled,sourceExecutionAllowed,...(euWriter?{euWriterSupported:true,euWriterPolicyVersion:euWriter.configuration.policyVersion,euWriterMappingDigest:euWriter.configuration.mappingDigest}:{}),discoveryDetailSupported:enrichmentEnabled, enrichmentSupported:enrichmentEnabled, resolutionSupported:resolutionEnabled, refreshSupported:refreshEnabled, transaction, administrator, enqueue, status, claim, stage, pending, apply, finish, releaseRetry, list, get, revision, platformList, platformGet,dashboardSummary, reconcileCoverage:coverageEnabled?async client=>{await coverage.reconcile(client,Boolean(euWriter));if(refreshEnabled)await require('./refresh').reconcile(client);}:null };
+  return { euSourceControlEnabled,sourceExecutionAllowed,...(euWriter?{euWriterSupported:true,euWriterPolicyVersion:euWriter.configuration.policyVersion,euWriterMappingDigest:euWriter.configuration.mappingDigest}:{}),discoveryDetailSupported:enrichmentEnabled, enrichmentSupported:enrichmentEnabled, resolutionSupported:resolutionEnabled, refreshSupported:refreshEnabled, transaction, administrator, enqueue, status, claim, stage, pending, apply, finish, releaseRetry, list, listForMatching, get, revision, platformList, platformGet,dashboardSummary, reconcileCoverage:coverageEnabled?async client=>{await coverage.reconcile(client,Boolean(euWriter));if(refreshEnabled)await require('./refresh').reconcile(client);}:null };
 }
 module.exports = { createFundingRepository, publicRun, WORKER };

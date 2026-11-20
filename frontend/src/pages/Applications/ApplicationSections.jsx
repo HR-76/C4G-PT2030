@@ -10,7 +10,8 @@ const sectionFor = hash => {
   return 'overview'
 }
 
-export default function ApplicationSections({ sections }) {
+// `onVisit` receives each section the reader opens, including the first one shown.
+export default function ApplicationSections({ sections, onVisit }) {
   const [active, setActive] = useState(() => sectionFor(window.location.hash))
   const [visited, setVisited] = useState(() => new Set([active]))
   const choose = id => {
@@ -18,6 +19,7 @@ export default function ApplicationSections({ sections }) {
     setVisited(previous => previous.has(id) ? previous : new Set([...previous, id]))
   }
   const root = useRef(null)
+  useEffect(() => { onVisit?.(active) }, [active, onVisit])
   useEffect(() => {
     const reveal = () => choose(sectionFor(window.location.hash))
     window.addEventListener('hashchange', reveal)

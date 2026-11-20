@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 const mocks = vi.hoisted(() => ({ read: vi.fn(), auth: { user: { id: 'user' }, organization: { id: 'org', name: 'Organização' } } }))
 vi.mock('../../api/api', () => ({ privateApplicationsApi: { myWork: mocks.read } }))
@@ -36,4 +36,47 @@ it('discards a late response from a former organization and closes its modal', a
 it('refreshing the window removes stale tasks and closes the modal on revoked permission', async () => {
  render(view()); fireEvent.click(await screen.findByRole('button', { name: 'Ver tarefa Rever orçamento' })); mocks.read.mockRejectedValue({ response: { status: 403 } }); fireEvent.focus(window)
  await screen.findByRole('alert'); expect(screen.queryByRole('dialog')).toBeNull(); expect(screen.queryByText(task.title)).toBeNull()
+})
+it('coming back to the window reads again without clearing the list or closing the open task', async () => {
+ render(view()); fireEvent.click(await screen.findByRole('button', { name: 'Ver tarefa Rever orçamento' }))
+ let answer; mocks.read.mockReturnValue(new Promise(resolve => { answer = resolve }))
+ fireEvent.focus(window)
+ await waitFor(() => expect(mocks.read).toHaveBeenCalledTimes(2))
+ expect(screen.getByRole('dialog')).toBeTruthy(); expect(screen.getByRole('button', { name: 'Ver tarefa Rever orçamento' })).toBeTruthy()
+ expect(screen.queryByText('A carregar tarefas…')).toBeNull()
+ await act(async () => answer({ data: { ...page, items: [{ ...task, deadline: '2026-12-01' }] } }))
+ expect(within(screen.getByRole('dialog')).getByText(/01\/12\/2026/)).toBeTruthy()
+})
+it('closes the open task after a silent read only when it is no longer in the answer', async () => {
+ render(view()); fireEvent.click(await screen.findByRole('button', { name: 'Ver tarefa Rever orçamento' }))
+ mocks.read.mockResolvedValue({ data: { items: [], total: 0, counts: {}, nextCursor: null } })
+ fireEvent.focus(window)
+ await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+ expect(screen.queryByRole('button', { name: 'Ver tarefa Rever orçamento' })).toBeNull()
+})
+it('keeps the previous tasks on screen, dimmed and inactive, while other filters are read', async () => {
+ render(view()); const button = await screen.findByRole('button', { name: 'Ver tarefa Rever orçamento' })
+ let answer; mocks.read.mockReturnValue(new Promise(resolve => { answer = resolve }))
+ fireEvent.change(screen.getByLabelText('Estado'), { target: { value: 'COMPLETED' } }); fireEvent.click(screen.getByRole('button', { name: 'Aplicar filtros' }))
+ await waitFor(() => expect(mocks.read).toHaveBeenCalledTimes(2))
+ const group = button.closest('section')
+ expect(screen.getByRole('button', { name: 'Ver tarefa Rever orçamento' })).toBeTruthy()
+ expect(group.classList.contains('my-work-stale')).toBe(true); expect(group.hasAttribute('inert')).toBe(true)
+ await act(async () => answer({ data: { items: [], total: 0, counts: {}, nextCursor: null } }))
+ expect(screen.queryByRole('button', { name: 'Ver tarefa Rever orçamento' })).toBeNull()
+})
+
+it('folds and unfolds a group of tasks without reading again', async () => {
+  const before = mocks.read.mock.calls.length
+  render(<MemoryRouter><MyWork /></MemoryRouter>)
+  const group = await screen.findAllByRole('region').then(regions => regions[0])
+  const toggle = within(group).getByRole('button', { expanded: true })
+  const tasks = within(group).getAllByRole('button', { name: /^Ver tarefa/ }).length
+  expect(tasks).toBeGreaterThan(0)
+  fireEvent.click(toggle)
+  expect(toggle.getAttribute('aria-expanded')).toBe('false')
+  expect(within(group).queryByRole('button', { name: /^Ver tarefa/ })).toBeNull()
+  fireEvent.click(toggle)
+  expect(within(group).getAllByRole('button', { name: /^Ver tarefa/ })).toHaveLength(tasks)
+  expect(mocks.read.mock.calls.length).toBe(before + 1)
 })

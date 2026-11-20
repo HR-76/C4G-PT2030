@@ -5,9 +5,10 @@ const api=vi.hoisted(()=>({partnersGet:vi.fn(),partnersHistory:vi.fn(),responsib
 const auth=vi.hoisted(()=>({user:{id:'00000000-0000-4000-8000-000000000004'},organization:{id:'00000000-0000-4000-8000-000000000001'}}))
 const interests=vi.hoisted(()=>({get:vi.fn(),units:vi.fn(),list:vi.fn()}))
 const central=vi.hoisted(()=>({get:vi.fn()}))
-vi.mock('../../api/api',()=>({privateApplicationsApi:api,opportunityInterestsApi:interests,centralOpportunitiesApi:central,privateOpportunitiesApi:{get:vi.fn().mockResolvedValue({data:{title:'Oportunidade'}})},pq1Api:{session:work=>work()}}))
+vi.mock('../../api/api',()=>({organizationDirectoryApi:()=>({context:()=>Promise.reject({response:{status:403}})}),privateApplicationsApi:api,opportunityInterestsApi:interests,centralOpportunitiesApi:central,privateOpportunitiesApi:{get:vi.fn().mockResolvedValue({data:{title:'Oportunidade'}})},pq1Api:{session:work=>work()}}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>auth}))
 import PrivateApplications from './PrivateApplications'
+import Interests from '../Interests/Interests'
 import {applicationIntentKey,clearApplicationIntentions} from './intentions'
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
 const org=id(1),opp=id(2),application=id(3),userA=id(4),userB=id(5)
@@ -28,17 +29,73 @@ it('does not offer transitions when the authoritative list is missing',async()=>
 beforeEach(()=>{api.partnersGet.mockResolvedValue({data:{items:[],revision:1,total:0,canEdit:false}});api.partnersHistory.mockResolvedValue({data:{items:[]}});vi.clearAllMocks();sessionStorage.clear();auth.user={id:userA};api.history.mockResolvedValue({data:{items:[],nextCursor:null}});api.get.mockResolvedValue({data:record});api.list.mockResolvedValue({data:{items:[],nextCursor:null}});api.work.mockResolvedValue({data:{revision:1,participants:[],tasks:[]}});api.workHistory.mockResolvedValue({data:{items:[],nextCursor:null}});api.documents.mockResolvedValue({data:{revision:1,documents:[],reviews:[],reviewsNextCursor:null}});api.documentCandidates.mockResolvedValue({data:{items:[],nextCursor:null}});api.documentHistory.mockResolvedValue({data:{items:[],nextCursor:null}})})
 beforeEach(()=>{interests.units.mockResolvedValue({data:{items:[]}})})
 
-it('prioritizes the application request before loading secondary data',async()=>{
+it('asks for team and documents together with the record and leaves the rest until its part is opened',async()=>{
  let finish
  api.get.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve}))
  api.responsibles.mockResolvedValue({data:{items:[]}})
  mount(`/candidaturas/${application}`)
  await waitFor(()=>expect(api.get).toHaveBeenCalled())
- expect(api.history).not.toHaveBeenCalled();expect(api.responsibles).not.toHaveBeenCalled()
+ // Team and documents only need the identifier: they do not wait for the record.
+ expect(api.work).toHaveBeenCalledTimes(1);expect(api.documents).toHaveBeenCalledTimes(1)
+ expect(api.work.mock.calls[0][0]).toBe(application);expect(api.documents.mock.calls[0][0]).toBe(application)
+ expect(api.history).not.toHaveBeenCalled();expect(api.responsibles).not.toHaveBeenCalled();expect(interests.units).not.toHaveBeenCalled()
  await act(async()=>finish({data:record}))
  await screen.findByRole('heading',{name:'Antes'})
- await waitFor(()=>expect(api.history).toHaveBeenCalled())
- expect(api.responsibles).toHaveBeenCalled()
+ // The early answers are used: the panels do not ask again.
+ await waitFor(()=>expect(screen.queryByText('A carregar equipa e tarefas…')).toBeNull())
+ expect(api.work).toHaveBeenCalledTimes(1);expect(api.documents).toHaveBeenCalledTimes(1)
+ expect(api.history).not.toHaveBeenCalled();expect(api.responsibles).not.toHaveBeenCalled();expect(interests.units).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('tab',{name:'Histórico'}))
+ await waitFor(()=>expect(api.history).toHaveBeenCalledTimes(1))
+ await waitFor(()=>expect(api.responsibles).toHaveBeenCalledTimes(1))
+ expect(interests.units).not.toHaveBeenCalled()
+})
+it('asks for responsibles and units when editing is opened, once',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ mount(`/candidaturas/${application}`)
+ await screen.findByRole('heading',{name:'Antes'})
+ expect(api.responsibles).not.toHaveBeenCalled();expect(interests.units).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('button',{name:'Editar dados e orçamento'}))
+ await waitFor(()=>expect(interests.units).toHaveBeenCalledTimes(1));await waitFor(()=>expect(api.responsibles).toHaveBeenCalledTimes(1))
+ fireEvent.click(screen.getByRole('tab',{name:'Histórico'}));fireEvent.click(screen.getByRole('tab',{name:'Equipa e tarefas'}))
+ await waitFor(()=>expect(api.history).toHaveBeenCalledTimes(1))
+ expect(api.responsibles).toHaveBeenCalledTimes(1);expect(interests.units).toHaveBeenCalledTimes(1)
+})
+it('reopens with the confirmed record, team and documents at once, reads them again and never shows them to another user',async()=>{
+ api.work.mockResolvedValue({data:{revision:1,participants:[],tasks:[],members:[]}})
+ const view=mount(`/candidaturas/${application}`)
+ await screen.findByRole('heading',{name:'Antes'});await waitFor(()=>expect(screen.queryByText('A carregar equipa e tarefas…')).toBeNull())
+ view.unmount()
+ const never=new Promise(()=>{})
+ api.get.mockReturnValue(never);api.work.mockReturnValue(never);api.documents.mockReturnValue(never)
+ const again=mount(`/candidaturas/${application}`)
+ expect(screen.getByRole('heading',{name:'Antes'})).toBeTruthy()
+ expect(screen.queryByText('A carregar equipa e tarefas…')).toBeNull()
+ expect(api.get).toHaveBeenCalledTimes(2);expect(api.work).toHaveBeenCalledTimes(2);expect(api.documents).toHaveBeenCalledTimes(2)
+ again.unmount()
+ auth.user={id:userB}
+ mount(`/candidaturas/${application}`)
+ expect(screen.queryByRole('heading',{name:'Antes'})).toBeNull()
+})
+it('removes the confirmed record when the new read is refused',async()=>{
+ const view=mount(`/candidaturas/${application}`)
+ await screen.findByRole('heading',{name:'Antes'});view.unmount()
+ api.get.mockRejectedValue({response:{status:403}})
+ mount(`/candidaturas/${application}`)
+ await screen.findByRole('alert')
+ expect(screen.queryByRole('heading',{name:'Antes'})).toBeNull()
+})
+it('keeps an edit in progress when the new read confirms the revision already on screen',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ const view=mount(`/candidaturas/${application}`)
+ await screen.findByRole('heading',{name:'Antes'});view.unmount()
+ let finish;api.get.mockReturnValue(new Promise(resolve=>{finish=resolve}))
+ mount(`/candidaturas/${application}`)
+ fireEvent.click(screen.getByRole('button',{name:'Editar dados e orçamento'}))
+ const title=await screen.findByDisplayValue('Antes')
+ fireEvent.change(title,{target:{value:'Em edição'}})
+ await act(async()=>finish({data:record}))
+ expect(screen.getByDisplayValue('Em edição')).toBeTruthy()
 })
 
 it('opens the application while its history is pending and permits retry after failure',async()=>{
@@ -56,20 +113,23 @@ it('opens the application while its history is pending and permits retry after f
  expect(screen.getByRole('heading',{name:'Antes'})).toBeTruthy()
 })
 
-it('keeps interests inside the applications area when applying and clearing filters',async()=>{
+it('sends the old interests view inside Candidaturas to the Interests page and keeps its filters',async()=>{
+ const Probe=()=>{const l=useLocation();return <p>{l.pathname+l.search}</p>}
+ render(<MemoryRouter initialEntries={['/candidaturas?ver=interesses&q=energia&status=ARCHIVED']}><Routes><Route path="/candidaturas" element={<PrivateApplications/>}/><Route path="/interesses" element={<Probe/>}/></Routes></MemoryRouter>)
+ expect(await screen.findByText('/interesses?q=energia&status=ARCHIVED')).toBeTruthy()
+})
+it('shows Interests as its own page, without the Candidaturas tabs, and applies and clears filters',async()=>{
  interests.list.mockResolvedValue({data:{items:[],nextCursor:null}})
- mount('/candidaturas?ver=interesses')
- expect(await screen.findByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
- const area=screen.getByRole('navigation',{name:'Área de candidaturas'})
- expect(within(area).getByRole('link',{name:'Interesses'}).getAttribute('aria-current')).toBe('page')
- expect(within(area).getByRole('link',{name:'Candidaturas'}).getAttribute('href')).toBe('/candidaturas')
+ render(<MemoryRouter initialEntries={['/interesses']}><Routes><Route path="/interesses" element={<Interests/>}/></Routes></MemoryRouter>)
+ expect(await screen.findByRole('heading',{name:'Interesses'})).toBeTruthy()
+ expect(screen.queryByRole('navigation',{name:'Área de candidaturas'})).toBeNull()
+ expect(screen.getByRole('link',{name:'Oportunidades'}).getAttribute('href')).toBe('/catalogo')
+ expect(screen.getByRole('link',{name:'Candidaturas'}).getAttribute('href')).toBe('/candidaturas')
  fireEvent.change(screen.getByLabelText('Pesquisar'),{target:{value:'energia'}})
  fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}))
  await waitFor(()=>expect(interests.list.mock.lastCall[0].q).toBe('energia'))
- expect(screen.getByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
  fireEvent.click(screen.getByRole('button',{name:'Limpar filtros'}))
  await waitFor(()=>expect(interests.list.mock.lastCall[0]).toEqual({status:'ACTIVE'}))
- expect(screen.getByRole('heading',{name:'Interesses da organização'})).toBeTruthy()
  expect(api.create).not.toHaveBeenCalled()
 })
 afterEach(()=>{cleanup();vi.restoreAllMocks()})
@@ -79,8 +139,8 @@ const openEdit=async()=>{
  return screen.findByRole('dialog',{name:'Editar dados e orçamento'})
 }
 const openTransitions=async()=>{
- const summary=await screen.findByText('Alterar estado',{selector:'summary'})
- if(!summary.closest('details').open)fireEvent.click(summary)
+ if(!screen.queryByRole('dialog',{name:'Alterar estado'}))fireEvent.click(await screen.findByRole('button',{name:'Alterar estado'}))
+ await screen.findByRole('dialog',{name:'Alterar estado'})
 }
 const fillCreation=async()=>{
  await screen.findByRole('option',{name:'Pessoa atual'})
@@ -414,18 +474,55 @@ it('carries saved analysis by explicit copy without overwriting application note
  expect(api.create.mock.calls[0][0]).toMatchObject({notes,sourceInterestId:interest,sourceInterestRevision:3})
  expect(screen.getByRole('button',{name:'Usar análise nas notas da candidatura'}).disabled).toBe(true)
 })
-it('recovers UBI next-step guidance and links existing sections without adding mutations',async()=>{
- api.get.mockResolvedValue({data:{...record,status:'PREPARATION',canEdit:false,allowedTransitions:[]}})
+it('replaces the permanent guidance with a pending list whose ticks come from the application data',async()=>{
+ api.get.mockResolvedValue({data:{...record,status:'PREPARATION',allowedTransitions:['SUBMITTED']}})
+ api.work.mockResolvedValue({data:{revision:1,participants:[{participantId:id(20),membershipId:id(10),name:'Pessoa',active:true}],tasks:[]}})
  api.responsibles.mockResolvedValue({data:{items:[]}})
  mount(`/candidaturas/${application}`)
- await screen.findByRole('heading',{name:'Próximo passo'})
- expect(screen.getByText('Completar equipa, parceiros e documentação antes de registar a submissão.')).toBeTruthy()
- for(const [name,target] of [['Equipa e tarefas','#equipa-tarefas'],['Parceiros','#parceiros'],['Documentos','#documentos-revisao']]){
-  fireEvent.click(screen.getByRole('tab',{name,exact:true}))
-  expect(screen.getByRole('tabpanel',{name,exact:true})).toBeTruthy()
-  expect(document.querySelector(target)).not.toBeNull()
- }
- expect(api.create).not.toHaveBeenCalled();expect(api.edit).not.toHaveBeenCalled();expect(api.transition).not.toHaveBeenCalled()
+ const open=await screen.findByRole('button',{name:'Pendências: 1 por tratar'})
+ expect(screen.queryByRole('heading',{name:'Próximo passo'})).toBeNull()
+ // Partners are only read when the list is opened.
+ expect(api.partnersGet).not.toHaveBeenCalled()
+ fireEvent.click(open)
+ const dialog=screen.getByRole('dialog',{name:'Pendências da candidatura'})
+ const point=text=>within(dialog).getByText(text).closest('li')
+ expect(point('Equipa com pelo menos um participante').dataset.state).toBe('done')
+ expect(point('Documentação com pelo menos um documento').dataset.state).toBe('pending')
+ expect(point('Parceiros associados').dataset.state).toBe('loading')
+ await waitFor(()=>expect(point('Parceiros associados').dataset.state).toBe('pending'))
+ expect(api.partnersGet).toHaveBeenCalledTimes(1)
+ // A required point is still open: the following step is not offered yet.
+ expect(within(dialog).queryByRole('button',{name:'Registar a submissão'})).toBeNull()
+ fireEvent.click(within(dialog).getByRole('button',{name:'Abrir documentos'}))
+ expect(screen.queryByRole('dialog',{name:'Pendências da candidatura'})).toBeNull()
+ await waitFor(()=>expect(screen.getByRole('tab',{name:'Documentos',exact:true}).getAttribute('aria-selected')).toBe('true'))
+ expect(api.edit).not.toHaveBeenCalled();expect(api.transition).not.toHaveBeenCalled()
+})
+it('offers the following step from the pending list only when the required points are settled',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ mount(`/candidaturas/${application}`)
+ fireEvent.click(await screen.findByRole('button',{name:'Pendências'}))
+ const dialog=screen.getByRole('dialog',{name:'Pendências da candidatura'})
+ expect(within(dialog).getByText('Responsável definido').closest('li').dataset.state).toBe('done')
+ expect(within(dialog).getByText('Prazo interno definido').closest('li').dataset.state).toBe('done')
+ fireEvent.click(within(dialog).getByRole('button',{name:'Iniciar a preparação'}))
+ await screen.findByRole('dialog',{name:'Alterar estado'})
+ expect(api.transition).not.toHaveBeenCalled()
+})
+it('keeps the pending list read-only for a reader who cannot edit or change the state',async()=>{
+ api.get.mockResolvedValue({data:{...record,deadline:null,canEdit:false,allowedTransitions:[]}})
+ mount(`/candidaturas/${application}`)
+ fireEvent.click(await screen.findByRole('button',{name:'Pendências: 1 por tratar'}))
+ const dialog=screen.getByRole('dialog',{name:'Pendências da candidatura'})
+ expect(within(dialog).getByText('Prazo interno definido').closest('li').dataset.state).toBe('pending')
+ expect(within(dialog).queryByRole('button',{name:'Definir prazo'})).toBeNull()
+ expect(within(dialog).queryByRole('button',{name:'Iniciar a preparação'})).toBeNull()
+})
+it('shows no pending list after the preparation phases',async()=>{
+ api.get.mockResolvedValue({data:{...record,status:'SUBMITTED',allowedTransitions:[]}})
+ mount(`/candidaturas/${application}`)
+ await screen.findByRole('heading',{name:'Antes'})
+ expect(screen.queryByRole('button',{name:/Pendências/})).toBeNull()
 })
 
 it.each([['APPROVED','Aprovada'],['REJECTED','Reprovada'],['CANCELLED','Cancelada'],['ARCHIVED','Arquivada']])('confirms %s only after showing the exact transition and reason',async(status,label)=>{
@@ -436,12 +533,14 @@ it.each([['APPROVED','Aprovada'],['REJECTED','Reprovada'],['CANCELLED','Cancelad
  const dialog=await screen.findByRole('dialog',{name:`Confirmar alteração para ${label}?`})
  expect(dialog.textContent).toContain('Submetida');expect(dialog.textContent).toContain('Decisão validada');expect(dialog.textContent).toContain(record.title)
  expect(api.transition).not.toHaveBeenCalled();expect(sessionStorage.getItem(applicationIntentKey(userA,org))).toBeNull()
- fireEvent.click(within(dialog).getByRole('button',{name:'Voltar'}));await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull())
+ fireEvent.click(within(dialog).getByRole('button',{name:'Voltar'}));await waitFor(()=>expect(screen.queryByRole('dialog',{name:/Confirmar alteração/})).toBeNull())
+ // The status modal returns with the reason kept.
+ await screen.findByRole('dialog',{name:'Alterar estado'})
  expect(screen.getByLabelText('Motivo').value).toBe('Decisão validada');expect(api.transition).not.toHaveBeenCalled()
- fireEvent.click(screen.getByRole('button',{name:label,exact:true}));fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button',{name:'Confirmar alteração'}))
+ fireEvent.click(screen.getByRole('button',{name:label,exact:true}));fireEvent.click(within(await screen.findByRole('dialog',{name:/Confirmar alteração/})).getByRole('button',{name:'Confirmar alteração'}))
  await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(1));expect(api.transition.mock.calls[0][1]).toMatchObject({status,reason:'Decisão validada',expectedRevision:record.revision})
  const first=api.transition.mock.calls[0];fireEvent.click(await screen.findByRole('button',{name:'Repetir o mesmo envio'}))
- await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(2));expect(api.transition.mock.calls[1]).toEqual(first);expect(screen.queryByRole('dialog')).toBeNull()
+ await waitFor(()=>expect(api.transition).toHaveBeenCalledTimes(2));expect(api.transition.mock.calls[1]).toEqual(first);expect(screen.queryByRole('dialog',{name:/Confirmar alteração/})).toBeNull()
 })
 it('abandons an open final confirmation without persisting or sending',async()=>{
  api.get.mockResolvedValue({data:{...record,allowedTransitions:['ARCHIVED']}});api.responsibles.mockResolvedValue({data:{items:[]}})
@@ -515,7 +614,33 @@ it('keeps archived application details visible without offering edit or transiti
  mount(`/candidaturas/${application}`)
  expect(await screen.findByRole('heading',{name:'Antes'})).toBeTruthy()
  expect(screen.queryByRole('button',{name:'Editar dados e orçamento'})).toBeNull()
- expect(screen.queryByText('Alterar estado',{selector:'summary'})).toBeNull()
+ expect(screen.queryByRole('button',{name:'Alterar estado'})).toBeNull()
  expect(screen.getByRole('link',{name:'Oportunidade: Oportunidade'}).getAttribute('href')).toBe(`/oportunidades/${opp}`)
  expect(api.edit).not.toHaveBeenCalled()
+})
+it('uses the central opportunity handed over by the table and reads it only when it is another revision or no longer recent',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ const search=`?nova=1&origem=CENTRAL&oportunidade=${opp}&revisao=${id(20)}`
+ const open=state=>render(<MemoryRouter initialEntries={[{pathname:'/candidaturas',search,state}]}><Routes><Route path="/candidaturas" element={<PrivateApplications/>}/></Routes></MemoryRouter>)
+ const handed=(revisionId,readAt=Date.now())=>({centralOpportunity:{record:{opportunityId:opp,revisionId,snapshot:{title:'Oportunidade entregue'}},readAt}})
+ open(handed(id(20)));await screen.findByText('Oportunidade entregue',{selector:'strong'})
+ expect(central.get).not.toHaveBeenCalled();cleanup()
+ central.get.mockResolvedValue({data:{revisionId:id(20),snapshot:{title:'Oportunidade lida'}}})
+ open(handed(id(21)));await screen.findByText('Oportunidade lida',{selector:'strong'})
+ expect(central.get).toHaveBeenCalledTimes(1);cleanup()
+ open(handed(id(20),Date.now()-61000));await screen.findByText('Oportunidade lida',{selector:'strong'})
+ expect(central.get).toHaveBeenCalledTimes(2)
+})
+it('uses the interest handed over with the navigation and reads it only when it is another revision or no longer recent',async()=>{
+ api.responsibles.mockResolvedValue({data:{items:[]}})
+ central.get.mockResolvedValue({data:{opportunityId:opp,revisionId:id(20),snapshot:{title:'Oportunidade'}}})
+ const interest={interestId:id(30),opportunityId:opp,revision:4,status:'ACTIVE',unitIds:[],capabilities:{canManage:true,canCreateApplication:true}}
+ interests.get.mockResolvedValue({data:interest})
+ const search=`?nova=1&origem=CENTRAL&oportunidade=${opp}&revisao=${id(20)}&interesse=${id(30)}&interesseRevisao=4`
+ const open=state=>render(<MemoryRouter initialEntries={[{pathname:'/candidaturas',search,state}]}><Routes><Route path="/candidaturas" element={<PrivateApplications/>}/></Routes></MemoryRouter>)
+ const handed=(revision,readAt=Date.now())=>({sourceInterest:{record:{...interest,revision},readAt}})
+ open(handed(4));await screen.findByText('Oportunidade',{selector:'strong'})
+ expect(interests.get).not.toHaveBeenCalled();expect(screen.queryByText(/O interesse mudou/)).toBeNull();cleanup()
+ open(handed(3));await waitFor(()=>expect(interests.get).toHaveBeenCalledTimes(1));cleanup()
+ open(handed(4,Date.now()-61000));await waitFor(()=>expect(interests.get).toHaveBeenCalledTimes(2))
 })

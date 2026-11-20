@@ -106,3 +106,64 @@ it('uses the same area list and explanation when matching people to an opportuni
 it('oferece consulta direta do catálogo quando o matching excede a capacidade',async()=>{
  mount(Promise.reject({response:{status:409,data:{error:{code:'LIMIT_EXCEEDED'}}}}));const alert=await screen.findByRole('alert');const link=screen.getByRole('link',{name:'consultar o catálogo diretamente'});expect(link.getAttribute('href')).toBe('/catalogo');expect(alert.textContent).toMatch(/não apresenta correspondências calculadas/)
 })
+
+it('shows the profile-choice sentence only when the profile picker is available',async()=>{
+ const noPeople={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:false,items:[]}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={noPeople}/></MemoryRouter>)
+ await screen.findByText('Sem correspondências')
+ expect(screen.queryByText(/Escolha um perfil/)).toBeNull()
+ cleanup()
+ const withPeople={matching:vi.fn(async()=>({data:{state:'READY',items:[]}})),people:vi.fn(async()=>({data:{items:[{personId:'p1',name:'Pessoa'}],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={withPeople}/></MemoryRouter>)
+ expect(await screen.findByText(/Escolha um perfil/)).toBeTruthy()
+})
+
+it('does not label catalog results with an origin name and keeps the programme; private ones stay marked',async()=>{
+ const rows=[{opportunityId:'c',origin:'CENTRAL',href:'/catalogo/c',title:'Central call',programmeName:'HORIZON',matchedAreas:[]},
+  {opportunityId:'n',origin:'CENTRAL',href:'/catalogo/n',title:'Central without programme',matchedAreas:[]},
+  {opportunityId:'p',origin:'PRIVATE',href:'/oportunidades/p',title:'Private call',programmeName:'Interno',matchedAreas:[]}]
+ const api={matching:vi.fn(async()=>({data:{state:'READY',privateIncluded:true,items:rows}})),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Central call'})
+ expect(screen.queryByText(/Catálogo C4G/)).toBeNull()
+ expect(screen.getByText('HORIZON')).toBeTruthy()
+ expect(screen.getByText('Privada · Interno')).toBeTruthy()
+})
+// Found in staging on 14/11/2026 with the Técnico account: the selector request was always refused with 403.
+it('does not request the people list when the account has no people section',async()=>{
+ const api={matching:vi.fn(async()=>ready('Resultado do técnico')),people:vi.fn(async()=>({data:{items:[],nextCursor:null}}))}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api} canReadPeople={false}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado do técnico'})
+ expect(api.matching).toHaveBeenCalledTimes(1);expect(api.people).not.toHaveBeenCalled()
+ expect(screen.queryByRole('combobox',{name:'Pessoa'})).toBeNull()
+})
+it('still requests the people list by default and when the account has the people section',async()=>{
+ for(const props of [{},{canReadPeople:true}]){
+  const api={matching:vi.fn(async()=>ready('Resultado')),people:vi.fn(async()=>({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}}))}
+  const view=render(<MemoryRouter><MatchingTable organizationId="org" api={api} {...props}/></MemoryRouter>)
+  await screen.findByRole('combobox',{name:'Pessoa'});expect(api.people).toHaveBeenCalledTimes(1);view.unmount()
+ }
+})
+it('keeps the previous result on screen, dimmed and inactive, while another person is calculated',async()=>{
+ let finish
+ const api={matching:vi.fn().mockResolvedValueOnce(ready('Resultado anterior')).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve})),
+  people:vi.fn().mockResolvedValue({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}})}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado anterior'})
+ fireEvent.change(await screen.findByLabelText('Pessoa'),{target:{value:'pessoa-a'}})
+ await waitFor(()=>expect(api.matching).toHaveBeenCalledTimes(2))
+ const results=screen.getByRole('link',{name:'Resultado anterior'}).closest('section')
+ expect(results.classList.contains('matching-stale')).toBe(true);expect(results.hasAttribute('inert')).toBe(true)
+ await act(async()=>finish(ready('Resultado novo')))
+ expect(screen.queryByRole('link',{name:'Resultado anterior'})).toBeNull()
+ expect(screen.getByRole('link',{name:'Resultado novo'}).closest('section').hasAttribute('inert')).toBe(false)
+})
+it('removes the previous result when the new calculation fails',async()=>{
+ const api={matching:vi.fn().mockResolvedValueOnce(ready('Resultado anterior')).mockRejectedValue({response:{status:503}}),
+  people:vi.fn().mockResolvedValue({data:{items:[{personId:'pessoa-a',name:'Pessoa A'}],nextCursor:null}})}
+ render(<MemoryRouter><MatchingTable organizationId="org" api={api}/></MemoryRouter>)
+ await screen.findByRole('link',{name:'Resultado anterior'})
+ fireEvent.change(await screen.findByLabelText('Pessoa'),{target:{value:'pessoa-a'}})
+ await screen.findByRole('alert')
+ expect(screen.queryByRole('link',{name:'Resultado anterior'})).toBeNull()
+})

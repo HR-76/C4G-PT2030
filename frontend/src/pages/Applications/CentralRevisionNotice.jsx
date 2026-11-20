@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react'
 import {Link} from 'react-router-dom'
 import {centralOpportunitiesApi} from '../../api/api'
+import {afterPageRequests} from '../../api/pageRequests'
 import {opportunityDate} from '../Opportunities/OpportunityPresentation'
 
 export default function CentralRevisionNotice({record}){
@@ -8,8 +9,10 @@ export default function CentralRevisionNotice({record}){
  const id=record.opportunityId,revision=record.centralRevisionId,central=record.origin==='CENTRAL'
  useEffect(()=>{
   let active=true;setCurrent(null);setUnavailable(false)
-  if(central&&revision)centralOpportunitiesApi.get(id).then(response=>{if(active)setCurrent(response.data)}).catch(()=>{if(active)setUnavailable(true)})
-  return()=>{active=false}
+  const controller=new AbortController()
+  // Secondary to the record itself: asked once the page's own requests have settled.
+  if(central&&revision)afterPageRequests(controller.signal,()=>centralOpportunitiesApi.get(id).then(response=>{if(active)setCurrent(response.data)}).catch(()=>{if(active)setUnavailable(true)}))
+  return()=>{active=false;controller.abort()}
  },[id,revision,central])
  if(!central||!revision)return null
  if(unavailable)return <p role="status">Não foi possível verificar alterações na fonte. A candidatura mantém a revisão original.</p>

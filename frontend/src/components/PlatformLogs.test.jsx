@@ -18,3 +18,16 @@ it('shows empty result and warns when collection has gaps',async()=>{
 it('shows unknown identity and retains filter when paging',async()=>{
  const response=result([{...entry,name:null,email:null,type:'ERROR',description:'Erro',httpStatus:503}]);response.data.total=16;const api={logs:vi.fn().mockResolvedValue(response)};render(<LogsView api={api}/>);await screen.findByText('Não identificado');expect(screen.getByText('HTTP 503')).toBeTruthy();expect(screen.getByText('Página 1 de 2')).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Seguinte'}));await waitFor(()=>expect(api.logs).toHaveBeenLastCalledWith({page:'2'},expect.any(AbortSignal)));
 })
+it('keeps the previous rows dimmed and inactive while another page is read and keeps nothing between entries',async()=>{
+ let finish
+ const api={logs:vi.fn().mockResolvedValueOnce(result()).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve}))}
+ const first=render(<LogsView api={api}/>);await screen.findByText('Ana')
+ fireEvent.change(screen.getByLabelText('Tipo'),{target:{value:'ERROR'}});fireEvent.click(screen.getByRole('button',{name:'Aplicar filtros'}))
+ await waitFor(()=>expect(api.logs).toHaveBeenCalledTimes(2))
+ const kept=screen.getByText('Ana').closest('.directory-stale');expect(kept).toBeTruthy();expect(kept.hasAttribute('inert')).toBe(true)
+ finish(result([{...entry,id:'b',name:'Bruno'}]));await screen.findByText('Bruno')
+ expect(screen.queryByText('Ana')).toBeNull();expect(screen.getByText('Bruno').closest('.directory-stale')).toBeNull()
+ first.unmount()
+ api.logs.mockReturnValue(new Promise(()=>{}))
+ render(<LogsView api={api}/>);expect(screen.queryByText('Bruno')).toBeNull()
+})

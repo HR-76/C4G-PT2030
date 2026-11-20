@@ -86,7 +86,7 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
   try {
     const centralReady = await require('../../src/security/centralMigrationPreflight').preflightCentral(centralPool);
     if(state.catalogRead?.mode==='controlled'){
-      if(!['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents'].includes(centralReady.currentVersion))throw Error('CATALOG_SCHEMA_REQUIRED');
+      if(!['048_catalog_read_service_v1','049_pt2030_document_upload','050_billing_private_documents','051_email_templates'].includes(centralReady.currentVersion))throw Error('CATALOG_SCHEMA_REQUIRED');
       const settings=JSON.parse(fs.readFileSync(path.join(folder,'catalog-controlled','settings.json'),'utf8'));
       catalogStartup=await require('../../src/opportunities/catalogRead/controlledStartup').prepareControlledStartup({centralPool,target:{host:config.host,port:config.port,database:config.centralDatabase},settings,Pool,express,policyVersion:state.identity.policyVersion||'c4g-assurance-v1',evidenceDirectory:path.join(root,'context/references/opportunity-v2/evidence'),sink:event=>fs.appendFileSync(path.join(folder,'catalog-controlled','telemetry.jsonl'),JSON.stringify(event)+'\n')});
     }
@@ -119,7 +119,7 @@ async function startNative({ config = readConfig(), state = JSON.parse(fs.readFi
       if(settings.installationId!==state.installationId||settings.issuer!==state.identity.issuer||settings.origin!==env.PUBLIC_APP_URL)throw Error('MEMBER_CONFIGURATION_INVALID');
       memberWorker=require('../../src/platformOnboarding/memberWorkerClient').createMemberWorkerClient(path.join(folder,'members','worker.json'));
       env.PLATFORM_ACCESS_RUNTIME='central';
-      createMemberOnboarding=({authorityCoordinator,authConfig})=>memberService=require('../../src/platformOnboarding/memberService').createMemberOnboardingService({coordinator:authorityCoordinator,issuer:settings.issuer,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],mfaPolicyCode:'USER_OPTIONAL',dataResidencyCode:'LOCAL',identity:{ensure:x=>memberWorker.call('identity',x)},projection:{ensure:x=>admissionWorker&&x.organizationId!==state.organizationId?admissionWorker.call('memberProjection',x):memberWorker.call('projection',x)},verification:{verify:x=>memberOidc.verify(x)},email:{secret:x=>memberWorker.call('activationSecret',x),send:x=>memberWorker.call('activationEmail',x)}});
+      createMemberOnboarding=({authorityCoordinator,authConfig,prepareEmail})=>memberService=require('../../src/platformOnboarding/memberService').createMemberOnboardingService({coordinator:authorityCoordinator,issuer:settings.issuer,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],mfaPolicyCode:'USER_OPTIONAL',dataResidencyCode:'LOCAL',identity:{ensure:x=>memberWorker.call('identity',x)},projection:{ensure:x=>admissionWorker&&x.organizationId!==state.organizationId?admissionWorker.call('memberProjection',x):memberWorker.call('projection',x)},verification:{verify:x=>memberOidc.verify(x)},prepareEmail,email:{secret:x=>memberWorker.call('activationSecret',x),send:x=>memberWorker.call('activationEmail',x),test:x=>memberWorker.call('testInvitationEmail',x)}});
     }
     const createAdmission=admissionWorker?({authorityCoordinator,authConfig})=>{
       const unused=async()=>{throw Error('WORKER_ONLY');};

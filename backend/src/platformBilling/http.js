@@ -70,7 +70,7 @@ function queryInput(request) {
   return Object.fromEntries(Object.entries(request.query || {}));
 }
 
-function createPlatformBillingRouter({ express, service, authenticate, pdfs=null }) {
+function createPlatformBillingRouter({ express, service, authenticate, pdfs=null, validation=null }) {
   const methods = [
     'summary', 'cycles', 'cycleDetail', 'accountDetail', 'accountWrite', 'cycleCreate',
     'cycleEdit', 'cycleTransition', 'documentRecord', 'documentTransition',
@@ -105,6 +105,7 @@ function createPlatformBillingRouter({ express, service, authenticate, pdfs=null
     }
   };
 
+  require('../billingValidation/http').mountValidationRoutes(router,{service:validation,admin:true});
   require('../customerBilling/pdfHttp').mountPdfRoutes(router,{express,service:pdfs});
   router.get('/summary', handle(200, 'read', request => service.summary(queryInput(request), request)));
   router.get('/cycles', handle(200, 'read', request => service.cycles(queryInput(request), request)));

@@ -14,3 +14,20 @@ it('supports zero data and unavailable activity without inventing healthy status
 it('uses the platform dashboard only for platform administrators',()=>{expect(getHomePath({platformRoles:['C4G_ADMIN']})).toBe('/administracao/dashboard');expect(getHomePath({platformRoles:[]})).toBe('/dashboard');expect(getHomePath({role:'ADMIN'})).toBe('/dashboard')})
 it('shows missing operational data as unavailable, never as healthy or zero',async()=>{mount({dashboard:vi.fn().mockResolvedValue({data:sample})});await screen.findByText('3 ativas');expect(screen.getByText('Dados insuficientes')).toBeTruthy();expect(screen.getByText('dados indisponíveis')).toBeTruthy();expect(screen.getByText('Dados indisponíveis')).toBeTruthy()})
 it('shows observed dependency state and pool capacity without inventing an SLO',async()=>{mount({dashboard:vi.fn().mockResolvedValue({data:{...sample,operational:{dependencies:{status:'DEGRADED',reasons:['DATABASE']},capacity:{total:4,idle:1,waiting:2,max:10}}}})});await screen.findByText('degradado');expect(screen.getByText('DATABASE')).toBeTruthy();expect(screen.getByText('de 10 ligações')).toBeTruthy();expect(screen.getByText(/1 livres/)).toBeTruthy();expect(screen.getByText('Dados insuficientes')).toBeTruthy()})
+it('reopens with the confirmed indicators, reads them again and never shows them to another administrator',async()=>{
+ const {clearConfirmedReads,readScope}=await import('../api/confirmedReads')
+ clearConfirmedReads()
+ const scope=readScope('admin',''),api={dashboard:vi.fn().mockResolvedValue({data:sample})}
+ const open=(as=scope)=>render(<MemoryRouter><DashboardView api={api} scope={as}/></MemoryRouter>)
+ open();await screen.findByText('3 ativas');cleanup()
+ api.dashboard.mockReturnValue(new Promise(()=>{}))
+ open();expect(screen.getByText('3 ativas')).toBeTruthy();expect(screen.queryByRole('status')).toBeNull();expect(api.dashboard).toHaveBeenCalledTimes(2)
+ // An explicit refresh waits for the server and shows nothing meanwhile.
+ fireEvent.click(screen.getByRole('button',{name:'Atualizar'}));expect(screen.queryByText('3 ativas')).toBeNull();expect(screen.getByRole('status')).toBeTruthy();cleanup()
+ open(readScope('other',''));expect(screen.queryByText('3 ativas')).toBeNull();cleanup()
+ api.dashboard.mockRejectedValue({response:{status:403}})
+ open();await screen.findByRole('alert');expect(screen.queryByText('3 ativas')).toBeNull();cleanup()
+ api.dashboard.mockReturnValue(new Promise(()=>{}))
+ open();expect(screen.queryByText('3 ativas')).toBeNull()
+ clearConfirmedReads()
+})

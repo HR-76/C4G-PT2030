@@ -1,4 +1,5 @@
 const { organizationContextUnavailable } = require('../utils/publicHttpError');
+const { navigationFor } = require('../organizationDirectory/accessProfiles');
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -11,7 +12,7 @@ function publicOrganization(context) {
     CONTRIBUTOR: 'Membro da organização',
     VIEWER: 'Consulta'
   }[context.baseRoleCode];
-  return { ...context.organization, ...(typeof profileLabel === 'string' ? { profileLabel, profileCode: context.baseRoleCode } : {}) };
+  return { ...context.organization, ...(typeof profileLabel === 'string' ? { profileLabel, profileCode: context.baseRoleCode, navigation: navigationFor(context.baseRoleCode) } : {}) };
 }
 
 function createOrganizationAuthController({ organizationSession, generateCsrfToken }) {

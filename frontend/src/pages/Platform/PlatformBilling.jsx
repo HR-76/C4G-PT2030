@@ -1,3 +1,4 @@
+import BillingValidationPanel from '../../components/BillingValidationPanel'
 import FilterBar from '../../components/FilterBar'
 import SearchInput from '../../components/SearchInput'
 import LoadingIndicator from '../../components/LoadingIndicator'
@@ -5,9 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarPlus, RefreshCw, SlidersHorizontal } from 'lucide-react'
 import { platformBillingApi, platformDirectoryApi } from '../../api/api'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { useAuth } from '../../contexts/AuthContext'
 import BillingDialog from './BillingDialog'
-import { billingError, cleanParams, cycleStates, formatDate, formatMoney, nullable, paymentStates } from './billingPresentation'
+import { billingError, cleanParams, cycleStates, documentTypes, formatDate, formatMoney, nullable, paymentStates } from './billingPresentation'
+import { accountLabels, accountLimits, overLimit, profileDifferences, profileSuggestions } from './billingAccountPrefill'
 import './platform-billing.css'
 
 const emptyFilters = { q: '', organizationId: '', from: '', to: '', cycleStatus: '', paymentStatus: '', overdue: '', currency: '' }
@@ -16,23 +19,27 @@ const cycleBlank = { periodStart: '', periodEnd: '', serviceDescription: 'Subscr
 
 export default function PlatformBilling() {
   const { user } = useAuth()
-  return <BillingView key={user?.id}/>
+  return <BillingView key={user?.id} scope={user?.id ? readScope(user.id, '') : null}/>
 }
 
-export function BillingView({ api = platformBillingApi, directoryApi = platformDirectoryApi }) {
+// The position this administrator last received for the same filters is shown at once and read again; while other
+// filters or another page are read, the previous position stays on screen, dimmed and inactive.
+export function BillingView({ api = platformBillingApi, directoryApi = platformDirectoryApi, scope = null }) {
   const [params, setParams] = useSearchParams(), navigate = useNavigate(), key = params.toString(), generation = useRef(0)
   const [filters, setFilters] = useState(() => ({ ...emptyFilters, ...Object.fromEntries(params) }))
-  const [snapshot, setSnapshot] = useState(null), [busy, setBusy] = useState(true), [error, setError] = useState(''), [reload, setReload] = useState(0)
+  const readName = `platform-billing:${key}`
+  const [snapshot, setSnapshot] = useState(() => { const held = startConfirmedRead(scope, readName).held; return held ? { key, ...held } : null }), [busy, setBusy] = useState(!snapshot), [error, setError] = useState(''), [reload, setReload] = useState(0)
   const [setup, setSetup] = useState(false)
-  const query = cleanParams(params), data = snapshot?.key === key ? snapshot : null
+  const query = cleanParams(params), exact = snapshot?.key === key ? snapshot : null, stale = !exact && busy && Boolean(snapshot), data = exact || (stale ? snapshot : null)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; params is read at that moment.
   useEffect(() => setFilters({ ...emptyFilters, ...Object.fromEntries(params) }), [key])
   useEffect(() => {
-    const epoch = ++generation.current, controller = new AbortController(); setBusy(true); setError('')
+    const epoch = ++generation.current, controller = new AbortController(), read = startConfirmedRead(scope, readName); setBusy(!read.held); setError('')
+    if (read.held) setSnapshot({ key, ...read.held })
     const summaryQuery = Object.fromEntries(['from', 'to', 'currency'].flatMap(name => query[name] ? [[name, query[name]]] : []))
     Promise.all([api.summary(summaryQuery, controller.signal), api.cycles(query, controller.signal)])
-      .then(([summary, cycles]) => { if (epoch === generation.current) setSnapshot({ key, summary: summary.data, cycles: cycles.data }) })
-      .catch(reason => { if (epoch === generation.current && reason?.code !== 'ERR_CANCELED') setError(billingError(reason)) })
+      .then(([summary, cycles]) => { read.keep({ summary: summary.data, cycles: cycles.data }); if (epoch === generation.current) setSnapshot({ key, summary: summary.data, cycles: cycles.data }) })
+      .catch(reason => { if (epoch === generation.current && reason?.code !== 'ERR_CANCELED') { read.drop(); setSnapshot(null); setError(billingError(reason)) } })
       .finally(() => { if (epoch === generation.current) setBusy(false) })
     return () => { generation.current += 1; controller.abort() }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; query is read at that moment.
@@ -48,11 +55,11 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
   return <div className="page platform-billing">
     <header className="billing-heading"><div><h1>Faturação</h1><p>Controlo operacional dos valores emitidos e recebidos pela C4G.</p></div>
       <div className="billing-heading-actions"><button className="btn btn-outline" disabled={busy} onClick={() => setReload(value => value + 1)}><RefreshCw size={16} aria-hidden="true"/>Atualizar</button>
-        <button className="btn btn-primary" onClick={() => setSetup(true)}><CalendarPlus size={17} aria-hidden="true"/>Preparar faturação</button></div></header>
+        <button className="btn btn-outline" onClick={() => setSetup('account')}>Fichas de faturação</button><button className="btn btn-primary" onClick={() => setSetup(true)}><CalendarPlus size={17} aria-hidden="true"/>Preparar faturação</button></div></header>
 
     {busy && !data && <LoadingIndicator>A carregar a posição financeira…</LoadingIndicator>}
     {error && <div className="alert alert-error" role="alert">{error} <button className="btn btn-outline" onClick={() => setReload(value => value + 1)}>Tentar novamente</button></div>}
-    {data && <>
+    {data && <div className={stale ? 'billing-stale' : undefined} inert={stale ? '' : undefined} aria-busy={stale || undefined}>
       <BillingSummary rows={data.summary.currencies}/>
       <section className="billing-register" aria-label="Ciclos de faturação">
       <div className="billing-register-heading"><h2>Ciclos de faturação</h2><p>Consulte documentos, pagamentos e saldos.</p></div>
@@ -71,8 +78,8 @@ export function BillingView({ api = platformBillingApi, directoryApi = platformD
       {data.cycles.items.length ? <CycleTable items={data.cycles.items}/> : <section className="billing-empty"><h2>{hasFilters ? 'Nenhum ciclo corresponde aos filtros' : 'Ainda não existem ciclos de faturação'}</h2><p>{hasFilters ? 'Altere os critérios ou limpe os filtros.' : 'Prepare a conta da entidade e registe o primeiro período de faturação.'}</p>{!hasFilters && <button className="btn btn-primary" onClick={() => setSetup(true)}>Preparar primeiro ciclo</button>}</section>}
       <nav className="billing-pagination" aria-label="Paginação"><button className="btn btn-secondary" disabled={data.cycles.page <= 1} onClick={() => page(-1)}>Anterior</button><span>Página {data.cycles.page}{data.cycles.total ? ` de ${Math.ceil(data.cycles.total / data.cycles.pageSize)}` : ''}</span><button className="btn btn-secondary" disabled={data.cycles.page * data.cycles.pageSize >= data.cycles.total} onClick={() => page(1)}>Seguinte</button></nav>
       </section>
-    </>}
-    {setup && <BillingSetup api={api} directoryApi={directoryApi} onClose={() => setSetup(false)} onCreated={cycleId => { setSetup(false); navigate(`/administracao/faturacao/${cycleId}`) }} onChanged={() => setReload(value => value + 1)}/>}
+    </div>}
+    {setup && <BillingSetup accountOnly={setup === 'account'} api={api} directoryApi={directoryApi} onClose={() => setSetup(false)} onCreated={cycleId => { setSetup(false); navigate(`/administracao/faturacao/${cycleId}`) }} onChanged={() => setReload(value => value + 1)}/>}
   </div>
 }
 
@@ -92,7 +99,7 @@ function CycleTable({ items }) {
   return <div className="table-wrap billing-table-wrap" role="region" aria-label="Tabela de ciclos de faturação" tabIndex={0}><table role="table" className="data-table mobile-card-table billing-table"><caption className="sr-only">Ciclos de faturação</caption><thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Entidade</th><th role="columnheader" scope="col">Período</th><th role="columnheader" scope="col">Documento</th><th role="columnheader" scope="col">Datas</th><th role="columnheader" scope="col">Total</th><th role="columnheader" scope="col">Pago</th><th role="columnheader" scope="col">Saldo</th><th role="columnheader" scope="col">Estados</th><th role="columnheader" scope="col"></th></tr></thead><tbody role="rowgroup">{items.map(item => <tr role="row" key={item.cycleId}>
     <td role="cell" data-label="Entidade"><strong>{item.organizationName}</strong><small>{item.organizationLegalName !== item.organizationName ? item.organizationLegalName : item.serviceDescription}</small></td>
     <td role="cell" data-label="Período">{formatDate(item.periodStart)}<small>até {formatDate(item.periodEnd)}</small></td>
-    <td role="cell" data-label="Documento">{item.document ? <>{item.document.number}<small>{item.document.type}</small></> : <span className="billing-muted">Por registar</span>}</td>
+    <td role="cell" data-label="Documento">{item.document ? <>{item.document.number}<small>{documentTypes[item.document.type] || item.document.type}</small></> : <span className="billing-muted">Por registar</span>}</td>
     <td role="cell" data-label="Datas"><span>{formatDate(item.document?.issueDate || item.plannedIssueDate)}</span><small>Vence {formatDate(item.document?.dueDate || item.dueDate)}</small></td>
     <td role="cell" data-label="Total" className="billing-money">{formatMoney(item.adjustedTotal, item.currency)}</td><td role="cell" data-label="Pago" className="billing-money">{formatMoney(item.paidAmount, item.currency)}</td><td role="cell" data-label="Saldo" className="billing-money billing-balance">{formatMoney(item.balanceAmount, item.currency)}</td>
     <td role="cell" data-label="Estados"><div className="billing-state-stack"><Status kind="cycle" value={item.cycleState}/><Status kind="payment" value={item.paymentState} overdue={item.overdue}/></div></td>
@@ -100,37 +107,58 @@ function CycleTable({ items }) {
   </tr>)}</tbody></table></div>
 }
 
-function BillingSetup({ api, directoryApi, onClose, onCreated, onChanged }) {
+function BillingSetup({ api, directoryApi, onClose, onCreated, onChanged, accountOnly = false }) {
   const [entities, setEntities] = useState([]), [entityId, setEntityId] = useState(''), [query, setQuery] = useState('')
   const [account, setAccount] = useState(null), [accountLoaded, setAccountLoaded] = useState(false), [mode, setMode] = useState('select')
   const [busy, setBusy] = useState(false), [error, setError] = useState('')
   const findEntities = async event => { event?.preventDefault(); setBusy(true); setError(''); try { const { data } = await directoryApi.entities({ ...(query.trim() ? { q: query.trim() } : {}), status: 'ACTIVE', page: 1 }); setEntities(data.items) } catch (reason) { setError(billingError(reason)) } finally { setBusy(false) } }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; findEntities is read at that moment.
   useEffect(() => { findEntities() }, [])
-  const choose = async value => { setEntityId(value); setAccount(null); setAccountLoaded(false); setError(''); if (!value) return; setBusy(true); try { const { data } = await api.account(value); setAccount(data); setAccountLoaded(true); setMode(data.account ? 'cycle' : 'account') } catch (reason) { setError(billingError(reason)) } finally { setBusy(false) } }
+  // The entity profile only suggests values; failing to read it never blocks billing setup.
+  const [profile, setProfile] = useState({ registration: null, failed: false })
+  const [saved, setSaved] = useState(false)
+  const readProfile = async value => { if (!directoryApi.entityProfile) return { registration: null, failed: false }; try { return { registration: (await directoryApi.entityProfile(value)).data?.registration || null, failed: false } } catch { return { registration: null, failed: true } } }
+  const choose = async value => { setEntityId(value); setAccount(null); setAccountLoaded(false); setError(''); if (!value) return; setBusy(true); try { const [{ data }, entityProfile] = await Promise.all([api.account(value), readProfile(value)]); setProfile(entityProfile); setAccount(data); setAccountLoaded(true); setMode(accountOnly || !data.account ? 'account' : 'cycle') } catch (reason) { setError(billingError(reason)) } finally { setBusy(false) } }
+  const differences = accountLoaded && account.account ? profileDifferences(account.account.version, profile.registration, account.organizationLegalName) : []
   const refreshAccount = async () => { if (!entityId) return; await choose(entityId) }
-  return <BillingDialog title="Preparar faturação" description="Selecione a entidade, confirme os dados faturados e registe o período." onClose={onClose} busy={busy} wide>
+  return <BillingDialog title={accountOnly ? 'Fichas de faturação' : 'Preparar faturação'} description={accountOnly ? 'Selecione a entidade para consultar ou editar os dados de faturação.' : 'Selecione a entidade, confirme os dados faturados e registe o período.'} onClose={onClose} busy={busy} wide>
     {error && <div className="alert alert-error" role="alert">{error}</div>}
     <FilterBar as="form" variant="compact" className="billing-entity-search" onSubmit={findEntities}><label>Pesquisar entidade<SearchInput value={query} maxLength={150} onChange={event => setQuery(event.target.value)} placeholder="Nome da entidade"/></label><button className="btn btn-outline" disabled={busy}>Pesquisar</button></FilterBar>
-    <label className="billing-full-field">Entidade<select value={entityId} onChange={event => choose(event.target.value)} disabled={busy}><option value="">Selecione uma entidade</option>{entities.map(entity => <option key={entity.id} value={entity.id}>{entity.name}</option>)}</select></label>
+    <label className="billing-full-field">Entidade<select value={entityId} onChange={event => { setSaved(false); choose(event.target.value) }} disabled={busy}><option value="">Selecione uma entidade</option>{entities.map(entity => <option key={entity.id} value={entity.id}>{entity.name}</option>)}</select></label>
     {busy && <p role="status">A consultar…</p>}
+    {saved && <p role="status">Dados de faturação guardados.</p>}
     {accountLoaded && mode === 'account' && (
-      <AccountForm organizationId={entityId} record={account} api={api} onSaved={async () => { onChanged(); await refreshAccount() }}/>
+      <AccountForm key={`${entityId}:${account.account?.revision || 0}`} organizationId={entityId} record={account} profile={profile} api={api} onDirty={() => setSaved(false)} onSaved={async () => { onChanged(); await refreshAccount(); setSaved(true) }}/>
     )}
-    {accountLoaded && mode === 'cycle' && <><div className="billing-account-strip"><div><span>Dados de faturação</span><strong>{account.account.version.legalName}</strong><small>{account.account.version.taxIdentifier} · {account.account.version.billingEmail}</small></div><button type="button" className="btn btn-outline" onClick={() => setMode('account')}>Editar dados</button></div><CycleCreateForm organizationId={entityId} accountVersionId={account.account.version.id} api={api} onCreated={onCreated}/></>}
+    {accountLoaded && mode === 'account' && account.account && <BillingValidationPanel key={`validation:${entityId}:${account.account.revision}`} api={api} organizationId={entityId} admin onBusy={setBusy}/>}
+    {accountLoaded && mode === 'cycle' && <>{differences.length > 0 && <ProfileDifferences items={differences} action="Rever diferenças" onAction={() => setMode('account')}/>}<div className="billing-account-strip"><div><span>Dados de faturação</span><strong>{account.account.version.legalName}</strong><small>{account.account.version.taxIdentifier} · {account.account.version.billingEmail}</small></div><button type="button" className="btn btn-outline" onClick={() => setMode('account')}>Editar dados</button></div><CycleCreateForm organizationId={entityId} accountVersionId={account.account.version.id} api={api} onCreated={onCreated}/></>}
   </BillingDialog>
 }
 
-function AccountForm({ organizationId, record, api, onSaved }) {
-  const version = record.account?.version, [form, setForm] = useState(() => version ? { ...accountBlank, ...version, externalSource: version.externalSource || '', externalCustomerRef: version.externalCustomerRef || '', addressLine2: version.addressLine2 || '', region: version.region || '', contactName: version.contactName || '', notes: version.notes || '', paymentTermsDays: String(version.paymentTermsDays) } : { ...accountBlank, legalName: record.organizationLegalName || '' })
+const names = fields => fields.map(field => accountLabels[field]).join(', ')
+
+function ProfileDifferences({ items, action, onAction }) {
+  return <div className="alert alert-info billing-profile-note" data-testid="billing-profile-difference"><div><strong>A ficha da entidade difere dos dados de faturação.</strong><ul>{items.map(item => <li key={item.field}>{item.label}: conta «{item.account || 'vazio'}» · ficha «{item.profile || 'vazio'}»</li>)}</ul></div><button type="button" className="btn btn-outline" onClick={onAction}>{action}</button></div>
+}
+
+function AccountForm({ organizationId, record, profile = { registration: null, failed: false }, api, onSaved, onDirty = () => {} }) {
+  const version = record.account?.version, suggestions = version ? null : profileSuggestions(profile.registration)
+  const [form, setForm] = useState(() => version ? { ...accountBlank, ...version, externalSource: version.externalSource || '', externalCustomerRef: version.externalCustomerRef || '', addressLine2: version.addressLine2 || '', region: version.region || '', contactName: version.contactName || '', notes: version.notes || '', paymentTermsDays: String(version.paymentTermsDays) } : { ...accountBlank, legalName: record.organizationLegalName || '', ...suggestions?.values })
+  const differences = version ? profileDifferences(form, profile.registration, record.organizationLegalName) : [], tooLong = overLimit(form)
+  const applyProfile = () => { onDirty(); setForm(old => ({ ...old, ...Object.fromEntries(differences.map(item => [item.field, item.profile])) })) }
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [conflict, setConflict] = useState(false), key = useRef(crypto.randomUUID())
-  const field = (name, value) => setForm(old => ({ ...old, [name]: value }))
+  const field = (name, value) => { onDirty(); setForm(old => ({ ...old, [name]: value })) }
   const submit = async event => { event.preventDefault(); setBusy(true); setError(''); setConflict(false); try { await api.accountWrite(organizationId, { ...form, addressLine2: nullable(form.addressLine2), region: nullable(form.region), contactName: nullable(form.contactName), externalSource: nullable(form.externalSource), externalCustomerRef: nullable(form.externalCustomerRef), notes: nullable(form.notes), paymentTermsDays: Number(form.paymentTermsDays), expectedRevision: record.account?.revision || 0, idempotencyKey: key.current }); await onSaved() } catch (reason) { setError(billingError(reason)); setConflict(reason?.response?.status === 409) } finally { setBusy(false) } }
-  return <form className="billing-command-form" onSubmit={submit}><fieldset disabled={busy}><legend>{record.account ? 'Editar dados de faturação' : 'Configurar conta de faturação'}</legend><div className="billing-form-grid">
+  return <form className="billing-command-form" onSubmit={submit}>
+    {suggestions && <div className="alert alert-info billing-profile-note" data-testid="billing-profile-note"><div>{suggestions.fromProfile.length > 0 && <p>Preenchido a partir da ficha da entidade: {names(suggestions.fromProfile)}.</p>}{suggestions.suggested.length > 0 && <p>Sugestões da ficha a confirmar: {names(suggestions.suggested)}.</p>}<p>Nada é guardado até confirmar.</p></div></div>}
+    {!version && profile.failed && <div className="alert alert-info billing-profile-note"><p>Não foi possível consultar a ficha da entidade. Preencha os dados manualmente.</p></div>}
+    {differences.length > 0 && <ProfileDifferences items={differences} action="Aplicar valores da ficha" onAction={applyProfile}/>}
+    {tooLong.length > 0 && <div className="alert alert-error" role="alert">{tooLong.map(field => `${accountLabels[field]} excede ${accountLimits[field]} caracteres`).join('; ')}. Abrevie antes de guardar.</div>}
+    <fieldset disabled={busy}><legend>{record.account ? 'Editar dados de faturação' : 'Configurar conta de faturação'}</legend><div className="billing-form-grid">
     <label className="billing-span-2">Denominação legal<input required maxLength={200} value={form.legalName} onChange={event => field('legalName', event.target.value)}/></label><label>País fiscal<input required maxLength={2} value={form.taxCountry} onChange={event => field('taxCountry', event.target.value.toUpperCase())}/></label><label>NIF / identificação fiscal<input required maxLength={32} value={form.taxIdentifier} onChange={event => field('taxIdentifier', event.target.value.toUpperCase())}/></label>
     <label className="billing-span-2">Morada<input required maxLength={200} value={form.addressLine1} onChange={event => field('addressLine1', event.target.value)}/></label><label>Complemento<input maxLength={200} value={form.addressLine2} onChange={event => field('addressLine2', event.target.value)}/></label><label>Código postal<input required maxLength={32} value={form.postalCode} onChange={event => field('postalCode', event.target.value)}/></label><label>Localidade<input required maxLength={120} value={form.locality} onChange={event => field('locality', event.target.value)}/></label><label>Região<input maxLength={120} value={form.region} onChange={event => field('region', event.target.value)}/></label>
     <label>Email de faturação<input required type="email" maxLength={254} value={form.billingEmail} onChange={event => field('billingEmail', event.target.value)}/></label><label>Contacto<input maxLength={160} value={form.contactName} onChange={event => field('contactName', event.target.value)}/></label><label>Origem externa<select value={form.externalSource} onChange={event => field('externalSource', event.target.value)}><option value="">Sem associação</option><option value="TOCONLINE">TOConline</option><option value="FE_AP">FE-AP</option><option value="OTHER">Outro</option></select></label><label>Referência externa<input maxLength={160} value={form.externalCustomerRef} onChange={event => field('externalCustomerRef', event.target.value)}/></label><label>Prazo de pagamento (dias)<input required type="number" min="0" max="365" value={form.paymentTermsDays} onChange={event => field('paymentTermsDays', event.target.value)}/></label><label className="billing-span-2">Notas<textarea maxLength={4000} value={form.notes} onChange={event => field('notes', event.target.value)}/></label>
-  </div></fieldset>{error && <div className="alert alert-error" role="alert">{error}{conflict && <span> Os dados introduzidos foram mantidos.</span>}</div>}<div className="billing-form-actions"><button className="btn btn-primary" disabled={busy}>{busy ? 'A guardar…' : 'Guardar dados de faturação'}</button></div></form>
+  </div></fieldset>{error && <div className="alert alert-error" role="alert">{error}{conflict && <span> Os dados introduzidos foram mantidos.</span>}</div>}<div className="billing-form-actions"><button className="btn btn-primary" disabled={busy || tooLong.length > 0}>{busy ? 'A guardar…' : 'Guardar dados de faturação'}</button></div></form>
 }
 
 function CycleCreateForm({ organizationId, accountVersionId, api, onCreated }) {

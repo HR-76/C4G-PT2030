@@ -113,6 +113,69 @@ export function PartnerForm({ form, saving, editing, onChange, onCancel, onSubmi
   )
 }
 
+export function PartnerTable({partners,canEditPartners,editPartner,removePartner}) { return (
+  <div className="table-wrap partner-table-wrap">
+    <table role="table" className="data-table application-partners-table mobile-card-table">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader" scope="col">Entidade</th>
+          <th role="columnheader" scope="col">País</th>
+          <th role="columnheader" scope="col">Interesse</th>
+          <th role="columnheader" scope="col">Responsável</th>
+          <th role="columnheader" scope="col">Pessoas afetas</th>
+          {canEditPartners && <th role="columnheader" scope="col"><span className="sr-only">Ações</span></th>}
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {partners.map(partner => (
+          <tr role="row" key={partner.id}>
+            <td role="cell" data-label="Entidade" className="td-notrunc"><span className="col-title">{partner.entity_name}</span></td>
+            <td role="cell" data-label="País" className="td-notrunc">{partner.country || '—'}</td>
+            <td role="cell" data-label="Interesse" className="td-notrunc">{partner.research_area_interest || '—'}</td>
+            <td role="cell" data-label="Responsável" className="td-notrunc">
+              {partner.responsible_person || partner.contact || partner.email ? (
+                <div className="partner-person-mini">
+                  {partner.responsible_person && <span>{partner.responsible_person}</span>}
+                  {partner.contact && <span className="text-muted">{partner.contact}</span>}
+                  {partner.email && <span className="text-muted">{partner.email}</span>}
+                </div>
+              ) : '—'}
+            </td>
+            <td role="cell" data-label="Pessoas afetas" className="td-notrunc">
+              {partner.people?.length > 0 ? (
+                <div className="partner-people-mini">
+                  {partner.people.map(person => (
+                    <div key={person.id || `${person.name}-${person.role}`} className="partner-person-mini">
+                      <span>{person.name}</span>
+                      <span className="text-muted">
+                        {PARTNER_PERSON_ROLE_LABELS[person.role] || person.role}
+                        {person.research_area ? ` - ${person.research_area}` : ''}
+                      </span>
+                      {(person.contact || person.email) && <span className="text-muted">{[person.contact, person.email].filter(Boolean).join(' | ')}</span>}
+                    </div>
+                  ))}
+                </div>
+              ) : '—'}
+            </td>
+            {canEditPartners && (
+              <td role="cell" data-label="" className="td-actions">
+                <div className="partner-actions">
+                  <button type="button" className="btn-icon" onClick={() => editPartner(partner)} title="Editar" aria-label={`Editar ${partner.entity_name}`}>
+                    <Pencil size={14} aria-hidden="true" />
+                  </button>
+                  <button type="button" className="btn btn-danger btn-sm btn-icon" onClick={() => removePartner(partner.id)} title="Remover" aria-label={`Remover ${partner.entity_name}`}>
+                    <Trash2 size={14} aria-hidden="true" />
+                  </button>
+                </div>
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) }
+
 export function PartnerCards({partners,canEditPartners,editPartner,removePartner}) { return (
           <div className="partner-grid">
             {partners.map(partner => (

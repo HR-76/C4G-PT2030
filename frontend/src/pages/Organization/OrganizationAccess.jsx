@@ -1,32 +1,49 @@
 import {useEffect,useMemo,useRef,useState} from 'react'
 import {useAuth} from '../../contexts/AuthContext'
-import {organizationDirectoryApi} from '../../api/api'
+import {authApi,organizationDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import FormModal from '../../components/FormModal'
 import './organization-access.css'
 import EntityUsers from '../Platform/EntityUsers'
 const labels={ORG_ADMIN:'Administrador',FUNDING_MANAGER:'Gestor de candidaturas',CONTRIBUTOR:'Técnico',VIEWER:'Consulta (perfil existente)'}
-const messages={MFA_REQUIRED:'Confirme novamente a autenticação multifator antes de alterar este acesso.',SELF_ACCESS_PROTECTED:'O seu próprio acesso está protegido. Peça a outro administrador para o alterar.',STALE_REVISION:'Este acesso foi alterado entretanto. Atualize a lista e reveja a alteração.',NOT_AUTHORIZED:'O seu perfil não permite alterar este acesso.',CONTEXT_CHANGED:'A organização mudou. Atualize a lista.',MEMBERSHIP_UNAVAILABLE:'Este acesso já não está disponível para alteração.'}
+const messages={REAUTH_REQUIRED:'Confirme novamente a sessão antes de alterar este acesso.',MFA_REQUIRED:'Confirme novamente a autenticação multifator antes de alterar este acesso.',SELF_ACCESS_PROTECTED:'O seu próprio acesso está protegido. Peça a outro administrador para o alterar.',STALE_REVISION:'Este acesso foi alterado entretanto. Atualize a lista e reveja a alteração.',NOT_AUTHORIZED:'O seu perfil não permite alterar este acesso.',CONTEXT_CHANGED:'A organização mudou. Atualize a lista.',MEMBERSHIP_UNAVAILABLE:'Este acesso já não está disponível para alteração.'}
+function sessionReturnPath(){
+ const value=`${window.location.pathname}${window.location.search}${window.location.hash}`
+ return value.startsWith('/')&&!value.startsWith('//')&&!/[\\\u0000-\u001f\u007f]/.test(value)&&!/%(?:2f|5c|0[0-9a-f]|1[0-9a-f]|7f)/i.test(value)?value:'/'
+}
 export default function OrganizationAccess(){
  const {user,organization}=useAuth()
  if(!organization)return <p>Esta conta não tem uma entidade associada para consultar acessos.</p>
- return <EntityUsers key={`${user.id}:${organization.id}`} organizationId={organization.id} organizationName={organization.name||organization.displayName||'Organização selecionada'}/>
+ return <EntityUsers key={`${user.id}:${organization.id}`} organizationId={organization.id} organizationName={organization.name||organization.displayName||'Organização selecionada'} scope={readScope(user.id,organization.id)}/>
 }
-export function AccessTable({organizationId,api:providedApi}){
+// With a `scope` (the organization's own page) the accesses this user last received are shown at once and read again.
+export function AccessTable({organizationId,api:providedApi,scope=null,auth=authApi}){
  const api=useMemo(()=>providedApi||organizationDirectoryApi(organizationId),[providedApi,organizationId]),generation=useRef(0)
- const [data,setData]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[review,setReview]=useState(null),[selected,setSelected]=useState({})
+ const [data,setData]=useState(()=>startConfirmedRead(scope,'organization-access').held),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[review,setReview]=useState(null),[selected,setSelected]=useState({}),[authRequired,setAuthRequired]=useState(false)
  const reviewTrigger=useRef(null)
- async function load(epoch=generation.current){setBusy(true);setError('');try{const r=await api.access();if(epoch===generation.current){setData(r.data);setSelected({})}}catch(e){if(epoch===generation.current){setData(null);setError(e.response?.status===403?'O seu perfil não permite consultar os acessos desta organização.':e.response?.status===409?'A organização ou a sessão mudou. Atualize a lista.':'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.')}}finally{if(epoch===generation.current)setBusy(false)}}
+ async function load(epoch=generation.current){const read=startConfirmedRead(scope,'organization-access');setBusy(true);setError('');setAuthRequired(false);try{const r=await api.access();read.keep(r.data);if(epoch===generation.current){setData(r.data);if(JSON.stringify(read.held)!==JSON.stringify(r.data))setSelected({})}}catch(e){if(epoch===generation.current){read.drop();setData(null);setError(e.response?.status===403?'O seu perfil não permite consultar os acessos desta organização.':e.response?.status===409?'A organização ou a sessão mudou. Atualize a lista.':'O serviço de acessos está temporariamente indisponível. Tente atualizar a lista.')}}finally{if(epoch===generation.current)setBusy(false)}}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; load is read at that moment.
- useEffect(()=>{const epoch=++generation.current;setData(null);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current += 1}},[api])
+ useEffect(()=>{const epoch=++generation.current;setData(startConfirmedRead(scope,'organization-access').held);setPending(null);setReview(null);setSelected({});setNotice('');load(epoch);return()=>{generation.current += 1}},[api])
  async function send(command){const epoch=generation.current;setBusy(true);setPending(command);setReview(null);setError('');setNotice('');try{
   await (command.kind==='billing'?api.membershipBilling:command.kind==='profile'?api.membershipProfile:api.membershipStatus)(command.id,command.body)
   if(epoch!==generation.current)return
   setPending(null);await load(epoch);if(epoch===generation.current)setNotice('Acesso atualizado nesta organização.')
- }catch(e){if(epoch===generation.current){const definite=e.response?.status<500;if(definite)setPending(null);setError(messages[e.response?.data?.error?.code]||(definite?'Não foi possível alterar o acesso. Atualize a lista e verifique a sua autorização.':'A resposta não foi confirmada. Pode repetir o mesmo envio em segurança.'))}}finally{if(epoch===generation.current)setBusy(false)}}
+ }catch(e){if(epoch===generation.current){const definite=e.response?.status<500,code=e.response?.data?.error?.code;if(definite)setPending(null);setAuthRequired(['REAUTH_REQUIRED','MFA_REQUIRED'].includes(code));setError(messages[code]||(definite?'Não foi possível alterar o acesso. Atualize a lista e verifique a sua autorização.':'A resposta não foi confirmada. Pode repetir o mesmo envio em segurança.'))}}finally{if(epoch===generation.current)setBusy(false)}}
+ async function confirmSession(){
+  const epoch=generation.current,returnTo=sessionReturnPath()
+  setBusy(true);setError('')
+  try{
+   const settings=(await auth.stepUpPolicy()).data
+   if(epoch!==generation.current)return
+   if(typeof settings?.mfaOptional!=='boolean')throw Error('AUTH_POLICY_UNAVAILABLE')
+   auth.stepUp(settings.mfaOptional?'recent-auth':'recent-mfa',returnTo)
+  }catch{if(epoch===generation.current){setError('Não foi possível iniciar a confirmação da sessão. Tente novamente.');setBusy(false)}}
+ }
  function prepare(m,kind,trigger){reviewTrigger.current=trigger;const value=kind==='billing'?!m.billingRead:kind==='profile'?selected[m.membershipId]:(m.status==='ACTIVE'?'SUSPENDED':'ACTIVE');setReview({id:m.membershipId,name:m.name,kind,value,body:{[kind==='billing'?'billingRead':kind==='profile'?'profileCode':'status']:value,expectedRevision:Number(m.revision),idempotencyKey:crypto.randomUUID()}});setNotice('');setError('')}
- const locked=busy||Boolean(pending)||Boolean(review)
+ const locked=busy||Boolean(pending)||Boolean(review)||authRequired
  return <section className="member-access"><div className="member-access-heading"><h2>Acessos da organização</h2>{data && <span>{data.items.length} {data.items.length===1?"membro":"membros"}</span>}</div>
   {error&&<div role="alert" className="alert alert-error">{error} <button disabled={busy} onClick={()=>load()}>Atualizar lista</button></div>}
+  {authRequired&&<div><p>Depois de confirmar a sessão, reveja a alteração de acesso.</p><button className="btn btn-primary" disabled={busy} onClick={confirmSession}>Confirmar sessão</button></div>}
   {notice&&<p role="status">{notice}</p>}{busy&&<p role="status">A consultar ou atualizar acessos…</p>}
   {pending&&!busy&&<button className="btn btn-primary" onClick={()=>send(pending)}>Repetir o mesmo envio</button>}
   {review&&<FormModal title="Confirmar alteração de acesso" onClose={()=>setReview(null)} returnFocusRef={reviewTrigger}><div className="access-review">

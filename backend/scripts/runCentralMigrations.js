@@ -75,9 +75,16 @@ function requirementsFor(entries, loadMigration) {
 }
 
 function centralLedgerBranch(rows) {
-  const { receiptManifest, replayCapacityManifest, failureCapacityManifest } = require('../src/security/centralMigrationManifest');
+  const { receiptManifest, replayCapacityManifest, failureCapacityManifest, centralRuntimeReadManifest, opportunityComplementManifest, billingValidationManifest, entityTypeManifest, emailDeliveryManifest, productionCentralManifest, platformAccountLifecycleManifest } = require('../src/security/centralMigrationManifest');
   if (rows.some(row => row.version === failureCapacityManifest.at(-1).version)) return failureCapacityManifest;
   if (rows.some(row => row.version === replayCapacityManifest.at(-1).version)) return replayCapacityManifest;
+  if (rows.some(row => row.version === platformAccountLifecycleManifest.at(-1).version)) return platformAccountLifecycleManifest;
+  if (rows.some(row => row.version === productionCentralManifest.at(-1).version)) return productionCentralManifest;
+  if (rows.some(row => row.version === emailDeliveryManifest.at(-1).version)) return emailDeliveryManifest;
+  if (rows.some(row => row.version === entityTypeManifest.at(-1).version)) return entityTypeManifest;
+  if (rows.some(row => row.version === billingValidationManifest.at(-1).version)) return billingValidationManifest;
+  if (rows.some(row => row.version === opportunityComplementManifest.at(-1).version)) return opportunityComplementManifest;
+  if (rows.some(row => row.version === centralRuntimeReadManifest.at(-1).version)) return centralRuntimeReadManifest;
   return rows.some(row => row.version === receiptManifest.at(-1).version) ? receiptManifest : knownManifest;
 }
 
@@ -288,9 +295,33 @@ module.exports.applyRegisteredCentralImportPackage=applyRegisteredCentralImportP
 async function applyRegisteredBillingPdfsPackage(pool,packageId){
  const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/billingPdfMigrationPackage');
  if(packageId!==PACKAGE_ID)throw Error('BILLING_PDF_PACKAGE_NOT_REGISTERED');
- return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+ // Its own manifest, not knownManifest: installing billing PDFs must never pull in a later package.
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').billingPdfManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
 }
 module.exports.applyRegisteredBillingPdfsPackage=applyRegisteredBillingPdfsPackage;
+
+// Email template installation is explicit; existing package entrypoints never apply it.
+async function applyRegisteredEmailTemplatesPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/emailTemplateMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('EMAIL_TEMPLATES_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,knownManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:knownManifest});
+}
+module.exports.applyRegisteredEmailTemplatesPackage=applyRegisteredEmailTemplatesPackage;
+// Central runtime read grants are explicit too; they apply on top of the 051 chain and never through existing entrypoints.
+async function applyRegisteredCentralRuntimeReadPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/centralRuntimeReadPackage');
+ if(packageId!==PACKAGE_ID)throw Error('CENTRAL_RUNTIME_READ_PACKAGE_NOT_REGISTERED');
+ return applyCentralMigrationsWithManifest(pool,require('../src/security/centralMigrationManifest').centralRuntimeReadManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:require('../src/security/centralMigrationManifest').centralRuntimeReadManifest});
+}
+module.exports.applyRegisteredCentralRuntimeReadPackage=applyRegisteredCentralRuntimeReadPackage;
+// The opportunity complement is explicit too: it applies on top of 052 and never through existing entrypoints.
+async function applyRegisteredOpportunityComplementPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/opportunityComplementMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('OPPORTUNITY_COMPLEMENT_PACKAGE_NOT_REGISTERED');
+ const {opportunityComplementManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,opportunityComplementManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:opportunityComplementManifest});
+}
+module.exports.applyRegisteredOpportunityComplementPackage=applyRegisteredOpportunityComplementPackage;
 
 async function applyRegisteredF12ReceiptPackage(pool) {
   const { receiptManifest } = require('../src/security/centralMigrationManifest');
@@ -329,3 +360,43 @@ async function applyRegisteredF12FailureCapacityPackage(pool) {
   });
 }
 module.exports.applyRegisteredF12FailureCapacityPackage = applyRegisteredF12FailureCapacityPackage;
+
+async function applyRegisteredBillingValidationPackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/billingValidationMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('BILLING_VALIDATION_PACKAGE_NOT_REGISTERED');
+ const {billingValidationManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,billingValidationManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:billingValidationManifest});
+}
+module.exports.applyRegisteredBillingValidationPackage=applyRegisteredBillingValidationPackage;
+
+async function applyRegisteredEntityTypePackage(pool,packageId){
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/entityTypeMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('ENTITY_TYPE_PACKAGE_NOT_REGISTERED');
+ const {entityTypeManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,entityTypeManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:entityTypeManifest});
+}
+module.exports.applyRegisteredEntityTypePackage=applyRegisteredEntityTypePackage;
+
+async function applyRegisteredEmailDeliveryPackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/emailDeliveryMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('EMAIL_DELIVERY_PACKAGE_REQUIRED');
+ const {emailDeliveryManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,emailDeliveryManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:emailDeliveryManifest});
+}
+module.exports.applyRegisteredEmailDeliveryPackage=applyRegisteredEmailDeliveryPackage;
+
+async function applyRegisteredProductionCentralPackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/productionCentralMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('PRODUCTION_CENTRAL_PACKAGE_REQUIRED');
+ const {productionCentralManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,productionCentralManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:productionCentralManifest});
+}
+module.exports.applyRegisteredProductionCentralPackage=applyRegisteredProductionCentralPackage;
+
+async function applyRegisteredPlatformAccountLifecyclePackage(pool, packageId) {
+ const {PACKAGE_ID,CENTRAL_BASELINE}=require('../src/security/platformAccountLifecycleMigrationPackage');
+ if(packageId!==PACKAGE_ID)throw Error('PLATFORM_ACCOUNT_LIFECYCLE_PACKAGE_REQUIRED');
+ const {platformAccountLifecycleManifest}=require('../src/security/centralMigrationManifest');
+ return applyCentralMigrationsWithManifest(pool,platformAccountLifecycleManifest,migrationSql,{requiredBaseVersion:CENTRAL_BASELINE,ledgerEntries:platformAccountLifecycleManifest});
+}
+module.exports.applyRegisteredPlatformAccountLifecyclePackage=applyRegisteredPlatformAccountLifecyclePackage;

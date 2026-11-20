@@ -206,7 +206,16 @@ const chatRetentionEntry = Object.freeze({
   compatibility: compatibility(CHAT_RETENTION_SCHEMA_VERSION)
 });
 const chatRetentionManifest = Object.freeze([...documentDeletionManifest, chatRetentionEntry]);
-const allRegisteredMigrations = Object.freeze([...chatRetentionManifest, receiptEntry, failureReceiptEntry]);
+const ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION='041_account_identity_erasure';
+const accountIdentityErasureEntry=Object.freeze({
+ version:ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION,ordinal:41,irreversible:true,
+ sqlChecksum:'000d02b20d45b2909c191a325942c6bfd3886dc3d69fb0a44aceb0ead866aa90',
+ schemaFingerprint:'36b031960141005db495c938e6a2d7be3adc757616e6efe3e71bf8195dcfa1a6',
+ capabilities:Object.freeze([...chatRetentionEntry.capabilities,'ACCOUNT_IDENTITY_ERASURE']),
+ compatibility:compatibility(ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION)
+});
+const accountIdentityErasureManifest=Object.freeze([...chatRetentionManifest,accountIdentityErasureEntry]);
+const allRegisteredMigrations = Object.freeze([...accountIdentityErasureManifest, receiptEntry, failureReceiptEntry]);
 
 function plainRecord(value) {
   return Boolean(value) && typeof value === 'object' && !isProxy(value)
@@ -341,7 +350,7 @@ function computeRequiredTenantMigrations(entries, loadMigration) {
 function validateTenantLedger(rows, entries, loadMigration = migrationSql) {
   if (!Array.isArray(rows)) throw new TypeError('Tenant migration ledger is invalid.');
   const head = rows.at(-1)?.migration_id;
-  entries ??= [applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
+  entries ??= [accountIdentityErasureManifest, chatRetentionManifest, documentDeletionManifest, applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
     .find(candidate => candidate.at(-1).version === head) || registeredManifest;
   const required = requiredTenantMigrations(entries, loadMigration);
   // An exact historical execution record may coexist with a repaired canonical
@@ -375,6 +384,7 @@ validateTenantMigrationManifest(organizationStrategyManifest);
 validateTenantMigrationManifest(applicationTaskDetailsManifest);
 validateTenantMigrationManifest(documentDeletionManifest);
 validateTenantMigrationManifest(chatRetentionManifest);
+validateTenantMigrationManifest(accountIdentityErasureManifest);
 
 module.exports = {
   APPLICATION_TENANT_DOWNGRADE,
@@ -412,6 +422,7 @@ module.exports = {
   applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION,
   documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION,
   chatRetentionManifest, CHAT_RETENTION_SCHEMA_VERSION,
+  accountIdentityErasureManifest, ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION,
   allRegisteredMigrations,
   migrationSql,
   requiredTenantMigrations,

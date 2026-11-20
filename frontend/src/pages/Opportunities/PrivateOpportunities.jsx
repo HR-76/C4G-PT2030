@@ -94,7 +94,7 @@ export function PrivateOpportunityDetail({ id, organization }) {
       <p className="text-muted">Revisão {record.revisionNumber}</p>
       <OpportunityOverview fields={record.snapshot} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization.id} opportunityId={id} />}>
         {(record.lifecycleState||record.snapshot.lifecycleState)!=='ARCHIVED'&&<Link className="btn btn-primary" to={`/candidaturas?nova=1&oportunidade=${id}`}>Criar candidatura</Link>}
-        <Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${id}&origem=PRIVATE`}>Pessoas correspondentes</Link>
+        {organization?.navigation?.people===true&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${id}&origem=PRIVATE`}>Pessoas correspondentes</Link>}
       </OpportunityOverview>
       <OpportunityApplications key={`${organization.id}:${id}`} organizationId={organization.id} opportunityId={id} />
       {record.capabilities?.evidencedCriteria===true&&<CriteriaPanel key={organization.id+':'+id} opportunity={record} organization={organization} />}

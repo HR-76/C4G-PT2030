@@ -15,7 +15,7 @@ async function opportunitySummary(client,{organizationId=null,today,central=fals
   JOIN opportunity_catalog.revision r ON r.revision_id=o.current_revision_id
   ${central?'LEFT JOIN opportunity_catalog.funding_identity f ON f.opportunity_id=o.opportunity_id':''}
   ${temporalSql({corrections:central?'f.corrections':"'{}'::jsonb",sourceReview:central?"to_jsonb(f)->>'source_review'":'NULL::text',now})}
-  ${central?'':"WHERE o.organization_id=$2 AND o.lifecycle_state='ACTIVE'"}
+  ${central?"WHERE o.lifecycle_state<>'ARCHIVED'":"WHERE o.organization_id=$2 AND o.lifecycle_state='ACTIVE'"}
  ), current AS (SELECT * FROM catalog WHERE lifecycle_state='ACTIVE' AND temporal_state='OPEN')
  SELECT (SELECT count(*)::int FROM catalog) AS total,(SELECT count(*)::int FROM current) AS open,
  (SELECT count(*)::int FROM current WHERE closing_date<=$1::date+14) AS closing_soon,

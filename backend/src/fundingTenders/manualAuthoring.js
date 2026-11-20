@@ -9,16 +9,17 @@ const { createPlatformAudit } = require('./audit');
 function createCentralManualAuthoring({ pool, repository, audit = createPlatformAudit({source:'API'}), clock = () => new Date() }) {
   const catalog = new CentralOpportunityRepository({ pool, identityFactory:createIdentityFactory(),
     auditWriter:{ async append(client, event) {
-      await client.query('RESET ROLE');
+      if(!pool.productionRole)await client.query('RESET ROLE');
       await audit(client, {actor:{type:'HUMAN',id:event.actor.reference},eventCode:event.eventCode,
         requestId:event.idempotencyKey,resourceId:event.resourceId,detailCode:'MANUAL_CREATED'});
-      await client.query('SET LOCAL ROLE c4g_opportunity_central_runtime');
+      await client.query(`SET LOCAL ROLE ${pool.productionRole||'c4g_opportunity_central_runtime'}`);
     } },
   });
-  return Object.freeze({ async create(userId, input) {
+  return Object.freeze({ async create(userId, input, sessionId) {
     uuid(userId);
     return repository.transaction(async client => {
       // Lock current authority through commit, including idempotent retries.
+      if(pool.productionRole&&!(await client.query('SELECT c4g_production.administrator($1,$2,true) AS allowed',[sessionId,userId])).rows[0]?.allowed)throw Object.assign(Error(),{code:'FUNDING_FORBIDDEN'});
       await repository.administrator(client,userId,true);
       const command=createCentralCommand(input,clock().toISOString());
       const central=validateCreateCommand({...command,
@@ -29,7 +30,7 @@ function createCentralManualAuthoring({ pool, repository, audit = createPlatform
       });
       const result=await catalog.withTransactionClient(client,()=>catalog.create(central,
         {actor:{type:'HUMAN',reference:userId},audit:{correlationId:randomUUID()}}));
-      await client.query('RESET ROLE');
+      if(!pool.productionRole)await client.query('RESET ROLE');
       return mutationReceipt(result);
     });
   } });

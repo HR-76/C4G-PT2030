@@ -57,8 +57,22 @@ function project(row,units=[],includeReadModel=true){
   title:row.title,notes:row.notes??null,transversal:row.transversal===true && !units.length,status:row.status,revision:Number(row.revision),unitIds:units.map(unit=>unit.unitId),units,
   createdBy:row.created_by,createdMembershipId:row.created_membership_id,createdAt:new Date(row.created_at).toISOString(),updatedAt:new Date(row.updated_at).toISOString()};
 }
-function createOpportunityInterestRepository({organizationId:org,actor,protect,authorize,audit,cursor,centralOrigin,centralCurrent}){
+function createOpportunityInterestRepository({organizationId:org,actor,protect,authorize:ask,audit,cursor,centralOrigin,centralCurrent,reuseDecisions=false,onDecisionReuse=()=>{}}){
  const root=resource(org);
+ // This repository serves one protected operation. In a read, the permissions
+ // that do not depend on the row (register, create an application, read
+ // opportunities, edit the team) were asked again for every row. With
+ // `reuseDecisions` each question is decided once and its answer reused;
+ // `onDecisionReuse` lets the operation confirm its authority is still current.
+ // A decision that could not be made throws and is never kept. Writes ask every time.
+ const decisions=new Map();
+ const authorize=reuseDecisions?async(operation,target)=>{
+  const key=JSON.stringify([operation,target]);
+  if(decisions.has(key)){onDecisionReuse();return decisions.get(key);}
+  const allowed=await ask(operation,target);
+  decisions.set(key,allowed);
+  return allowed;
+ }:ask;
  async function capabilities(id=org,status='ACTIVE'){
   const canRegister=await authorize(REGISTER,root),canManage=status==='ACTIVE'&&await authorize(MANAGE,resource(org,id));
   const canCreateApplication=canManage&&await authorize('APPLICATION_CREATE',resource(org,org,'APPLICATION'))&&await authorize('OPPORTUNITY_READ',resource(org,org,'OPPORTUNITY'));
@@ -192,8 +206,7 @@ function createOpportunityInterestRepository({organizationId:org,actor,protect,a
   const found=new Map();for(const row of allowed){
    found.set(row.central_opportunity_id,{opportunityId:row.central_opportunity_id,interestId:row.interest_id,status:row.status,unitIds:units.get(row.interest_id)||[]});
   }
-  const canRegister=await authorize(REGISTER,root);
-  return {capabilities:{canRegister},items:input.opportunityIds.map(opportunityId=>found.get(opportunityId)||{opportunityId,interestId:null,status:null,unitIds:[]})};
+  return {capabilities:await capabilities(),items:input.opportunityIds.map(opportunityId=>found.get(opportunityId)||{opportunityId,interestId:null,status:null,unitIds:[]})};
  }
  async function units(client,input){
   if(input.purpose==='ASSIGN'){

@@ -12,6 +12,7 @@
 .application-other-states { flex-basis:100%; border-bottom:1px solid var(--color-border-strong); padding-bottom:12px; }
 .application-other-states summary { color:var(--list-brand); cursor:pointer; width:fit-content; font-weight:600; }
 .application-browse .table-meta { color:var(--list-ink); font-size:.9rem; font-weight:650; padding:8px 0; margin:0; }
+.application-browse .application-list-stale { opacity:.45; transition:opacity .15s; }
 .application-browse .application-list-loading { padding:24px 16px; color:var(--color-text-secondary); text-align:center; }
 .application-browse .table-wrap { border:1px solid var(--list-line); border-radius:8px; overflow-x:auto; background:var(--color-surface); scrollbar-color:var(--color-success) var(--color-border); scrollbar-width:auto; }
 .application-browse .table-wrap:focus-visible { outline:2px solid var(--list-brand); outline-offset:3px; }

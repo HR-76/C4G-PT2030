@@ -1,6 +1,6 @@
 # MFA opcional por utilizador
 
-Estado: Review. Pedido e âmbito integral confirmados pelo utilizador em 2026-10-17. Implementado e aplicado à instalação nativa; [evidência e limites](../reviews/optional-user-mfa.md).
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Não repetido: o percurso de ativação e desativação de MFA no navegador. Estado anterior: Review. Pedido e âmbito integral confirmados pelo utilizador em 2026-10-17. Implementado e aplicado à instalação nativa; [evidência e limites](../reviews/optional-user-mfa.md).
 
 ## Comportamento confirmado
 

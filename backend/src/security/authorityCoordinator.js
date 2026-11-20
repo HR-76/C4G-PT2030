@@ -44,10 +44,12 @@ function createAuthorityCoordinator({ pool,permitSecret, clock = { now: () => ne
     client.on?.('error',onError);
     try {
       const admittedSchema = await timing.measure(category+'.admission',()=>isolatedCatalogAdmission?isolatedCatalogAdmission.admit(client):require('./authoritySecurityManifest').assertAuthorityAdmission(client));
+      const setupStart=performance.now();
       await client.query(readOnly?'BEGIN READ ONLY':'BEGIN'); open = true;
       await client.query("SELECT set_config('statement_timeout',$1,true),set_config('lock_timeout',$1,true)", [`${Math.max(1, deadline-now())}ms`]);
       await client.query("SELECT set_config('idle_in_transaction_session_timeout',$1,true)", [`${Math.max(1,deadline-now())}ms`]);
       const identity=await client.query("SELECT EXISTS(SELECT 1 FROM public.c4g_database_identity WHERE product_code='C4G' AND database_role='CENTRAL') AS valid");
+      timing.record(category+'.setup',performance.now()-setupStart);
       if(identity.rows[0]?.valid!==true)fail('AUTHORITY_CENTRAL_REQUIRED');
       await timing.measure(category+'.lock',()=>client.query(readOnly?'SELECT pg_advisory_xact_lock_shared(43001306,1)':'SELECT pg_advisory_xact_lock(43001306,1)'));
       await timing.measure(category+'.verify',()=>isolatedCatalogAdmission?isolatedCatalogAdmission.verifyLocked(client,admittedSchema):require('./authoritySecurityManifest').assertAuthoritySecurity(client, admittedSchema?.currentVersion));
@@ -61,11 +63,11 @@ function createAuthorityCoordinator({ pool,permitSecret, clock = { now: () => ne
         return result;
       },finish(sql,values,permit){return require('./authorityProtocolQueries').execute(client,sql,values,permit);}});
       const work=local.run(scoped,()=>callback(scoped));
-      const result=await Promise.race([work,fatal,new Promise((resolve,reject)=>{
+      const result=await timing.measure(category+'.work',()=>Promise.race([work,fatal,new Promise((resolve,reject)=>{
         timer=setTimeout(()=>{active=false;const error=new Error('AUTHORITY_DEADLINE');error.code=error.message;reject(error);},Math.max(1,deadline-now()));
-      })]);
+      })]));
       if (now() >= deadline) fail('AUTHORITY_DEADLINE');
-      await client.query('COMMIT'); open = false;
+      await timing.measure(category+'.commit',()=>client.query('COMMIT')); open = false;
       return result;
     } catch (error) {
       failed=error;

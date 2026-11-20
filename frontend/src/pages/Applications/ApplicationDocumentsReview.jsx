@@ -1,6 +1,8 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import {useEffect,useRef,useState} from 'react'
 import {FileText} from 'lucide-react'
 import {privateApplicationsApi as api} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import './application-documents.css'
 import {applicationDocumentIntentKey} from './intentions'
 import {navigateDocumentDownload} from '../../api/documentNavigation'
@@ -48,11 +50,13 @@ function DocumentReviewActivity({item,requests,events,historyReady,historyNext,r
  </details>
 }
 
-export default function ApplicationDocumentsReview({applicationId,userId,organizationId,onPreparationChange,loadDetails=true}){
- const [snapshot,setSnapshot]=useState(null),[candidates,setCandidates]=useState([]),[candidateNext,setCandidateNext]=useState(null),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
+export default function ApplicationDocumentsReview({applicationId,userId,organizationId,onPreparationChange,loadDetails=true,takeEarlyRead}){
+ // The documents this user and organization last received are shown at once and read again; actions wait for the new answer.
+ const scope=userId&&organizationId?readScope(userId,organizationId):null,readName=`application-documents:${applicationId}`
+ const [snapshot,setSnapshot]=useState(()=>startConfirmedRead(scope,readName).held),[candidates,setCandidates]=useState([]),[candidateNext,setCandidateNext]=useState(null),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
  const [historyReady,setHistoryReady]=useState(false)
  const contextKey=`${organizationId}:${applicationId}:${userId}`
- const [snapshotContext,setSnapshotContext]=useState(null)
+ const [snapshotContext,setSnapshotContext]=useState(()=>snapshot?contextKey:null)
  const [selected,setSelected]=useState(''),[reviewDrafts,setReviewDrafts]=useState({})
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState(null),[pendingUpload,setPendingUpload]=useState(null),[refresh,setRefresh]=useState(0),[uploadFile,setUploadFile]=useState(null),[accessBlocked,setAccessBlocked]=useState(false)
  const [processingVersion,setProcessingVersion]=useState(null),[candidatePoll,setCandidatePoll]=useState(0)
@@ -91,8 +95,10 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   setSnapshot(null);setCandidates([]);setCandidateNext(null);setHistory([]);setHistoryNext(null);setHistoryReady(false);setError('');setNotice('');setSelected('');setReviewDrafts({});setAccessBlocked(false)
  },[applicationId,userId,organizationId,intentKey,uploadIntentKey])
  useEffect(()=>{let active=true;setReading(true);setError('');setAccessBlocked(false)
-  const controller=new AbortController()
-  api.documents(applicationId,undefined,controller.signal).then(s=>{if(active){setSnapshot(s.data);setSnapshotContext(contextKey)}}).catch(e=>{if(active){if(accessDenied(e))setAccessBlocked(true);setError(readMessage(e))}}).finally(()=>{if(active)setReading(false)})
+  const controller=new AbortController(),read=startConfirmedRead(scope,readName)
+  if(read.held){setSnapshot(read.held);setSnapshotContext(contextKey)}
+  // The page may already have asked for the documents together with the record.
+  ;((refresh===0&&takeEarlyRead?.('documents'))||api.documents(applicationId,undefined,controller.signal)).then(s=>{read.keep(s.data);if(active){setSnapshot(s.data);setSnapshotContext(contextKey)}}).catch(e=>{if(active){read.drop();if(read.held)setSnapshot(null);if(accessDenied(e))setAccessBlocked(true);setError(readMessage(e))}}).finally(()=>{if(active)setReading(false)})
   return()=>{active=false;controller.abort()}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; contextKey is read at that moment.
  },[applicationId,organizationId,userId,refresh])
@@ -181,7 +187,7 @@ export default function ApplicationDocumentsReview({applicationId,userId,organiz
   {error&&<p role="alert">{error}</p>}{accessBlocked&&snapshot&&<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar permissões documentais</button>}{notice&&<p role="status">{notice}</p>}
   {pending&&<p role="status">Envio por confirmar. {!permits(pending.method)?'A intenção foi preservada; confirme a sessão, a organização e as permissões antes de continuar.':<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>send(null,null,true)}>Repetir o mesmo envio</button>}</p>}
   {pendingUpload&&<p role="status">{canUpload?'Upload por confirmar. Selecione novamente o mesmo ficheiro e repita a operação com a chave preservada.':'Upload por confirmar preservado. Confirme as permissões antes de continuar.'}</p>}
-  {!snapshot?<><p>Carregar documentos e revisão…</p><button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar documentos e revisão</button></>:<>
+  {!snapshot?<>{!error&&<LoadingIndicator>A carregar documentos e revisão…</LoadingIndicator>}<button type="button" className="btn btn-outline btn-sm" disabled={busy} onClick={()=>setRefresh(v=>v+1)}>Recarregar documentos e revisão</button></>:<>
    <dl className="document-summary"><div><dt>Versões associadas</dt><dd>{snapshot.documents.length}</dd></div><div><dt>Disponíveis para revisão</dt><dd>{snapshot.documents.length-unavailable}</dd></div><div><dt>Indisponíveis</dt><dd>{unavailable}</dd></div></dl>
    <p>{canEdit?preparationHint:canDecide?'Pode consultar os documentos e decidir os pedidos de revisão disponíveis.':'Consulta documental. Sem permissão atual para editar ou decidir revisões.'}</p>
    <section className="linked-files" aria-label="Versões associadas"><h3>Versões associadas</h3>

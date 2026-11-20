@@ -8,7 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.keycloak.util.JsonSerialization;
 
-// Explicit local installation allowlist. Passwords remain native Keycloak data.
+// Explicit allowlist: the local Docker bridge, or the staging API by its container network alias.
+// Passwords remain native Keycloak data.
 final class Bridge {
  static String check(String ticket, String subject, String realm, String client) {
   if (ticket == null || !ticket.matches("[a-f0-9]{64}")) throw new IllegalStateException("INVITATION_UNAVAILABLE");
@@ -20,7 +21,8 @@ final class Bridge {
    if(secret==null || !secret.matches("[a-f0-9]{64}")) throw new IllegalStateException();
    URI endpoint=URI.create(config.getProperty("endpoint"));
    boolean isolatedPort=realm.equals("c4g-manual-proof") && endpoint.getPort()==5295;
-   if(!endpoint.getHost().equals("host.docker.internal") || !endpoint.getScheme().equals("http") || (endpoint.getPort()!=5285 && !isolatedPort) || !endpoint.getPath().equals("/bridge/check") || endpoint.getQuery()!=null || endpoint.getUserInfo()!=null) throw new IllegalStateException();
+   boolean knownHost="host.docker.internal".equals(endpoint.getHost()) || "c4g-activation-bridge".equals(endpoint.getHost());
+   if(!knownHost || !endpoint.getScheme().equals("http") || (endpoint.getPort()!=5285 && !isolatedPort) || !endpoint.getPath().equals("/bridge/check") || endpoint.getQuery()!=null || endpoint.getUserInfo()!=null) throw new IllegalStateException();
    var req = HttpRequest.newBuilder(endpoint)
     .timeout(Duration.ofSeconds(5)).header("Content-Type", "application/json")
     .header("X-C4G-Activation", secret)

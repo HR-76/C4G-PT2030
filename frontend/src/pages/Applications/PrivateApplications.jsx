@@ -1,15 +1,18 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import ApplicationTimeline from './ApplicationTimeline'
 import FormModal from '../../components/FormModal'
 import ApplicationSections from './ApplicationSections'
 import { useConfirmDialog } from '../../components/ConfirmDialog'
 import ApplicationPreparationSummary from './ApplicationPreparationSummary'
-import ApplicationNextStep from './ApplicationNextStep'
+import ApplicationPending from './ApplicationPending'
 import ApplicationPartners from './ApplicationPartners'
-import { useEffect, useRef, useState } from 'react'
+import ApplicationObjectives from './ApplicationObjectives'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { privateApplicationsApi as api, privateOpportunitiesApi, centralOpportunitiesApi, opportunityInterestsApi, pq1Api } from '../../api/api'
 import { applicationIntentKey, loadApplicationIntention, saveApplicationIntention } from './intentions'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { applicationReturnTarget, applicationDetailTarget } from './navigation'
 import UnitSelector, { unitLabel } from '../Interests/UnitSelector'
 import ApplicationWork from './ApplicationWork'
@@ -20,8 +23,7 @@ import { LABEL, CHIP, budgetLabel, dateLabel } from './lifecycle'
 import './applications.css'
 import './application-detail.css'
 import './application-create.css'
-import ApplicationBrowse from './ApplicationBrowse'
-import Interests from '../Interests/Interests'
+import ApplicationsRoute from './ApplicationsRoute'
 import CentralRevisionNotice from './CentralRevisionNotice'
 
 const message = error => error?.code==='APPLICATION_STORAGE_UNAVAILABLE'?error.message:error?.response?.data?.error?.code==='SCHEMA_UPGRADE_REQUIRED'?'A organização ainda precisa da atualização de candidaturas para guardar estes campos.':({ 400:'Verifique os campos.', 403:'Sem permissão para esta candidatura.', 404:'Candidatura ou oportunidade indisponível.', 409:'Os dados mudaram. Recarregue antes de editar.' }[error?.response?.status] || 'Resultado incerto. Repita o mesmo pedido sem alterar os campos.')
@@ -36,17 +38,17 @@ const FINAL_TRANSITION_MESSAGE = {
 }
 
 export default function PrivateApplications() {
- const {id}=useParams(),[params]=useSearchParams(),{user,organization}=useAuth()
- if(!id&&params.get('nova')!=='1'&&params.get('ver')==='interesses')return <Interests/>
- return !id&&params.get('nova')!=='1'?<ApplicationBrowse key={user?.id+':'+organization?.id}/>:<ApplicationRecord key={`${user?.id}:${organization?.id}:${id||params.toString()}`}/>
+ return <ApplicationsRoute Record={ApplicationRecord}/>
 }
-function ApplicationRecord() {
+export function ApplicationRecord() {
   const { id } = useParams(), navigate = useNavigate(), [params] = useSearchParams()
   const { user, organization } = useAuth(), org = organization?.id, userId = user?.id
   const {confirm,dialog}=useConfirmDialog()
   const [items,setItems]=useState([]),[cursor,setCursor]=useState(null),[next,setNext]=useState(null)
   const [preparationWork,setPreparationWork]=useState(null),[preparationDocuments,setPreparationDocuments]=useState(null)
-  const [record,setRecord]=useState(null),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
+  // The record this user and organization last received is shown at once and read again.
+  const scope=userId&&org?readScope(userId,org):null,recordName=id?`application:${id}`:null
+  const [record,setRecord]=useState(()=>startConfirmedRead(scope,recordName).held),[history,setHistory]=useState([]),[historyNext,setHistoryNext]=useState(null)
   const [historyLoading,setHistoryLoading]=useState(false),[historyError,setHistoryError]=useState(''),[historyRefresh,setHistoryRefresh]=useState(0)
   const currentRecord=useRef(record);currentRecord.current=record
   const [responsibles,setResponsibles]=useState([]),[responsiblesNext,setResponsiblesNext]=useState(null),[loadingResponsibles,setLoadingResponsibles]=useState(false),[opportunity,setOpportunity]=useState(null)
@@ -60,6 +62,8 @@ function ApplicationRecord() {
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [pendingIntent,setPendingIntent]=useState(null)
   const [editOpen,setEditOpen]=useState(false)
+  // The status change opens in a modal; it steps aside while a final transition is being confirmed.
+  const [statusOpen,setStatusOpen]=useState(false),[confirming,setConfirming]=useState(false)
   const [refresh,setRefresh]=useState(0)
   const recordGeneration=useRef(0),confirmedRevision=useRef(0)
   const alive=useRef(false),inFlight=useRef(false),unitsTouched=useRef(false)
@@ -67,7 +71,25 @@ function ApplicationRecord() {
   const centralOrigin=params.get('origem')==='CENTRAL',centralRevisionId=params.get('revisao')
   const sourceInterestId=params.get('interesse'),sourceInterestRevision=Number(params.get('interesseRevisao'))
   const creating=!id && params.get('nova')==='1'
-  const alertQuery = useLocation().state?.alertQuery
+  // Data only some parts of the page use is asked for when that part is opened:
+  // responsibles (editing, team, history), units (editing) and history (its tab).
+  const [seen,setSeen]=useState(()=>new Set()),visitSection=useCallback(section=>setSeen(previous=>previous.has(section)?previous:new Set([...previous,section])),[])
+  const [wanted,setWanted]=useState({responsibles:creating,units:creating,history:false})
+  useEffect(()=>{setWanted(previous=>{
+    const next={responsibles:previous.responsibles||editOpen||seen.has('team')||seen.has('history'),units:previous.units||editOpen,history:previous.history||seen.has('history')}
+    return next.responsibles===previous.responsibles&&next.units===previous.units&&next.history===previous.history?previous:next
+  })},[editOpen,seen])
+  // Team and documents only need the identifier, so they are asked for together with the record.
+  const early=useRef(null),takeEarlyRead=useCallback(kind=>{const request=early.current?.[kind]||null;if(request)early.current[kind]=null;return request},[])
+  // With a confirmed record already on screen the panels are mounted and ask by themselves at once.
+  useEffect(()=>{if(!org||!id||currentRecord.current)return
+    const controller=new AbortController(),quiet=request=>{request.catch(()=>{});return request}
+    early.current={work:quiet(api.work(id,undefined,controller.signal)),documents:quiet(api.documents(id,undefined,controller.signal))}
+    return()=>{controller.abort();early.current=null}
+  },[org,userId,id])
+  const navigationState = useLocation().state, alertQuery = navigationState?.alertQuery
+  // A central opportunity read moments ago by «Iniciar candidatura» in the table.
+  const handed = navigationState?.centralOpportunity, handedInterest = navigationState?.sourceInterest
   const fromAlerts = Boolean(id) && typeof alertQuery === 'string'
   const returnTo=fromAlerts ? '/notificacoes' + (alertQuery ? '?' + alertQuery : '') : applicationReturnTarget(params.get('retorno'),id?'/candidaturas':sourceInterestId?`/interesses/${sourceInterestId}`:opportunityId?`${centralOrigin?'/catalogo':'/oportunidades'}/${opportunityId}`:centralOrigin?'/catalogo':'/oportunidades')
   useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
@@ -75,13 +97,13 @@ function ApplicationRecord() {
   useEffect(()=>{const pending=loadApplicationIntention(userId,org);setPendingIntent(pending)
     if(pending?.method==='create'&&creating&&pending.payload.opportunityId===opportunityId){const p=pending.payload;setForm({title:p.title||'',responsibleMembershipId:p.responsibleMembershipId||'',deadline:p.deadline||'',evaluationId:p.evaluationId||'',notes:p.notes??'',totalBudget:p.totalBudget??'',organizationBudget:p.organizationBudget??''});setUnitIds(p.unitIds||[]);setIncludeResponsibleInTeam(p.includeResponsibleInTeam===true)}
   },[userId,org,id,opportunityId,creating])
-  useEffect(()=>{if(!org||(id&&(!record||record.canEdit===false)))return;let active=true
+  useEffect(()=>{if(!org||!wanted.responsibles||(id&&(!record||record.canEdit===false)))return;let active=true
     setResponsibles([]);setResponsiblesNext(null);setLoadingResponsibles(true);setResponsiblesLoadFailed(false)
     api.responsibles().then(r=>{if(active){setResponsibles(r.data.items||[]);setResponsiblesNext(r.data.nextCursor||null)}})
       .catch(()=>{if(active)setResponsiblesLoadFailed(true)}).finally(()=>{if(active)setLoadingResponsibles(false)})
     return()=>{active=false}
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
-  },[org,id,Boolean(record),record?.canEdit])
+  },[org,id,Boolean(record),record?.canEdit,wanted.responsibles])
   const loadMoreResponsibles=async()=>{if(!responsiblesNext||loadingResponsibles)return
     const requestedOrg=org,cursor=responsiblesNext;setLoadingResponsibles(true)
     try{const r=await api.responsibles({cursor});if(!alive.current||responsibleOrg.current!==requestedOrg)return
@@ -91,35 +113,44 @@ function ApplicationRecord() {
     finally{if(alive.current&&responsibleOrg.current===requestedOrg)setLoadingResponsibles(false)}
   }
   useEffect(()=>{if(!org||!creating||!opportunityId)return;let active=true
-    pq1Api.session(()=>centralOrigin?centralOpportunitiesApi.get(opportunityId):privateOpportunitiesApi.get(opportunityId)).then(r=>{if(!active)return;if(centralOrigin&&r.data.revisionId!==centralRevisionId){setOpportunity(null);setError('A oportunidade foi atualizada. Volte ao catálogo e abra novamente a criação de candidatura.');return}const value={...r.data,...r.data.snapshot,title:opportunityDisplay(r.data).title};setOpportunity(value);if(!loadApplicationIntention(userId,org))setForm(f=>({...f,title:f.title||value.title?.slice(0,200)||''}))}).catch(e=>{if(active)setError(e?.response?.status===404?'Oportunidade indisponível.':'Não foi possível carregar a oportunidade. Tente novamente.')})
+    const known=centralOrigin&&sourceRefresh===0&&handed?.record?.opportunityId===opportunityId&&handed.record.revisionId===centralRevisionId&&Date.now()-handed.readAt<60000?handed.record:null
+    ;(known?Promise.resolve({data:known}):pq1Api.session(()=>centralOrigin?centralOpportunitiesApi.get(opportunityId):privateOpportunitiesApi.get(opportunityId))).then(r=>{if(!active)return;if(centralOrigin&&r.data.revisionId!==centralRevisionId){setOpportunity(null);setError('A oportunidade foi atualizada. Volte ao catálogo e abra novamente a criação de candidatura.');return}const value={...r.data,...r.data.snapshot,title:opportunityDisplay(r.data).title};setOpportunity(value);if(!loadApplicationIntention(userId,org))setForm(f=>({...f,title:f.title||value.title?.slice(0,200)||''}))}).catch(e=>{if(active)setError(e?.response?.status===404?'Oportunidade indisponível.':'Não foi possível carregar a oportunidade. Tente novamente.')})
     return()=>{active=false}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; the handed record is read at that moment.
   },[org,userId,creating,opportunityId,centralOrigin,centralRevisionId,sourceRefresh])
   useEffect(()=>{if(!org||!creating||!sourceInterestId)return;let active=true;const controller=new AbortController();setInterest(null)
-    opportunityInterestsApi.get(sourceInterestId,org,controller.signal).then(r=>{if(!active)return;const value=r.data
+    const known=sourceRefresh===0&&handedInterest?.record?.interestId===sourceInterestId&&handedInterest.record.revision===sourceInterestRevision&&Date.now()-handedInterest.readAt<60000?handedInterest.record:null
+    ;(known?Promise.resolve({data:known}):opportunityInterestsApi.get(sourceInterestId,org,controller.signal)).then(r=>{if(!active)return;const value=r.data
       if(!centralOrigin||value.opportunityId!==opportunityId||value.revision!==sourceInterestRevision||value.status!=='ACTIVE'||!value.capabilities?.canCreateApplication){setError('O interesse mudou ou já não permite abrir candidatura. Volte ao interesse para rever os dados.');return}
       setInterest(value);if(!loadApplicationIntention(userId,org)&&!unitsTouched.current)setUnitIds(value.unitIds||[])
     }).catch(()=>{if(active)setError('Não foi possível carregar o interesse. Tente novamente.')});return()=>{active=false;controller.abort()}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; the handed interest is read at that moment.
   },[org,userId,creating,sourceInterestId,sourceInterestRevision,centralOrigin,opportunityId,sourceRefresh])
-  useEffect(()=>{if(!org||(!creating&&(!id||!record||record.canEdit===false||['CANCELLED','ARCHIVED'].includes(record.status))))return;let active=true;const controller=new AbortController();setUnitsReady(false);setUnitsError('')
+  useEffect(()=>{if(!org||!wanted.units||(!creating&&(!id||!record||record.canEdit===false||['CANCELLED','ARCHIVED'].includes(record.status))))return;let active=true;const controller=new AbortController();setUnitsReady(false);setUnitsError('')
     opportunityInterestsApi.units({purpose:'ASSIGN'},org,controller.signal).then(r=>{if(active){if(!Array.isArray(r.data.items))throw Error('Incomplete units');setUnits(r.data.items);setUnitsReady(true)}}).catch(()=>{if(active)setUnitsError('Não foi possível carregar as unidades. Os dados da candidatura foram preservados.')})
     return()=>{active=false;controller.abort()}
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
-  },[org,id,creating,Boolean(record),record?.canEdit,record?.status,unitsRefresh])
+  },[org,id,creating,Boolean(record),record?.canEdit,record?.status,unitsRefresh,wanted.units])
   useEffect(()=>{if(!org||id||creating)return;let active=true
     api.list({cursor,opportunityId:opportunityId||undefined}).then(r=>{if(active){setItems(r.data.items||[]);setNext(r.data.nextCursor)}}).catch(e=>{if(active)setError(message(e))})
     return()=>{active=false}
   },[org,id,creating,cursor,opportunityId,refresh])
   useEffect(()=>{if(!org||!id)return;let active=true;const generation=++recordGeneration.current
-    const controller = new AbortController()
-    api.get(id,controller.signal).then(a=>{if(active&&generation===recordGeneration.current&&a.data.revision>=confirmedRevision.current){confirmedRevision.current=a.data.revision;setRecord(a.data);setForm({title:a.data.title,responsibleMembershipId:a.data.responsibleMembershipId,deadline:a.data.deadline||'',evaluationId:a.data.evaluationId||'',notes:a.data.notes??'',totalBudget:a.data.totalBudget??'',organizationBudget:a.data.organizationBudget??''});setUnitIds(a.data.unitIds||[]);setUnitsChanged(false)}})
-      .catch(e=>{if(active&&generation===recordGeneration.current)setError(!e?.response?.status||e.response.status>=500?'Não foi possível carregar a candidatura. Repita a consulta.':message(e))});return()=>{active=false;controller.abort()}
+    const controller = new AbortController(), read = startConfirmedRead(scope,recordName)
+    // The form follows the record unless the answer is the revision already on screen: an edit in progress is not replaced.
+    const show=(data,keepForm)=>{confirmedRevision.current=data.revision;setRecord(data);if(keepForm)return;setForm({title:data.title,responsibleMembershipId:data.responsibleMembershipId,deadline:data.deadline||'',evaluationId:data.evaluationId||'',notes:data.notes??'',totalBudget:data.totalBudget??'',organizationBudget:data.organizationBudget??''});setUnitIds(data.unitIds||[]);setUnitsChanged(false)}
+    const held=read.held&&read.held.revision>=confirmedRevision.current?read.held:null
+    if(held)show(held,false)
+    api.get(id,controller.signal).then(a=>{read.keep(a.data);if(active&&generation===recordGeneration.current&&a.data.revision>=confirmedRevision.current)show(a.data,held?.revision===a.data.revision)})
+      .catch(e=>{if(active&&generation===recordGeneration.current){read.drop();if(held)setRecord(null)}if(active&&generation===recordGeneration.current)setError(!e?.response?.status||e.response.status>=500?'Não foi possível carregar a candidatura. Repita a consulta.':message(e))});return()=>{active=false;controller.abort()}
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the read name follow them.
   },[org,userId,id,refresh])
-  useEffect(()=>{if(!org||!id||!record)return;let active=true;setHistory([]);setHistoryNext(null);setHistoryError('');setHistoryLoading(true)
+  useEffect(()=>{if(!org||!id||!record||!wanted.history)return;let active=true;setHistory([]);setHistoryNext(null);setHistoryError('');setHistoryLoading(true)
     api.history(id).then(h=>{if(active){setHistory(h.data.items||[]);setHistoryNext(h.data.nextCursor)}})
       .catch(()=>{if(active)setHistoryError('Não foi possível carregar o histórico.')}).finally(()=>{if(active)setHistoryLoading(false)})
     return()=>{active=false}
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; record is read at that moment.
-  },[org,userId,id,Boolean(record),refresh,historyRefresh])
+  },[org,userId,id,Boolean(record),refresh,historyRefresh,wanted.history])
   if(!org||!userId)return <main className="page"><p role="status">Esta conta não tem uma entidade associada para acompanhar candidaturas.</p></main>
   const activePending=pendingIntent?.userId===userId&&pendingIntent?.organizationId===org?pendingIntent:null
   const transitions=Array.isArray(record?.allowedTransitions)?record.allowedTransitions:[]
@@ -147,7 +178,7 @@ function ApplicationRecord() {
     if(!alive.current)return
     sessionStorage.removeItem(applicationIntentKey(userId,org));setPendingIntent(null);setReason('');setNotice('Alteração guardada.')
     if(method==='create')navigate(applicationDetailTarget(result.data.applicationId,returnTo))
-    else { confirmRecord(result.data,method); if(method==='edit')setEditOpen(false) }
+    else { confirmRecord(result.data,method); if(method==='edit')setEditOpen(false);else setStatusOpen(false) }
   }
   const handleSendFailure=e=>{
     if(!alive.current)return
@@ -162,9 +193,11 @@ function ApplicationRecord() {
       :{status,reason:reason.trim(),expectedRevision:record.revision}
     try{
       if(method==='transition'&&FINAL_TRANSITION_MESSAGE[status]){
+        setConfirming(true)
         const accepted=await confirm({tone:'warning',eyebrow:'Alteração de estado',title:`Confirmar alteração para ${LABEL[status]}?`,
           message:`${record.title}: ${LABEL[record.status]} → ${LABEL[status]}. ${FINAL_TRANSITION_MESSAGE[status]} Motivo: ${payload.reason}`,
           confirmLabel:'Confirmar alteração',cancelLabel:'Voltar'})
+        if(alive.current)setConfirming(false)
         if(!accepted||!alive.current)return
         if(currentRecord.current?.revision!==payload.expectedRevision||!Array.isArray(currentRecord.current?.allowedTransitions)||!currentRecord.current.allowedTransitions.includes(status)){
           setError('Os dados ou permissões mudaram. Consulte o estado atual antes de confirmar novamente.');return
@@ -193,7 +226,7 @@ function ApplicationRecord() {
       return (<>
       {interest&&interest.centralRevisionId!==centralRevisionId&&<p role="status">A oportunidade foi atualizada desde o registo de interesse. Reveja os dados atuais antes de criar a candidatura.</p>}
       <div className="application-create-layout"><div className="application-create-context">
-      <section className="application-create-source" aria-label="Oportunidade de origem"><h2>Oportunidade</h2>{opportunity?<ApplicationOpportunityContext opportunity={opportunity} showLabel={false}/>:<p>A carregar oportunidade…</p>}</section>
+      <section className="application-create-source" aria-label="Oportunidade de origem"><h2>Oportunidade</h2>{opportunity?<ApplicationOpportunityContext opportunity={opportunity} showLabel={false}/>:<LoadingIndicator compact>A carregar oportunidade…</LoadingIndicator>}</section>
       {interest&&<section className="interest-application-context" aria-label="Análise do interesse de origem">
         <h2>Análise do interesse</h2>
         {interest.notes?<><div className="application-interest-notes pre-wrap" tabIndex={0} role="region" aria-label="Notas do interesse">{interest.notes}</div><button type="button" className="btn btn-outline" disabled={locked||Boolean(form.notes)} onClick={()=>{if(!locked&&!form.notes)setForm(previous=>previous.notes?previous:{...previous,notes:interest.notes})}}>Usar análise nas notas da candidatura</button></>:<p>Sem notas guardadas no interesse.</p>}
@@ -211,6 +244,9 @@ function ApplicationRecord() {
     function renderDetails() {
       const responsibleName=record.responsibleName||responsibles.find(item=>item.membershipId===record.responsibleMembershipId)?.name
         || (record.responsibleMembershipId?'Responsável associado':'Não identificado')
+      // Pending-list actions: reveal the tab (focus scrolls it into view).
+      const openTab=section=>{const tab=document.getElementById(`application-tab-${section}`);tab?.click();tab?.focus()}
+      const openStatusChange=()=>setStatusOpen(true)
       return (<>
       <header className="application-record-header">
         <div><p className="application-client-context">{organization?.displayName || organization?.name || organization?.label || 'Organização selecionada'}</p>
@@ -223,11 +259,18 @@ function ApplicationRecord() {
           <div><dt>Prazo interno</dt><dd>{record.deadline?dateLabel(record.deadline):'Não definido'}</dd></div>
         </dl>
       </header>
-      <div className="application-priority"><ApplicationNextStep status={record.status} showNavigation={false}/>
+      <div className="application-priority"><ApplicationPending status={record.status} record={record} work={preparationWork} documents={preparationDocuments} applicationId={id} organizationId={org} transitions={transitions} actions={{
+        edit:record.canEdit!==false?()=>setEditOpen(true):null,transition:openStatusChange,
+        team:()=>openTab('team'),partners:()=>openTab('partners'),documents:()=>openTab('documents'),
+      }}/>
       {record.canEdit!==false&&!['CANCELLED','ARCHIVED'].includes(record.status)&&<><button type="button" className="btn btn-primary" onClick={()=>setEditOpen(true)}>Editar dados e orçamento</button>{editOpen&&<FormModal title="Editar dados e orçamento" locked={busy} onClose={()=>setEditOpen(false)}><div className="application-edit-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}<form className="edit-form" onSubmit={e=>submit(e,'edit')}>{fields}<div className="form-actions"><button className="btn btn-primary" type="submit" disabled={locked}>Guardar alterações</button></div></form></div></FormModal>}</>}
+      {transitions.length>0&&<><button type="button" className="btn btn-outline" onClick={openStatusChange}>Alterar estado</button>{statusOpen&&<FormModal title="Alterar estado" locked={busy} active={!confirming} onClose={()=>setStatusOpen(false)}><div className="application-edit-modal application-status-modal">{error&&<p role="alert">{error}</p>}{activePending&&<p role="status">Existe um envio por confirmar. <button type="button" disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
+        <p>Estado atual: <span className={`chip ${CHIP[record.status]||'chip-grey'}`}>{LABEL[record.status]}</span></p>
+        <p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
+        <div className="pipeline-buttons">{transitions.map(s=><button className="btn btn-outline" type="button" key={s} disabled={locked||!reason.trim()} onClick={e=>submit(e,'transition',s)}>{LABEL[s]}</button>)}</div></div></FormModal>}</>}
       </div>
       <CentralRevisionNotice key={`${userId}:${org}:${id}`} record={record}/>
-      <ApplicationSections sections={[
+      <ApplicationSections onVisit={visitSection} sections={[
         {id:'overview',label:'Resumo',content:<>
       <ApplicationPreparationSummary work={preparationWork} documents={preparationDocuments} responsibles={responsibles}/>
       <div className="application-overview-toolbar">
@@ -242,21 +285,20 @@ function ApplicationRecord() {
       {record.lastSubmittedAt&&<p>Último registo de submissão: {new Date(record.lastSubmittedAt).toLocaleString('pt-PT')}</p>}
       {record.evaluationId&&<p>Avaliação F14 associada: {record.evaluationId} (referência, sem prova de elegibilidade)</p>}
       {record.canEdit===false&&<p>Acesso de consulta à candidatura. A edição requer autorização do gestor.</p>}
-      {transitions.length>0&&<details className="detail-section application-status-actions"><summary>Alterar estado</summary><p>Submissão e resultado são registos internos; esta ação não envia a candidatura ao financiador.</p><label>Motivo <input required maxLength="500" disabled={locked} value={reason} onChange={e=>setReason(e.target.value)}/></label>
-        <div className="pipeline-buttons">{transitions.map(s=><button className="btn btn-outline" type="button" key={s} disabled={locked||!reason.trim()} onClick={e=>submit(e,'transition',s)}>{LABEL[s]}</button>)}</div></details>}
+      {organization?.navigation?.directory!==false&&<ApplicationObjectives key={`${userId}:${org}:${id}`} applicationId={id} organizationId={org}/>}
         </>},
-        {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
-        {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
+        {id:'documents',label:'Documentos',render:visited=><ApplicationDocumentsReview takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationDocuments} applicationId={id} userId={userId} organizationId={org}/>},
+        {id:'team',label:'Equipa e tarefas',render:visited=><ApplicationWork takeEarlyRead={takeEarlyRead} loadDetails={visited} onPreparationChange={setPreparationWork} applicationId={id} userId={userId} organizationId={org} responsibles={responsibles} responsiblesNext={responsiblesNext} loadingResponsibles={loadingResponsibles} responsiblesLoadFailed={responsiblesLoadFailed} loadMoreResponsibles={loadMoreResponsibles} applicationResponsibleId={record.responsibleMembershipId} applicationDeadline={record.deadline} canEdit={record.canEdit!==false}/>},
         {id:'partners',label:'Parceiros',render:visited=>visited&&<ApplicationPartners applicationId={id} userId={userId} organizationId={org}/>},
-        {id:'history',label:'Histórico',content:<>      <section id="historico-candidatura" tabIndex={-1} className="detail-section"><h2>Histórico</h2><p>Revisão atual: {record.revision} · Data do estado: {dateLabel(record.statusChangedAt)}</p>{historyLoading?<p role="status">A carregar histórico…</p>:historyError?<p role="alert">{historyError} <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>:<ApplicationTimeline history={history} record={record} responsibles={responsibles}/>}
+        {id:'history',label:'Histórico',content:<>      <section id="historico-candidatura" tabIndex={-1} className="detail-section"><h2>Histórico</h2><p>Revisão atual: {record.revision} · Data do estado: {dateLabel(record.statusChangedAt)}</p>{historyLoading?<LoadingIndicator compact>A carregar histórico…</LoadingIndicator>:historyError?<p role="alert">{historyError} <button type="button" onClick={()=>setHistoryRefresh(n=>n+1)}>Repetir consulta</button></p>:<ApplicationTimeline history={history} record={record} responsibles={responsibles}/>}
         {historyNext&&<button type="button" onClick={async()=>{try{const r=await api.history(id,{cursor:historyNext});if(!alive.current)return;setHistory(h=>[...h,...r.data.items]);setHistoryNext(r.data.nextCursor)}catch(e){if(alive.current)setError(message(e))}}}>Mais histórico</button>}</section></>}
       ]}/>
     </>)
     }
     return <main className={`page detail-page ${id?'application-detail-workspace':creating?'application-create-workspace':''}`}>{dialog}<Link to={returnTo}>{fromAlerts ? "Voltar aos alertas" : "Voltar"}</Link>{!id&&(creating?<header className="application-create-header"><div><p>{organization?.displayName || organization?.name || 'Organização selecionada'}</p><h1>Nova candidatura</h1></div><div className="application-create-initial-state"><span>Estado inicial</span><strong>Identificada</strong></div></header>:<h1>Candidaturas</h1>)}
-    {error&&<p role="alert">{error}</p>}{id&&!record&&error&&<button type="button" className="btn btn-outline" onClick={()=>{setError('');setRefresh(v=>v+1)}}>Repetir consulta da candidatura</button>}{notice&&<p role="status">{notice}</p>}
+    {error&&!statusOpen&&<p role="alert">{error}</p>}{id&&!record&&error&&<button type="button" className="btn btn-outline" onClick={()=>{setError('');setRefresh(v=>v+1)}}>Repetir consulta da candidatura</button>}{notice&&<p role="status">{notice}</p>}
     {creating&&error&&(!opportunity||(sourceInterestId&&!interest))&&<button type="button" className="btn btn-outline" disabled={busy} onClick={()=>{setError('');setSourceRefresh(v=>v+1)}}>Repetir consulta da origem</button>}
-    {activePending&&<p role="status">Existe um envio por confirmar. <button type="button" className={creating?'btn btn-outline':undefined} disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
+    {activePending&&!statusOpen&&<p role="status">Existe um envio por confirmar. <button type="button" className={creating?'btn btn-outline':undefined} disabled={busy} onClick={retryPending}>Repetir o mesmo envio</button></p>}
     {creating&&renderCreation()}
     {!id&&!creating&&renderList()}
     {id&&record&&renderDetails()}

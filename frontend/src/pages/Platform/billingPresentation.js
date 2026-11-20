@@ -12,6 +12,7 @@ export const documentTypes = {
   CREDIT_NOTE: 'Nota de crédito', DEBIT_NOTE: 'Nota de débito',
 }
 
+export const documentSources = { TOCONLINE: 'TOConline', FE_AP: 'FE-AP', OTHER: 'Outro' }
 export const documentStates = { ISSUED: 'Emitido', CREDITED: 'Creditado', CANCELLED: 'Cancelado' }
 export const paymentMethods = {
   BANK_TRANSFER: 'Transferência bancária', DIRECT_DEBIT: 'Débito direto',

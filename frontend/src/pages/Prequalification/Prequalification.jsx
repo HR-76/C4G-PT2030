@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import DecisionPanel from './DecisionPanel'
 import {useEffect,useRef,useState} from 'react'
 import {Link,useLocation,useNavigate} from 'react-router-dom'
@@ -79,7 +80,7 @@ export function Workspace({auth,search=''}){
  const disabled=loading||busy,canEvaluate=context?.canEvaluate===true&&head?.head?.state==='CONFIRMED'&&head.head.freshness==='CURRENT'&&active
  return <section className="editorial prequalification"><div className="heading-with-info"><h2>Análise parcial de oportunidades</h2><InfoTooltip label="Informação sobre a análise parcial">Esta análise cobre apenas parte dos critérios e não confirma a elegibilidade.</InfoTooltip></div>
   <nav><Link to="/publicacao-perfil">Publicações do perfil</Link> · <Link to="/oportunidades">Escolher oportunidade</Link> · <button disabled={disabled} onClick={load}>Atualizar consulta</button></nav>
-  {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}{loading&&<p role="status">A consultar…</p>}
+  {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}{loading&&<LoadingIndicator>A consultar…</LoadingIndicator>}
   {pending.map(p=><aside key={p.idempotencyKey} aria-label="Intenção pendente"><p>Resultado por confirmar: {p.operation==='PQ1_ACTIVATE'?'ativação':p.operation==='PQ1_DECIDE'?'decisão':'avaliação'}. Intenção {p.idempotencyKey}</p><button disabled={disabled} onClick={()=>recover(p)}>Consultar resultado da intenção</button><p>Não repita a gravação. Se persistir, contacte o suporte com esta referência. Não existe resolução automática garantida. Outras operações independentes permanecem disponíveis.</p></aside>)}
   {!loading&&context&&<><h3>Ativar publicação para análise parcial</h3><label>Publicação <select aria-label="Publicação" value={selected} disabled={disabled||activationPending} onChange={e=>{setSelected(e.target.value);setPreview(null);setConfirmed(false)}}><option value="">Selecione uma publicação</option>{context.items.map(p=><option key={p.versionId} value={p.versionId}>{p.publishedAt} · {p.versionId}</option>)}</select></label>
    {context.nextCursor&&<button disabled={disabled} onClick={()=>more('context')}>Mais publicações</button>}

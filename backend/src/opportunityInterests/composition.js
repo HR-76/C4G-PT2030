@@ -3,6 +3,7 @@ const {AsyncLocalStorage}=require('node:async_hooks');
 const {createAuthorityDataRepository}=require('../authorization/authorityDataRepository');
 const {createTaxonomySessionAuthority}=require('../security/authenticatedAuthority');
 const {createTaxonomyAuthorization}=require('../authorization/resourceAuthorization');
+const {applicantOpportunityReadPolicy}=require('../applications/teamAccess');
 const {createTenantRuntime}=require('../security/tenantRuntime');
 const {createAuthorizedTenantOperationCatalog}=require('../security/tenantOperationCatalog');
 const {preparedAuthorityBinding}=require('../security/tenantLeaseExecutor');
@@ -28,6 +29,7 @@ function createOpportunityInterestComposition({sessionStore,sessionRegistry,auth
  const auditPort={accept(event){const active=scope.getStore();if(!active)throw Error('INTEREST_AUDIT_SCOPE_REQUIRED');const task=(active.auditTail||Promise.resolve()).then(()=>baseAudit.accept(event));active.auditTail=task;task.catch(()=>{});return task;}};
  const drain=()=>scope.getStore()?.auditTail||Promise.resolve();
  const authorization=createTaxonomyAuthorization({exactResourceScope:false,catalogs,...data,assurancePolicyVersion:policyVersion,recentMfaRequirement,clock,authorizationAuditPort:auditPort,
+  snapshotForResource:applicantOpportunityReadPolicy,
   withAuthorityReads:work=>coordinator.withAuthority(work)});
  const guard=coordinator.bindAuthority({sessionAuthority:authority,authorization,operationCatalog:catalogs.operationCatalog,permissionCatalog:catalogs.permissionCatalog,recentMfaRequirement});
  const append=createAppendService({appendPort:new PostgresAppendRepository()}),adapters={};
@@ -73,6 +75,9 @@ function createOpportunityInterestComposition({sessionStore,sessionRegistry,auth
      if(!decision.allowed&&/AUDIT|UNAVAILABLE|STALE|MEMBERSHIP|POLICY_INVALID|SESSION_INVALID/.test(decision.reasonCode))fail('SERVICE_UNAVAILABLE');
      return decision.allowed;},
     protect:async args=>{const decision=await guard.protect(client,{handle:state.handle,...args});state.guard=decision.token;await drain();return decision;},
+    // Only reads reuse a decision inside the operation; each reuse confirms the guard is still current.
+    reuseDecisions:operation(state.method)===OPERATIONS.READ,
+    onDecisionReuse:()=>{if(state.guard)coordinator.assert(state.guard,client,preparedAuthorityBinding(client).transactionId);},
     audit:(connection,entry)=>audit(connection,state,entry)});
    return await repository[state.method](client,state.input,state.id);
   }finally{await drain();}});

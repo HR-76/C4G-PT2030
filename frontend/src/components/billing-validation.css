@@ -1,0 +1,9 @@
+.billing-validation { margin-top: 1rem; }
+.billing-validation h3 { margin: 0; }
+.billing-validation dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1.5rem; margin: 1rem 0; }
+.billing-validation dt { font-size: .85rem; color: #475569; }
+.billing-validation dd { margin: .2rem 0 0; overflow-wrap: anywhere; }
+.billing-validation button { margin: .35rem .5rem .35rem 0; }
+@media (max-width: 640px) {
+  .billing-validation dl { grid-template-columns: minmax(0, 1fr); }
+}

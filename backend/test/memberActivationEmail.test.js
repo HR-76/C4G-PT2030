@@ -2,6 +2,26 @@
 const test=require('node:test'),assert=require('node:assert/strict'),{randomUUID}=require('node:crypto');
 const {createActivationEmail}=require('../src/platformOnboarding/activationEmail');
 const options={key:'k'.repeat(32),apiKey:'test-only',from:'C4G <activation@example.invalid>',origin:'https://app.example.invalid'};
+const {renderTemplate}=require('../src/emailTemplates/render');
+const {defaultTemplate}=require('../src/emailTemplates/defaultTemplates');
+const message=()=>renderTemplate(defaultTemplate('MEMBER_INVITATION'),{organizationName:'Entidade',expiresAt:'2030-01-15T12:00:00Z'});
+
+test('configured messages reach the provider in HTML and text with the real activation link',async()=>{
+ const sent=[];const email=createActivationEmail({...options,fetchImpl:async(url,request)=>{sent.push(JSON.parse(request.body));return {ok:true,json:async()=>({id:'accepted'})};}});
+ const invitationId=randomUUID(),secret=await email.secret({invitationId});
+ const value={invitationId,to:'person@example.invalid',secret,expiresAt:new Date(Date.now()+3600000),message:message()};
+ assert.equal((await email.send(value)).status,'ACCEPTED');
+ for(const part of ['html','text'])assert.ok(sent[0][part].includes('/api/activation#'+secret));
+ assert.equal((await email.send({...value,message:{...value.message,text:'missing marker'}})).status,'UNCONFIRMED');
+ assert.equal(sent.length,1);
+});
+
+test('test emails are marked and only contain the nonfunctional example link',async()=>{
+ let sent;const email=createActivationEmail({...options,fetchImpl:async(url,request)=>{sent=JSON.parse(request.body);return {ok:true,json:async()=>({id:'accepted'})};}});
+ assert.equal((await email.test({to:'admin@example.invalid',message:message(),idempotencyKey:randomUUID()})).status,'ACCEPTED');
+ assert.match(sent.subject,/^\[TESTE\]/);
+ for(const part of ['html','text']){assert.match(sent[part],/TESTE/);assert.match(sent[part],/https:\/\/exemplo.invalid\/ativacao-de-exemplo/);assert.doesNotMatch(sent[part],/api\/activation#/);}
+});
 test('activation retries preserve token, message and provider idempotency key',async()=>{
  const calls=[];
  const email=createActivationEmail({...options,fetchImpl:async(url,request)=>{calls.push({url,...request});return {ok:true,json:async()=>({id:'accepted'})};}});

@@ -1,24 +1,27 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { privateApplicationsApi as api } from '../../api/api'
+import { afterPageRequests } from '../../api/pageRequests'
 import { opportunityDate } from './OpportunityPresentation'
 import { applicationStatusLabels as labels, applicationStatusChips } from '../../utils/applicationStatuses'
 
-export default function OpportunityApplications({ opportunityId, organizationId }) {
-  return <ApplicationList key={`${organizationId}:${opportunityId}`} opportunityId={opportunityId} organizationId={organizationId} />
+// With `afterPage` the first read waits for the page's own requests to settle.
+export default function OpportunityApplications({ opportunityId, organizationId, afterPage = false }) {
+  return <ApplicationList key={`${organizationId}:${opportunityId}`} opportunityId={opportunityId} organizationId={organizationId} afterPage={afterPage} />
 }
-function ApplicationList({ opportunityId, organizationId }) {
+function ApplicationList({ opportunityId, organizationId, afterPage }) {
   const [items, setItems] = useState([]), [cursor, setCursor] = useState(null), [next, setNext] = useState(null)
   const [loading, setLoading] = useState(true), [error, setError] = useState(false), [retry, setRetry] = useState(0)
   useEffect(() => {
     let active = true; setLoading(true); setError(false)
-    api.list({ opportunityId, ...(cursor ? { cursor } : {}) }).then(r => {
+    const controller = new AbortController(), start = work => afterPage && !cursor && !retry ? afterPageRequests(controller.signal, work) : work()
+    start(() => api.list({ opportunityId, ...(cursor ? { cursor } : {}) }).then(r => {
       if (!active) return
       setItems(old => cursor ? [...old, ...r.data.items.filter(item => !old.some(previous => previous.applicationId === item.applicationId))] : r.data.items)
       setNext(r.data.nextCursor)
-    }).catch(() => { if (active) setError(true) }).finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [opportunityId, organizationId, cursor, retry])
+    }).catch(() => { if (active) setError(true) }).finally(() => { if (active) setLoading(false) }))
+    return () => { active = false; controller.abort() }
+  }, [opportunityId, organizationId, cursor, retry, afterPage])
   return <section className="detail-section opportunity-applications" aria-label="Candidaturas da organização"><div className="section-hd"><h2 className="opportunity-section-title">Candidaturas da organização</h2><Link className="btn btn-outline btn-sm" to={`/candidaturas?oportunidade=${opportunityId}`}>Consultar candidaturas desta oportunidade</Link></div>
     {loading && <p role="status">A consultar candidaturas…</p>}
     {error && <p role="alert">Não foi possível consultar candidaturas ou não tem permissão. <button className="btn btn-outline btn-sm" onClick={() => setRetry(v => v + 1)}>Repetir consulta de candidaturas</button></p>}

@@ -1,6 +1,6 @@
 # Conclusão da ficha e preparação da entidade
 
-Estado: Review / prova isolada PASS (18/10/2026). Recorte D autorizado em 18/10/2026, apenas em composição isolada. Segue o plano `platform-entity-invited-registration-plan.md` e preserva os percursos atuais de utilizadores.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Fecho no âmbito deste incremento isolado. Não repetida: a prova isolada com duas bases e credenciais reais. Estado anterior: Review / prova isolada PASS (18/10/2026). Recorte D autorizado em 18/10/2026, apenas em composição isolada. Segue o plano `platform-entity-invited-registration-plan.md` e preserva os percursos atuais de utilizadores.
 
 ## Contrato e aceitação
 

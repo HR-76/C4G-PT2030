@@ -1,0 +1,10 @@
+[Unit]
+Description=C4G staging: teste de restauro semanal (domingo 05:30 UTC)
+
+[Timer]
+OnCalendar=Sun *-*-* 05:30:00 UTC
+Persistent=true
+Unit=c4g-staging-restore-test.service
+
+[Install]
+WantedBy=timers.target

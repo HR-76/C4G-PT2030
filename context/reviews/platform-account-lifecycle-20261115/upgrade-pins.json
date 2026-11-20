@@ -1,0 +1,11 @@
+{
+  "upChecksum": "43b4bb3f832eec9b11155804f3b1d54eb0e35ae828f3dd6d4a8498cb3a8a07c5",
+  "schemaFingerprint": "7c86b26901348aca49c98b6bc24e1b29aaedc607377bb02bb004ec43c1a62454",
+  "authoritySecurityFingerprint": "7faed0225461434f065dc1ba46416633f23d2d171f23fd8936251046fcd1f61a",
+  "catalogSecurityFingerprint": "cbf754e67d08e4d4da72fa78c4fece1c0fb0a37faa81f6ebbfe8bc681174b602",
+  "euWriterSecurityFingerprint": "0d50c2b0added35af76afb86783bcba34c151f969cec692eab2a1d7e59601b9c",
+  "euRunReconciliationSecurityFingerprint": "040b426fc45dc4af1c2e2b36a0c9056ac28a1e84119704f314d5bdd1f7f3fb82",
+  "euLegacyPrearchiveSecurityFingerprint": "d960c020d800e12656fad7a32e7795219090aca8debc0f09ff7e05a38bbec1c5",
+  "productionSecurityFingerprint": "7863be506cb4637c31df92fc4d714f05b4be6ea14d0f8e0aeb47886cde6e424a",
+  "readFingerprint": "007fcfaa1a206d287d8aa776596153f95f2135aa7bfce16d04c7c5ed8b64e6dc"
+}

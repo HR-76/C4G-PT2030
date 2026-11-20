@@ -11,8 +11,11 @@ import InfoTooltip from '../../components/InfoTooltip'
 import {directoryIntentKey} from './intentions'
 import {clearDirectoryCache,defaultPeopleQuery,directoryCacheEpoch,directoryCacheKey,keepDirectoryRead,peopleQueryKey,readDirectoryCache,sharedDirectoryRead,writeDirectoryCache} from './directoryCache'
 import EntityProfileCard from './EntityProfileCard'
+import EntityEmailLogo from './EntityEmailLogo'
 import './organization.css'
 import OrganizationStrategy, { AreaNames, StrategyFields } from './OrganizationStrategy'
+import DepartmentProfile from './DepartmentProfile'
+import DepartmentContributions from './DepartmentContributions'
 
 const emptyPerson={name:'',email:'',functionLabel:'',active:true,unitIds:[],primaryUnitId:null}
 const clean=value=>value.trim().normalize('NFC')
@@ -39,9 +42,10 @@ export function unitPath(unit,units){
 export default function OrganizationProfile(){
  const auth=useAuth()
  if(!auth.organization)return <section className="organization-page"><h2>Perfil da organização</h2><p role="status">Esta conta não tem uma entidade associada.</p></section>
- return <Workspace key={`${auth.user.id}:${auth.organization.id}`} userId={auth.user.id} organizationId={auth.organization.id}/>
+ // The email logo is the entity administrator's alone; the server confirms it again on every request.
+ return <Workspace key={`${auth.user.id}:${auth.organization.id}`} userId={auth.user.id} organizationId={auth.organization.id} managesEmailLogo={auth.organization.profileCode==='ORG_ADMIN'}/>
 }
-function Workspace({userId,organizationId}){
+function Workspace({userId,organizationId,managesEmailLogo=false}){
  const location=useLocation(),api=useMemo(()=>organizationDirectoryApi(organizationId),[organizationId])
  const tab=/^\/perfil-organizacao\/pessoas(?:\/|$)/.test(location.pathname)?'people':location.pathname.endsWith('/unidades')?'units':'profile'
  const cacheKey=directoryCacheKey(userId,organizationId),[initial]=useState(()=>readDirectoryCache(cacheKey))
@@ -54,6 +58,8 @@ function Workspace({userId,organizationId}){
  const [areas,setAreas]=useState([]),[areaId,setAreaId]=useState(''),[interestAreaId,setInterestAreaId]=useState('')
  const [areasOpen,setAreasOpen]=useState(false),areasTrigger=useRef(null)
  const strategyTrigger=useRef(null)
+ // The department whose profile is open, with the button that opened it.
+ const [departmentUnit,setDepartmentUnit]=useState(null),departmentTrigger=useRef(null)
  const [search,setSearch]=useState(''),[unitId,setUnitId]=useState(appliedUnit),[status,setStatus]=useState('ACTIVE'),[otherFilters,setFilters]=useState({search:'',status:'ACTIVE'})
  const filters=useMemo(()=>({...otherFilters,unitId:appliedUnit}),[otherFilters,appliedUnit])
  useEffect(()=>{setUnitId(appliedUnit)},[appliedUnit])
@@ -154,6 +160,12 @@ function Workspace({userId,organizationId}){
   setForm({method:'strategyEdit',values:{areaIds:strategy.areaIds,objectives:strategy.objectives,
    interestText:strategy.interests.join('\n'),expectedRevision:context.profile.revision}})
  }
+ // A department chose an area the entity does not have: adopting it is an ordinary strategy edit.
+ function adoptArea(areaId){
+  if(pending||busy)return
+  send({userId,organizationId,method:'strategyEdit',id:null,body:{areaIds:[...strategy.areaIds,areaId],interests:strategy.interests,objectives:strategy.objectives,
+   expectedRevision:context.profile.revision,idempotencyKey:crypto.randomUUID()}})
+ }
  function editPerson(person){setForm({method:'personEdit',id:person.personId,values:{name:person.name,email:person.email,functionLabel:person.functionLabel,active:person.active,unitIds:person.unitIds,primaryUnitId:person.primaryUnitId,expectedRevision:person.revision}})}
  const loadMorePeople=people.nextCursor?()=>loadPeople({...filters,cursor:people.nextCursor},true):null
  const personForm=form?.method.startsWith('person'),unitForm=form?.method.startsWith('unit')
@@ -186,10 +198,15 @@ function Workspace({userId,organizationId}){
    </section><aside className="detail-section organization-card"><h3>Estrutura da entidade</h3><Link aria-label="Ver departamentos e unidades" to="/perfil-organizacao/unidades" className="btn btn-outline">Ver departamentos e unidades</Link><Link aria-label="Ver pessoas" to="/perfil-organizacao/pessoas" className="btn btn-outline">Ver pessoas</Link><hr/><div className="heading-with-info"><h3>Competências e Matching</h3></div><Link to="/matching" className="btn btn-outline">Consultar Matching</Link></aside></div>}
     {tab==='profile'&&strategy&&<OrganizationStrategy strategy={strategy} areas={context.profile.strategyAreas}
      onEdit={canEdit?editStrategy:null} editTriggerRef={strategyTrigger}/>}
-    {tab==='profile'&&<EntityProfileCard profile={context.registration} organization={context.organization} canEdit={canEdit} defaults={!context.registration?{institutionalEmail:context.profile.email||'',website:context.profile.website||''}:{}} onSave={async body=>{const saved=(await api.registrationProfile(body)).data;clearDirectoryCache();return saved}}/>}
+    {tab==='profile'&&strategy&&context.permissions.units&&<DepartmentContributions strategy={strategy} areas={context.profile.strategyAreas} api={api} cacheKey={cacheKey} onAdopt={canEdit?adoptArea:null}/>}
+    {tab==='profile'&&<EntityProfileCard profile={context.registration} organization={context.organization} canEdit={canEdit} onSaveType={async body=>{const saved=(await api.registrationType(body)).data;clearDirectoryCache();setContext(old=>({...old,registration:saved,organization:{...old.organization,typeCode:saved.fields.typeCode}}));return saved}} defaults={!context.registration?{institutionalEmail:context.profile.email||'',website:context.profile.website||''}:{}} onSave={async body=>{const saved=(await api.registrationProfile(body)).data;clearDirectoryCache();return saved}}/>}
+    {tab==='profile'&&managesEmailLogo&&<EntityEmailLogo api={api}/>}
    {tab==='units'&&<><div className="organization-heading"><div className="heading-with-info"><h3>Departamentos / Unidades</h3></div>{canEdit&&context.permissions.createUnit&&<button className="btn btn-primary btn-create" onClick={()=>setForm({method:'unitCreate',values:{label:'',stableCode:'',parentScopeId:null}})}><Plus size={16}/> Criar unidade</button>}</div>
-    {!context.permissions.units?<p>Sem permissão para consultar a estrutura completa da organização.</p>:units.length===0?<div className="detail-section organization-card"><h3>A organização ainda não tem unidades</h3><p>Crie o primeiro departamento ou unidade para começar a organizar a equipa.</p></div>:<div className="table-wrap" role="region" aria-label="Tabela de departamentos e unidades" tabIndex={0}><table role="table" className="data-table mobile-card-table organization-directory-table"><thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Departamento / Unidade</th><th role="columnheader" scope="col">Estado</th><th role="columnheader" scope="col">Ações</th></tr></thead><tbody role="rowgroup">{[...units].sort((a,b)=>unitPath(a,units).localeCompare(unitPath(b,units),'pt')).map(unit=><tr role="row" key={unit.scopeId}><td role="cell" data-label="Unidade"><Link className="unit-people-link" aria-label={`Ver pessoas de ${unit.label}`} to={`/perfil-organizacao/pessoas?unitId=${encodeURIComponent(unit.scopeId)}`}>{unit.label}</Link>{(unitPath(unit,units)!==unit.label||unit.stableCode)&&<small className="organization-path">{unitPath(unit,units)!==unit.label?unitPath(unit,units):''}{unitPath(unit,units)!==unit.label&&unit.stableCode?' · ':''}{unit.stableCode||''}</small>}</td><td role="cell" data-label="Estado"><span className={unit.lifecycle==='ACTIVE'?'badge-green':'badge-grey'}>{unit.lifecycle==='ACTIVE'?'Ativa':'Arquivada'}</span></td><td role="cell" data-label="Ações"><div className="organization-actions">{canEdit&&unit.lifecycle==='ACTIVE'&&<>{context.permissions.renameUnit&&<button className="btn btn-outline" onClick={()=>setForm({method:'unitRename',id:unit.scopeId,values:{label:unit.label,expectedRevision:unit.revision}})}>Renomear</button>}</>}</div></td></tr>)}</tbody></table></div>}
+    {!context.permissions.units?<p>Sem permissão para consultar a estrutura completa da organização.</p>:units.length===0?<div className="detail-section organization-card"><h3>A organização ainda não tem unidades</h3><p>Crie o primeiro departamento ou unidade para começar a organizar a equipa.</p></div>:<div className="table-wrap" role="region" aria-label="Tabela de departamentos e unidades" tabIndex={0}><table role="table" className="data-table mobile-card-table organization-directory-table"><thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Departamento / Unidade</th><th role="columnheader" scope="col">Estado</th><th role="columnheader" scope="col">Ações</th></tr></thead><tbody role="rowgroup">{[...units].sort((a,b)=>unitPath(a,units).localeCompare(unitPath(b,units),'pt')).map(unit=><tr role="row" key={unit.scopeId}><td role="cell" data-label="Unidade"><Link className="unit-people-link" aria-label={`Ver pessoas de ${unit.label}`} to={`/perfil-organizacao/pessoas?unitId=${encodeURIComponent(unit.scopeId)}`}>{unit.label}</Link>{(unitPath(unit,units)!==unit.label||unit.stableCode)&&<small className="organization-path">{unitPath(unit,units)!==unit.label?unitPath(unit,units):''}{unitPath(unit,units)!==unit.label&&unit.stableCode?' · ':''}{unit.stableCode||''}</small>}</td><td role="cell" data-label="Estado"><span className={unit.lifecycle==='ACTIVE'?'badge-green':'badge-grey'}>{unit.lifecycle==='ACTIVE'?'Ativa':'Arquivada'}</span></td><td role="cell" data-label="Ações"><div className="organization-actions">{strategy&&unit.lifecycle==='ACTIVE'&&<button className="btn btn-outline" aria-haspopup="dialog" aria-label={`Perfil de ${unit.label}`} onClick={event=>{departmentTrigger.current=event.currentTarget;setDepartmentUnit(unit)}}>Perfil</button>}{canEdit&&unit.lifecycle==='ACTIVE'&&<>{context.permissions.renameUnit&&<button className="btn btn-outline" onClick={()=>setForm({method:'unitRename',id:unit.scopeId,values:{label:unit.label,expectedRevision:unit.revision}})}>Renomear</button>}</>}</div></td></tr>)}</tbody></table></div>}
    </>}
+   {tab==='units'&&departmentUnit&&strategy&&<DepartmentProfile key={departmentUnit.scopeId} unit={departmentUnit} profile={context.profile} api={api} canEdit={Boolean(canEdit)}
+    returnFocusRef={departmentTrigger} onClose={()=>setDepartmentUnit(null)}
+    onSaved={()=>{clearDirectoryCache();setDepartmentUnit(null);setNotice('Alterações guardadas.');load(true)}}/>}
    {tab==='people'&&<><div className="organization-heading">
     <div className="heading-with-info"><h3>Pessoas da organização</h3><InfoTooltip label="Informação sobre o registo de pessoas">Registar uma pessoa não cria uma conta nem concede acesso à aplicação.</InfoTooltip></div>
     <div className="people-heading-actions">

@@ -61,6 +61,34 @@ function createApplicationSliceRouter({express,service,authenticate,organization
   router.delete('/:id/documents/:documentId/versions/:versionId',async(req,res)=>{const correlationId=requestCorrelation();try{if(!documentAccessPort||typeof documentAccessPort.deleteDocument!=='function')throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});const result=await documentAccessPort.deleteDocument({request:req,applicationId:req.params.id,documentId:req.params.documentId,versionId:req.params.versionId});res.status(200).json(result)}catch(error){failure(res,error,correlationId,'SERVICE_UNAVAILABLE')}});
   router.post('/:id/documents/upload-intents',async(req,res)=>{const correlationId=requestCorrelation();try{if(!documentAccessPort||typeof documentAccessPort.createIntent!=='function')throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});const result=await documentAccessPort.createIntent({request:req,applicationId:req.params.id,input:req.body});res.status(201).json(result)}catch(error){const raw=String(error.code||'');failure(res,error,correlationId,raw==='DOCUMENT_INTENT_INVALID'?'INVALID_INPUT':'SERVICE_UNAVAILABLE')}});
   router.put('/:id/documents/uploads/:versionId',async(req,res)=>{const correlationId=requestCorrelation();try{if(!documentAccessPort||typeof documentAccessPort.upload!=='function')throw Object.assign(new Error(),{code:'SERVICE_UNAVAILABLE'});const token=req.get('X-C4G-Upload-Capability');if(typeof token!=='string'||!token||req.get('Content-Encoding'))throw Object.assign(new Error(),{code:'INVALID_INPUT'});const result=await documentAccessPort.upload({request:req,applicationId:req.params.id,versionId:req.params.versionId,token,source:req});res.status(202).json(result)}catch(error){const raw=String(error.code||error.message||'');failure(res,error,correlationId,/INVALID|LIMIT|MISMATCH|UNKNOWN/.test(raw)?'INVALID_INPUT':'SERVICE_UNAVAILABLE')}});
+ // The Técnico dashboard in one request. Each part is the existing protected
+ // operation, unchanged, with its own authority, lease and audit; they run one
+ // after another on this request so they share its admission checks instead of
+ // competing as three simultaneous requests. A part that is refused or
+ // unavailable is reported in its place and the others are still returned.
+ // An invalid session refuses the whole request.
+ // The applications part is the list read without filters; only its counts leave the server.
+ const technicianParts=[['tasks','workMine',{status:'OPEN',period:'all'}],['alerts','alertsList',{limit:5}],['reviews','reviewMine',{}],
+  ['applications','browse',{},({total,countsByStatus})=>({total,countsByStatus})]];
+ router.get('/technician-dashboard',async(req,res)=>{
+  const correlationId=requestCorrelation(),disconnected=()=>req.aborted||res.destroyed;
+  try{
+   if(Object.keys(req.query).length||(req.body&&Object.keys(req.body).length))throw Object.assign(new Error(),{code:'INVALID_INPUT'});
+   const result={};
+   for(const [part,method,input,shape] of technicianParts){
+    if(disconnected())return;
+    try{const value=await service.execute(method,{...input},null,req);result[part]=shape?shape(value):value;}
+    catch(error){
+     const value=publicApplicationError(error);
+     if(value.status===401)throw error;
+     observeFailure(error,correlationId);
+     result[part]={error:{code:value.code}};
+    }
+   }
+   if(disconnected())return;
+   res.status(200).json(result);
+  }catch(error){if(disconnected())return;failure(res,error,correlationId,'SERVICE_UNAVAILABLE')}
+ });
  const entries=[['get','/my-work','workMine'],['get','/calendar','calendar'],['get','/report','report'],['get','/report.xlsx','reportExport'],['get','/partners','partnersBrowse'],['get','/:id/partners','partnersGet'],['get','/:id/partners/history','partnersHistory'],['post','/:id/partners','partnerCreate'],['put','/:id/partners','partnerEdit'],['post','/:id/partners/remove','partnerRemove'],['get','/units','unitOptions'],['get','/browse','browse'],['get','/browse-page','browsePage'],['get','/responsibles','responsibles'],['get','/opportunity-summaries','opportunitySummaries'],['get','/','list'],['post','/','create'],['get','/:id/work','workGet'],['get','/:id/work/history','workHistory'],
   ['post','/:id/work/participants','participantAdd'],['post','/:id/work/participants/remove','participantRemove'],
   ['get','/:id/work/chat','chatGet'],['post','/:id/work/chat','chatSend'],

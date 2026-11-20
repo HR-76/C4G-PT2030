@@ -81,3 +81,11 @@ test('partner page digests remain byte-compatible with existing canonical cursor
   assert.equal(JSON.parse(first.nextCursor).position.digest, legacyDigest);
   assert.equal(JSON.parse(second.previousCursor).position.digest, legacyDigest);
 });
+
+test('the cross-application partner list is refused to profiles that may not browse it, before any read', async () => {
+  const queries = []; let protectedCalls = 0;
+  const repository = createPartnersRepository({ organizationId: org, actor: { id: 'actor' }, protect: async () => { protectedCalls++; }, audit: async () => {},
+    authorize: async () => true, browseAllowed: async () => false, cursor: { cursor: String, openCursor: String } });
+  await assert.rejects(repository.partnersBrowse({ query: async sql => { queries.push(sql); return { rows: [] }; } }, null, { q: '', country: '', person_role: '', cursor: null }), { code: 'NOT_AUTHORIZED' });
+  assert.equal(queries.length, 0); assert.equal(protectedCalls, 1);
+});

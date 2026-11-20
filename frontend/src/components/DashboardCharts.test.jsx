@@ -67,7 +67,7 @@ it('can reveal all matching applications when a result has more than eight', asy
 })
 
 it.each([
-  ['NO_OBJECTIVE_AREAS', 'Associe áreas temáticas aos objetivos para calcular o índice.'],
+  ['NO_OBJECTIVE_AREAS', 'Associe áreas temáticas aos objetivos ou ligue candidaturas a um objetivo para calcular o índice.'],
   ['NO_PREPARATION', 'Ainda não há candidaturas em preparação.'],
   ['UNAVAILABLE', 'Não foi possível calcular o índice para todas as candidaturas em preparação.'],
 ])('shows the %s state without a percentage', (state, message) => {
@@ -76,4 +76,63 @@ it.each([
   const chart = within(screen.getByRole('region', { name: 'Alinhamento estratégico' }))
   expect(chart.getByText(message)).toBeTruthy()
   expect(chart.queryByText(/\d\s?%/)).toBeNull()
+})
+
+it('counts applications linked to an objective and marks the link in its list', async () => {
+  const dashboard = alignmentDashboard({ state: 'READY', total: 2, aligned: 1, objectives: [
+    { id: 'first', title: 'Objetivo sem áreas com ligação', areaIds: [], count: 1, linkedCount: 1 },
+    { id: 'second', title: 'Objetivo por configurar', areaIds: [], count: 0, linkedCount: 0 },
+  ], areaNames: {}, applications: [
+    { applicationId: 'a', title: 'Projeto ligado', areaIds: [], objectiveIds: ['first'] },
+    { applicationId: 'b', title: 'Projeto solto', areaIds: [], objectiveIds: [] },
+  ] })
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const chart = within(screen.getByRole('region', { name: 'Alinhamento estratégico' }))
+  expect(chart.getAllByText('Sem áreas associadas')).toHaveLength(1)
+  const details = chart.getByText('Objetivo sem áreas com ligação').closest('li').querySelector('details')
+  details.open = true
+  expect((await within(details).findByRole('link', { name: 'Projeto ligado' })).getAttribute('href')).toBe('/candidaturas/a')
+  expect(within(details).getByText('Ligação manual')).toBeTruthy()
+  const unmatched = chart.getByText('Sem correspondência').closest('li').querySelector('details')
+  unmatched.open = true
+  expect(await within(unmatched).findByRole('link', { name: 'Projeto solto' })).toBeTruthy()
+  expect(within(unmatched).queryByRole('link', { name: 'Projeto ligado' })).toBeNull()
+})
+
+it('opens the charts with the applications in progress and by status', () => {
+  const dashboard = { ...alignmentDashboard({ state: 'NO_PREPARATION', total: 0, aligned: null }), today: '2026-11-19' }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const titles = [...document.querySelectorAll('.dashboard-charts > section h2')].map(heading => heading.textContent)
+  expect(titles.slice(0, 2)).toEqual(['Candidaturas em curso', 'Candidaturas por estado'])
+  expect(titles.indexOf('Alinhamento estratégico')).toBeGreaterThan(1)
+})
+
+it('leaves the first two charts to the top of the page when asked', () => {
+  const dashboard = { ...alignmentDashboard({ state: 'NO_PREPARATION', total: 0, aligned: null }), today: '2026-11-19' }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard} leading={false}/></MemoryRouter>)
+  expect(screen.queryByRole('heading', { name: 'Candidaturas em curso' })).toBeNull()
+  expect(screen.queryByRole('heading', { name: 'Candidaturas por estado' })).toBeNull()
+  expect(screen.getByRole('region', { name: 'Alinhamento estratégico' })).toBeTruthy()
+})
+
+it('shows the approval rate over decided applications, overall and per unit with decisions', () => {
+  const dashboard = { applications: { total: 20, by_status: {}, approved: 5, rejected: 3, decisions: 8 }, unit_totals: [
+    { unitId: 'a', label: 'Unidade A', total: 6, approved: 1, rejected: 3, decisions: 4 },
+    { unitId: 'b', label: 'Unidade B', total: 9, approved: 4, rejected: 0, decisions: 4 },
+    { unitId: 'c', label: 'Unidade C', total: 5, approved: 0, rejected: 0, decisions: 0 },
+  ] }
+  render(<MemoryRouter><DashboardCharts dashboard={dashboard}/></MemoryRouter>)
+  const panel = within(screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section'))
+  expect(panel.getByText(/^63\s?%$/)).toBeTruthy()
+  expect(panel.getByText('5 aprovadas em 8 decididas')).toBeTruthy()
+  const rows = [...screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section').querySelectorAll('.chart-budget')].map(row => row.textContent.replace(/\s/g, ' '))
+  expect(rows.map(row => row.replace(/ /g, ''))).toEqual(['UnidadeB100%·4de4', 'UnidadeA25%·1de4'])
+  expect(panel.queryByText(/Unidade C/)).toBeNull()
+})
+
+it('says there are no decisions yet instead of a zero rate', () => {
+  render(<MemoryRouter><DashboardCharts dashboard={{ applications: { total: 2, by_status: {}, decisions: 0 }, unit_totals: null }}/></MemoryRouter>)
+  const panel = within(screen.getByRole('heading', { name: 'Taxa de aprovação' }).closest('section'))
+  expect(panel.getByText('Ainda não há candidaturas com decisão.')).toBeTruthy()
+  expect(panel.queryByText(/%/)).toBeNull()
 })

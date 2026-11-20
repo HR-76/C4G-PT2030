@@ -27,7 +27,7 @@ const entitySelect=`SELECT o.id,o.display_name AS name,o.legal_name AS "legalNam
  WHERE m.organization_id=o.id AND m.base_role_code='ORG_ADMIN' AND ${eligible}
  ORDER BY u.display_name,u.id LIMIT 10) v),'[]') AS administrators
  FROM public.organization o`;
-function createPlatformDirectory({pool,logs,health}){
+function createPlatformDirectory({pool,logs,health,deletionAvailable=false}){
  if(!pool||typeof pool.connect!=='function')throw TypeError('Central pool required');
  async function read(request,work){
   const sid=request.authContext?.sessionId,userId=request.user?.id;
@@ -35,7 +35,7 @@ function createPlatformDirectory({pool,logs,health}){
   const c=await pool.connect();
   try{
    await c.query('BEGIN READ ONLY');await c.query("SET LOCAL statement_timeout='5s'");
-   const authorize=async()=>{if(!(await c.query(authoritySql,[sid,userId])).rowCount)fail('C4G_ADMIN_REQUIRED');};
+   const authorize=async()=>{if(!(await c.query(c.productionCapability?'SELECT $2::uuid AS id WHERE c4g_production.administrator($1,$2,false)':authoritySql,[sid,userId])).rowCount)fail('C4G_ADMIN_REQUIRED');};
    await authorize();const result=await work(c);await authorize();await c.query('COMMIT');return result;
   }catch(e){await c.query('ROLLBACK').catch(()=>{});throw e;}finally{c.release();}
  }
@@ -64,7 +64,7 @@ function createPlatformDirectory({pool,logs,health}){
     FROM public.organization_membership m JOIN public.organization o ON o.id=m.organization_id WHERE m.global_user_id=u.id
     ORDER BY (o.id=$3::uuid) DESC NULLS LAST,o.display_name,o.id LIMIT 100) v),'[]') AS memberships
     FROM public.global_user u ${where} ORDER BY u.display_name,u.id LIMIT $4 OFFSET $5`,values)).rows;
-   return {items,total,page:p.page,pageSize:50};
+   return {items:items.map(item=>({...item,...(deletionAvailable?{canDelete:item.id!==request.user.id}:{})})),total,page:p.page,pageSize:50};
   });}
  });
 }

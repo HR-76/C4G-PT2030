@@ -1,0 +1,231 @@
+{
+  "postgres": "18",
+  "mode": "full",
+  "checks": [
+    {
+      "name": "default plan performs no mutations",
+      "pass": true
+    },
+    {
+      "name": "wrong physical identity and staging config fail before mutations",
+      "pass": true
+    },
+    {
+      "name": "unverified provider identity fails before any database creation",
+      "pass": true
+    },
+    {
+      "name": "shared instance and foreign roles are refused",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after databases-ready",
+      "pass": true
+    },
+    {
+      "name": "migration failure rolls back full Central chain and demotes its owner",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after central-migrated",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after central-profiles-ready",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after tenant-ready",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after identity-seeded",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after directory-published",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after administrator-projected",
+      "pass": true
+    },
+    {
+      "name": "retains resources and demotes technical owner after identity-active",
+      "pass": true
+    },
+    {
+      "name": "complete installation succeeds after all durable phase interruptions",
+      "pass": true
+    },
+    {
+      "name": "replay preserves data and password verifiers without duplicate admin or membership",
+      "pass": true
+    },
+    {
+      "name": "changed immutable config or secret is refused without replacement",
+      "pass": true
+    },
+    {
+      "name": "stale technical elevation is repaired on safe replay",
+      "pass": true
+    },
+    {
+      "name": "058 and 041 pinned preflights remain exact after activation",
+      "pass": true
+    },
+    {
+      "name": "all service identities are limited and confined to their database",
+      "pass": true
+    },
+    {
+      "name": "limited tenant login enforces organization RLS and rejects Central connection",
+      "pass": true
+    },
+    {
+      "name": "billing mail login can only claim and finish deliveries without table access or role escalation",
+      "pass": true
+    },
+    {
+      "name": "privilege drift fails closed and does not repair or elevate the login",
+      "pass": true
+    },
+    {
+      "name": "public receipt contains no secrets; private artifacts are explicit and conflict-safe",
+      "pass": true
+    },
+    {
+      "name": "private runtime bundle uses observed F4 binding and keeps provider secrets outside API environment",
+      "pass": true
+    },
+    {
+      "name": "read: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "commands: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "authoring: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "logs: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "retention: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "catalog: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "authority: actual login has no direct application authority",
+      "pass": true
+    },
+    {
+      "name": "read: entity is visible; identities, sessions and directory cannot be mutated",
+      "pass": true
+    },
+    {
+      "name": "commands: closed email commands execute; arbitrary DML, retention and claim do not",
+      "pass": true
+    },
+    {
+      "name": "authoring: catalog reads and administrator gate execute; collection and generic updates do not",
+      "pass": true
+    },
+    {
+      "name": "logs: support event insertion works while reading and deleting events are forbidden",
+      "pass": true
+    },
+    {
+      "name": "retention: dedicated retention command works without access to email content",
+      "pass": true
+    },
+    {
+      "name": "catalog: dedicated reader admission and catalog SELECT work, writes and identities fail",
+      "pass": true
+    },
+    {
+      "name": "authority: exact identity lookup works through coordinator; direct DML and arbitrary SQL fail",
+      "pass": true
+    },
+    {
+      "name": "tenant API cannot connect to a second physically separate database",
+      "pass": true
+    },
+    {
+      "name": "real limited identity resolver recognizes only the bound C4G administrator",
+      "pass": true
+    },
+    {
+      "name": "real membership and authorization ports resolve exact ORG_ADMIN grants with optional MFA",
+      "pass": true
+    },
+    {
+      "name": "real bounded authority directory resolves the published tenant and named person projection",
+      "pass": true
+    },
+    {
+      "name": "direct F5 DML is denied to both authority and production read logins",
+      "pass": true
+    },
+    {
+      "name": "bootstrap audit records the installation service without personal data or secrets",
+      "pass": true
+    },
+    {
+      "name": "C4G role gives the first administrator no implicit membership or F5 authority in a second organization",
+      "pass": true
+    },
+    {
+      "name": "editorial/PQ1 API profile validates actual bound login and reads its product tables",
+      "pass": true
+    },
+    {
+      "name": "editorial and PQ1 writes obey tenant RLS and cannot create privileged access",
+      "pass": true
+    },
+    {
+      "name": "member projection works with the editorial profile and retries without duplication",
+      "pass": true
+    },
+    {
+      "name": "deletion projection admits the same editorial profile and erases idempotently",
+      "pass": true
+    },
+    {
+      "name": "minimal selectors and extra capability grants are refused by production lifecycle validators",
+      "pass": true
+    }
+  ],
+  "total": 50,
+  "receipt": {
+    "installed": true,
+    "installationId": "344749f1-c354-44de-9280-a408fa6c187e",
+    "intentDigest": "62f2b191c107687a63d16c2679d7a70ee5862c88010eb3505a71415987309181",
+    "centralVersion": "058_platform_account_lifecycle",
+    "tenantVersion": "041_account_identity_erasure",
+    "organizationId": "abc76e3e-fa86-4e90-bbb1-f52758ee6f32",
+    "tenantId": "f71904ed-f499-4ce2-9e19-366017e30253",
+    "administratorId": "519b75c3-e591-44df-a8c5-d5dc3cd499e7",
+    "organizationProfile": "ORG_ADMIN",
+    "mfa": "OPTIONAL",
+    "logins": {
+      "read": "c4g_prod_api_read",
+      "commands": "c4g_prod_api_commands",
+      "authoring": "c4g_prod_catalog_authoring",
+      "logs": "c4g_prod_logs",
+      "retention": "c4g_prod_email_retention",
+      "catalog": "c4g_prod_catalog_read",
+      "authority": "c4g_authority_runtime",
+      "billingMail": "c4g_prod_billing_mail",
+      "tenantApi": "prod_tenant_api"
+    },
+    "runtimeConfigurationDigest": "e5a4caad96d8c6e1c8e7cc0b14e9682b1ea4e6089035de86b197ea2ed1a06450"
+  }
+}

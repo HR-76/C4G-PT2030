@@ -1,0 +1,229 @@
+{
+  "date": "2026-11-15",
+  "baseRevision": "af594e7ef6529770652a8bb51e63c0b3f0763c46",
+  "published": false,
+  "stagingModified": false,
+  "deploymentExecuted": false,
+  "mfa": "OPTIONAL",
+  "checks": {
+    "postgres": {
+      "version": "18.6",
+      "fresh": 41,
+      "full": 50,
+      "isolatedDataRemoved": true
+    },
+    "backend": {
+      "total": 3547,
+      "passed": 3538,
+      "skipped": 9,
+      "failed": 0
+    },
+    "frontend": {
+      "files": 128,
+      "passed": 1150,
+      "failed": 0
+    },
+    "focused": 105,
+    "structuralAndSimulatedDocker": 21,
+    "syntaxFiles": 30,
+    "lint": "PASS",
+    "frontendBuild": "PASS"
+  },
+  "dockerExecuted": false,
+  "realProvidersVerified": false,
+  "realAdministratorAndEntityProvided": false,
+  "artifactHashes": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "fccf4e1a79e2f02bedb6b38f2084e5e1bf081693301b07ae8e6a27ce7df48f2c"
+    },
+    {
+      "path": "backend/scripts/installProductionPlatform.js",
+      "sha256": "36315448e55a9b71837b584462e1b0595b4f897492f34b38a848d72c214a3203"
+    },
+    {
+      "path": "backend/scripts/prepareProductionIdentity.js",
+      "sha256": "a0ab90848a1978c591311e86934c2c1c0acb9661a0641cf62df41d4cac9980a3"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/billing.js",
+      "sha256": "aade0be3d58f704c86de2faeeee5d196a4bc9b43ef1cdbe3d408c8a7dd5e5812"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/config.js",
+      "sha256": "2bb453dc6485f2195a798ef7ed47074d2ff2037126106ab1ef7eb657c9c79350"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/identity.js",
+      "sha256": "2925eee96f3abb8a9507ad2396200ddd2cbefa06451cf15f3800e6d5c7a77eea"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/runtimeConfiguration.js",
+      "sha256": "85b32f4eb10e4dddd936f6340171d6e6fca0aa274e6de4b2487ee3206281d491"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/runtimeIntent.js",
+      "sha256": "6a42874a0dbf537f7ca11c17d0a84d3bb2c398f08ed9f22a2083ad2cbcc3c7b9"
+    },
+    {
+      "path": "backend/scripts/productionBootstrap/tenant.js",
+      "sha256": "1399c5fab6fdac6bfc6e13b2c0dfddea019698cb070c745ac2e249a038775a7a"
+    },
+    {
+      "path": "backend/src/config/opportunityRuntime.js",
+      "sha256": "5dc14b94581d92e5696efdee33dd93583d83ab03395a0f3f37f822e97b2cb86f"
+    },
+    {
+      "path": "backend/src/platformDirectory/deletionProjection.js",
+      "sha256": "e009d0b7a5d5597cba2adbda2793effff73de094480c7b255ec4f2183aa7bc99"
+    },
+    {
+      "path": "backend/src/platformOnboarding/memberProjection.js",
+      "sha256": "5f667b6192e770a0c24b457b56bf2fecdf7d41f3f181d3b284aa8ae64ba75a7b"
+    },
+    {
+      "path": "backend/src/platformOnboarding/memberWorker.js",
+      "sha256": "b6133a1046ed5b028848ddbbbf616ff0e48398f999440ca32905b7ccd0a7c2da"
+    },
+    {
+      "path": "backend/src/platformOnboarding/memberWorkerEmail.js",
+      "sha256": "96aa33005401296ba47994329e9b2404523bfe24de709a681eb157211a133003"
+    },
+    {
+      "path": "backend/src/security/tenantApiProfile.js",
+      "sha256": "c787d35bc9ba950183202255b2fbd425fd9a7eb39d6b1679f842f69765733c1e"
+    },
+    {
+      "path": "backend/test/memberWorkerPrivateEmail.test.js",
+      "sha256": "1856af7abdd66dc6f03a2a9418b9c98fdb8adbf4a3a4e29ae1e935cf3a467323"
+    },
+    {
+      "path": "backend/test/productionBootstrapBilling.test.js",
+      "sha256": "e861c55e3d62f66d5103fd9b93d082b1cc1163a48f9779778cffd756930c10dd"
+    },
+    {
+      "path": "backend/test/productionBootstrapIdentity.test.js",
+      "sha256": "293daba2743219722628f5f1fb3661f314b18d6d2ab2a3734069a88bac5fd1aa"
+    },
+    {
+      "path": "backend/test/productionBootstrapInstaller.test.js",
+      "sha256": "02d9b2f500cc6e959ef26bbfdfa0d9aeb83bc996891c0198b9329c6fcf797af5"
+    },
+    {
+      "path": "backend/test/productionIdentityPreparation.test.js",
+      "sha256": "e3668f011ab1a737025b8acfeff6ae2096673d309ae14220b3a8afa7af8f3174"
+    },
+    {
+      "path": "backend/test/productionReleaseIntegration.test.js",
+      "sha256": "79f491b2eb82c5dff3c53096bdd78a527dede28bc6dce872b2e2cb4fb1cad942"
+    },
+    {
+      "path": "backend/test/productionRuntimeConfiguration.test.js",
+      "sha256": "2972d822a8b5b0f2ffff54a11220b51e48e924e252366ee00ad0026b5ec4940e"
+    },
+    {
+      "path": "backend/test/productionRuntimeIntent.test.js",
+      "sha256": "d0ce3e44bb52dbce002d755e6caef42a485ad69db29a72c52ff3ba432873b33f"
+    },
+    {
+      "path": "backend/test/productionTenantProfileIntegration.test.js",
+      "sha256": "0053111970da6b38543ba86f7602998a0c0c227613f111658f9a42b969e97c3d"
+    },
+    {
+      "path": "context/current-work.md",
+      "sha256": "542e73714980435558feef4962562985c6f7de0cb88731fbe957ccfea7efbe26"
+    },
+    {
+      "path": "context/features/production-release-integration.md",
+      "sha256": "3dbfab5daf6106c2b742f06906c3089fbaa1581c2aea381480bef36bf3192fc5"
+    },
+    {
+      "path": "context/runbooks/production-057-configuration.md",
+      "sha256": "2f022695d7160398900b388934fe56745e028e541f8df213020bd7045c004021"
+    },
+    {
+      "path": "context/runbooks/production-057-deployment.md",
+      "sha256": "21568af89f7c9085e8fe56ed4fcf3e6398da1e659fdf8d5a62c44373414691f8"
+    },
+    {
+      "path": "context/runbooks/production-bootstrap-installer.md",
+      "sha256": "40dba1b89c7826c7f09a8125f368418d4af464d12cd14a9f87b16ea85673bfbd"
+    },
+    {
+      "path": "context/runbooks/production-runtime-bundle.md",
+      "sha256": "1ff4f5186652599487938584a9f0d92b91a17aa36169cd506c709481879b78dd"
+    },
+    {
+      "path": "deploy/production/api.env.example",
+      "sha256": "427a7ea95d5b011948157c22d5683c02799f54ddd05ca7e16c207f4ccea079d6"
+    },
+    {
+      "path": "deploy/production/bootstrap.env.example",
+      "sha256": "af3d4793820bd8b30b1417235b7821e23575bf1e8e0009f76d4fcc17be68c7c8"
+    },
+    {
+      "path": "deploy/production/compose.bootstrap.yaml",
+      "sha256": "253c58eab8543498f0eef382f6c48178a4e2c7a324845c2afa49e8a1f736962d"
+    },
+    {
+      "path": "deploy/production/compose.yaml",
+      "sha256": "ee902a0ed957d9c86fa0535ddeb3d75eb8d62ea5d364eda8b2ef11ee5b2ee063"
+    },
+    {
+      "path": "deploy/production/README.md",
+      "sha256": "aaf6ecfa42597595a649ea812bb54db2501cc3df7954a44414a672ebba79940d"
+    },
+    {
+      "path": "deploy/production/runtime.config.example.json",
+      "sha256": "aa9d7c0dc65a58d628dc1336b15cb0e1fe5e992035403e9f7f125adf94dcb11d"
+    },
+    {
+      "path": "deploy/production/runtime.credentials.example.json",
+      "sha256": "53a895f5fc24b7b9938c38c2d01028dd8d4d3b15a1264d3a1da58f11d50f93a8"
+    },
+    {
+      "path": "deploy/rehearsal/production/compose.yaml",
+      "sha256": "9b259091427b2472cf3a0942aee5e75ee7f8a9579d1e80ed9df408ab1aa885d9"
+    },
+    {
+      "path": "deploy/rehearsal/production/Gate.Dockerfile",
+      "sha256": "0f6a87b0f8bb2b8bfe51ced07425c45437eac35c8107dd2fbb7214f1c3e40fb0"
+    },
+    {
+      "path": "deploy/rehearsal/production/images.example.json",
+      "sha256": "263751a994f2c9b1f02dbb6484d41ada5462941f6dd4199585912a36b58ffb04"
+    },
+    {
+      "path": "deploy/rehearsal/production/README.md",
+      "sha256": "71c9e4c79c57b30b9645e58adc26afe47d86d2d63f29ec050dd558daf08e3c0f"
+    },
+    {
+      "path": "deploy/rehearsal/production/run.cjs",
+      "sha256": "a5406053a65eed52f04b2f42c67e2a55643624085cd2c44164e648f3af6fa410"
+    },
+    {
+      "path": "test/integration/production-bootstrap/docker.cjs",
+      "sha256": "3936d30b985d0ec81d5bbb8b8bbd0a2462870a30e0dd45a3a581b76a702d667a"
+    },
+    {
+      "path": "test/integration/production-bootstrap/editorial-lifecycle.cjs",
+      "sha256": "ff760cade48a01d1e03ca8d73b199cd31033074c0f03a35bb4d7e18d38cc20ee"
+    },
+    {
+      "path": "test/integration/production-bootstrap/probe.cjs",
+      "sha256": "7b0d5579c302e86badc7f21d6635305f7a4eff4e77f704071da780b89e19799f"
+    },
+    {
+      "path": "test/integration/production-bootstrap/runtime-inputs.cjs",
+      "sha256": "d50f682d415f08f3d963ea212e331b6d1f9969c8ee153c775ef3754bb7e90cf1"
+    },
+    {
+      "path": "test/production-preparation.test.cjs",
+      "sha256": "963a2c7475a8d60d8ef8789c495b073a1b6c7b7c088f7465f28dd1777d9505e0"
+    },
+    {
+      "path": "test/production-rehearsal.test.cjs",
+      "sha256": "37c9d70e4cb31a901a7b2f2778bc6e5b119beb48ad6ebaf9476a6df352c591eb"
+    }
+  ]
+}

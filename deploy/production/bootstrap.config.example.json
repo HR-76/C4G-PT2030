@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "installationId": "REPLACE_INSTALLATION_UUID",
+  "target": {
+    "host": "replace-production-postgres.invalid",
+    "port": 5432,
+    "expectedSystemIdentifier": "REPLACE_OBSERVED_POSTGRES_SYSTEM_IDENTIFIER",
+    "centralDatabase": "replace_central_database",
+    "tenantDatabase": "replace_tenant_database",
+    "ssl": { "rejectUnauthorized": true }
+  },
+  "organization": {
+    "id": "REPLACE_ORGANIZATION_UUID",
+    "name": "REPLACE_ORGANIZATION_NAME",
+    "legalName": "REPLACE_ORGANIZATION_LEGAL_NAME",
+    "slug": "replace-organization-slug",
+    "type": "REPLACE_ORGANIZATION_TYPE_CODE",
+    "currency": "REPLACE_CURRENCY_CODE",
+    "dataResidencyCode": "REPLACE_RESIDENCY_CODE"
+  },
+  "tenant": {
+    "id": "REPLACE_TENANT_UUID",
+    "generationId": "REPLACE_DATABASE_GENERATION_UUID",
+    "apiLogin": "prod_tenant_api",
+    "credentialRef": "replace-production-tenant-api",
+    "regionCode": "EU",
+    "residencyPolicyVersion": "replace-production-residency-policy"
+  },
+  "administrator": {
+    "globalUserId": "REPLACE_ADMINISTRATOR_UUID",
+    "membershipId": "REPLACE_MEMBERSHIP_UUID_OR_JSON_NULL",
+    "issuer": "https://login.c4g.ai/realms/REPLACE_REALM",
+    "subject": "REPLACE_VERIFIED_KEYCLOAK_USER_ID",
+    "name": "REPLACE_ADMINISTRATOR_NAME",
+    "email": "REPLACE_ADMINISTRATOR_EMAIL",
+    "organizationProfile": "REPLACE_WITH_ORG_ADMIN_OR_JSON_NULL"
+  }
+}
