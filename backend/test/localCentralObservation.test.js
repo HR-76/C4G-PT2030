@@ -53,3 +53,14 @@ test('the local tenant activation scripts synchronise Central after migrating', 
     assert.match(source, /syncCentralObservation\(/, name);
   }
 });
+
+test('a second tenant reaching the same version publishes under its own idempotency scope', async () => {
+  const other = '22222222-2222-4222-8222-222222222222';
+  const second = { async query(sql, values) { assert.deepEqual(values, [other]); return { rows: [stale] }; } };
+  const publisher = recorder();
+  await syncCentralObservation({ central: second, observation: { ...observation, tenantId: other }, tenantId: other, installationId: 'install', apply: true,
+    idempotencyScope: `install-${other}`, publisher });
+  assert.deepEqual([publisher.calls[0].idempotencyKey, publisher.calls[0].correlationId], [`install-${other}-central-observation-040_application_chat_retention`, 'install']);
+  await assert.rejects(syncCentralObservation({ central: second, observation: { ...observation, tenantId: other }, tenantId: other, installationId: 'install', apply: true, idempotencyScope: '', publisher }),
+    /CENTRAL_OBSERVATION_SCOPE_INVALID/);
+});

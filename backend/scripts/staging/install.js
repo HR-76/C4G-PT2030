@@ -275,7 +275,9 @@ const pendingTenantSteps = head => TENANT_STEPS.filter(([to]) => to > head);
 
 // Applies the given registered steps to one tenant database, in order. After each step the database must be exactly on
 // that version, and Central is told before the next step starts. Stops at the first failure; nothing is skipped.
-async function applyTenantSteps({ steps, central, tenant, identity, installationId, onStep = () => {}, dependencies = {} }) {
+// observationScope: Central admits one event per idempotency key across all tenants. The installed tenant keeps the
+// installation's own keys; every other tenant must pass a scope of its own or its observation is refused.
+async function applyTenantSteps({ steps, central, tenant, identity, installationId, observationScope = null, onStep = () => {}, dependencies = {} }) {
   const runners = dependencies.runners || require('../../src/security/tenantMigrationRunner');
   const preflight = dependencies.preflightTenant || require('../../src/security/tenantMigrationPreflight').preflightTenant;
   const authority = dependencies.withInstallerAuthority || withInstallerAuthority;
@@ -291,7 +293,7 @@ async function applyTenantSteps({ steps, central, tenant, identity, installation
     });
     const observation = await preflight(tenant, identity, undefined, { timeoutMs: 15000 });
     if (observation.currentVersion !== to) throw refuse('STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED');
-    const synced = await sync({ central, observation, tenantId: identity.tenantId, installationId, apply: true });
+    const synced = await sync({ central, observation, tenantId: identity.tenantId, installationId, apply: true, ...(observationScope ? { idempotencyScope: observationScope } : {}) });
     await onStep(observation);
     applied.push(`${to}:${synced.status}`);
   }
@@ -352,7 +354,8 @@ async function upgrade(env, args) {
     // stay migrated, the ones after it untouched, and the line below names it (codes only).
     for (const item of skipOnboarded ? [] : onboarded) {
       try {
-        item.entry.steps = await applyTenantSteps({ steps: item.pending, central, tenant: item.pool, identity: item.identity, installationId: state.installationId });
+        item.entry.steps = await applyTenantSteps({ steps: item.pending, central, tenant: item.pool, identity: item.identity, installationId: state.installationId,
+          observationScope: `${state.installationId}-${item.identity.tenantId}` });
       } catch (error) {
         const code = [error?.code, error?.message].find(text => typeof text === 'string' && /^[A-Z0-9_]{3,80}$/.test(text)) || 'UNCLASSIFIED';
         console.error(`STAGING_UPGRADE_ONBOARDED_TENANT_FAILED ${item.entry.database} from=${await ledgerHead(item.pool, TENANT_HEAD_SQL).catch(() => '?')} ${code}`);

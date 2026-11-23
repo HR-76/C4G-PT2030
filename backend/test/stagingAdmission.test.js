@@ -183,3 +183,16 @@ test('a refused step stops that database at once, with the elevated window close
   assert.equal(wrong.events.some(event => event[0] === 'sync'), false, 'a database on an unexpected version is never recorded in Central');
   assert.equal(wrong.events.filter(event => event[0] === 'migrate').length, 1);
 });
+
+test('an admission database tells Central under its own scope, the installed tenant under the installation scope', async () => {
+  const scopes = [];
+  const run = async observationScope => {
+    const h = migrationHarness();
+    h.dependencies.syncCentralObservation = async input => { scopes.push(Object.hasOwn(input, 'idempotencyScope') ? input.idempotencyScope : 'default'); return { status: 'PUBLISHED' }; };
+    await applyTenantSteps({ steps: [h.step('034')], central: h.central, tenant: h.tenant, identity: IDENTITY, installationId: 'installation-1', dependencies: h.dependencies,
+      ...(observationScope ? { observationScope } : {}) });
+  };
+  await run(null); await run(`installation-1-${IDENTITY.tenantId}`);
+  assert.deepEqual(scopes, ['default', `installation-1-${IDENTITY.tenantId}`]);
+  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/staging/install.js'), 'utf8'), /observationScope: `\$\{state\.installationId\}-\$\{item\.identity\.tenantId\}`/);
+});

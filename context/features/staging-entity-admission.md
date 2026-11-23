@@ -109,6 +109,14 @@ Critérios de aceitação: os itens acima. Verificado com substitutos: ordem mig
 
 **Não provado:** nenhum passo correu numa base criada pela adesão. A base da entidade instalada foi criada por uma sessão com a autoridade do instalador e as da adesão pelo administrador do PostgreSQL; se os pacotes exigirem o primeiro caso, recusam (`TENANT_MIGRATION_OWNER_MISMATCH` ou equivalente) sem alterar a base. O ensaio é: `upgrade` sem `--apply`, cópia de segurança, `upgrade --apply`.
 
+### Ensaio da migração na entidade «Teste» (23/11/2026)
+
+- **Sem `--apply`:** relatório correto à primeira (Central e entidade instalada sem passos em falta; a base da adesão em 033 com os oito passos).
+- **Com `--apply`:** o passo 034 foi aplicado à base e verificado, mas o registo na Central foi recusado e o comando parou. A base ficou em 034 e a Central em 033 para essa entidade, que fica indisponível enquanto as duas não coincidirem. O papel do instalador ficou sem privilégios; a entidade instalada não foi tocada.
+- **Causa.** A Central admite um só evento por chave de idempotência (`UNIQUE (idempotency_key, action_code)`), para todos os tenants. A chave do registo da observação era `<instalação>-central-observation-<versão>`, sem o tenant, e já tinha sido usada quando a entidade instalada passou pelo mesmo passo.
+- **Correção.** `syncCentralObservation` aceita um âmbito para a chave; a entidade instalada mantém o da instalação e cada base da adesão usa `<instalação>-<tenant>`. Os testes com substitutos não podiam apanhar isto: a restrição só existe na base de dados.
+- **Retoma.** Repetir `upgrade --apply`: os passos em falta são calculados a partir da versão real da base (034), e o primeiro registo aceite leva a Central diretamente para a versão desse passo.
+
 ## Limites e decisões
 
 - A listagem de convites lê a Central pelo pool da API. No staging a API liga à Central como administrador (decisão de 14/11/2026); numa Central com logins limitados esta leitura precisa do seu próprio perfil.
