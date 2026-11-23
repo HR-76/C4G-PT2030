@@ -17,6 +17,12 @@ Estado: Review (13/11/2026), por validar na VPS. Pedido do utilizador: agendamen
 - **Teste de restauro:** descarrega a última cópia, decifra, restaura num PostgreSQL 18 **descartável** (contentor sem rede, removido no fim), verifica que o restauro termina sem erros, que os eventos de auditoria restaurados não são menos do que os registados no manifesto e que o número de tabelas coincide. Não substitui um ensaio de recuperação completo.
 - **Fora de âmbito:** a base do Keycloak (`c4g-staging-keycloak-db-1`: contas e realm) **não** fica coberta neste passo. Perdê-la significa perder as contas de login; fica como seguimento a decidir.
 
+## Bases copiadas (23/11/2026)
+
+A lista de bases deixou de ser fixa. A cópia e o teste de restauro perguntam ao PostgreSQL quais são as bases `c4g_*` (não modelo, com ligações permitidas) e tratam todas. Motivo: o provisionamento cria uma base `c4g_onb_<id>` por entidade nova (`platformOnboarding/postgresProvisioner.js`, hoje só montado no perfil local); com a lista fixa essa base ficaria sem cópia em silêncio. Falhar a consulta (`BACKUP_DATABASE_LIST_FAILED`) ou não encontrar nenhuma base (`BACKUP_NO_DATABASES`) termina com erro, sem copiar nada. Provado com um Docker simulado (três bases, lista vazia e consulta falhada); por correr na VPS.
+
+Consequências: qualquer base `c4g_*` nesse servidor passa a ser copiada, incluindo bases de ensaio que lá existam. As cópias de uma base entretanto apagada ficam no R2 sem limpeza (a retenção só olha para as bases existentes) e a página mostra-a em atraso; removê-las é uma decisão manual.
+
 ## Critérios de aceitação
 
 - O cliente R2 só lê e escreve chaves sob o prefixo configurado; recusa nomes de base, carimbos e prefixos inválidos.

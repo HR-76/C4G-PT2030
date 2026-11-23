@@ -4,7 +4,10 @@ PG_CONTAINER=c4g-staging-postgres-db-1
 KEY_FILE="$ROOT/backup/backup.key"
 WORK="$ROOT/backup/work"
 R2_ENV="$ROOT/r2.env"
-DATABASES=(c4g_central_staging c4g_tenant_staging)
+# Preenchida por require_ready: todas as bases c4g_* deste PostgreSQL (a Central, a entidade do staging e as
+# c4g_onb_* de entidades novas). Uma lista fixa deixaria de fora, em silêncio, a base de uma entidade nova.
+DATABASES=()
+DATABASES_SQL="select datname from pg_database where not datistemplate and datallowconn and datname ~ '^c4g_[a-z0-9_]{1,50}\$' order by datname"
 # Imagem da API mais recente construída nesta VPS (contém scripts/staging/r2Backup.js). C4G_RELEASE força uma etiqueta.
 RELEASE="${C4G_RELEASE:-$(docker images c4g-staging-api --format '{{.Tag}}' 2>/dev/null | head -n 1)}"
 IMAGE="c4g-staging-api:$RELEASE"
@@ -26,4 +29,9 @@ require_ready() {
   [ -s "$R2_ENV" ] || { echo "BACKUP_R2_ENV_MISSING"; exit 1; }
   docker image inspect "$IMAGE" >/dev/null 2>&1 || { echo "BACKUP_IMAGE_MISSING $IMAGE"; exit 1; }
   install -d -m 700 "$WORK"
+  local found
+  found=$(docker exec "$PG_CONTAINER" psql -U postgres -v ON_ERROR_STOP=1 -Atc "$DATABASES_SQL") || { echo "BACKUP_DATABASE_LIST_FAILED"; exit 1; }
+  mapfile -t DATABASES < <(printf '%s\n' "$found" | sed '/^$/d')
+  [ "${#DATABASES[@]}" -gt 0 ] || { echo "BACKUP_NO_DATABASES"; exit 1; }
+  log "databases:${DATABASES[*]}"
 }

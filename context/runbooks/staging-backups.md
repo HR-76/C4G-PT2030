@@ -112,6 +112,14 @@ O `backup.sh` aplica-a (`--apply`) no fim de cada cópia, só sobre objetos que 
 
 Use o mesmo procedimento do `restore-test.sh` como referência. Não restaure por cima das bases em uso sem decisão sua.
 
+## Bases copiadas
+
+Desde 23/11/2026 o `backup.sh` e o `restore-test.sh` descobrem as bases sozinhos: todas as `c4g_*` do contentor `c4g-staging-postgres-db-1`. A primeira linha de cada execução (`"step":"databases:…"`) diz quais são. Para ver a lista sem copiar nada:
+
+```bash
+docker exec c4g-staging-postgres-db-1 psql -U postgres -Atc "select datname from pg_database where not datistemplate and datname like 'c4g\_%' order by 1"
+```
+
 ## Limites
 
 - Não cobre a base do Keycloak (`c4g-staging-keycloak-db-1`): perdê-la significa perder as contas de login. Seguimento a decidir.
