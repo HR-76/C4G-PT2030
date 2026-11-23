@@ -22,6 +22,7 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
   createListing = options => require('./listing').createAdmissionListing(options),
   createOidc = options => require('../platformOnboarding/oidcActivationAdapter').createOidcActivationAdapter(options),
   readMemberSettings = (directory, environment) => require('../platformOnboarding/memberRuntime').readSettings(directory, environment),
+  createInvitationEmail = options => require('./invitationEmail').createEntityInvitationEmail(options),
   report = line => { process.stderr.write(line + '\n'); } }) {
   const selection = env.ENTITY_ADMISSION_RUNTIME || 'disabled';
   if (selection === 'disabled') return null;
@@ -33,6 +34,7 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
   if (typeof directory !== 'string' || !path.isAbsolute(directory)) throw invalid('ENTITY_ADMISSION_DIRECTORY_INVALID');
   const settings = readMemberSettings(env.MEMBER_ONBOARDING_DIRECTORY, env);
   const worker = createWorker(path.join(directory, 'worker.json'), WORKER_ENTRY);
+  const prepareEmail = createInvitationEmail({ centralPool, publicBaseUrl: settings.origin });
   let service = null, oidc = null, supervisor = null, started = null;
 
   function createAdmission({ authorityCoordinator, authConfig }) {
@@ -45,7 +47,26 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
       identity: { ensure: value => worker.call('identity', value) },
       // The adapter needs the service, so it only exists after start(); activation cannot be reached before that.
       verification: { verify: value => { if (!oidc) throw invalid('ACTIVATION_INVALID'); return oidc.verify(value); } } });
-    return service;
+    return Object.freeze({ ...service, issue });
+  }
+
+  // Issuing a link also sends it to the invited administrator (context/features/entity-invitation-email-and-branding.md).
+  // Once the provider accepts the email the link is no longer returned; otherwise it is, so the invitation can still be
+  // handed over. A replayed request has no link any more and sends nothing.
+  async function issue(id, value, request) {
+    const issued = await service.issue(id, value, request);
+    if (!issued?.secret) return issued;
+    let status = 'UNCONFIRMED', recipient = null;
+    try {
+      recipient = (await service.get(id, request)).email;
+      const { message } = await prepareEmail({ expiresAt: issued.expiresAt });
+      const sent = await worker.call('invitationEmail', { invitationId: issued.id, to: recipient, secret: issued.secret, expiresAt: issued.expiresAt, message });
+      if (['ACCEPTED', 'NOT_CONFIGURED'].includes(sent?.status)) status = sent.status;
+    } catch { /* The link is still returned below. */ }
+    if (status !== 'ACCEPTED') return { ...issued, emailDelivery: { status } };
+    const delivered = { ...issued, emailDelivery: { status, recipient } };
+    delete delivered.secret;
+    return delivered;
   }
 
   function start() {

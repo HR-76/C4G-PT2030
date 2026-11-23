@@ -46,6 +46,7 @@ function fakes({ workerFails = false } = {}) {
     createService(options) { state.service = options; return { marker: 'admission' }; },
     createCompletion(options) { state.completion = options; return { marker: 'completion' }; },
     createListing(options) { state.listing = options; return { marker: 'listing' }; },
+    createInvitationEmail(options) { state.email = options; return async input => { state.prepared = input; if (state.prepareFails) throw Error('private'); return { message: { subject: 's', html: 'h', text: 't' } }; }; },
     async createOidc(options) { state.oidc = options; return { async bridge(ticket, subject) { return { subject: subject || SUBJECT, by: 'admission' }; }, async verify(value) { return { verified: value }; } }; } };
 }
 const members = () => ({ fallback: null, projection: null, setBridgeFallback(check) { this.fallback = check; }, setProjectionFallback(project) { this.projection = project; } });
@@ -73,7 +74,8 @@ test('privileged steps stay in the worker and the HTTP process only calls its cl
   await assert.rejects(admission.start(), { code: 'ENTITY_ADMISSION_NOT_COMPOSED' });
 
   const coordinator = { marker: 'coordinator' };
-  assert.deepEqual(admission.createAdmission({ authorityCoordinator: coordinator, authConfig }), { marker: 'admission' });
+  const composed = admission.createAdmission({ authorityCoordinator: coordinator, authConfig });
+  assert.deepEqual([composed.marker, typeof composed.issue, Object.isFrozen(composed)], ['admission', 'function', true]);
   const completion = f.state.completion, service = f.state.service;
   assert.deepEqual([completion.coordinator, completion.issuer, completion.policyVersion, completion.assuranceRequirements, completion.mfaPolicyCode, completion.dataResidencyCode],
     [coordinator, ISSUER, 'c4g-user-mfa-v1', { level: 1 }, 'USER_OPTIONAL', 'EU']);
@@ -230,4 +232,42 @@ test('a failing step of the worker is reported once per change, as codes only', 
   health = { ready: true, lastFailure: null };
   await pass();
   assert.deepEqual(lines.at(-1), 'C4G_ADMISSION_STEP_RECOVERED');
+});
+
+// Issuing an invitation link also sends it by email (context/features/entity-invitation-email-and-branding.md).
+function issuing(t, { sent, issued = { id: 'inv-1', status: 'OPEN', revision: 1, expiresAt: '2027-01-01T00:00:00Z', secret: 'ef'.repeat(32) }, prepareFails = false, getFails = false } = {}) {
+  const folder = memberDirectory(t), f = fakes(), calls = [];
+  f.state.prepareFails = prepareFails;
+  f.createService = () => ({ marker: 'admission', async issue(id, value, request) { calls.push(['issue', id, value, request]); return issued; },
+    async get(id, request) { calls.push(['get', id, request]); if (getFails) throw Error('NOT_AUTHORIZED'); return { id, email: 'ana@example.invalid', name: 'Ana' }; } });
+  f.createWorker = () => ({ async call(method, value) { calls.push([method, value]); if (method === 'invitationEmail') { if (sent instanceof Error) throw sent; return sent; } return {}; }, async close() {} });
+  const admission = configuredEntityAdmission({ env: environment(folder), express, members: members(), centralPool: pool, ...f });
+  t.after(() => admission.close());
+  return { f, calls, service: admission.createAdmission({ authorityCoordinator: {}, authConfig }) };
+}
+const REQUEST = { user: { id: 'admin' } };
+
+test('an accepted invitation email keeps the link on the server and names the recipient', async t => {
+  const { f, calls, service } = issuing(t, { sent: { status: 'ACCEPTED' } });
+  const result = await service.issue('adm-1', { requestId: 'r' }, REQUEST);
+  assert.deepEqual(result, { id: 'inv-1', status: 'OPEN', revision: 1, expiresAt: '2027-01-01T00:00:00Z', emailDelivery: { status: 'ACCEPTED', recipient: 'ana@example.invalid' } });
+  assert(!JSON.stringify(result).includes('ef'.repeat(32)), 'the link is never returned once the email was accepted');
+  assert.deepEqual([f.state.email.centralPool, f.state.email.publicBaseUrl, f.state.prepared], [pool, ORIGIN, { expiresAt: '2027-01-01T00:00:00Z' }]);
+  assert.deepEqual(calls, [['issue', 'adm-1', { requestId: 'r' }, REQUEST], ['get', 'adm-1', REQUEST],
+    ['invitationEmail', { invitationId: 'inv-1', to: 'ana@example.invalid', secret: 'ef'.repeat(32), expiresAt: '2027-01-01T00:00:00Z', message: { subject: 's', html: 'h', text: 't' } }]]);
+});
+
+test('when the email does not leave, the link is still returned with the reason', async t => {
+  for (const [options, status] of [[{ sent: { status: 'NOT_CONFIGURED' } }, 'NOT_CONFIGURED'], [{ sent: { status: 'UNCONFIRMED' } }, 'UNCONFIRMED'], [{ sent: { status: 'EXPIRED' } }, 'UNCONFIRMED'],
+    [{ sent: undefined }, 'UNCONFIRMED'], [{ sent: Error('WORKER_TIMEOUT') }, 'UNCONFIRMED'], [{ sent: { status: 'ACCEPTED' }, prepareFails: true }, 'UNCONFIRMED'], [{ sent: { status: 'ACCEPTED' }, getFails: true }, 'UNCONFIRMED']]) {
+    const { service } = issuing(t, options);
+    const result = await service.issue('adm-1', { requestId: 'r' }, REQUEST);
+    assert.deepEqual([result.secret, result.emailDelivery], ['ef'.repeat(32), { status }], JSON.stringify(options));
+  }
+});
+
+test('a replayed request has no link any more and sends nothing', async t => {
+  const { calls, service } = issuing(t, { sent: { status: 'ACCEPTED' }, issued: { id: 'inv-1', status: 'OPEN', revision: 1, expiresAt: '2027-01-01T00:00:00Z', secretUnavailable: true } });
+  assert.deepEqual(await service.issue('adm-1', { requestId: 'r' }, REQUEST), { id: 'inv-1', status: 'OPEN', revision: 1, expiresAt: '2027-01-01T00:00:00Z', secretUnavailable: true });
+  assert.deepEqual(calls.map(call => call[0]), ['issue']);
 });

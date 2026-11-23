@@ -58,3 +58,8 @@ it('a fiscal conflict preserves the draft without disclosing another entity',asy
 it('explains when the account already belongs to another entity',async()=>{
  api.draft.mockResolvedValue({data:{...record,revision:2,completionAvailable:true}});api.submit=vi.fn().mockRejectedValue({response:{status:409,data:{error:{code:'MEMBERSHIP_ALREADY_EXISTS'}}}});mount();await screen.findByLabelText(/Nome legal/);for(let n=0;n<3;n++){fireEvent.click(screen.getByRole('button',{name:'Continuar'}));await screen.findByRole('heading',{name:`${n+2}. ${['Morada e contactos','Administrador e dimensão','Rever'][n]}`})}fireEvent.click(screen.getByRole('button',{name:'Concluir ficha e preparar acesso'}));await screen.findByText(/já pertence a uma entidade/)
 })
+it('shows the C4G logo in the header instead of the old product name',async()=>{
+ mount();await screen.findByLabelText(/Nome legal/)
+ const logo=screen.getByRole('img',{name:'C4G'});expect(logo.getAttribute('src')).toBe('/logo-c4g.png');expect(logo.closest('header')).toBeTruthy()
+ expect(screen.queryByText(/Funding Platform/)).toBeNull()
+})

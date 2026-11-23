@@ -76,16 +76,31 @@ function fakes() {
     createCompletion(options) { state.completion = options; return { marker: 'completion' }; },
     createCompletionWorker(service) { state.completionService = service; return { async runOnce() { state.runs += 1; if (state.fail) throw Error('private'); return []; } }; },
     createMemberProjection(options) { state.projection = options; return { ensure: record('memberProjection') }; },
+    createEmail(options) { state.email = options; return { async send(value) { state.calls.push(['email', value]); return state.emailResult; } }; },
     async probe(input) { state.calls.push(['probe', input.material, input.workload]); }
   };
   return { state, dependencies };
 }
 
-test('administration stays inside the worker and only five closed methods cross the boundary', async t => {
+test('the invitation email is sent from the worker with the inherited provider settings and answers only a status', async t => {
+  const { state, dependencies } = fakes();
+  const worker = buildWorker({ settings: valid(), directory: folder(t), dependencies,
+    env: { RESEND_API_KEY: 'synthetic-provider-key', ACTIVATION_EMAIL_FROM: 'C4G <convites@example.test>', ACTIVATION_PUBLIC_URL: 'https://app.example.test' } });
+  t.after(() => worker.close());
+  assert.deepEqual(state.email, { key: 'ab'.repeat(32), apiKey: 'synthetic-provider-key', from: 'C4G <convites@example.test>', origin: 'https://app.example.test', purpose: 'ADMISSION' });
+  const value = { invitationId: ORGANIZATION, to: 'ana@example.invalid', secret: 'ef'.repeat(32), expiresAt: '2027-01-01T00:00:00Z', message: { subject: 's' } };
+  state.emailResult = { status: 'ACCEPTED', id: 'provider-id', debug: 'not forwarded' };
+  assert.deepEqual(await worker.methods.invitationEmail(value), { status: 'ACCEPTED' });
+  assert.deepEqual(state.calls.at(-1), ['email', value]);
+  state.emailResult = undefined;
+  assert.deepEqual(await worker.methods.invitationEmail(value), { status: 'UNCONFIRMED' });
+});
+
+test('administration stays inside the worker and only six closed methods cross the boundary', async t => {
   const { state, dependencies } = fakes(), directory = folder(t);
   let clock = 1000000;
   const worker = buildWorker({ settings: valid(), directory, dependencies, now: () => clock });
-  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'memberProjection', 'passwordReady', 'resolve']);
+  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'invitationEmail', 'memberProjection', 'passwordReady', 'resolve']);
 
   assert.deepEqual(state.pools.map(pool => [pool.database, pool.user, pool.ssl]), [['c4g_central_staging', 'postgres', false], ['postgres', 'postgres', false], ['c4g_central_staging', 'c4g_authority_runtime', false]]);
   assert.deepEqual([state.coordinator.permitSecret, state.journals.map(journal => path.relative(directory, journal.directory)), state.journals.every(journal => journal.key === 'cd'.repeat(32))],

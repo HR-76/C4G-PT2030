@@ -342,7 +342,7 @@ Se a API não ficar pronta, o worker não arrancou (ficheiro recusado ou emissor
 
 Uma adesão que não avança aparece no registo da API como `C4G_ADMISSION_STEP_FAILED <passo>:<código>` (uma linha por mudança, sem mensagens): `docker logs c4g-staging-api-api-1 2>&1 | grep C4G_ADMISSION`. `TENANT:LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP` significa que os agregadores partilhados `c4g_tenant_api_capabilities` e `c4g_tenant_worker_capabilities` têm papéis diferentes dos de `tenantRoles`; compara-os antes de mexer em concessões.
 
-**4. Ensaio (tu, no navegador).** Como Admin C4G, em Entidades, «Convidar uma entidade» com um endereço teu; abrir a ligação mostrada, definir a palavra-passe, preencher a ficha e submeter. Dentro de alguns segundos deve existir uma base nova:
+**4. Ensaio (tu, no navegador).** Como Admin C4G, em Entidades, «Convidar uma entidade» com um endereço teu e «Enviar convite». O convite segue por email com o mesmo serviço do convite de utilizador (`activation-email.env`, passo 4 da secção anterior); a página só mostra a ligação se o email não sair. Abrir a ligação, definir a palavra-passe, preencher a ficha e submeter. Dentro de alguns segundos deve existir uma base nova:
 
 ```bash
 docker exec c4g-staging-postgres-db-1 psql -U postgres -Atc "select datname from pg_database where datname like 'c4g\_onb\_%'"

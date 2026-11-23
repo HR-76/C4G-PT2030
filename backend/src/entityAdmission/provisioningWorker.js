@@ -56,6 +56,7 @@ const realDependencies = Object.freeze({
   createCompletion: options => require('./completionService').createCompletionService(options),
   createCompletionWorker: service => require('./completionWorker').createCompletionWorker(service),
   createMemberProjection: options => require('../platformOnboarding/memberProjection').createMemberProjection(options),
+  createEmail: options => require('../platformOnboarding/activationEmail').createActivationEmail(options),
   // A published login must reach only its own database, without elevated attributes, and match the Central binding.
   async probe({ createPool, material, snapshot, workload }) {
     const pool = createPool({ host: material.host, port: material.port, database: material.database, user: material.login, password: material.password,
@@ -76,7 +77,7 @@ const realDependencies = Object.freeze({
 });
 
 // Builds the worker from validated settings. `directory` holds the two encrypted journals and must be writable and persistent.
-function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch, now = () => Date.now() }) {
+function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch, now = () => Date.now(), env = process.env }) {
   if (!path.isAbsolute(directory)) throw invalid('ADMISSION_CONFIGURATION_INVALID');
   const d = { ...realDependencies, ...dependencies };
   const base = { host: settings.postgres.host, port: settings.postgres.port, ssl: settings.postgres.ssl ? { rejectUnauthorized: true } : false };
@@ -132,8 +133,13 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
       .catch(() => {}).finally(() => { inFlight = null; });
     return inFlight;
   }
+  // The invitation email uses the provider settings this process inherits; the provider key never reaches the HTTP process.
+  const email = d.createEmail({ key: settings.ownershipKey, apiKey: env.RESEND_API_KEY, from: env.ACTIVATION_EMAIL_FROM,
+    origin: env.ACTIVATION_PUBLIC_URL, purpose: 'ADMISSION' });
   // Only these names cross the IPC boundary. `resolve` returns the API login of one tenant; nothing returns administration material.
   const methods = Object.freeze({
+    // Sends one invitation link to its recipient and answers only the provider's verdict.
+    invitationEmail: async value => ({ status: (await email.send(value))?.status || 'UNCONFIRMED' }),
     identity: value => identity.ensure(value),
     passwordReady: value => identity.passwordReady(value.subject),
     resolve: value => registry.resolve(value),
