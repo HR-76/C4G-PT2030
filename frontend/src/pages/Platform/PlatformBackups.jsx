@@ -8,6 +8,7 @@ import './directory-workspace.css'
 import './platform-backups.css'
 
 const date = value => new Intl.DateTimeFormat('pt-PT', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Lisbon' }).format(new Date(value))
+const fileDate = value => new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' }).format(new Date(value)).replace(',', '')
 const megabytes = new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 const size = bytes => typeof bytes === 'number' ? `${megabytes.format(bytes / 1048576)} MB` : '—'
 const databaseLabel = name => name.startsWith('c4g_central') ? 'Central' : name.startsWith('c4g_tenant') ? 'Entidades' : name
@@ -65,7 +66,7 @@ export function BackupsView({ api = platformDirectoryApi }) {
               <td role="cell" data-label="Base de dados">{databaseLabel(item.database)}</td>
               <td role="cell" data-label="Estado"><span className={`directory-status directory-status-${tone}`}>{label}</span>{item.restoreTestedAt && <small>Testado em {date(item.restoreTestedAt)}</small>}</td>
               <td role="cell" data-label="Tamanho" className="backup-size">{size(item.sizeBytes)}</td>
-              <td role="cell" data-label="Ficheiro" className="backup-file">{item.database}/{item.file}</td>
+              <td role="cell" data-label="Ficheiro" className="backup-file" title={`${item.database}/${item.file}`}>{databaseLabel(item.database)} · {fileDate(item.at)}</td>
             </tr>
           })}</tbody></table></div> : <div className="directory-empty"><h2>Sem cópias</h2><p>A primeira cópia aparecerá aqui depois da próxima execução noturna.</p></div>}
       </section>

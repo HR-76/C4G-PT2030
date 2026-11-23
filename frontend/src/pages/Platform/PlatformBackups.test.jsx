@@ -22,8 +22,9 @@ it('shows that the copies are up to date, with Lisbon time, sizes and the list',
   expect(summary.textContent).toContain('14 diárias e 8 semanais')
   const rows = screen.getAllByRole('row').slice(1)
   expect(rows.map(row => within(row).getAllByRole('cell').map(cell => cell.textContent))).toEqual([
-    ['23/11/26, 02:32', 'Central', 'Disponível', '12,2 MB', 'c4g_central_staging/20261123T023259Z.dump.enc'],
-    ['23/11/26, 02:32', 'Entidades', 'Disponível', '6,7 MB', 'c4g_tenant_staging/20261123T023259Z.dump.enc']])
+    ['23/11/26, 02:32', 'Central', 'Disponível', '12,2 MB', 'Central · 23/11/2026 02:32'],
+    ['23/11/26, 02:32', 'Entidades', 'Disponível', '6,7 MB', 'Entidades · 23/11/2026 02:32']])
+  expect(screen.getByText('Central · 23/11/2026 02:32').getAttribute('title')).toBe('c4g_central_staging/20261123T023259Z.dump.enc')
   expect(screen.queryByRole('button', { name: /Fazer cópia/ })).toBeNull()
 })
 

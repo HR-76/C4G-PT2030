@@ -16,6 +16,7 @@ O utilizador quer, na Administração C4G, uma secção de cópias de segurança
   - «Disponível»: existem a cópia cifrada e o seu manifesto. O manifesto só é enviado depois de o envio da cópia ter sido conferido (tamanho e SHA-256).
   - «Restauro testado»: o teste semanal restaurou essa cópia com sucesso. O `restore-test.sh` passa a gravar um marcador `<carimbo>.verified.json` ao lado da cópia; a retenção apaga-o com ela.
   - «Incompleta»: há cópia sem manifesto.
+- **Coluna «Ficheiro»:** mostra um nome legível («Central · 23/11/2026 02:32», hora de Lisboa); o nome real no R2 (`<base>/<carimbo>.dump.enc`) não muda e fica na dica do campo. Pedido do utilizador em 23/11/2026.
 - **Em dia:** cada base tem uma cópia disponível com 36 h ou menos (o mesmo limite do `status` da linha de comandos). «Última cópia boa» é a data em que todas as bases ficaram cobertas.
 - **Carga:** o servidor guarda o resultado 60 s; cada pedido ao R2 tem limite de 8 s e é feito fora da transação de autorização.
 
