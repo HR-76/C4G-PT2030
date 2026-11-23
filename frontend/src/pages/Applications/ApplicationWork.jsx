@@ -176,12 +176,11 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
         <div><dt>Tarefas abertas</dt><dd>{openTasks.length}</dd></div>
       </dl>
       {(work.participantNextCursor||work.taskNextCursor)&&<p role="status">Existem mais participantes ou tarefas por carregar. Os resumos referem-se à lista «Todas» já carregada.</p>}
-      {taskFilter !== 'all' && !work.taskNextCursor && <p className="text-muted">Os resumos da equipa referem-se à lista «Todas» já carregada.</p>}
       <div className="application-work-participant-heading">
         <h3>Participantes</h3>
-        {work.canChat && <button type="button" className="btn btn-outline btn-sm" ref={chatTrigger}
+        {work.canChat && <button type="button" className="btn btn-outline application-work-chat-trigger" ref={chatTrigger}
           aria-haspopup="dialog" onClick={() => setChatOpen(true)}>
-          <MessageSquare size={16} aria-hidden="true" /> Chat da equipa
+          <MessageSquare size={18} aria-hidden="true" /> Chat da equipa
         </button>}
       </div>
       {work.canChat && <ApplicationTeamChat key={`${organizationId}:${userId}:${applicationId}`}
@@ -242,12 +241,13 @@ export default function ApplicationWork({ applicationId, userId, organizationId,
             onClick={() => setTaskFilter(key)}>{label}</button>)}
       </div>
       {!work.currentMembershipId && <p id="task-membership-unavailable" className="text-muted">Não foi possível identificar a sua associação à organização para filtrar as suas tarefas.</p>}
-      <p className="work-task-filter-status" role="status">{selection.loading ? 'A pesquisar tarefas…' : `${visibleTasks.length} tarefas apresentadas.`} A pesquisa abrange todas as tarefas da candidatura. O calendário mostra os resultados apresentados.{taskNextCursor && ' Existem mais resultados deste filtro.'}</p>
+      {/* The count stays in the live region for screen readers; only the search-in-progress text is shown. */}
+      <p className={selection.loading ? 'work-task-filter-status' : 'sr-only'} role="status">{selection.loading ? 'A pesquisar tarefas…' : `${visibleTasks.length} tarefas apresentadas.${taskNextCursor ? ' Existem mais resultados deste filtro.' : ''}`}</p>
       {selection.error && <p role="alert">Não foi possível consultar as tarefas deste filtro. <button type="button" className="btn btn-outline btn-sm" disabled={selection.loading} onClick={selection.data ? selection.loadMore : selection.retry}>Tentar novamente</button></p>}
       {showCalendar && <ApplicationTaskCalendar tasks={visibleTasks} memberName={memberName} labels={STATUS}
         editing={writable && editor === 'task'} onClose={() => setShowCalendar(false)} returnFocusRef={calendarTrigger}
         onEdit={writable ? editTask : undefined} disabled={busy || Boolean(pending) || selection.loading} />}
-      {visibleTasks.length>0&&<p className="work-task-order">Tarefas abertas primeiro nas tarefas carregadas.</p>}<ul className="work-tasks">{[...visibleTasks].sort((a,b)=>Number(b.status==='OPEN')-Number(a.status==='OPEN')).map(t=><li key={t.taskId} id={`tarefa-${t.taskId}`} tabIndex={-1} className="work-task"><div className="work-task-heading"><strong>{t.title}</strong><span className="chip chip-grey">{STATUS[t.status]}</span></div><dl><div><dt>Responsável</dt><dd>{memberName(t.responsibleMembershipId)}</dd></div><div><dt>Prazo</dt><dd>{dateLabel(t.deadline)}</dd></div></dl>
+      <ul className="work-tasks">{[...visibleTasks].sort((a,b)=>Number(b.status==='OPEN')-Number(a.status==='OPEN')).map(t=><li key={t.taskId} id={`tarefa-${t.taskId}`} tabIndex={-1} className="work-task"><div className="work-task-heading"><strong>{t.title}</strong><span className="chip chip-grey">{STATUS[t.status]}</span></div><dl><div><dt>Responsável</dt><dd>{memberName(t.responsibleMembershipId)}</dd></div><div><dt>Prazo</dt><dd>{dateLabel(t.deadline)}</dd></div></dl>
         {t.description&&<p className="task-description">{t.description}</p>}
         {t.status==='OPEN'&&afterInternal(t.deadline)&&<p className="work-deadline-note">Prazo posterior ao prazo interno da candidatura.</p>}
         {writable&&t.status==='OPEN'&&<>{' '}<button type="button" className="btn btn-outline btn-sm" disabled={busy||!!pending} onClick={event=>editTask(t,event.currentTarget)}>Editar</button>{' '}

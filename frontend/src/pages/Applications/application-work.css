@@ -5,6 +5,7 @@
 .application-work .work-participants,.application-work .work-tasks { list-style:none; padding:0; display:grid; gap:12px; }
 .application-work-participant-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
 .application-work-participant-heading h3 { margin:0; }
+.application-work-chat-trigger { border-width:2px; font-weight:600; }
 .application-work .work-participants { grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); }
 .application-work .work-participants:empty { display:none; }
 .application-work .work-participants li { display:flex; align-items:flex-start; flex-wrap:wrap; gap:10px; padding:14px; border:1px solid var(--border-control); border-radius:10px; background:var(--surface-default); overflow-wrap:anywhere; }
@@ -13,7 +14,6 @@
 .application-work .work-tasks { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .application-work .work-task { border:1px solid var(--border); border-radius:8px; padding:16px; min-width:0; overflow-wrap:anywhere; }
 .application-work .work-task-heading { display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:8px; }
-.application-work .work-task-order { color:var(--color-text-secondary); font-size:13px; margin:4px 0 12px; }
 .application-work .work-task dl { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; margin:16px 0; }
 .application-work .work-task button { margin:4px 8px 0 0; }
 .application-work .work-deadline-note { border-left:3px solid var(--border-control); padding-left:10px; }
