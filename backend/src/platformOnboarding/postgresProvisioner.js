@@ -10,7 +10,10 @@ const {bindingDigest}=require('../security/localTenantCredentialAdapter');
 const {createLocalTenantIdentityProvisioner}=require('../security/localTenantIdentityProvisioner');
 const id=value=>{if(!/^[a-z][a-z0-9_]{0,62}$/.test(value))fail('PROVISIONING_IDENTIFIER_INVALID');return '"'+value+'"';};
 const binding=x=>Object.fromEntries(['operationId','organizationId','globalUserId','membershipId'].map(k=>[k,uuid(x[k])]));
-function createPostgresProvisioner({adminPool,centralPool,connection,journal,ownershipKey,regionCode='EU',residencyPolicyVersion='onboarding-isolated-v1'}){
+// apiRoles/workerRoles: the functional roles the shared API and WORKER aggregators hold in this environment. They must
+// name exactly what is already granted there (an environment's installer decides it); the defaults are the isolated profile.
+function createPostgresProvisioner({adminPool,centralPool,connection,journal,ownershipKey,regionCode='EU',residencyPolicyVersion='onboarding-isolated-v1',apiRoles=['c4g_opportunity_tenant_runtime'],workerRoles=['c4g_opportunity_tenant_runtime']}){
+ for(const roles of [apiRoles,workerRoles])if(!Array.isArray(roles)||!roles.length||roles.some(role=>typeof role!=='string'||!/^[a-z][a-z0-9_]{0,62}$/.test(role)))fail('PROVISIONING_ROLES_INVALID');
  const directory=require('../security/tenantDirectoryRepository').createTenantDirectoryRepository(centralPool),provisioning=require('../security/tenantProvisioningRepository').createTenantProvisioningRepository(centralPool),connections=require('../security/tenantConnectionRepository').createTenantConnectionRepository(centralPool),schema=require('../security/tenantSchemaRepository').createTenantSchemaRepository(centralPool),workloads=require('../security/tenantWorkloadDirectoryRepository').createTenantWorkloadDirectoryRepository(centralPool);
  const row=async(sql,values)=>(await centralPool.query(sql,values)).rows[0];
  async function reservation(x){const b=binding(x);return journal.reserve(x.operationId,{...b,input:x.input},()=>{const suffix=x.organizationId.replaceAll('-','');return {...b,tenantId:x.organizationId,generationId:randomUUID(),database:'c4g_onb_'+suffix,owner:'c4g_onb_owner_'+suffix,apiLogin:'c4g_onb_api_'+suffix,workerLogin:'c4g_onb_worker_'+suffix,apiPassword:randomBytes(32).toString('hex'),workerPassword:randomBytes(32).toString('hex')};});}
@@ -59,7 +62,7 @@ function createPostgresProvisioner({adminPool,centralPool,connection,journal,own
     await runner.migrate({tenantId:r.tenantId,databaseGenerationId:r.generationId,expectedRevision:1,correlationId:r.operationId,idempotencyKey:r.operationId});
     // A new tenant only has the baseline audit partitions; create five years ahead so nobody rotates by hand.
     await ensureAuditPartitionsWithPool(pool);
-    const provisioner=await createLocalTenantIdentityProvisioner(adminPool);await provisioner.reconcile({apiLogin:r.apiLogin,workerLogin:r.workerLogin,apiPassword:r.apiPassword,workerPassword:r.workerPassword,apiRoles:['c4g_opportunity_tenant_runtime'],workerRoles:['c4g_opportunity_tenant_runtime']});
+    const provisioner=await createLocalTenantIdentityProvisioner(adminPool);await provisioner.reconcile({apiLogin:r.apiLogin,workerLogin:r.workerLogin,apiPassword:r.apiPassword,workerPassword:r.workerPassword,apiRoles:[...apiRoles],workerRoles:[...workerRoles]});
     await pool.query(`GRANT CONNECT ON DATABASE ${id(r.database)} TO ${id(r.apiLogin)},${id(r.workerLogin)}`);
     const evidence=await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},manifest,{timeoutMs:15000});
     for(const workload of ['API','WORKER']){const m=material(r,workload),limited=new Pool({...connection,database:r.database,user:m.login,password:m.password,max:1});try{const result=(await limited.query('SELECT current_database() name,rolsuper,rolcreatedb,rolcreaterole,rolbypassrls FROM pg_roles WHERE rolname=session_user')).rows[0];if(result.name!==r.database||result.rolsuper||result.rolcreatedb||result.rolcreaterole||result.rolbypassrls)fail('PROVISIONING_LOGIN_INVALID');}finally{await limited.end();}}

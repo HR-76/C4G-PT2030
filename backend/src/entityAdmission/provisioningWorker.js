@@ -6,9 +6,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const KEYS = ['issuer', 'clientId', 'clientSecret', 'adminOrigin', 'certificate', 'ownershipKey', 'journalKey', 'postgres', 'centralDatabase',
-  'authority', 'permitSecret', 'policyVersion', 'dataResidencyCode', 'regionCode', 'residencyPolicyVersion'];
+  'authority', 'permitSecret', 'policyVersion', 'dataResidencyCode', 'regionCode', 'residencyPolicyVersion', 'tenantRoles'];
 const BINDING = ['operationId', 'organizationId', 'globalUserId', 'membershipId'];
 const PASS_MS = 3000;
+// After a failed step the same admission is not tried again at once: every attempt alters roles in the database cluster.
+const RETRY_AFTER_FAILURE_MS = 60000;
+const ROLE = /^[a-z][a-z0-9_]{0,62}$/;
 const READY_WITHIN_MS = 15000;
 
 function invalid(code) {
@@ -36,6 +39,9 @@ function readSettings(file, env) {
     || !object(authority) || Object.keys(authority).sort().join(',') !== 'password,user' || !text(authority.user) || !text(authority.password)
     || !text(settings.permitSecret) || Buffer.byteLength(settings.permitSecret) < 32 || !text(settings.dataResidencyCode) || !text(settings.regionCode) || !text(settings.residencyPolicyVersion)
     || !Object.hasOwn(require('../security/authConfig').RECOGNIZED_ASSURANCE_POLICIES, settings.policyVersion || '')) throw invalid('ADMISSION_CONFIGURATION_INVALID');
+  // The functional roles the shared aggregators hold in this environment. Never defaulted: the wrong set grants roles to every login.
+  const roles = settings.tenantRoles, list = value => Array.isArray(value) && value.length > 0 && value.every(role => typeof role === 'string' && ROLE.test(role)) && new Set(value).size === value.length;
+  if (!object(roles) || Object.keys(roles).sort().join(',') !== 'api,worker' || !list(roles.api) || !list(roles.worker)) throw invalid('ADMISSION_TENANT_ROLES_REQUIRED');
   return settings;
 }
 
@@ -82,7 +88,8 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
   const tenantDirectory = d.createDirectory(central);
   const journal = name => d.createJournal({ directory: path.join(directory, name), key: settings.journalKey });
   const provisioner = d.createProvisioner({ adminPool: admin, centralPool: central, connection: { ...administration, database: 'postgres' }, journal: journal('provisioning'),
-    ownershipKey: settings.ownershipKey, regionCode: settings.regionCode, residencyPolicyVersion: settings.residencyPolicyVersion });
+    ownershipKey: settings.ownershipKey, regionCode: settings.regionCode, residencyPolicyVersion: settings.residencyPolicyVersion,
+    apiRoles: settings.tenantRoles.api, workerRoles: settings.tenantRoles.worker });
   const registry = d.createRegistry({ journal: journal('credentials'), directory: tenantDirectory,
     probe: (material, snapshot, workload) => d.probe({ createPool: d.createPool, material, snapshot, workload }) });
 
@@ -98,18 +105,31 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
       return token;
     } });
 
+  // The completion service hides why a step failed. The step and a code (never a message, which may carry identifiers) are
+  // kept for `health`, so that a stuck admission can be diagnosed without entering the container.
+  let lastFailure = null, retryAfter = 0;
+  const step = (name, work) => async value => {
+    try { return await work(value); } catch (error) {
+      const code = [error?.code, error?.message].find(text => typeof text === 'string' && /^[A-Z0-9_]{3,80}$/.test(text)) || 'UNCLASSIFIED';
+      lastFailure = { step: name, code, at: new Date(now()).toISOString() }; retryAfter = now() + RETRY_AFTER_FAILURE_MS;
+      throw error;
+    }
+  };
   const policy = require('../security/authConfig').RECOGNIZED_ASSURANCE_POLICIES[settings.policyVersion];
   const completion = d.createCompletion({ coordinator, issuer: settings.issuer, policyVersion: settings.policyVersion,
     assuranceRequirements: policy.policy[policy.privilegedCategory], mfaPolicyCode: 'USER_OPTIONAL', dataResidencyCode: settings.dataResidencyCode,
-    tenant: { ensure: value => provisioner.ensure(value) }, projection: { ensure: value => provisioner.project(value) },
-    publishCredentials: async value => registry.publish(Object.fromEntries(BINDING.map(key => [key, value[key]])),
-      await provisioner.apiCredentials(value), await provisioner.workerCredentials(value)) });
+    tenant: { ensure: step('TENANT', value => provisioner.ensure(value)) }, projection: { ensure: step('PROJECTION', value => provisioner.project(value)) },
+    publishCredentials: step('CREDENTIALS', async value => registry.publish(Object.fromEntries(BINDING.map(key => [key, value[key]])),
+      await provisioner.apiCredentials(value), await provisioner.workerCredentials(value))) });
   const completionWorker = d.createCompletionWorker(completion);
 
   let stopping = false, inFlight = null, lastPass = 0;
   function tick() {
     if (stopping || inFlight) return inFlight;
-    inFlight = completionWorker.runOnce().then(() => { lastPass = now(); }).catch(() => {}).finally(() => { inFlight = null; });
+    // Waiting out a failure still counts as a live loop.
+    if (now() < retryAfter) { lastPass = now(); return null; }
+    inFlight = completionWorker.runOnce().then(results => { lastPass = now(); if (Array.isArray(results) && results.length && results.every(result => result.confirmed)) lastFailure = null; })
+      .catch(() => {}).finally(() => { inFlight = null; });
     return inFlight;
   }
   // Only these names cross the IPC boundary. `resolve` returns the API login of one tenant; nothing returns administration material.
@@ -117,7 +137,7 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
     identity: value => identity.ensure(value),
     passwordReady: value => identity.passwordReady(value.subject),
     resolve: value => registry.resolve(value),
-    health: async () => ({ ready: now() - lastPass < READY_WITHIN_MS }),
+    health: async () => ({ ready: now() - lastPass < READY_WITHIN_MS, lastFailure }),
     async memberProjection(value) {
       const snapshot = await tenantDirectory.resolveSnapshotByOrganization(value.organizationId, 'API');
       const credentials = await registry.resolve({ ...snapshot, workload: 'API' });

@@ -213,6 +213,9 @@ function memberWorkerConfiguration(state, { issuer, adminOrigin, clients, prior 
 // Entity admission (context/features/staging-entity-admission.md): the privileged worker's file. It reuses the technical
 // Keycloak client of the member worker and keeps its own ownership and journal keys, generated once.
 const ADMISSION_CALLBACK_PATH = '/api/admission-activation/callback';
+// What the staging installation grants to the shared API and WORKER aggregators (scripts/localPlatform/schema.js). The
+// admission worker must name the same set: its provisioner refuses, and must not widen, anything else.
+const TENANT_AGGREGATOR_ROLES = Object.freeze({ api: Object.freeze(['c4g_opportunity_tenant_runtime']), worker: Object.freeze(['c4g_import_worker_runtime']) });
 function admissionWorkerConfiguration(state, { issuer, member, postgres, centralDatabase, prior = null, generateSecret }) {
   if (state?.phase !== 'READY' || !state.authorityPassword || !state.permitSecret) throw failure('STAGING_INSTALLATION_NOT_READY');
   const text = value => typeof value === 'string' && value.length > 0;
@@ -224,7 +227,8 @@ function admissionWorkerConfiguration(state, { issuer, member, postgres, central
   return { issuer, adminOrigin: member.adminOrigin, clientId: member.clientId, clientSecret: member.clientSecret, ownershipKey, journalKey,
     postgres: { host: postgres.host, port: postgres.port, user: 'postgres', password: postgres.password, ssl: true }, centralDatabase,
     authority: { user: 'c4g_authority_runtime', password: state.authorityPassword }, permitSecret: state.permitSecret,
-    policyVersion: AUTH_POLICY_VERSION, dataResidencyCode: REGION.regionCode, regionCode: REGION.regionCode, residencyPolicyVersion: REGION.residencyPolicyVersion };
+    policyVersion: AUTH_POLICY_VERSION, dataResidencyCode: REGION.regionCode, regionCode: REGION.regionCode, residencyPolicyVersion: REGION.residencyPolicyVersion,
+    tenantRoles: { api: [...TENANT_AGGREGATOR_ROLES.api], worker: [...TENANT_AGGREGATOR_ROLES.worker] } };
 }
 
-module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, ADMISSION_CALLBACK_PATH, admissionWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });
+module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, ADMISSION_CALLBACK_PATH, TENANT_AGGREGATOR_ROLES, admissionWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });

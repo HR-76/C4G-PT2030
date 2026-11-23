@@ -338,7 +338,9 @@ docker compose -f deploy/staging/compose.yaml up -d --force-recreate api
 sleep 60; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
 ```
 
-Se a API não ficar pronta, o worker não arrancou (ficheiro recusado ou emissor diferente de `OIDC_ISSUER`): volta atrás e repete o passo 1.
+Se a API não ficar pronta, o worker não arrancou (ficheiro recusado ou emissor diferente de `OIDC_ISSUER`): volta atrás e repete o passo 1. Um `worker.json` escrito antes de 23/11/2026 não tem `tenantRoles` e é recusado: repetir o passo 1 acrescenta-o e mantém as chaves.
+
+Uma adesão que não avança aparece no registo da API como `C4G_ADMISSION_STEP_FAILED <passo>:<código>` (uma linha por mudança, sem mensagens): `docker logs c4g-staging-api-api-1 2>&1 | grep C4G_ADMISSION`. `TENANT:LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP` significa que os agregadores partilhados `c4g_tenant_api_capabilities` e `c4g_tenant_worker_capabilities` têm papéis diferentes dos de `tenantRoles`; compara-os antes de mexer em concessões.
 
 **4. Ensaio (tu, no navegador).** Como Admin C4G, em Entidades, «Convidar uma entidade» com um endereço teu; abrir a ligação mostrada, definir a palavra-passe, preencher a ficha e submeter. Dentro de alguns segundos deve existir uma base nova:
 

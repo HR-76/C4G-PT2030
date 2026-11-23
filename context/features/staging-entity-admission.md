@@ -79,6 +79,19 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 - **Rotação mensal das partições de auditoria** nas bases novas: o provisionamento cria as partições iniciais; a rotação por base não foi verificada.
 - **Documentos das candidaturas** continuam adiados no staging, para todas as entidades.
 
+## Fase 5 — ensaio na VPS (23/11/2026, em curso)
+
+**Passou:** o comando `admission` contra o Keycloak e o PostgreSQL reais; a API a arrancar com a adesão ligada; o convite, a ativação e a ficha no browser; a criação da base `c4g_onb_e168701f6e1f493893fda1ff934a91c3` com o esquema base (033).
+
+**Falhou:** o provisionamento parou no passo da base com `LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP`, repetido 547 vezes em cerca de meia hora até a adesão ser desligada. A entidade «Teste» ficou em `PROVISIONING`, sem ligação publicada.
+
+- **Causa.** O provisionador tinha fixos os papéis funcionais do perfil isolado (`c4g_opportunity_tenant_runtime` para API e WORKER). No staging o agregador partilhado dos workers tem `c4g_import_worker_runtime`, concedido pela instalação; a verificação final recusa qualquer concessão que não espere.
+- **Efeito lateral.** Antes de verificar, cada tentativa concedeu `c4g_opportunity_tenant_runtime` ao agregador partilhado `c4g_tenant_worker_capabilities`, que a instalação do staging não tinha. Tem de ser retirado à mão (`REVOKE`); enquanto lá estiver, as verificações que exigem o conjunto exato de papéis dos workers falham.
+- **Correção.** `worker.json` passa a nomear os papéis dos dois agregadores (`tenantRoles`, obrigatório, sem valor por omissão) e o provisionador usa-os. O instalador escreve os mesmos que a instalação do staging concede. O worker guarda o passo e o código da última falha (nunca a mensagem), devolve-os em `health`, e a API escreve uma linha `C4G_ADMISSION_STEP_FAILED <passo>:<código>` por cada mudança. Depois de uma falha, a mesma adesão só é tentada de novo ao fim de 60 s.
+- **Por resolver.** A base nova fica no esquema 033 e o staging está no 041: os passos 034 a 041 só são aplicados pelo `upgrade`, que não migra bases criadas pela adesão (ver «Fase 4»). Uma entidade nova fica, por isso, sem as páginas que dependem desses passos.
+
+Lição: o provisionador só tinha sido provado em ambientes isolados, onde os papéis partilhados coincidem com os que ele assume. Qualquer passo que altere papéis ou concessões partilhadas pelo cluster tem de ser comparado com o ambiente de destino antes de correr.
+
 ## Limites e decisões
 
 - A listagem de convites lê a Central pelo pool da API. No staging a API liga à Central como administrador (decisão de 14/11/2026); numa Central com logins limitados esta leitura precisa do seu próprio perfil.

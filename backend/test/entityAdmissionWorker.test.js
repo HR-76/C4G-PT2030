@@ -14,7 +14,8 @@ const ORGANIZATION = '10000000-0000-4000-8000-000000000001';
 const valid = () => ({ issuer: ISSUER, clientId: 'c4g-admission-worker', clientSecret: 'synthetic', adminOrigin: 'http://keycloak:8080',
   ownershipKey: 'ab'.repeat(32), journalKey: 'cd'.repeat(32), postgres: { host: '127.0.0.1', port: 1, user: 'postgres', password: 'synthetic', ssl: false },
   centralDatabase: 'c4g_central_staging', authority: { user: 'c4g_authority_runtime', password: 'synthetic' }, permitSecret: 'synthetic-permit-secret-of-32-bytes!',
-  policyVersion: 'c4g-user-mfa-v1', dataResidencyCode: 'EU', regionCode: 'EU', residencyPolicyVersion: 'staging-v1' });
+  policyVersion: 'c4g-user-mfa-v1', dataResidencyCode: 'EU', regionCode: 'EU', residencyPolicyVersion: 'staging-v1',
+  tenantRoles: { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] } });
 
 function folder(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-admission-worker-'));
@@ -42,6 +43,15 @@ test('the worker file is closed: unknown, missing or malformed values are refuse
     s => { s.postgres.port = 0; }, s => { s.postgres.ssl = 'yes'; }, s => { s.postgres.database = 'x'; }, s => { delete s.postgres.password; },
     s => { s.centralDatabase = 'Central; DROP'; }, s => { s.authority = { user: 'a' }; }, s => { s.permitSecret = 'shorter-than-32-bytes'; },
     s => { s.policyVersion = 'unknown-policy'; }, s => { s.regionCode = ''; }, s => { delete s.residencyPolicyVersion; }]) refused(change, 'ADMISSION_CONFIGURATION_INVALID');
+});
+
+test('the roles of the shared aggregators are named by the file and never defaulted', t => {
+  const env = { OIDC_ISSUER: ISSUER };
+  for (const tenantRoles of [undefined, {}, { api: ['c4g_opportunity_tenant_runtime'] }, { api: [], worker: ['c4g_import_worker_runtime'] }, { api: ['c4g_opportunity_tenant_runtime'], worker: ['Bad Role'] },
+    { api: ['c4g_x', 'c4g_x'], worker: ['c4g_y'] }, { api: 'c4g_x', worker: ['c4g_y'] }, { api: ['c4g_x'], worker: ['c4g_y'], other: [] }]) {
+    const settings = valid(); if (tenantRoles === undefined) delete settings.tenantRoles; else settings.tenantRoles = tenantRoles;
+    assert.throws(() => readSettings(write(t, settings), env), { code: 'ADMISSION_TENANT_ROLES_REQUIRED' }, JSON.stringify(tenantRoles));
+  }
 });
 
 test('the worker only serves the identity provider the API signs in with, over HTTPS', t => {
@@ -81,6 +91,7 @@ test('administration stays inside the worker and only five closed methods cross 
   assert.deepEqual([state.coordinator.permitSecret, state.journals.map(journal => path.relative(directory, journal.directory)), state.journals.every(journal => journal.key === 'cd'.repeat(32))],
     ['synthetic-permit-secret-of-32-bytes!', ['provisioning', 'credentials'], true]);
   assert.deepEqual([state.provisioner.regionCode, state.provisioner.residencyPolicyVersion, state.provisioner.connection.database, state.provisioner.connection.host], ['EU', 'staging-v1', 'postgres', '127.0.0.1']);
+  assert.deepEqual([state.provisioner.apiRoles, state.provisioner.workerRoles], [['c4g_opportunity_tenant_runtime'], ['c4g_import_worker_runtime']], 'the environment\'s roles, not the isolated default');
   assert.deepEqual([state.identity.issuer, state.identity.purpose, state.identity.usernameMode, state.identity.adminOrigin], [ISSUER, 'ADMISSION', 'email', 'http://keycloak:8080']);
   assert.deepEqual([state.completion.coordinator, state.completion.issuer, state.completion.policyVersion, state.completion.mfaPolicyCode, state.completion.dataResidencyCode],
     [{ marker: 'coordinator' }, ISSUER, 'c4g-user-mfa-v1', 'USER_OPTIONAL', 'EU']);
@@ -102,16 +113,43 @@ test('administration stays inside the worker and only five closed methods cross 
   assert.deepEqual(state.projection.allowedResidency, [{ regionCode: 'EU', policyVersion: 'staging-v1' }], 'the staging region, not the local default');
   assert.deepEqual(state.calls.at(-1), ['memberProjection', { organizationId: ORGANIZATION, name: 'Pessoa' }]);
 
-  assert.deepEqual(await worker.methods.health(), { ready: false }, 'not ready before the first completed pass');
+  assert.deepEqual(await worker.methods.health(), { ready: false, lastFailure: null }, 'not ready before the first completed pass');
   await worker.tick();
-  assert.deepEqual(await worker.methods.health(), { ready: true });
+  assert.deepEqual(await worker.methods.health(), { ready: true, lastFailure: null });
   clock += 16000;
-  assert.deepEqual(await worker.methods.health(), { ready: false }, 'a stalled loop stops being ready');
+  assert.equal((await worker.methods.health()).ready, false, 'a stalled loop stops being ready');
   state.fail = true; await worker.tick();
-  assert.deepEqual(await worker.methods.health(), { ready: false }, 'a failed pass does not count');
+  assert.equal((await worker.methods.health()).ready, false, 'a failed pass does not count');
   await worker.close();
   assert.equal(state.ended, 3);
   assert.equal(worker.tick(), null, 'no pass starts after close');
+});
+
+test('a failed step is recorded as a code, spaced before the next attempt and cleared by a confirmed pass', async t => {
+  const { state, dependencies } = fakes();
+  let clock = 5000000, outcome = [{ id: 'a', confirmed: false }];
+  dependencies.createProvisioner = options => { state.provisioner = options; return {
+    async ensure() { throw Error('LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP'); }, async project() { throw Object.assign(Error('relation "private_table" does not exist'), { code: '42P01' }); },
+    async apiCredentials() { throw Object.assign(Error('x'), { code: 'CREDENTIAL_BINDING_INVALID' }); }, async workerCredentials() { return {}; } }; };
+  dependencies.createCompletionWorker = () => ({ async runOnce() { state.runs += 1; return outcome; } });
+  const worker = buildWorker({ settings: valid(), directory: folder(t), dependencies, now: () => clock });
+  t.after(() => worker.close());
+  await assert.rejects(state.completion.tenant.ensure({}), /LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP/);
+  assert.deepEqual((await worker.methods.health()).lastFailure, { step: 'TENANT', code: 'LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP', at: new Date(clock).toISOString() });
+  assert.equal(worker.tick(), null, 'no attempt right after a failure');
+  assert.equal(state.runs, 0);
+  assert.equal((await worker.methods.health()).ready, true, 'waiting out a failure is a live loop');
+  await assert.rejects(state.completion.projection.ensure({}));
+  assert.deepEqual([(await worker.methods.health()).lastFailure.step, (await worker.methods.health()).lastFailure.code], ['PROJECTION', '42P01']);
+  assert(!JSON.stringify(await worker.methods.health()).includes('private_table'), 'messages never leave the worker');
+  await assert.rejects(state.completion.publishCredentials({}));
+  assert.equal((await worker.methods.health()).lastFailure.code, 'CREDENTIAL_BINDING_INVALID');
+  clock += 59000; assert.equal(worker.tick(), null);
+  clock += 2000; await worker.tick();
+  assert.equal(state.runs, 1);
+  assert.notEqual((await worker.methods.health()).lastFailure, null, 'an unconfirmed pass keeps the failure');
+  outcome = [{ id: 'a', confirmed: true }]; await worker.tick();
+  assert.equal((await worker.methods.health()).lastFailure, null);
 });
 
 test('the technical token is requested from the issuer, reused until it nears expiry and never fetched over a redirect', async t => {
@@ -150,6 +188,13 @@ test('as a process, the worker starts only with a valid file and denies methods 
   // No database listens on port 1: the worker still answers, reports itself not ready and never leaks the failure.
   const running = await runProcess(t, valid(), { OIDC_ISSUER: ISSUER }, ['health', 'provision', 'resolve']);
   assert.equal(running.ready, true);
-  assert.deepEqual(running.answers.slice(0, 2), ['ready', 'WORKER_METHOD_DENIED']);
+  assert.deepEqual(running.answers.slice(0, 2), ['ready,lastFailure', 'WORKER_METHOD_DENIED']);
   assert.match(running.answers[2], /^[A-Z0-9_]+$/);
+});
+
+test('the provisioner refuses role sets that are missing or malformed', () => {
+  const { createPostgresProvisioner } = require('../src/platformOnboarding/postgresProvisioner');
+  for (const roles of [{ apiRoles: [] }, { workerRoles: ['Bad Role'] }, { apiRoles: 'c4g_x' }, { workerRoles: [42] }]) {
+    assert.throws(() => createPostgresProvisioner({ adminPool: {}, centralPool: {}, connection: {}, journal: {}, ownershipKey: 'ab'.repeat(32), ...roles }), { code: 'PROVISIONING_ROLES_INVALID' }, JSON.stringify(roles));
+  }
 });

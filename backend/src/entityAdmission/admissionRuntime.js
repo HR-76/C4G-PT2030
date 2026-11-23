@@ -21,7 +21,8 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
   createCompletion = options => require('./completionService').createCompletionService(options),
   createListing = options => require('./listing').createAdmissionListing(options),
   createOidc = options => require('../platformOnboarding/oidcActivationAdapter').createOidcActivationAdapter(options),
-  readMemberSettings = (directory, environment) => require('../platformOnboarding/memberRuntime').readSettings(directory, environment) }) {
+  readMemberSettings = (directory, environment) => require('../platformOnboarding/memberRuntime').readSettings(directory, environment),
+  report = line => { process.stderr.write(line + '\n'); } }) {
   const selection = env.ENTITY_ADMISSION_RUNTIME || 'disabled';
   if (selection === 'disabled') return null;
   if (selection !== 'central') throw invalid('ENTITY_ADMISSION_RUNTIME_INVALID');
@@ -52,7 +53,12 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
       if (!service) throw invalid('ENTITY_ADMISSION_NOT_COMPOSED');
       try { await worker.call('health', {}); } catch { throw invalid('ENTITY_ADMISSION_WORKER_UNAVAILABLE'); }
       // The worker also runs the completion loop: a call restarts it if it ended.
-      supervisor = setInterval(() => { worker.call('health', {}).catch(() => {}); }, SUPERVISION_MS);
+      // A failing step is reported once per change, as codes only: the worker's output is not captured anywhere else.
+      let reported = '';
+      supervisor = setInterval(() => { worker.call('health', {}).then(state => {
+        const failure = state?.lastFailure, signature = failure ? `${failure.step}:${failure.code}` : '';
+        if (signature !== reported) { reported = signature; report(signature ? `C4G_ADMISSION_STEP_FAILED ${signature}` : 'C4G_ADMISSION_STEP_RECOVERED'); }
+      }).catch(() => {}); }, SUPERVISION_MS);
       supervisor.unref?.();
       oidc = await createOidc({ issuer: settings.issuer, origin: settings.origin, manualClientId: settings.manualClientId,
         existingClientId: settings.existingClientId, callbackPath: ADMISSION_PATH + '/callback', service,

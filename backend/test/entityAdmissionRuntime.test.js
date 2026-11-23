@@ -211,3 +211,23 @@ test('a person invited into an entity the member worker does not know is project
   failure = null;
   assert.deepEqual((await service.projection.ensure({ organizationId: 'installed' })).by, 'member');
 });
+
+test('a failing step of the worker is reported once per change, as codes only', async t => {
+  const folder = memberDirectory(t), lines = [];
+  let health = { ready: true, lastFailure: null };
+  const f = fakes();
+  f.createWorker = () => ({ async call(method) { return method === 'health' ? health : {}; }, async close() {} });
+  t.mock.timers.enable({ apis: ['setInterval'] });
+  const admission = configuredEntityAdmission({ env: environment(folder), express, members: members(), centralPool: pool, ...f, report: line => lines.push(line) });
+  t.after(() => admission.close());
+  admission.createAdmission({ authorityCoordinator: {}, authConfig });
+  await admission.start();
+  const pass = async () => { t.mock.timers.tick(5000); await new Promise(resolve => setImmediate(resolve)); };
+  await pass(); assert.deepEqual(lines, []);
+  health = { ready: true, lastFailure: { step: 'TENANT', code: 'LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP', at: 'x' } };
+  await pass(); await pass();
+  assert.deepEqual(lines, ['C4G_ADMISSION_STEP_FAILED TENANT:LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP']);
+  health = { ready: true, lastFailure: null };
+  await pass();
+  assert.deepEqual(lines.at(-1), 'C4G_ADMISSION_STEP_RECOVERED');
+});

@@ -25,7 +25,10 @@ test('the worker file is one the worker accepts, and repeating keeps both keys',
   assert.deepEqual(first, { issuer: ISSUER, adminOrigin: 'http://keycloak:8080', clientId: 'c4g-member-worker', clientSecret: 'synthetic-client-secret',
     ownershipKey: '01'.repeat(32), journalKey: '02'.repeat(32), postgres: { host: 'c4g-postgres', port: 5432, user: 'postgres', password: 'synthetic-admin', ssl: true },
     centralDatabase: 'c4g_central_staging', authority: { user: 'c4g_authority_runtime', password: 'synthetic-authority' }, permitSecret: 'synthetic-permit-secret-of-32-bytes!',
-    policyVersion: 'c4g-user-mfa-v1', dataResidencyCode: 'EU', regionCode: 'EU', residencyPolicyVersion: 'staging-v1' });
+    policyVersion: 'c4g-user-mfa-v1', dataResidencyCode: 'EU', regionCode: 'EU', residencyPolicyVersion: 'staging-v1',
+    // The same roles the staging installation grants to the shared aggregators (scripts/localPlatform/schema.js).
+    tenantRoles: { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] } });
+  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/localPlatform/schema.js'), 'utf8'), /apiRoles: \['c4g_opportunity_tenant_runtime'\], workerRoles: \['c4g_import_worker_runtime'\]/);
   assert.notEqual(first.ownershipKey, member().ownershipKey, 'admission has its own ownership key');
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-staging-admission-'));
   t.after(() => fs.rmSync(folder, { recursive: true, force: true }));
