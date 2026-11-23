@@ -24,7 +24,8 @@ sleep 3
 for db in "${DATABASES[@]}"; do
   log "restore:$db"
   rm -f "$WORK"/restore-*
-  if ! r2 latest --database "$db" --out "/b/restore-$db.dump.enc" --manifest-out "/b/restore-$db.json" >/dev/null; then echo "RESTORE_FAIL $db no-copy-in-r2"; fail=1; continue; fi
+  if ! latest=$(r2 latest --database "$db" --out "/b/restore-$db.dump.enc" --manifest-out "/b/restore-$db.json"); then echo "RESTORE_FAIL $db no-copy-in-r2"; fail=1; continue; fi
+  stamp=$(printf '%s' "$latest" | sed -n 's/.*"stamp":"\([0-9TZ]*\)".*/\1/p')
   if ! decrypt "$WORK/restore-$db.dump.enc" "$WORK/restore-$db.dump"; then echo "RESTORE_FAIL $db decrypt"; fail=1; continue; fi
   # O servidor lê o manifesto com pg_read_file como utilizador postgres: o ficheiro (só contagens e nomes de papéis) tem de ser legível.
   chmod 644 "$WORK/restore-$db.json"
@@ -45,6 +46,12 @@ for db in "${DATABASES[@]}"; do
   want_tables=$(sql -c "select (pg_read_file('/tmp/$db.json')::jsonb->>'tables')::int")
   if [ "$events" -ge "$want_events" ] && [ "$tables" -eq "$want_tables" ]; then verdict=ok; else verdict=FAIL; fail=1; fi
   printf '{"database":"%s","restore":"%s","auditEvents":%s,"manifestAuditEvents":%s,"tables":%s,"manifestTables":%s}\n' "$db" "$verdict" "$events" "$want_events" "$tables" "$want_tables"
+  # Marcador ao lado da cópia restaurada com sucesso, lido pela página Administração C4G → Cópias de segurança.
+  # Uma imagem antiga não conhece este tipo: o teste não falha por isso.
+  if [ "$verdict" = ok ] && [ -n "$stamp" ]; then
+    printf '{"database":"%s","restore":"ok","testedAt":"%s","auditEvents":%s,"tables":%s}\n' "$db" "$(date -u +%FT%TZ)" "$events" "$tables" > "$WORK/restore-$db.verified.json"
+    r2 put "/b/restore-$db.verified.json" --database "$db" --stamp "$stamp" --kind verification >/dev/null 2>&1 || echo "RESTORE_RESULT_NOT_RECORDED $db"
+  fi
   sql -c "DROP DATABASE restore_check WITH (FORCE)" >/dev/null
 done
 

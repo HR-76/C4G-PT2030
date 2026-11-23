@@ -172,7 +172,8 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     composedRoutes.platformDirectory=require('./routes/platformDirectoryRoutes').createPlatformDirectoryRouter({express,authenticate,registration:registrationService,centralImports,userDeletion,
       members:memberOnboarding,
       access:env.PLATFORM_ACCESS_RUNTIME==='central'?require('./platformDirectory/access').createPlatformAccess({coordinator:authorityCoordinator,policyVersion:authConfig.policyVersion,assuranceRequirements:authConfig.assurancePolicy[authConfig.privilegedLoginCategory],recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory]}):null,
-      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health,deletionAvailable:Boolean(userDeletion)})});
+      service:require('./platformDirectory/service').createPlatformDirectory({pool:centralPool,logs:platformLogs,health:observability.health,deletionAvailable:Boolean(userDeletion),
+        backups:require('./backups/overview').configuredBackupOverview({env,provided:dependencies.platformBackups})})});
     const platformBillingService=require('./platformBilling/service').createPlatformBillingService({
       coordinator:authorityCoordinator,centralPool
     });

@@ -34,6 +34,7 @@ const PlatformDashboard = routePage(() => import('./pages/Platform/PlatformDashb
 const EuLegacyPrearchiveReview = routePage(() => import('./pages/Platform/EuLegacyPrearchiveReview'))
 const EuLegacyAcceptanceReview = routePage(() => import('./pages/Platform/EuLegacyAcceptanceReview.jsx'))
 const PlatformLogs = routePage(() => import('./pages/Platform/PlatformLogs'))
+const PlatformBackups = routePage(() => import('./pages/Platform/PlatformBackups'))
 const PlatformDirectory = routePage(() => import('./pages/Platform/PlatformDirectory'))
 const CustomerBilling = routePage(() => import('./pages/Billing/CustomerBilling.jsx'))
 const PlatformBilling = routePage(() => import('./pages/Platform/PlatformBilling.jsx'))
@@ -132,6 +133,7 @@ function AppRoutes() {
         <Route path="/administracao/aprovacoes-eu" element={<ProtectedRoute platformOnly><EuLegacyPrearchiveReview /></ProtectedRoute>} />
         <Route path="/administracao/aceitacoes-eu" element={<ProtectedRoute platformOnly><EuLegacyAcceptanceReview /></ProtectedRoute>} />
         <Route path="/administracao/logs" element={<ProtectedRoute platformOnly><PlatformLogs /></ProtectedRoute>} />
+        <Route path="/administracao/copias-seguranca" element={<ProtectedRoute platformOnly><PlatformBackups /></ProtectedRoute>} />
         <Route path="/administracao/entidades" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/entidades/utilizadores" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/entidades/:entityId" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />

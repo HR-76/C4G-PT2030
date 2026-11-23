@@ -1,0 +1,10 @@
+.platform-backups .backup-summary { display:flex; gap:16px; align-items:flex-start; margin:0 0 24px; padding:20px 24px; border:1px dashed var(--color-success); border-radius:10px; background:var(--color-success-soft); }
+.platform-backups .backup-summary-late { border-color:var(--color-warning); background:var(--color-warning-soft); }
+.platform-backups .backup-summary > svg { flex-shrink:0; color:var(--color-success); }
+.platform-backups .backup-summary-late > svg { color:var(--color-warning); }
+.platform-backups .backup-summary h2 { margin:0 0 6px; font-size:18px; color:var(--color-text-primary); }
+.platform-backups .backup-summary p { margin:0 0 4px; color:var(--color-text-primary); }
+.platform-backups .backup-summary .backup-summary-note { font-size:13px; color:var(--color-text-secondary); }
+.platform-backups .backup-size { text-align:right; white-space:nowrap; }
+.platform-backups .backup-file { font-size:12px; color:var(--color-text-secondary); overflow-wrap:anywhere; }
+.platform-backups td small { display:block; margin-top:4px; color:var(--color-text-secondary); }

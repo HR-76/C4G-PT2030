@@ -83,6 +83,17 @@ docker run --rm --user 0:0 --env-file /srv/c4g-staging/r2.env c4g-staging-api:$C
 
 `status` devolve código 1 se uma base não tiver cópia ou a última tiver mais de 36 h.
 
+## Página na Administração C4G
+
+[Contrato](../features/platform-backups-page.md). A página Administração C4G → Cópias de segurança lê esta pasta do R2 e só funciona com `PLATFORM_BACKUPS_RUNTIME=r2` no `api-private.env`; sem a variável responde 503 e diz que a consulta não está ligada. Exige os valores `C4G_R2_*` já presentes no mesmo ficheiro (armazenamento ligado); com a variável e sem eles a API não arranca. Depois de atualizar o código e a imagem pelo README:
+
+```bash
+grep -q '^PLATFORM_BACKUPS_RUNTIME=' /srv/c4g-staging/api-private.env || echo 'PLATFORM_BACKUPS_RUNTIME=r2' >> /srv/c4g-staging/api-private.env
+cd /srv/c4g-staging/src && docker compose -f deploy/staging/compose.yaml up -d --force-recreate api
+```
+
+Recriar só a `api` (nunca sem o nome do serviço). «Restauro testado» aparece a partir do primeiro teste semanal feito com a imagem nova; para não esperar por domingo, corra `restore-test.sh` (passo 4).
+
 ## Retenção
 
 14 cópias diárias e 8 semanais (a mais recente de cada semana ISO), por base; a mais recente nunca se apaga. Simulação, sem apagar:

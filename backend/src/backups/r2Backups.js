@@ -6,7 +6,10 @@ const { createHash } = require('node:crypto');
 const DATABASE = /^c4g_[a-z0-9_]{1,50}$/;
 const STAMP = /^\d{8}T\d{6}Z$/;
 const PREFIX = /^backups\/[a-z0-9][a-z0-9-]{0,30}\/$/;
-const KEY_TAIL = /^(c4g_[a-z0-9_]{1,50})\/(\d{8}T\d{6}Z)\.(dump\.enc|json)$/;
+const KEY_TAIL = /^(c4g_[a-z0-9_]{1,50})\/(\d{8}T\d{6}Z)\.(dump\.enc|verified\.json|json)$/;
+// "verification" marks a copy the weekly restore test restored successfully; retention removes it with its copy.
+const SUFFIX = Object.freeze({ dump: 'dump.enc', manifest: 'json', verification: 'verified.json' });
+const KIND = Object.freeze({ 'dump.enc': 'dump', json: 'manifest', 'verified.json': 'verification' });
 const MAX_BYTES = 500 * 1024 * 1024;
 const DAY = 86400000;
 
@@ -24,14 +27,14 @@ function loadBackupConfiguration(env) {
 }
 
 function objectKey(prefix, database, stamp, kind = 'dump') {
-  if (!PREFIX.test(prefix) || !DATABASE.test(database) || !STAMP.test(stamp) || !['dump', 'manifest'].includes(kind)) throw failure('BACKUP_KEY_INVALID');
-  return `${prefix}${database}/${stamp}.${kind === 'manifest' ? 'json' : 'dump.enc'}`;
+  if (!PREFIX.test(prefix) || !DATABASE.test(database) || !STAMP.test(stamp) || !Object.hasOwn(SUFFIX, kind)) throw failure('BACKUP_KEY_INVALID');
+  return `${prefix}${database}/${stamp}.${SUFFIX[kind]}`;
 }
 
 function parseKey(prefix, key) {
   if (typeof key !== 'string' || !key.startsWith(prefix)) return null;
   const match = KEY_TAIL.exec(key.slice(prefix.length));
-  return match ? { database: match[1], stamp: match[2], kind: match[3] === 'json' ? 'manifest' : 'dump' } : null;
+  return match ? { database: match[1], stamp: match[2], kind: KIND[match[3]] } : null;
 }
 
 function stampDate(stamp) {
@@ -86,20 +89,20 @@ function createBackupStore(config, options = {}) {
     requestChecksumCalculation: 'WHEN_REQUIRED', responseChecksumValidation: 'WHEN_REQUIRED', maxAttempts: 3 });
   const inside = key => { if (typeof key !== 'string' || !key.startsWith(config.prefix) || key.includes('..')) throw failure('BACKUP_KEY_OUTSIDE_PREFIX'); return key; };
   async function send(Command, input) {
-    try { return await client.send(new Command(input), { abortSignal: AbortSignal.timeout(120000) }); }
+    try { return await client.send(new Command(input), { abortSignal: AbortSignal.timeout(options.timeoutMs || 120000) }); }
     catch (error) {
       if (error?.$metadata?.httpStatusCode === 404) throw failure('BACKUP_OBJECT_NOT_FOUND');
       throw failure('BACKUP_R2_FAILED');
     }
   }
   async function listAll(prefix) {
-    const keys = []; let token;
+    const objects = []; let token;
     do {
       const page = await send(sdk.ListObjectsV2Command, { Bucket: config.bucket, Prefix: prefix, ...(token ? { ContinuationToken: token } : {}) });
-      for (const item of page.Contents || []) keys.push(item.Key);
+      for (const item of page.Contents || []) objects.push({ key: item.Key, size: item.Size, modifiedAt: item.LastModified });
       token = page.IsTruncated ? page.NextContinuationToken : undefined;
     } while (token);
-    return keys;
+    return objects;
   }
   return Object.freeze({
     async put({ key, body }) {
@@ -118,8 +121,10 @@ function createBackupStore(config, options = {}) {
     },
     async list(database) {
       if (!DATABASE.test(database)) throw failure('BACKUP_KEY_INVALID');
-      return listAll(`${config.prefix}${database}/`);
+      return (await listAll(`${config.prefix}${database}/`)).map(item => item.key);
     },
+    // Every object under the backups prefix, with size and modification time (for the administration page).
+    objects() { return listAll(config.prefix); },
     async latest(database) {
       const dumps = (await this.list(database)).map(key => ({ key, ...parseKey(config.prefix, key) })).filter(item => item.kind === 'dump').sort((a, b) => b.stamp.localeCompare(a.stamp));
       if (!dumps.length) return null;

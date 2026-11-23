@@ -27,7 +27,7 @@ const entitySelect=`SELECT o.id,o.display_name AS name,o.legal_name AS "legalNam
  WHERE m.organization_id=o.id AND m.base_role_code='ORG_ADMIN' AND ${eligible}
  ORDER BY u.display_name,u.id LIMIT 10) v),'[]') AS administrators
  FROM public.organization o`;
-function createPlatformDirectory({pool,logs,health,deletionAvailable=false}){
+function createPlatformDirectory({pool,logs,health,deletionAvailable=false,backups=null}){
  if(!pool||typeof pool.connect!=='function')throw TypeError('Central pool required');
  async function read(request,work){
   const sid=request.authContext?.sessionId,userId=request.user?.id;
@@ -42,6 +42,8 @@ function createPlatformDirectory({pool,logs,health,deletionAvailable=false}){
  return Object.freeze({
   importAvailability(input,request){return read(request,async()=>{if(!input||Object.keys(input).length)fail('INVALID_INPUT');return {available:false,code:'CENTRAL_IMPORT_NOT_CONFIGURED'};});},
   dashboard(input,request){return read(request,async c=>{if(!input||Object.keys(input).length)fail('INVALID_INPUT');const result=await require('./dashboard').dashboard(c,logs);let dependencies=null;try{const state=await health?.check();if(state&&['READY','DEGRADED','UNAVAILABLE'].includes(state.status)&&Array.isArray(state.reasons))dependencies={status:state.status,reasons:state.reasons.filter(x=>typeof x==='string'&&/^[A-Z0-9_-]{1,80}$/.test(x))};}catch{}const values=[pool.totalCount,pool.idleCount,pool.waitingCount,pool.options?.max];const capacity=values.every(Number.isSafeInteger)&&values.every(x=>x>=0)&&values[3]>0?{total:values[0],idle:values[1],waiting:values[2],max:values[3]}:null;return {...result,operational:{dependencies,capacity}};});},
+  // The administrator is confirmed first; the R2 listing then runs outside the Central transaction.
+  backups(input,request){return read(request,async()=>{if(!input||Object.keys(input).length)fail('INVALID_INPUT');if(!backups)fail('BACKUPS_NOT_CONFIGURED');}).then(()=>backups.read());},
   logs(input,request){return read(request,async c=>{if(!logs)throw Error('LOGS_UNAVAILABLE');return require('./logs').listLogs(c,input,logs);});},
   entities(input,request){return read(request,async c=>{
    const p=query(input,'entities'),values=[p.q,p.status,50,(p.page-1)*50];

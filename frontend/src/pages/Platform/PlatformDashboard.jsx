@@ -1,7 +1,7 @@
 import LoadingIndicator from '../../components/LoadingIndicator'
 import {useEffect,useRef,useState} from 'react'
 import {Link} from 'react-router-dom'
-import {RefreshCw,Building2,Users,Globe,Receipt,Database,ScrollText,Activity,AlertTriangle} from 'lucide-react'
+import {RefreshCw,Building2,Users,Globe,Receipt,Database,DatabaseBackup,ScrollText,Activity,AlertTriangle} from 'lucide-react'
 import {useAuth} from '../../contexts/AuthContext'
 import {platformDirectoryApi} from '../../api/api'
 import {readScope,startConfirmedRead} from '../../api/confirmedReads'
@@ -57,6 +57,7 @@ export function DashboardView({api=platformDirectoryApi,scope=null}){
      <Link to="/administracao/faturacao"><Receipt aria-hidden="true" size={20} data-icon-tone="amber"/><div>Faturação <span>Acompanhar ciclos, documentos e pagamentos</span></div></Link>
      <Link to="/integracoes"><Database aria-hidden="true" size={20} data-icon-tone="violet"/><div>Fontes de oportunidades <span>Consultar recolhas e importações</span></div></Link>
      <Link to="/administracao/logs"><ScrollText aria-hidden="true" size={20} data-icon-tone="rose"/><div>Logs <span>Rever entradas e erros registados</span></div></Link>
+     <Link to="/administracao/copias-seguranca"><DatabaseBackup aria-hidden="true" size={20} data-icon-tone="sky"/><div>Cópias de segurança <span>Ver a última cópia e o teste de restauro</span></div></Link>
     </section>
    </div>
   </>}

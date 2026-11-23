@@ -22,10 +22,11 @@ function createPlatformDirectoryRouter({express,service,authenticate,access,memb
  const handle=work=>async(req,res)=>{try{
   if(req.body&&Object.keys(req.body).length)throw Object.assign(Error(),{code:'INVALID_INPUT'});
   res.json(await work(req));
- }catch(e){const statuses={C4G_ADMIN_REQUIRED:403,INVALID_INPUT:400,RESOURCE_NOT_AVAILABLE:404};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}};
+ }catch(e){const statuses={C4G_ADMIN_REQUIRED:403,INVALID_INPUT:400,RESOURCE_NOT_AVAILABLE:404,BACKUPS_NOT_CONFIGURED:503};const code=Object.hasOwn(statuses,e.code)?e.code:'SERVICE_UNAVAILABLE';res.status(statuses[code]||503).json({error:{code},correlationId:correlationId()});}};
  router.get('/entities',handle(req=>service.entities(req.query,req)));
  router.get('/entities/:id',handle(req=>{if(Object.keys(req.query).length)throw Object.assign(Error(),{code:'INVALID_INPUT'});return service.entity(req.params.id,req);}));
  router.get('/users',handle(req=>service.users(req.query,req)));
+ router.get('/backups',handle(req=>service.backups(req.query,req)));
  router.get('/logs',handle(req=>service.logs(req.query,req)));
  router.get('/dashboard',handle(req=>service.dashboard(req.query,req)));
  router.use('/imports/portugal2030',require('../portugal2030/uploadHttp').createCentralImportRouter({express,multer,runtime:centralImports,authorize:req=>service.importAvailability({},req)}));

@@ -35,6 +35,7 @@ const titles = {
   '/administracao/entidades': 'Entidades e utilizadores',
   '/administracao/faturacao': 'Faturação',
   '/administracao/logs': 'Logs',
+  '/administracao/copias-seguranca': 'Cópias de segurança',
   '/administracao/email': 'Email',
   '/administracao/importar': 'Importar Portugal 2030',
   '/administracao/aprovacoes-eu': 'Pré-aprovações EU',
@@ -90,7 +91,7 @@ export default function Layout() {
   const base  = '/' + pathname.split('/')[1]
   const sectionPath = '/' + pathname.split('/').slice(1, 3).join('/')
   const title = titles[pathname] || titles[sectionPath] || titles[base] || ''
-  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/email' || pathname.startsWith('/administracao/email/') ||pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
+  const platformDirectory = pathname === '/administracao/oportunidades/nova' || pathname === '/importar' || pathname === '/administracao/importar' || pathname === '/administracao/dashboard' || pathname === '/administracao/aprovacoes-eu' || pathname === '/administracao/aceitacoes-eu' || pathname === '/administracao/logs' || pathname === '/administracao/copias-seguranca' || pathname === '/administracao/email' || pathname.startsWith('/administracao/email/') ||pathname === '/administracao/entidades' || pathname.startsWith('/administracao/entidades/') || pathname === '/administracao/faturacao' || pathname.startsWith('/administracao/faturacao/')
   const needsOrganization = !organization && !platformDirectory && !['/catalogo', '/integracoes', '/conta'].includes(base)
   const closeMenu = () => { setSidebarOpen(false); if (!mobile) setDesktopCollapsed(true); menuButton.current?.focus() }
 

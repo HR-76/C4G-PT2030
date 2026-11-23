@@ -7,7 +7,7 @@ import '../../dashboard-palette.css'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   LayoutDashboard, FileText, Zap, Bell, ListChecks, CalendarDays,
-  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus, Mail, Heart,
+  Building2, Network, User, Users, Upload, Globe, LogOut, Handshake, ShieldCheck, ReceiptText, Plus, Minus, Mail, Heart, DatabaseBackup,
 } from 'lucide-react'
 
 export default function Sidebar({ open, mobile, hidden = false, panelRef, onClose, onNavigate, navigationAccess = {directory:true, units:true, access:true} }) {
@@ -39,6 +39,7 @@ export default function Sidebar({ open, mobile, hidden = false, panelRef, onClos
       { to: '/administracao/faturacao', icon: ReceiptText, tone: 'amber', label: 'Faturação' },
       { to: '/administracao/email', icon: Mail, tone: 'sky', label: 'Email' },
       { to: '/administracao/logs', icon: FileText, tone: 'blue', label: 'Logs' },
+      { to: '/administracao/copias-seguranca', icon: DatabaseBackup, tone: 'sky', label: 'Cópias de segurança' },
       { to: '/conta/seguranca', icon: ShieldCheck, tone: 'rose', label: 'Segurança da conta' },
     ] }] : []),
     ...(organization ? [{ label: 'Trabalho diário', items: [

@@ -118,6 +118,7 @@ export const admissionApi = {
 export const platformDirectoryApi = {
   dashboard: signal => api.get('/admin/directory/dashboard', { signal, timeout: 15000 }),
   logs: (params, signal) => api.get('/admin/directory/logs', { params, signal, timeout: 15000 }),
+  backups: signal => api.get('/admin/directory/backups', { signal, timeout: 15000 }),
   entities: (params, signal) => api.get('/admin/directory/entities', { params, signal, timeout: 15000 }),
   entity: (id, signal) => api.get(`/admin/directory/entities/${id}`, { signal, timeout: 15000 }),
   entityProfile: (id, signal) => api.get(`/admin/directory/entities/${id}/registration`, { signal, timeout: 15000 }),
