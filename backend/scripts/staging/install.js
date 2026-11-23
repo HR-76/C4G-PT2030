@@ -25,7 +25,7 @@ const { withInstallerAuthority, nativePool } = require('../localPlatform/install
 const { syncCentralObservation } = require('../localPlatform/centralObservation');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
-  memberHttpConfiguration, memberWorkerConfiguration,
+  memberHttpConfiguration, memberWorkerConfiguration, memberTarget, MEMBER_CLIENTS, ADMISSION_CALLBACK_PATH, admissionWorkerConfiguration,
   CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, workerCentralEnvironment, AUTH_POLICY_VERSION } = require('./environment');
 
 const STAGING_ADMISSION = require('../../src/security/stagingCentralRuntimeAdmission');
@@ -269,6 +269,13 @@ async function ledgerHead(pool, sql) {
 
 // Brings Central to 053 and the tenant to 041. Without --apply it reports what is pending and changes nothing.
 // The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
+// Databases created by entity admission (context/features/staging-entity-admission.md). Applying tenant steps only to the
+// installed tenant would leave them on an older schema without notice, so that is refused unless it is asked for by name.
+const ONBOARDED_TENANTS_SQL = "SELECT database_ref FROM public.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '^c4g_onb_' ORDER BY database_ref";
+function assertOnboardedTenantsCovered({ apply, pendingTenant, onboarded, skip }) {
+  if (apply && pendingTenant.length > 0 && onboarded.length > 0 && !skip) throw refuse('STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED');
+}
+
 async function upgrade(env, args) {
   const { config, stateFile } = settings(env);
   const state = readState(stateFile);
@@ -282,6 +289,9 @@ async function upgrade(env, args) {
     const report = { applied: Boolean(args.apply), central: { from: await centralHead(), steps: [] }, tenant: { from: await tenantHead(), steps: [] } };
     const pendingCentral = CENTRAL_STEPS.filter(([to]) => to > report.central.from);
     const pendingTenant = TENANT_STEPS.filter(([to]) => to > report.tenant.from);
+    // Entities created by admission have their own databases, which this command does not migrate yet.
+    report.onboardedTenants = (await central.query(ONBOARDED_TENANTS_SQL)).rows.map(row => row.database_ref);
+    assertOnboardedTenantsCovered({ apply: Boolean(args.apply), pendingTenant: pendingTenant.map(([to]) => to), onboarded: report.onboardedTenants, skip: args['skip-onboarded'] === true });
     if (!args.apply) {
       report.central.pending = pendingCentral.map(([to]) => to);
       report.tenant.pending = pendingTenant.map(([to]) => to);
@@ -392,6 +402,40 @@ async function members(env, args, { fetchImpl = fetch } = {}) {
   return { configured: true, realm, clients: [clients.manualClientId, clients.existingClientId, clients.clientId], files: ['http.json', 'c4g-activation.properties', 'worker.json'] };
 }
 
+// Entity admission (context/features/staging-entity-admission.md). Runs in the Keycloak container's network, after "members":
+// lets the two activation clients return to the admission pages and writes the privileged worker's file. Repeating it keeps
+// the keys already written. Nothing is printed except names and booleans.
+async function admission(env, args, { fetchImpl = fetch } = {}) {
+  const { config, stateFile, apiHost } = settings(env);
+  const state = readState(stateFile);
+  if (state?.phase !== 'READY') throw refuse('STAGING_INSTALLATION_NOT_READY');
+  const issuer = env.OIDC_ISSUER, origin = env.PUBLIC_APP_URL;
+  if (!issuer || !origin) throw refuse('STAGING_MEMBER_TARGET_REQUIRED');
+  const folder = args.out || '/admissions', memberFolder = args.members || '/members';
+  if (!fs.existsSync(folder)) throw refuse('STAGING_ADMISSION_FOLDER_MISSING');
+  const member = readJson(path.join(memberFolder, 'worker.json'));
+  if (!member) throw refuse('STAGING_MEMBERS_REQUIRED');
+  const owner = env.C4G_STAGING_RUNTIME_UID === undefined ? 1000 : Number(env.C4G_STAGING_RUNTIME_UID);
+  const workerFile = path.join(folder, 'worker.json');
+  // Built before Keycloak is touched: a refused configuration changes nothing.
+  const worker = admissionWorkerConfiguration(state, { issuer, member, centralDatabase: config.centralDatabase,
+    postgres: { host: apiHost, port: config.port, password: config.password }, prior: readJson(workerFile), generateSecret: () => randomBytes(32).toString('hex') });
+  const { realm } = memberTarget({ issuer, origin });
+  const kc = await keycloakAdministration({ baseUrl: env.C4G_KEYCLOAK_ADMIN_URL || 'http://localhost:8080', realm, username: env.C4G_KEYCLOAK_ADMIN_USER, password: env.C4G_KEYCLOAK_ADMIN_PASSWORD, fetchImpl });
+  const redirect = origin + ADMISSION_CALLBACK_PATH, clients = [];
+  for (const clientId of [MEMBER_CLIENTS.manualClientId, MEMBER_CLIENTS.existingClientId]) {
+    const found = await kc('clients?clientId=' + encodeURIComponent(clientId));
+    // Only clients this installation created are changed.
+    if (found?.length !== 1 || found[0].attributes?.['c4g.member.installation'] !== state.installationId) throw refuse('STAGING_MEMBER_CLIENTS_INVALID');
+    const client = await kc('clients/' + found[0].id);
+    if (!client.redirectUris?.includes(redirect)) await kc('clients/' + client.id, 'PUT', { ...client, redirectUris: [...(client.redirectUris || []), redirect] });
+    if (!(await kc('clients/' + client.id)).redirectUris?.includes(redirect)) throw refuse('STAGING_ADMISSION_REDIRECT_NOT_APPLIED');
+    clients.push(clientId);
+  }
+  writePrivate(workerFile, JSON.stringify(worker), owner);
+  return { configured: true, realm, clients, files: ['worker.json'] };
+}
+
 function writeEnvironment(env, destination, carryFile, collection, storageFile, centralRuntimeLogin = false) {
   const { config, stateFile, apiHost } = settings(env);
   const state = readState(stateFile);
@@ -431,7 +475,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   if (command === 'person') {
     return person(env, parseArguments(rest, { values: ['--subject', '--name', '--email', '--profile'], flags: ['--platform-admin', '--org-admin'] }));
   }
-  if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply'] }));
+  if (command === 'upgrade') return upgrade(env, parseArguments(rest, { flags: ['--apply', '--skip-onboarded'] }));
   if (command === 'runtime-logins') { parseArguments(rest); return runtimeLogins(env); }
   if (command === 'env') {
     const args = parseArguments(rest, { values: ['--out', '--carry', '--collection', '--storage'], flags: ['--central-runtime-login'] });
@@ -439,6 +483,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   }
   if (command === 'storage-check') { parseArguments(rest); return storageCheck(env); }
   if (command === 'members') return members(env, parseArguments(rest, { values: ['--out', '--keycloak-internal'], flags: ['--prepare'] }));
+  if (command === 'admission') return admission(env, parseArguments(rest, { values: ['--out', '--members'] }));
   throw refuse('STAGING_COMMAND_INVALID');
 }
 
@@ -455,4 +500,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-module.exports = { main, members, CENTRAL_STEPS, TENANT_STEPS };
+module.exports = { main, members, admission, assertOnboardedTenantsCovered, ONBOARDED_TENANTS_SQL, CENTRAL_STEPS, TENANT_STEPS };

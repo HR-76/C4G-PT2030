@@ -210,4 +210,21 @@ function memberWorkerConfiguration(state, { issuer, adminOrigin, clients, prior 
     bindings: [{ organizationId: state.organizationId, credentials: state.credentials, snapshot: state.snapshot }] };
 }
 
-module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });
+// Entity admission (context/features/staging-entity-admission.md): the privileged worker's file. It reuses the technical
+// Keycloak client of the member worker and keeps its own ownership and journal keys, generated once.
+const ADMISSION_CALLBACK_PATH = '/api/admission-activation/callback';
+function admissionWorkerConfiguration(state, { issuer, member, postgres, centralDatabase, prior = null, generateSecret }) {
+  if (state?.phase !== 'READY' || !state.authorityPassword || !state.permitSecret) throw failure('STAGING_INSTALLATION_NOT_READY');
+  const text = value => typeof value === 'string' && value.length > 0;
+  if (!member || member.issuer !== issuer || !text(member.clientId) || !text(member.clientSecret) || !text(member.adminOrigin)) throw failure('STAGING_MEMBERS_REQUIRED');
+  if (!postgres || !text(postgres.host) || !Number.isSafeInteger(postgres.port) || !text(postgres.password) || !text(centralDatabase)) throw failure('STAGING_ADMISSION_TARGET_INVALID');
+  const ownershipKey = prior?.ownershipKey ?? generateSecret(), journalKey = prior?.journalKey ?? generateSecret();
+  // The journal key opens the credentials of every database created so far: it is never regenerated over an existing file.
+  if (!SECRET_HEX.test(ownershipKey) || !SECRET_HEX.test(journalKey) || ownershipKey === journalKey) throw failure('STAGING_ADMISSION_SECRET_INVALID');
+  return { issuer, adminOrigin: member.adminOrigin, clientId: member.clientId, clientSecret: member.clientSecret, ownershipKey, journalKey,
+    postgres: { host: postgres.host, port: postgres.port, user: 'postgres', password: postgres.password, ssl: true }, centralDatabase,
+    authority: { user: 'c4g_authority_runtime', password: state.authorityPassword }, permitSecret: state.permitSecret,
+    policyVersion: AUTH_POLICY_VERSION, dataResidencyCode: REGION.regionCode, regionCode: REGION.regionCode, residencyPolicyVersion: REGION.residencyPolicyVersion };
+}
+
+module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, ADMISSION_CALLBACK_PATH, admissionWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });

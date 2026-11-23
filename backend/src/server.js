@@ -7,10 +7,10 @@ const {configuredCoverage}=require('./fundingTenders/coverageConfig');
 function duration(env,name,fallback){const value=env[name]===undefined?fallback:Number(env[name]);if(!Number.isSafeInteger(value)||value<1||value>300000)throw new TypeError(`${name} must be an integer between 1 and 300000.`);return value;}
 
 async function start({production=null,dependencies=null,env=process.env,host=undefined,installSignals=true,
-  telemetry=null,dependencyLoader=null,composer=null,memberOnboardingLoader=null}={}) {
+  telemetry=null,dependencyLoader=null,composer=null,memberOnboardingLoader=null,entityAdmissionLoader=null}={}) {
   const graceMs=duration(env,'API_SHUTDOWN_GRACE_MS',10000),settleMs=duration(env,'API_SHUTDOWN_SETTLE_MS',10000);
   const owner=createResourceOwner(),ownedPools=[];
-  let server,drain,stopping,telemetryOwned=false,draining=false,lifecycleStarted=false,members=null,activation=null;
+  let server,drain,stopping,telemetryOwned=false,draining=false,lifecycleStarted=false,members=null,activation=null,admission=null,admissionPages=null;
   const record=event=>production?.logger.info('c4g.api.lifecycle',{component:'server',operation:'api.shutdown',outcome:'observed',phase:event.phase,elapsedMs:event.elapsedMs});
   const signals=['SIGTERM','SIGINT'];
   async function stopLifecycle(){if(lifecycleStarted){const result=await production.observability.lifecycle.stop();if(result?.errorCode)throw new Error('API_OBSERVABILITY_SHUTDOWN_FAILED');}}
@@ -43,15 +43,20 @@ async function start({production=null,dependencies=null,env=process.env,host=und
       // Member invitations (MEMBER_ONBOARDING_RUNTIME=central): the service joins the composition; its pages and bridge start after readiness.
       members=(memberOnboardingLoader||require('./platformOnboarding/memberRuntime').configuredMemberOnboarding)({env,express:dependencies.express});
       if(members){owner.own(members,()=>members.close());dependencies={...dependencies,createMemberOnboarding:members.createMemberOnboarding,createUserDeletion:members.createUserDeletion};}
+      // Entity admission (ENTITY_ADMISSION_RUNTIME=central) builds on the member runtime; its pages start after the member pages.
+      admission=(entityAdmissionLoader||require('./entityAdmission/admissionRuntime').configuredEntityAdmission)({env,express:dependencies.express,members,centralPool:dependencies.centralPool});
+      if(admission){owner.own(admission,()=>admission.close());dependencies={...dependencies,createAdmission:admission.createAdmission,tenantCredentialResolver:admission.credentialResolver};}
       production=(composer||composition.createProductionComposition)({dependencies,env});
     }
     await production.assertDatabaseReadiness();
     if(members)activation=await members.start();
+    if(admission)admissionPages=await admission.start();
     production.observability.lifecycle.start();lifecycleStarted=true;
     const work=trackExpress(production.app);
     server=http.createServer((req,res)=>{
       if(draining){res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store','Connection':'close'});res.end('{"error":{"code":"SERVICE_UNAVAILABLE"}}');return;}
       if(activation?.handles(req.url)){activation.handler(req,res);return;}
+      if(admissionPages?.handles(req.url)){admissionPages.handler(req,res);return;}
       production.app(req,res);
     });
     const watched=watchServer(server);

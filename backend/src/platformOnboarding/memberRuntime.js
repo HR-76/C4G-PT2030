@@ -46,14 +46,21 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   const settings = readSettings(directory, env);
   const port = bridgePort(env);
   const worker = createWorker(path.join(directory, 'worker.json'));
-  let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null;
+  let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null, bridgeFallback = null, projectionFallback = null;
 
   function createMemberOnboarding({ authorityCoordinator, authConfig, prepareEmail, deliveryHistory }) {
     service = createService({ coordinator: authorityCoordinator, issuer: settings.issuer, policyVersion: authConfig.policyVersion,
       assuranceRequirements: authConfig.assurancePolicy[authConfig.privilegedLoginCategory], mfaPolicyCode: 'USER_OPTIONAL',
       dataResidencyCode: settings.dataResidencyCode,
       identity: { ensure: value => worker.call('identity', value) },
-      projection: { ensure: value => worker.call('projection', value) },
+      // The member worker only knows the organizations of its own file. A person of an entity created by admission is
+      // projected by the fallback (the admission worker), if one was set; any other failure is never retried there.
+      projection: { ensure: async value => {
+        try { return await worker.call('projection', value); } catch (error) {
+          if (!projectionFallback || error?.code !== 'ONBOARDING_NOT_READY') throw error;
+          return projectionFallback(value);
+        }
+      } },
       // The adapter needs the service, so it only exists after start(); activation cannot be reached before that.
       verification: { verify: value => { if (!oidc) throw invalid('ACTIVATION_INVALID'); return oidc.verify(value); } },
       prepareEmail, deliveryHistory,
@@ -72,7 +79,11 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
       oidc = await createOidc({ issuer: settings.issuer, origin: settings.origin, manualClientId: settings.manualClientId,
         existingClientId: settings.existingClientId, callbackPath: ACTIVATION_PATH + '/callback', service,
         passwordReady: subject => worker.call('passwordReady', { subject }) });
-      const activation = require('./activationHttp').createActivationHttp({ express, service, oidc, origin: settings.origin,
+      // Keycloak consults one bridge. A ticket that is not a member invitation goes to the fallback (entity admission), if one was set.
+      const bridgeOidc = { ...oidc, async bridge(ticket, subject) {
+        try { return await oidc.bridge(ticket, subject); } catch (error) { if (!bridgeFallback) throw error; return bridgeFallback(ticket, subject); }
+      } };
+      const activation = require('./activationHttp').createActivationHttp({ express, service, oidc: bridgeOidc, origin: settings.origin,
         identityOrigin: new URL(settings.issuer).origin, bridgeSecret: settings.bridgeSecret });
       const app = express();
       app.disable('x-powered-by');
@@ -104,7 +115,15 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
       identity:{remove:value=>worker.call('deleteIdentity',value)},projection:{anonymize:value=>worker.call('erasePerson',value)}});
     return deletionService;
   }
-  return Object.freeze({ createMemberOnboarding, createUserDeletion, start, close });
+  function setBridgeFallback(check) {
+    if (typeof check !== 'function') throw invalid('ACTIVATION_BRIDGE_FALLBACK_INVALID');
+    bridgeFallback = check;
+  }
+  function setProjectionFallback(project) {
+    if (typeof project !== 'function') throw invalid('MEMBER_PROJECTION_FALLBACK_INVALID');
+    projectionFallback = project;
+  }
+  return Object.freeze({ createMemberOnboarding, createUserDeletion, setBridgeFallback, setProjectionFallback, start, close });
 }
 
-module.exports = { configuredMemberOnboarding, ACTIVATION_PATH, BRIDGE_PORT };
+module.exports = { configuredMemberOnboarding, readSettings, ACTIVATION_PATH, BRIDGE_PORT };

@@ -228,7 +228,9 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
     }
     {
       const runtimeDependencies=dependencies.opportunityRuntimeDependencies || require('./config/opportunityRuntime')
-        .createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,env,editorialEnabled:editorialRuntime==='f13-editorial',documentsEnabled:env.DOCUMENTS_RUNTIME==='f11-r2'});
+        .createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,env,editorialEnabled:editorialRuntime==='f13-editorial',documentsEnabled:env.DOCUMENTS_RUNTIME==='f11-r2',
+          // Entity admission: tenants created after start-up are not in the configured list; their API login comes from the admission worker.
+          credentialResolver:dependencies.tenantCredentialResolver});
       functionalRuntimeDependencies=runtimeDependencies;
       authorityCoordinator.registerRuntimeRecovery(require('./security/tenantAuthorityRecovery').createTenantAuthorityRecovery(runtimeDependencies));
       if (env.F12_RECEIPT_RECOVERY_DATABASE_URL) {
@@ -313,7 +315,7 @@ function createProductionComposition({ dependencies, env, logger = null, isolate
   if(editorialRuntime==='f13-editorial'){
     if(!functionalRuntimeDependencies){
       functionalRuntimeDependencies=dependencies.opportunityRuntimeDependencies||require('./config/opportunityRuntime')
-        .createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,env,editorialEnabled:true});
+        .createConfiguredOpportunityRuntime({centralPool,authorityCoordinator,env,editorialEnabled:true,credentialResolver:dependencies.tenantCredentialResolver});
       if(!dependencies.opportunityRuntimeDependencies){
         ownedOpportunityPoolManager=functionalRuntimeDependencies.poolManager;
         closeOwnedTenantPools=dependencies.ownResource?.(ownedOpportunityPoolManager,()=>ownedOpportunityPoolManager.closeAll())||(()=>ownedOpportunityPoolManager.closeAll());

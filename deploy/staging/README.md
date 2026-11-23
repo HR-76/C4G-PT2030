@@ -304,6 +304,58 @@ Depois de um `upgrade` do tenant, repete o passo 3: o `worker.json` guarda o est
 
 **Voltar atrás:** retira as duas linhas `MEMBER_ONBOARDING_` do `api-private.env` e recria a API (`up -d --force-recreate api`). As páginas voltam a 503; as contas e os clientes criados no Keycloak ficam.
 
+## Adesão de novas entidades
+
+Liga «Convidar uma entidade» (Administração C4G → Entidades), a ficha da entidade e a criação da base própria de cada entidade nova. Contrato: [staging-entity-admission.md](../../context/features/staging-entity-admission.md). **Ainda não foi ensaiado na VPS** (fase 5 do contrato): seguir estes passos é o ensaio. Exige os convites de utilizadores já ligados (secção anterior).
+
+O que muda: os dois clientes de ativação do Keycloak passam a aceitar também o retorno `/api/admission-activation/callback`; a API ganha um processo interno com o login de administração do PostgreSQL, que cria uma base `c4g_onb_<id>` por entidade; a pasta `/srv/c4g-staging/admissions` passa a guardar, cifradas, as credenciais dessas bases.
+
+**1. Pasta e ficheiro do worker.** Corre na rede do contentor do Keycloak, como o passo 3 dos convites. Repetir mantém as chaves já escritas:
+
+```bash
+cd /srv/c4g-staging/src && export C4G_RELEASE=$(git rev-parse --short HEAD)
+install -d -m 700 -o 1000 -g 1000 /srv/c4g-staging/admissions
+install -m 600 /dev/null /srv/c4g-staging/keycloak-admin.env
+read -rp 'Administrador do Keycloak: ' V1; read -rsp 'Palavra-passe (não aparece): ' V2; echo
+printf 'C4G_KEYCLOAK_ADMIN_USER=%s\nC4G_KEYCLOAK_ADMIN_PASSWORD=%s\n' "$V1" "$V2" > /srv/c4g-staging/keycloak-admin.env; unset V1 V2
+docker run --rm --user 0:0 --network container:c4g-staging-keycloak-keycloak-1 --env-file /srv/c4g-staging/postgres/.env --env-file /srv/c4g-staging/api-oidc.env --env-file /srv/c4g-staging/keycloak-admin.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/members:/members:ro -v /srv/c4g-staging/admissions:/admissions c4g-staging-api:$C4G_RELEASE node scripts/staging/install.js admission
+rm -f /srv/c4g-staging/keycloak-admin.env
+```
+
+Esperado: `{"configured":true,"realm":"c4g-staging","clients":["c4g-member-activation","c4g-member-existing"],"files":["worker.json"]}`. Códigos de recusa: `STAGING_MEMBERS_REQUIRED` (falta o `worker.json` dos convites), `STAGING_MEMBER_CLIENTS_INVALID` (os clientes não foram criados por esta instalação), `STAGING_ADMISSION_REDIRECT_NOT_APPLIED` (o Keycloak não guardou a alteração), `STAGING_KEYCLOAK_ADMIN_REQUIRED` ou `…_REFUSED` (credenciais de administração).
+
+**2. Confirmar que a Central tem as tabelas da adesão** (devem ser duas linhas com `t`):
+
+```bash
+docker exec c4g-staging-postgres-db-1 psql -U postgres -d c4g_central_staging -Atc "select to_regclass('public.entity_admission') is not null; select to_regclass('public.entity_admission_invitation') is not null"
+```
+
+**3. Ativar.** Só a API é recriada:
+
+```bash
+F=/srv/c4g-staging/api-private.env; grep -q '^ENTITY_ADMISSION_RUNTIME=' $F || printf 'ENTITY_ADMISSION_RUNTIME=central\nENTITY_ADMISSION_DIRECTORY=/admissions\n' >> $F
+docker compose -f deploy/staging/compose.yaml up -d --force-recreate api
+sleep 60; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
+```
+
+Se a API não ficar pronta, o worker não arrancou (ficheiro recusado ou emissor diferente de `OIDC_ISSUER`): volta atrás e repete o passo 1.
+
+**4. Ensaio (tu, no navegador).** Como Admin C4G, em Entidades, «Convidar uma entidade» com um endereço teu; abrir a ligação mostrada, definir a palavra-passe, preencher a ficha e submeter. Dentro de alguns segundos deve existir uma base nova:
+
+```bash
+docker exec c4g-staging-postgres-db-1 psql -U postgres -Atc "select datname from pg_database where datname like 'c4g\_onb\_%'"
+```
+
+**Depois de existirem entidades novas:**
+
+- `upgrade` (sem `--apply`) mostra-as em `onboardedTenants`. Com passos tenant por aplicar, `upgrade --apply` recusa com `STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED`, porque só migra a base da entidade instalada. `upgrade --apply --skip-onboarded` prossegue; as entidades novas ficam no esquema anterior e podem ficar indisponíveis.
+- A retenção do chat (90 dias) e a eliminação de utilizadores não abrangem as entidades novas.
+- As cópias de segurança abrangem-nas sem mais passos.
+
+**Guardar fora da VPS:** a pasta `/srv/c4g-staging/admissions` inteira (`worker.json` e as subpastas `credentials` e `provisioning`). Sem ela, ou sem a `journalKey` que está no `worker.json`, a API deixa de conseguir entrar nas bases das entidades novas, mesmo com as cópias de segurança das bases. Não apagues nem regeneres o `worker.json`.
+
+**Voltar atrás:** retira as duas linhas `ENTITY_ADMISSION_` do `api-private.env` e recria a API (`up -d --force-recreate api`). As rotas de adesão deixam de existir; as bases já criadas, os registos na Central e as contas no Keycloak ficam, e as entidades novas ficam inacessíveis até a adesão voltar a ser ligada.
+
 ## Limites conhecidos
 
 - O catálogo e o Dashboard ficam ativos mas **vazios**: a recolha de oportunidades (worker e fontes) ainda não está ligada.

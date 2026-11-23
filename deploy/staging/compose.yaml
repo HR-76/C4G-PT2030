@@ -48,6 +48,9 @@ services:
       # Configuração dos convites (http.json e worker.json), escrita pelo comando "members". Só é lida com
       # MEMBER_ONBOARDING_RUNTIME=central.
       - /srv/c4g-staging/members:/members:ro
+      # Adesão de novas entidades (worker.json, escrito pelo comando "admission", e os registos cifrados das bases criadas).
+      # Gravável: o worker guarda aqui as credenciais de cada base nova. Só é lida com ENTITY_ADMISSION_RUNTIME=central.
+      - /srv/c4g-staging/admissions:/admissions
 
   # Antivírus dos ficheiros enviados (PDFs de faturação, carregamento PT2030). Partilha a rede do "pod" com a API e escuta em
   # 127.0.0.1:3310 dentro dela; não tem porta publicada.

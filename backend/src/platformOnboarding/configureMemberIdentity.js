@@ -1,4 +1,7 @@
 'use strict';
+// The activation clients return to the member pages and, once entity admission is installed, also to the admission pages.
+// Any other address is drift.
+const allowedRedirects=(uris,origin)=>Array.isArray(uris)&&uris.includes(origin+'/api/activation/callback')&&uris.every(uri=>[origin+'/api/activation/callback',origin+'/api/admission-activation/callback'].includes(uri))&&new Set(uris).size===uris.length;
 // Explicit installer only; never called by an HTTP request.
 async function configureMemberIdentity({kc,origin,installationId,browserFlowId}){
  const marker={'c4g.member.installation':installationId};
@@ -15,7 +18,7 @@ async function configureMemberIdentity({kc,origin,installationId,browserFlowId})
  async function client(clientId,body){const found=await kc('clients?clientId='+clientId);if(found.length>1||found.length===1&&found[0].attributes?.['c4g.member.installation']!==installationId)throw Error('MEMBER_CLIENT_OWNERSHIP_CONFLICT');if(!found.length)await kc('clients','POST',{clientId,enabled:true,protocol:'openid-connect',attributes:marker,...body});return (await kc('clients?clientId='+clientId))[0];}
  for(const [clientId,id] of [['c4g-member-activation',flow.id],['c4g-member-existing',browserFlowId]]){
   const c=await client(clientId,{publicClient:true,standardFlowEnabled:true,directAccessGrantsEnabled:false,redirectUris:[origin+'/api/activation/callback'],webOrigins:[origin],attributes:{...marker,'pkce.code.challenge.method':'S256'},authenticationFlowBindingOverrides:{browser:id}});
-  if(!c.publicClient||c.directAccessGrantsEnabled||c.redirectUris?.length!==1||c.redirectUris[0]!==origin+'/api/activation/callback'||c.authenticationFlowBindingOverrides?.browser!==id||c.attributes?.['pkce.code.challenge.method']!=='S256')throw Error('MEMBER_CLIENT_DRIFT');
+  if(!c.publicClient||c.directAccessGrantsEnabled||!allowedRedirects(c.redirectUris,origin)||c.authenticationFlowBindingOverrides?.browser!==id||c.attributes?.['pkce.code.challenge.method']!=='S256')throw Error('MEMBER_CLIENT_DRIFT');
  }
  const worker=await client('c4g-member-worker',{publicClient:false,standardFlowEnabled:false,directAccessGrantsEnabled:false,serviceAccountsEnabled:true});
  if(worker.publicClient||worker.standardFlowEnabled||worker.directAccessGrantsEnabled||!worker.serviceAccountsEnabled)throw Error('MEMBER_CLIENT_DRIFT');
@@ -24,4 +27,4 @@ async function configureMemberIdentity({kc,origin,installationId,browserFlowId})
  await kc('users/'+serviceUser.id+'/role-mappings/clients/'+management.id,'POST',roles);
  return {clientId:worker.clientId,clientSecret:(await kc('clients/'+worker.id+'/client-secret')).value,manualClientId:'c4g-member-activation',existingClientId:'c4g-member-existing'};
 }
-module.exports={configureMemberIdentity};
+module.exports={configureMemberIdentity,allowedRedirects};
