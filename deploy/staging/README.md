@@ -350,7 +350,7 @@ docker exec c4g-staging-postgres-db-1 psql -U postgres -Atc "select datname from
 
 **Depois de existirem entidades novas:**
 
-- `upgrade` (sem `--apply`) mostra-as em `onboardedTenants`. Com passos tenant por aplicar, `upgrade --apply` recusa com `STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED`, porque só migra a base da entidade instalada. `upgrade --apply --skip-onboarded` prossegue; as entidades novas ficam no esquema anterior e podem ficar indisponíveis.
+- Uma base nova nasce no esquema base (033). `upgrade` (sem `--apply`) mostra cada uma em `onboardedTenants`, com a versão atual e os passos em falta; `upgrade --apply` aplica-os, depois da Central e da entidade instalada. Corre-o depois de cada entidade criada. Se uma base recusar um passo, o comando pára e escreve `STAGING_UPGRADE_ONBOARDED_TENANT_FAILED <base> from=<versão> <código>`; `--skip-onboarded` deixa as bases da adesão como estão.
 - A retenção do chat (90 dias) e a eliminação de utilizadores não abrangem as entidades novas.
 - As cópias de segurança abrangem-nas sem mais passos.
 

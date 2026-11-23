@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { admission, assertOnboardedTenantsCovered, ONBOARDED_TENANTS_SQL, main } = require('../scripts/staging/install');
+const { admission, applyTenantSteps, pendingTenantSteps, ONBOARDED_TENANTS_SQL, TENANT_STEPS, main } = require('../scripts/staging/install');
 const { admissionWorkerConfiguration } = require('../scripts/staging/environment');
 const { readSettings } = require('../src/entityAdmission/provisioningWorker');
 const { allowedRedirects } = require('../src/platformOnboarding/configureMemberIdentity');
@@ -121,15 +121,65 @@ test('repeating the member setup accepts the admission return address and still 
   }
 });
 
-test('upgrade never leaves entities created by admission behind without being told to', async t => {
-  const refused = input => assert.throws(() => assertOnboardedTenantsCovered(input), { code: 'STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED' });
-  refused({ apply: true, pendingTenant: ['041_x'], onboarded: ['c4g_onb_a'], skip: false });
-  for (const allowed of [{ apply: false, pendingTenant: ['041_x'], onboarded: ['c4g_onb_a'], skip: false }, { apply: true, pendingTenant: [], onboarded: ['c4g_onb_a'], skip: false },
-    { apply: true, pendingTenant: ['041_x'], onboarded: [], skip: false }, { apply: true, pendingTenant: ['041_x'], onboarded: ['c4g_onb_a'], skip: true }]) assert.doesNotThrow(() => assertOnboardedTenantsCovered(allowed));
-  assert.match(ONBOARDED_TENANTS_SQL, /^SELECT database_ref FROM public\.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '\^c4g_onb_'/);
+test('upgrade lists the admission databases with the identity Central recorded and what each still needs', async t => {
+  assert.match(ONBOARDED_TENANTS_SQL, /^SELECT database_ref, tenant_id, database_generation_id FROM public\.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '\^c4g_onb_' ORDER BY database_ref$/);
+  assert.deepEqual(pendingTenantSteps('033_organizational_opportunity_interests').map(([to]) => to), TENANT_STEPS.map(([to]) => to));
+  assert.deepEqual(pendingTenantSteps('039_document_deletion').map(([to]) => to), ['040_application_chat_retention', '041_account_identity_erasure']);
+  assert.deepEqual(pendingTenantSteps(TENANT_STEPS.at(-1)[0]), []);
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-staging-upgrade-'));
   t.after(() => fs.rmSync(folder, { recursive: true, force: true }));
   const env = { POSTGRES_PASSWORD: 'synthetic', C4G_STAGING_STATE: path.join(folder, 'missing.json') };
   await assert.rejects(() => main(['upgrade', '--apply', '--skip-onboarded'], env), { code: 'STAGING_INSTALLATION_NOT_READY' }, 'the flag is accepted');
   await assert.rejects(() => main(['admission', '--bogus'], env), { code: 'STAGING_ARGUMENT_INVALID' });
+});
+
+// One tenant database and a Central that records what it is told; every dependency of a step is a recorder.
+function migrationHarness({ failAt = null, wrongVersionAt = null } = {}) {
+  const events = [], tenant = { name: 'tenant-pool' }, central = { name: 'central-pool' };
+  let version = '033';
+  const dependencies = {
+    runners: { marker: 'runners' },
+    nativePool: pool => ({ native: pool }),
+    async withInstallerAuthority(pool, options, work) {
+      events.push(['elevate', pool === central, options.targets[0] === central]);
+      let demoted = false;
+      try { return await work({ async demote() { demoted = true; events.push(['demote']); } }); } finally { if (!demoted) events.push(['demote-on-failure']); }
+    },
+    async preflightTenant(pool, identity, manifest, options) { events.push(['preflight', pool === tenant, identity.tenantId, manifest, options.timeoutMs]); return { tenantId: identity.tenantId, currentVersion: wrongVersionAt === version ? 'other' : version, schemaFingerprint: 'fp-' + version, capabilities: [] }; },
+    async syncCentralObservation(input) { events.push(['sync', input.central === central, input.tenantId, input.observation.currentVersion, input.apply, input.installationId]); return { status: 'PUBLISHED' }; }
+  };
+  const step = to => [to, (runners, options) => ({ async migrate(input) {
+    events.push(['migrate', to, runners === dependencies.runners, options.pool.native === tenant, input.tenantId, input.databaseGenerationId, input.idempotencyKey]);
+    if (failAt === to) throw Object.assign(new Error('TENANT_MIGRATION_OWNER_MISMATCH'), { code: 'TENANT_MIGRATION_OWNER_MISMATCH' });
+    version = to;
+  } })];
+  return { events, tenant, central, dependencies, step };
+}
+const IDENTITY = { tenantId: 'e168701f-6e1f-4938-93fd-a1ff934a91c3', databaseGenerationId: '11111111-1111-4111-8111-111111111111' };
+
+test('each registered step is applied to the given database, verified and told to Central before the next one', async () => {
+  const h = migrationHarness(), seen = [];
+  const applied = await applyTenantSteps({ steps: [h.step('034'), h.step('035')], central: h.central, tenant: h.tenant, identity: IDENTITY, installationId: 'installation-1',
+    onStep: observation => { seen.push(observation.currentVersion); }, dependencies: h.dependencies });
+  assert.deepEqual(applied, ['034:PUBLISHED', '035:PUBLISHED']);
+  assert.deepEqual(seen, ['034', '035']);
+  assert.deepEqual(h.events, [
+    ['elevate', true, true], ['migrate', '034', true, true, IDENTITY.tenantId, IDENTITY.databaseGenerationId, `installation-1-${IDENTITY.tenantId}-034`], ['demote'],
+    ['preflight', true, IDENTITY.tenantId, undefined, 15000], ['sync', true, IDENTITY.tenantId, '034', true, 'installation-1'],
+    ['elevate', true, true], ['migrate', '035', true, true, IDENTITY.tenantId, IDENTITY.databaseGenerationId, `installation-1-${IDENTITY.tenantId}-035`], ['demote'],
+    ['preflight', true, IDENTITY.tenantId, undefined, 15000], ['sync', true, IDENTITY.tenantId, '035', true, 'installation-1']]);
+  assert.deepEqual(await applyTenantSteps({ steps: [], central: h.central, tenant: h.tenant, identity: IDENTITY, installationId: 'installation-1', dependencies: h.dependencies }), []);
+});
+
+test('a refused step stops that database at once, with the elevated window closed and Central untouched for it', async () => {
+  const h = migrationHarness({ failAt: '035' });
+  await assert.rejects(applyTenantSteps({ steps: [h.step('034'), h.step('035'), h.step('036')], central: h.central, tenant: h.tenant, identity: IDENTITY, installationId: 'i', dependencies: h.dependencies }),
+    { code: 'TENANT_MIGRATION_OWNER_MISMATCH' });
+  assert.deepEqual(h.events.map(event => event[0] + (event[1] && typeof event[1] === 'string' ? ':' + event[1] : '')),
+    ['elevate', 'migrate:034', 'demote', 'preflight', 'sync', 'elevate', 'migrate:035', 'demote-on-failure']);
+  const wrong = migrationHarness({ wrongVersionAt: '034' });
+  await assert.rejects(applyTenantSteps({ steps: [wrong.step('034'), wrong.step('035')], central: wrong.central, tenant: wrong.tenant, identity: IDENTITY, installationId: 'i', dependencies: wrong.dependencies }),
+    { code: 'STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED' });
+  assert.equal(wrong.events.some(event => event[0] === 'sync'), false, 'a database on an unexpected version is never recorded in Central');
+  assert.equal(wrong.events.filter(event => event[0] === 'migrate').length, 1);
 });

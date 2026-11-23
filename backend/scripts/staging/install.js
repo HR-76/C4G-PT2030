@@ -267,15 +267,40 @@ async function ledgerHead(pool, sql) {
   return (await pool.query(sql)).rows[0]?.version;
 }
 
-// Brings Central to 053 and the tenant to 041. Without --apply it reports what is pending and changes nothing.
-// The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
-// Databases created by entity admission (context/features/staging-entity-admission.md). Applying tenant steps only to the
-// installed tenant would leave them on an older schema without notice, so that is refused unless it is asked for by name.
-const ONBOARDED_TENANTS_SQL = "SELECT database_ref FROM public.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '^c4g_onb_' ORDER BY database_ref";
-function assertOnboardedTenantsCovered({ apply, pendingTenant, onboarded, skip }) {
-  if (apply && pendingTenant.length > 0 && onboarded.length > 0 && !skip) throw refuse('STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED');
+// Databases created by entity admission (context/features/staging-entity-admission.md): each is a tenant of its own, with
+// the identity Central recorded for it. They are created on the base schema and receive the same registered steps.
+const ONBOARDED_TENANTS_SQL = "SELECT database_ref, tenant_id, database_generation_id FROM public.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '^c4g_onb_' ORDER BY database_ref";
+const TENANT_HEAD_SQL = 'SELECT migration_id AS version FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1';
+const pendingTenantSteps = head => TENANT_STEPS.filter(([to]) => to > head);
+
+// Applies the given registered steps to one tenant database, in order. After each step the database must be exactly on
+// that version, and Central is told before the next step starts. Stops at the first failure; nothing is skipped.
+async function applyTenantSteps({ steps, central, tenant, identity, installationId, onStep = () => {}, dependencies = {} }) {
+  const runners = dependencies.runners || require('../../src/security/tenantMigrationRunner');
+  const preflight = dependencies.preflightTenant || require('../../src/security/tenantMigrationPreflight').preflightTenant;
+  const authority = dependencies.withInstallerAuthority || withInstallerAuthority;
+  const native = dependencies.nativePool || nativePool;
+  const sync = dependencies.syncCentralObservation || syncCentralObservation;
+  const applied = [];
+  for (const [to, createRunner] of steps) {
+    await authority(central, { targets: [central] }, async ({ demote }) => {
+      await createRunner(runners, { pool: native(tenant), observationPublisher: { async publish() {} }, timeoutMs: 30000,
+        scheduler: { setTimeout, clearTimeout } }).migrate({ ...identity, expectedRevision: 1, correlationId: installationId,
+        idempotencyKey: `${installationId}-${identity.tenantId}-${to}` });
+      await demote();
+    });
+    const observation = await preflight(tenant, identity, undefined, { timeoutMs: 15000 });
+    if (observation.currentVersion !== to) throw refuse('STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED');
+    const synced = await sync({ central, observation, tenantId: identity.tenantId, installationId, apply: true });
+    await onStep(observation);
+    applied.push(`${to}:${synced.status}`);
+  }
+  return applied;
 }
 
+// Brings Central to 053 and every tenant to 041: the installed one first, then each database created by admission.
+// Without --apply it reports what is pending and changes nothing. --skip-onboarded leaves the admission databases alone.
+// The migrations are irreversible: staging holds synthetic data only, so no backup is taken here.
 async function upgrade(env, args) {
   const { config, stateFile } = settings(env);
   const state = readState(stateFile);
@@ -283,18 +308,27 @@ async function upgrade(env, args) {
   const central = new Pool(connection(config, config.centralDatabase));
   const tenant = new Pool(connection(config, config.tenantDatabase));
   const persist = value => saveState(value, stateFile);
+  const onboardedPools = [];
   try {
     const centralHead = () => ledgerHead(central, 'SELECT version FROM public.c4g_schema_migration ORDER BY version DESC LIMIT 1');
-    const tenantHead = () => ledgerHead(tenant, 'SELECT migration_id AS version FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1');
+    const tenantHead = () => ledgerHead(tenant, TENANT_HEAD_SQL);
     const report = { applied: Boolean(args.apply), central: { from: await centralHead(), steps: [] }, tenant: { from: await tenantHead(), steps: [] } };
     const pendingCentral = CENTRAL_STEPS.filter(([to]) => to > report.central.from);
-    const pendingTenant = TENANT_STEPS.filter(([to]) => to > report.tenant.from);
-    // Entities created by admission have their own databases, which this command does not migrate yet.
-    report.onboardedTenants = (await central.query(ONBOARDED_TENANTS_SQL)).rows.map(row => row.database_ref);
-    assertOnboardedTenantsCovered({ apply: Boolean(args.apply), pendingTenant: pendingTenant.map(([to]) => to), onboarded: report.onboardedTenants, skip: args['skip-onboarded'] === true });
+    const pendingTenant = pendingTenantSteps(report.tenant.from);
+    const skipOnboarded = args['skip-onboarded'] === true;
+    const onboarded = [];
+    for (const row of (await central.query(ONBOARDED_TENANTS_SQL)).rows) {
+      const pool = new Pool(connection(config, row.database_ref));
+      onboardedPools.push(pool);
+      const from = await ledgerHead(pool, TENANT_HEAD_SQL);
+      onboarded.push({ pool, identity: { tenantId: row.tenant_id, databaseGenerationId: row.database_generation_id },
+        entry: { database: row.database_ref, from, ...(skipOnboarded ? { skipped: true } : {}), steps: [] }, pending: pendingTenantSteps(from) });
+    }
+    report.onboardedTenants = onboarded.map(item => item.entry);
     if (!args.apply) {
       report.central.pending = pendingCentral.map(([to]) => to);
       report.tenant.pending = pendingTenant.map(([to]) => to);
+      for (const item of onboarded) item.entry.pending = item.pending.map(([to]) => to);
       return report;
     }
     const run = require('../runCentralMigrations');
@@ -305,28 +339,29 @@ async function upgrade(env, args) {
       if (checked.currentVersion !== to) throw refuse('STAGING_UPGRADE_CENTRAL_VERSION_UNEXPECTED');
       report.central.steps.push(to);
     }
-    const runners = require('../../src/security/tenantMigrationRunner');
-    const { preflightTenant } = require('../../src/security/tenantMigrationPreflight');
-    const identity = { tenantId: state.tenantId, databaseGenerationId: state.generationId };
-    for (const [to, createRunner] of pendingTenant) {
-      await withInstallerAuthority(central, { targets: [central] }, async ({ demote }) => {
-        await createRunner(runners, { pool: nativePool(tenant), observationPublisher: { async publish() {} }, timeoutMs: 30000,
-          scheduler: { setTimeout, clearTimeout } }).migrate({ ...identity, expectedRevision: 1, correlationId: state.installationId,
-          idempotencyKey: `${state.installationId}-${to}` });
-        await demote();
-      });
-      const observation = await preflightTenant(tenant, identity, undefined, { timeoutMs: 15000 });
-      if (observation.currentVersion !== to) throw refuse('STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED');
-      const synced = await syncCentralObservation({ central, observation, tenantId: state.tenantId, installationId: state.installationId, apply: true });
-      state.snapshot.schema = { ...state.snapshot.schema, currentVersion: observation.currentVersion, schemaFingerprint: observation.schemaFingerprint,
-        verifiedCapabilities: Object.fromEntries(observation.capabilities.map(code => [code, true])) };
-      persist(state);
-      report.tenant.steps.push(`${to}:${synced.status}`);
-    }
+    report.tenant.steps = await applyTenantSteps({ steps: pendingTenant, central, tenant, installationId: state.installationId,
+      identity: { tenantId: state.tenantId, databaseGenerationId: state.generationId },
+      onStep(observation) {
+        state.snapshot.schema = { ...state.snapshot.schema, currentVersion: observation.currentVersion, schemaFingerprint: observation.schemaFingerprint,
+          verifiedCapabilities: Object.fromEntries(observation.capabilities.map(code => [code, true])) };
+        persist(state);
+      } });
     report.central.to = await centralHead();
     report.tenant.to = await tenantHead();
+    // Only after the installed tenant is complete. One admission database failing stops the command: the ones before it
+    // stay migrated, the ones after it untouched, and the line below names it (codes only).
+    for (const item of skipOnboarded ? [] : onboarded) {
+      try {
+        item.entry.steps = await applyTenantSteps({ steps: item.pending, central, tenant: item.pool, identity: item.identity, installationId: state.installationId });
+      } catch (error) {
+        const code = [error?.code, error?.message].find(text => typeof text === 'string' && /^[A-Z0-9_]{3,80}$/.test(text)) || 'UNCLASSIFIED';
+        console.error(`STAGING_UPGRADE_ONBOARDED_TENANT_FAILED ${item.entry.database} from=${await ledgerHead(item.pool, TENANT_HEAD_SQL).catch(() => '?')} ${code}`);
+        throw refuse('STAGING_UPGRADE_ONBOARDED_TENANT_FAILED');
+      }
+      item.entry.to = await ledgerHead(item.pool, TENANT_HEAD_SQL);
+    }
     return report;
-  } finally { await central.end(); await tenant.end(); }
+  } finally { await central.end(); await tenant.end(); await Promise.all(onboardedPools.map(pool => pool.end().catch(() => {}))); }
 }
 
 // Keycloak administration API for one realm, as the installer sees it from inside the Keycloak container's network.
@@ -500,4 +535,4 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
-module.exports = { main, members, admission, assertOnboardedTenantsCovered, ONBOARDED_TENANTS_SQL, CENTRAL_STEPS, TENANT_STEPS };
+module.exports = { main, members, admission, applyTenantSteps, pendingTenantSteps, ONBOARDED_TENANTS_SQL, CENTRAL_STEPS, TENANT_STEPS };

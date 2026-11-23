@@ -68,18 +68,17 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 
 - **Convites de utilizadores numa entidade nova.** O worker dos convites só conhece as organizações do seu ficheiro. Quando recusa uma pessoa por não conhecer a organização (`ONBOARDING_NOT_READY`), a projeção passa ao worker de adesão, que entra na base própria dessa entidade com o login API dela. Qualquer outra falha fica como estava e nunca chega ao worker de adesão.
 - **Região da projeção.** O worker de adesão projetava pessoas com a região por omissão do ambiente local; passa a usar a região e a política de residência do seu ficheiro. Sem isto, os convites numa entidade nova falhariam no staging.
-- **Upgrade do esquema.** O comando `upgrade` só migra a base da entidade instalada. Passa a listar as bases criadas pela adesão (`onboardedTenants`) e recusa aplicar passos tenant quando existem (`STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED`), para não as deixar num esquema antigo sem aviso. `--skip-onboarded` prossegue de forma explícita; os passos só da Central não são afetados.
+- **Upgrade do esquema.** Primeiro só uma guarda (recusa `STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED`); substituída no mesmo dia pela migração das bases da adesão, descrita em «Migração do esquema das bases da adesão».
 - **Cópias de segurança.** Já descobrem todas as bases `c4g_*` ([staging-backups.md](staging-backups.md)).
 
 **Por fazer (cada um exige contrato e prova própria)**
 
-- **Migrar as bases das entidades novas.** O `upgrade` teria de aplicar os passos tenant a cada base `c4g_onb_*` e sincronizar a observação na Central. O caminho existente só foi exercitado com a entidade instalada e não tem testes com base de dados; estendê-lo sem um gate em PostgreSQL descartável seria alterar migrações às cegas. Até lá, um upgrade tenant com entidades novas exige `--skip-onboarded`, e essas entidades podem ficar indisponíveis até serem migradas.
 - **Retenção do chat.** `CHAT_RETENTION_CREDENTIALS_JSON` é uma lista explícita por organização com o login WORKER. As entidades novas não entram: as suas conversas não são eliminadas aos 90 dias. O login WORKER delas existe no registo cifrado, mas a fronteira do worker só expõe o login API.
 - **Eliminação de utilizadores** (`USER_DELETION_RUNTIME=central`): a anonimização da pessoa no tenant só conhece as organizações do ficheiro dos convites.
 - **Rotação mensal das partições de auditoria** nas bases novas: o provisionamento cria as partições iniciais; a rotação por base não foi verificada.
 - **Documentos das candidaturas** continuam adiados no staging, para todas as entidades.
 
-## Fase 5 — ensaio na VPS (23/11/2026, em curso)
+## Fase 5 — ensaio na VPS (23/11/2026): segunda entidade criada, com limites
 
 **Passou:** o comando `admission` contra o Keycloak e o PostgreSQL reais; a API a arrancar com a adesão ligada; o convite, a ativação e a ficha no browser; a criação da base `c4g_onb_e168701f6e1f493893fda1ff934a91c3` com o esquema base (033).
 
@@ -90,7 +89,25 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 - **Correção.** `worker.json` passa a nomear os papéis dos dois agregadores (`tenantRoles`, obrigatório, sem valor por omissão) e o provisionador usa-os. O instalador escreve os mesmos que a instalação do staging concede. O worker guarda o passo e o código da última falha (nunca a mensagem), devolve-os em `health`, e a API escreve uma linha `C4G_ADMISSION_STEP_FAILED <passo>:<código>` por cada mudança. Depois de uma falha, a mesma adesão só é tentada de novo ao fim de 60 s.
 - **Por resolver.** A base nova fica no esquema 033 e o staging está no 041: os passos 034 a 041 só são aplicados pelo `upgrade`, que não migra bases criadas pela adesão (ver «Fase 4»). Uma entidade nova fica, por isso, sem as páginas que dependem desses passos.
 
+**Resultado depois da correção (commit `787a115`, mesmo dia).** O `REVOKE` repôs os papéis do agregador dos workers; o comando `admission` acrescentou `tenantRoles` ao `worker.json` mantendo as chaves; a adesão retomou do ponto onde tinha parado e chegou a `COMPLETE` em três tentativas (base, pessoa, credenciais), com a entidade «Teste» `ACTIVE` e o provisionamento `READY`, sem concessões a mais nos agregadores e sem linhas `C4G_ADMISSION_STEP_FAILED`. O administrador da entidade entrou e viu o Dashboard da entidade «Teste» (prova do resolvedor dinâmico de credenciais). A cópia de segurança descobriu a base nova e o teste de restauro repô-la com as 202 tabelas do manifesto.
+
+**Não verificado no ensaio:** criar uma candidatura na entidade nova e confirmar no browser que não aparece na entidade instalada; convidar um segundo utilizador para a entidade nova (o caminho da fase 4); as páginas que dependem dos passos 034 a 041.
+
 Lição: o provisionador só tinha sido provado em ambientes isolados, onde os papéis partilhados coincidem com os que ele assume. Qualquer passo que altere papéis ou concessões partilhadas pelo cluster tem de ser comparado com o ambiente de destino antes de correr.
+
+## Migração do esquema das bases da adesão (23/11/2026, em Review, por ensaiar)
+
+Pedido do utilizador depois do ensaio: a entidade «Teste» ficou no esquema 033 e o staging está no 041.
+
+- **O que muda.** O comando `upgrade` passa a tratar cada base `c4g_onb_*` registada e não retirada na Central como um tenant próprio, com a identidade que a Central guardou (`tenant_id`, `database_generation_id`). Aplica-lhe os mesmos passos registados (034 a 041) e pelo mesmo caminho da entidade instalada: janela de autoridade do instalador, verificação de que a base ficou exatamente na versão do passo e publicação da observação na Central antes do passo seguinte.
+- **Ordem.** Primeiro a Central, depois a entidade instalada, só depois as bases da adesão, uma a uma por ordem de nome. Os passos em falta são calculados por base.
+- **Falha.** A primeira recusa pára o comando. As bases anteriores ficam migradas e as seguintes intactas; a linha `STAGING_UPGRADE_ONBOARDED_TENANT_FAILED <base> from=<versão> <código>` diz onde parou. Uma base cuja versão não coincide com a do passo nunca é registada na Central.
+- **Sem `--apply`** o relatório lista cada base com a versão atual e os passos em falta e não altera nada. `--skip-onboarded` deixa as bases da adesão como estão. A recusa `STAGING_UPGRADE_ONBOARDED_TENANTS_UNSUPPORTED` deixou de existir.
+- **O que não muda.** Os passos, os seus pacotes e as verificações de `backend/src/security` são os mesmos; nenhum ficheiro dessa pasta foi alterado.
+
+Critérios de aceitação: os itens acima. Verificado com substitutos: ordem migrar → verificar → publicar, janela de autoridade fechada em caso de recusa, paragem na primeira falha, chave de idempotência por tenant.
+
+**Não provado:** nenhum passo correu numa base criada pela adesão. A base da entidade instalada foi criada por uma sessão com a autoridade do instalador e as da adesão pelo administrador do PostgreSQL; se os pacotes exigirem o primeiro caso, recusam (`TENANT_MIGRATION_OWNER_MISMATCH` ou equivalente) sem alterar a base. O ensaio é: `upgrade` sem `--apply`, cópia de segurança, `upgrade --apply`.
 
 ## Limites e decisões
 
