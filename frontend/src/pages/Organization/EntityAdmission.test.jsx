@@ -70,3 +70,9 @@ it('keeps a visible way out when the admission is no longer available',async()=>
  // The header is light: the sign-out styled for dark surfaces would be invisible on it.
  expect(exit.className).toBe('btn btn-danger');fireEvent.click(exit);await waitFor(()=>expect(auth.logout).toHaveBeenCalledTimes(1))
 })
+it('does not call a submitted admission unavailable when its state could not be confirmed',async()=>{
+ api.draft.mockRejectedValue({response:{status:404}});api.status=vi.fn().mockRejectedValueOnce({response:{status:503}}).mockResolvedValue({data:{admissionId:'test',phase:'PROJECTION',canEnter:false}});mount()
+ expect((await screen.findByRole('alert')).textContent).toContain('Não foi possível confirmar o estado da adesão. Tente novamente dentro de momentos.')
+ expect(screen.queryByText(/já não está disponível/)).toBeNull();expect(screen.getByRole('button',{name:'Sair'})).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Consultar versão guardada'}));expect(await screen.findByRole('heading',{name:'Estamos a preparar a entidade'})).toBeTruthy()
+})

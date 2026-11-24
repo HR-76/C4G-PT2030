@@ -22,7 +22,11 @@ export default function EntityAdmission({api=admissionApi}){
  async function load(){
   if(!id){setLoaded(true);return}
   const generation=++request.current;setError('');
-  try{const result=(await api.draft(id)).data;if(!alive.current||generation!==request.current)return;setDraft(result);setFields(result.fields);setErrors({});setPending(null)}catch(e){if(e.response?.status===404&&api.status){try{const result=(await api.status(id)).data;if(alive.current&&generation===request.current&&result.phase!=='FILLING'){setPreparation(result);setError('');return}}catch{}}if(alive.current&&generation===request.current)setError(problem(e))}finally{if(alive.current&&generation===request.current)setLoaded(true)}
+  try{const result=(await api.draft(id)).data;if(!alive.current||generation!==request.current)return;setDraft(result);setFields(result.fields);setErrors({});setPending(null)}catch(e){if(e.response?.status===404&&api.status){try{const result=(await api.status(id)).data;if(alive.current&&generation===request.current&&result.phase!=='FILLING'){setPreparation(result);setError('');return}}catch(statusError){
+    // "No longer available" is only true when the server says so. Any other failure while the entity is being created is
+    // a state that could not be confirmed, and the person can try again.
+    if(statusError.response?.status!==404){if(alive.current&&generation===request.current)setError('Não foi possível confirmar o estado da adesão. Tente novamente dentro de momentos.');return}
+   }}if(alive.current&&generation===request.current)setError(problem(e))}finally{if(alive.current&&generation===request.current)setLoaded(true)}
  }
  function showErrors(next){setErrors(next);setError('Reveja os campos assinalados.');const key=Object.keys(next)[0],index=registrationFields.findIndex(group=>group.some(field=>field[0]===key));if(index>=0)setStep(index);setTimeout(()=>document.getElementById(`registration-${key}`)?.focus(),0)}
  async function save(exit=false,validate=false){
