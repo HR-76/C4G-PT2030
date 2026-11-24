@@ -79,7 +79,11 @@ test('the command lets both activation clients return to the admission pages and
   const w = workspace(t), kc = keycloak();
   const result = await admission(w.env, { out: w.out, members: w.members }, { fetchImpl: kc.fetchImpl });
   assert.deepEqual(result, { configured: true, realm: 'c4g-staging', clients: ['c4g-member-activation', 'c4g-member-existing'], files: ['worker.json'] });
-  for (const client of kc.clients.values()) { assert.deepEqual(client.redirectUris, REDIRECTS); assert.equal(client.publicClient, true, 'the rest of the client is preserved'); }
+  for (const client of kc.clients.values()) {
+    assert.deepEqual(client.redirectUris, REDIRECTS); assert.equal(client.publicClient, true, 'the rest of the client is preserved');
+    // The identity provider may return to the same addresses after ending another account's session.
+    assert.deepEqual(client.attributes, { 'c4g.member.installation': INSTALLATION, 'post.logout.redirect.uris': '+' });
+  }
   const file = path.join(w.out, 'worker.json'), written = readSettings(file, { OIDC_ISSUER: ISSUER });
   assert.deepEqual([written.postgres.host, written.postgres.port, written.postgres.ssl, written.centralDatabase, written.clientId], ['c4g-postgres', 5432, true, 'c4g_central_staging', 'c4g-member-worker']);
   assert(!JSON.stringify(result).includes('synthetic'), 'nothing secret is printed');
@@ -198,4 +202,12 @@ test('an admission database tells Central under its own scope, the installed ten
   assert.deepEqual(scopes, ['default', `installation-1-${IDENTITY.tenantId}`]);
   assert.match(fs.readFileSync(path.join(__dirname, '../scripts/staging/install.js'), 'utf8'), /observationScope: onboardedObservationScope\(state\.installationId, item\.identity\.tenantId\)/);
   assert.equal(require('../scripts/staging/tenantSteps').onboardedObservationScope('installation-1', IDENTITY.tenantId), `installation-1-${IDENTITY.tenantId}`);
+});
+
+test('a client that already returns to the admission pages still receives the post sign-out setting', async t => {
+  const w = workspace(t), kc = keycloak();
+  for (const client of kc.clients.values()) client.redirectUris = [...REDIRECTS];
+  await admission(w.env, { out: w.out, members: w.members }, { fetchImpl: kc.fetchImpl });
+  assert.equal(kc.calls.filter(([method]) => method === 'PUT').length, 2);
+  for (const client of kc.clients.values()) { assert.deepEqual(client.redirectUris, REDIRECTS); assert.equal(client.attributes['post.logout.redirect.uris'], '+'); }
 });
