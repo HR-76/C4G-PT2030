@@ -95,7 +95,7 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 
 Lição: o provisionador só tinha sido provado em ambientes isolados, onde os papéis partilhados coincidem com os que ele assume. Qualquer passo que altere papéis ou concessões partilhadas pelo cluster tem de ser comparado com o ambiente de destino antes de correr.
 
-## Migração do esquema das bases da adesão (23/11/2026, em Review, por ensaiar)
+## Migração do esquema das bases da adesão (23/11/2026, em Review, ensaiada no staging)
 
 Pedido do utilizador depois do ensaio: a entidade «Teste» ficou no esquema 033 e o staging está no 041.
 
@@ -116,6 +116,7 @@ Critérios de aceitação: os itens acima. Verificado com substitutos: ordem mig
 - **Causa.** A Central admite um só evento por chave de idempotência (`UNIQUE (idempotency_key, action_code)`), para todos os tenants. A chave do registo da observação era `<instalação>-central-observation-<versão>`, sem o tenant, e já tinha sido usada quando a entidade instalada passou pelo mesmo passo.
 - **Correção.** `syncCentralObservation` aceita um âmbito para a chave; a entidade instalada mantém o da instalação e cada base da adesão usa `<instalação>-<tenant>`. Os testes com substitutos não podiam apanhar isto: a restrição só existe na base de dados.
 - **Retoma.** Repetir `upgrade --apply`: os passos em falta são calculados a partir da versão real da base (034), e o primeiro registo aceite leva a Central diretamente para a versão desse passo.
+- **Resultado (commit `2a2a6ad`).** Relatório com os sete passos em falta (035 a 041) só na base da adesão; `upgrade --apply` aplicou os sete, cada um registado na Central (`PUBLISHED`); base e Central em `041_account_identity_erasure`, estado `COMPATIBLE`; papel do instalador sem privilégios; entidade instalada inalterada; API pronta depois de recriada. **Por verificar no browser:** chat, estratégia e detalhe das tarefas na entidade «Teste».
 
 ## Limites e decisões
 
