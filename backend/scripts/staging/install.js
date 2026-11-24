@@ -404,7 +404,6 @@ async function members(env, args, { fetchImpl = fetch } = {}) {
 // Entity admission (context/features/staging-entity-admission.md). Runs in the Keycloak container's network, after "members":
 // lets the two activation clients return to the admission pages and writes the privileged worker's file. Repeating it keeps
 // the keys already written. Nothing is printed except names and booleans.
-const POST_LOGOUT_ATTRIBUTE = 'post.logout.redirect.uris';
 async function admission(env, args, { fetchImpl = fetch } = {}) {
   const { config, stateFile, apiHost } = settings(env);
   const state = readState(stateFile);
@@ -428,13 +427,8 @@ async function admission(env, args, { fetchImpl = fetch } = {}) {
     // Only clients this installation created are changed.
     if (found?.length !== 1 || found[0].attributes?.['c4g.member.installation'] !== state.installationId) throw refuse('STAGING_MEMBER_CLIENTS_INVALID');
     const client = await kc('clients/' + found[0].id);
-    // "+" lets the identity provider return to the same addresses after ending a session, which the activation pages need
-    // when the browser holds another account's session (context/features/activation-other-account-session.md).
-    const applied = value => value?.redirectUris?.includes(redirect) && value.attributes?.[POST_LOGOUT_ATTRIBUTE] === '+';
-    if (!applied(client)) await kc('clients/' + client.id, 'PUT', { ...client,
-      redirectUris: client.redirectUris?.includes(redirect) ? client.redirectUris : [...(client.redirectUris || []), redirect],
-      attributes: { ...client.attributes, [POST_LOGOUT_ATTRIBUTE]: '+' } });
-    if (!applied(await kc('clients/' + client.id))) throw refuse('STAGING_ADMISSION_REDIRECT_NOT_APPLIED');
+    if (!client.redirectUris?.includes(redirect)) await kc('clients/' + client.id, 'PUT', { ...client, redirectUris: [...(client.redirectUris || []), redirect] });
+    if (!(await kc('clients/' + client.id)).redirectUris?.includes(redirect)) throw refuse('STAGING_ADMISSION_REDIRECT_NOT_APPLIED');
     clients.push(clientId);
   }
   writePrivate(workerFile, JSON.stringify(worker), owner);

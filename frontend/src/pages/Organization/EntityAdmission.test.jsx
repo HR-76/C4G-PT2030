@@ -40,7 +40,7 @@ it('save and exit stays available by name and logs out once only after server co
  await act(async()=>confirmSave({data:{...record,fields:api.save.mock.calls[0][1].fields,revision:1,savedAt:'2026-10-30T10:00:00Z'}}))
  await waitFor(()=>expect(auth.logout).toHaveBeenCalledTimes(1))
  expect(api.save.mock.calls[0][1].fields.legalName).toBe('Preservar antes de sair')
- expect(exit.classList.contains('btn-logout')).toBe(true)
+ expect(exit.classList.contains('btn-danger')).toBe(true)
  expect(exit.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
 })
 it('save and exit preserves the draft and never logs out when saving fails',async()=>{
@@ -62,4 +62,11 @@ it('shows the C4G logo in the header instead of the old product name',async()=>{
  mount();await screen.findByLabelText(/Nome legal/)
  const logo=screen.getByRole('img',{name:'C4G'});expect(logo.getAttribute('src')).toBe('/logo-c4g.png');expect(logo.closest('header')).toBeTruthy()
  expect(screen.queryByText(/Funding Platform/)).toBeNull()
+})
+it('keeps a visible way out when the admission is no longer available',async()=>{
+ api.draft.mockRejectedValue({response:{status:404}});api.status=vi.fn().mockRejectedValue({response:{status:404}});mount()
+ expect((await screen.findByRole('alert')).textContent).toContain('Esta adesão já não está disponível')
+ const exit=screen.getByRole('button',{name:'Sair'});expect(exit.disabled).toBe(false)
+ // The header is light: the sign-out styled for dark surfaces would be invisible on it.
+ expect(exit.className).toBe('btn btn-danger');fireEvent.click(exit);await waitFor(()=>expect(auth.logout).toHaveBeenCalledTimes(1))
 })
