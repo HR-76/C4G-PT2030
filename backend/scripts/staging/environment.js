@@ -217,8 +217,8 @@ const ADMISSION_CALLBACK_PATH = '/api/admission-activation/callback';
 // admission worker must name the same set: its provisioner refuses, and must not widen, anything else.
 const TENANT_AGGREGATOR_ROLES = Object.freeze({ api: Object.freeze(['c4g_opportunity_tenant_runtime']), worker: Object.freeze(['c4g_import_worker_runtime']) });
 function admissionWorkerConfiguration(state, { issuer, member, postgres, centralDatabase, prior = null, generateSecret }) {
-  if (state?.phase !== 'READY' || !state.authorityPassword || !state.permitSecret) throw failure('STAGING_INSTALLATION_NOT_READY');
   const text = value => typeof value === 'string' && value.length > 0;
+  if (state?.phase !== 'READY' || !state.authorityPassword || !state.permitSecret || !text(state.installationId)) throw failure('STAGING_INSTALLATION_NOT_READY');
   if (!member || member.issuer !== issuer || !text(member.clientId) || !text(member.clientSecret) || !text(member.adminOrigin)) throw failure('STAGING_MEMBERS_REQUIRED');
   if (!postgres || !text(postgres.host) || !Number.isSafeInteger(postgres.port) || !text(postgres.password) || !text(centralDatabase)) throw failure('STAGING_ADMISSION_TARGET_INVALID');
   const ownershipKey = prior?.ownershipKey ?? generateSecret(), journalKey = prior?.journalKey ?? generateSecret();
@@ -228,7 +228,9 @@ function admissionWorkerConfiguration(state, { issuer, member, postgres, central
     postgres: { host: postgres.host, port: postgres.port, user: 'postgres', password: postgres.password, ssl: true }, centralDatabase,
     authority: { user: 'c4g_authority_runtime', password: state.authorityPassword }, permitSecret: state.permitSecret,
     policyVersion: AUTH_POLICY_VERSION, dataResidencyCode: REGION.regionCode, regionCode: REGION.regionCode, residencyPolicyVersion: REGION.residencyPolicyVersion,
-    tenantRoles: { api: [...TENANT_AGGREGATOR_ROLES.api], worker: [...TENANT_AGGREGATOR_ROLES.worker] } };
+    tenantRoles: { api: [...TENANT_AGGREGATOR_ROLES.api], worker: [...TENANT_AGGREGATOR_ROLES.worker] },
+    // A new database is brought to the staging schema right after it is created, with the steps `upgrade` applies.
+    tenantUpgrade: { profile: 'staging-registered-v1', installationId: state.installationId } };
 }
 
 module.exports = Object.freeze({ ACTIVATION_BRIDGE_ENDPOINT, MEMBER_CLIENTS, memberTarget, memberHttpConfiguration, memberWorkerConfiguration, ADMISSION_CALLBACK_PATH, TENANT_AGGREGATOR_ROLES, admissionWorkerConfiguration, STORAGE_KEYS, storageEnvironment, COLLECTION_APPROVALS, collectionEnvironment, AUTH_POLICY_VERSION, UUID, PROFILES, CATALOG_LOGIN, CENTRAL_API_LOGIN, CENTRAL_WORKER_LOGIN, REGION, requireProfile, projectionOperationId, CARRIED_KEYS, carriedSettings, parseArguments, requirePerson, stagingTarget, databaseUrl, apiPrivateEnvironment, workerCentralEnvironment });

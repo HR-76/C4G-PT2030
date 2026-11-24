@@ -27,7 +27,9 @@ test('the worker file is one the worker accepts, and repeating keeps both keys',
     centralDatabase: 'c4g_central_staging', authority: { user: 'c4g_authority_runtime', password: 'synthetic-authority' }, permitSecret: 'synthetic-permit-secret-of-32-bytes!',
     policyVersion: 'c4g-user-mfa-v1', dataResidencyCode: 'EU', regionCode: 'EU', residencyPolicyVersion: 'staging-v1',
     // The same roles the staging installation grants to the shared aggregators (scripts/localPlatform/schema.js).
-    tenantRoles: { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] } });
+    tenantRoles: { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] },
+    // New databases are brought to the staging schema by the worker, with the installer's own steps.
+    tenantUpgrade: { profile: 'staging-registered-v1', installationId: INSTALLATION } });
   assert.match(fs.readFileSync(path.join(__dirname, '../scripts/localPlatform/schema.js'), 'utf8'), /apiRoles: \['c4g_opportunity_tenant_runtime'\], workerRoles: \['c4g_import_worker_runtime'\]/);
   assert.notEqual(first.ownershipKey, member().ownershipKey, 'admission has its own ownership key');
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-staging-admission-'));
@@ -194,5 +196,6 @@ test('an admission database tells Central under its own scope, the installed ten
   };
   await run(null); await run(`installation-1-${IDENTITY.tenantId}`);
   assert.deepEqual(scopes, ['default', `installation-1-${IDENTITY.tenantId}`]);
-  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/staging/install.js'), 'utf8'), /observationScope: `\$\{state\.installationId\}-\$\{item\.identity\.tenantId\}`/);
+  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/staging/install.js'), 'utf8'), /observationScope: onboardedObservationScope\(state\.installationId, item\.identity\.tenantId\)/);
+  assert.equal(require('../scripts/staging/tenantSteps').onboardedObservationScope('installation-1', IDENTITY.tenantId), `installation-1-${IDENTITY.tenantId}`);
 });

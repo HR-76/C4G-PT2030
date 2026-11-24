@@ -213,3 +213,95 @@ test('the provisioner refuses role sets that are missing or malformed', () => {
     assert.throws(() => createPostgresProvisioner({ adminPool: {}, centralPool: {}, connection: {}, journal: {}, ownershipKey: 'ab'.repeat(32), ...roles }), { code: 'PROVISIONING_ROLES_INVALID' }, JSON.stringify(roles));
   }
 });
+
+// Automatic schema upgrade of a database created by admission (context/features/staging-entity-admission.md).
+const { createTenantUpgrade } = require('../src/entityAdmission/provisioningWorker');
+const GENERATION = '22222222-2222-4222-8222-222222222222';
+const DATABASE = 'c4g_onb_' + 'a'.repeat(32);
+
+test('the upgrade setting is optional, closed and names a known profile', t => {
+  const env = { OIDC_ISSUER: ISSUER };
+  const accepted = readSettings(write(t, { ...valid(), tenantUpgrade: { profile: 'staging-registered-v1', installationId: 'installation-1' } }), env);
+  assert.deepEqual(accepted.tenantUpgrade, { profile: 'staging-registered-v1', installationId: 'installation-1' });
+  assert.equal(readSettings(write(t, valid()), env).tenantUpgrade, undefined);
+  for (const tenantUpgrade of [null, 'staging-registered-v1', {}, { profile: 'staging-registered-v1' }, { profile: 'unknown', installationId: 'i' },
+    { profile: 'staging-registered-v1', installationId: '' }, { profile: 'staging-registered-v1', installationId: 'i', extra: 1 }, { profile: 'constructor', installationId: 'i' }]) {
+    assert.throws(() => readSettings(write(t, { ...valid(), tenantUpgrade }), env), { code: 'ADMISSION_TENANT_UPGRADE_INVALID' }, JSON.stringify(tenantUpgrade));
+  }
+});
+
+test('without the setting a new database is only provisioned; with it, it is reconciled, provisioned and then upgraded', async t => {
+  const plain = fakes();
+  const worker = buildWorker({ settings: valid(), directory: folder(t), dependencies: plain.dependencies });
+  t.after(() => worker.close());
+  await plain.state.completion.tenant.ensure({ organizationId: ORGANIZATION });
+  assert.deepEqual(plain.state.calls.map(call => call[0]), ['ensure']);
+
+  const upgraded = fakes(), order = [];
+  upgraded.dependencies.createTenantUpgrade = options => { upgraded.state.upgrade = options; return {
+    async resync(id) { order.push(['resync', id]); }, async apply(id) { order.push(['apply', id]); if (upgraded.state.applyFails) throw Object.assign(Error('x'), { code: 'TENANT_MIGRATION_OWNER_MISMATCH' }); } }; };
+  upgraded.dependencies.createProvisioner = () => ({ async ensure(value) { order.push(['ensure', value.organizationId]); return { from: 'ensure' }; }, async project() {}, async apiCredentials() {}, async workerCredentials() {} });
+  const second = buildWorker({ settings: { ...valid(), tenantUpgrade: { profile: 'staging-registered-v1', installationId: 'installation-1' } }, directory: folder(t), dependencies: upgraded.dependencies });
+  t.after(() => second.close());
+  assert.deepEqual([upgraded.state.upgrade.profile, upgraded.state.upgrade.installationId, upgraded.state.upgrade.administration.user, typeof upgraded.state.upgrade.createPool], ['staging-registered-v1', 'installation-1', 'postgres', 'function']);
+  assert.deepEqual(await upgraded.state.completion.tenant.ensure({ organizationId: ORGANIZATION }), { from: 'ensure' });
+  assert.deepEqual(order, [['resync', ORGANIZATION], ['ensure', ORGANIZATION], ['apply', ORGANIZATION]]);
+  upgraded.state.applyFails = true;
+  await assert.rejects(upgraded.state.completion.tenant.ensure({ organizationId: ORGANIZATION }), { code: 'TENANT_MIGRATION_OWNER_MISMATCH' });
+  assert.deepEqual((await second.methods.health()).lastFailure.code, 'TENANT_MIGRATION_OWNER_MISMATCH', 'a refused step is visible as the admission failure');
+});
+
+function upgradeHarness({ rows, head = '033_organizational_opportunity_interests', synced = 'PUBLISHED' } = {}) {
+  const events = [], pools = [];
+  const central = { async query(sql, values) { events.push(['central', values]); assert.match(sql, /tenant_database_generation g LEFT JOIN public\.tenant_schema_state/); return { rows }; } };
+  const createPool = options => { const pool = { options, ended: false, async query(sql) { events.push(['head', sql]); return { rows: head ? [{ version: head }] : [] }; }, async end() { this.ended = true; } }; pools.push(pool); return pool; };
+  const steps = { TENANT_HEAD_SQL: 'HEAD', onboardedObservationScope: (installation, tenant) => `${installation}-${tenant}`,
+    pendingTenantSteps: from => { events.push(['pending', from]); return ['step-a', 'step-b']; },
+    async applyTenantSteps(input) { events.push(['apply', input.steps, input.tenant === pools.at(-1), input.central === central, input.identity, input.installationId, input.observationScope]); return ['a:PUBLISHED', 'b:PUBLISHED']; } };
+  const upgrade = createTenantUpgrade({ profile: 'staging-registered-v1', installationId: 'installation-1', central, createPool,
+    administration: { host: 'h', port: 5432, user: 'postgres', password: 'synthetic', ssl: false }, dependencies: { steps,
+      async preflightTenant(pool, identity, manifest, options) { events.push(['preflight', pool === pools.at(-1), identity, manifest, options.timeoutMs]); return { tenantId: identity.tenantId, currentVersion: head }; },
+      async syncCentralObservation(input) { events.push(['sync', input.tenantId, input.apply, input.idempotencyScope, input.installationId]); return { status: synced }; } } });
+  return { upgrade, events, pools };
+}
+const published = state => [{ database_ref: DATABASE, tenant_id: ORGANIZATION, database_generation_id: GENERATION, compatibility_state: state }];
+const TARGET = { tenantId: ORGANIZATION, databaseGenerationId: GENERATION };
+
+test('apply runs the steps the database still lacks, on that database, under the tenant scope, and closes its pool', async () => {
+  const h = upgradeHarness({ rows: published('COMPATIBLE') });
+  assert.deepEqual(await h.upgrade.apply(ORGANIZATION), ['a:PUBLISHED', 'b:PUBLISHED']);
+  assert.deepEqual(h.events, [['central', [ORGANIZATION]], ['head', 'HEAD'], ['pending', '033_organizational_opportunity_interests'],
+    ['apply', ['step-a', 'step-b'], true, true, TARGET, 'installation-1', `installation-1-${ORGANIZATION}`]]);
+  assert.deepEqual([h.pools[0].options.database, h.pools[0].options.user, h.pools[0].options.options, h.pools[0].ended], [DATABASE, 'postgres', '-c timezone=UTC', true]);
+});
+
+test('apply refuses anything that is not exactly one admission database with a schema ledger', async () => {
+  for (const rows of [[], [...published('COMPATIBLE'), ...published('COMPATIBLE')], [{ ...published('COMPATIBLE')[0], database_ref: 'c4g_tenant_staging' }], [{ ...published('COMPATIBLE')[0], database_ref: 'c4g_onb_x; drop' }]]) {
+    const h = upgradeHarness({ rows });
+    await assert.rejects(h.upgrade.apply(ORGANIZATION), { code: 'TENANT_UPGRADE_TARGET_MISSING' }, JSON.stringify(rows));
+    assert.equal(h.pools.length, 0, 'no connection is opened to a database that is not the target');
+  }
+  const empty = upgradeHarness({ rows: published('COMPATIBLE'), head: null });
+  await assert.rejects(empty.upgrade.apply(ORGANIZATION), { code: 'TENANT_UPGRADE_HEAD_MISSING' });
+  assert.equal(empty.pools[0].ended, true);
+});
+
+test('resync tells Central where a published database really is and does nothing before the first publication', async () => {
+  const h = upgradeHarness({ rows: published('COMPATIBLE'), head: '034_application_snapshot_v2' });
+  assert.deepEqual(await h.upgrade.resync(ORGANIZATION), { resynced: true });
+  assert.deepEqual(h.events.slice(1), [['preflight', true, TARGET, undefined, 15000], ['sync', ORGANIZATION, true, `installation-1-${ORGANIZATION}`, 'installation-1']]);
+  assert.equal(h.pools[0].ended, true);
+  assert.deepEqual(await upgradeHarness({ rows: published('COMPATIBLE'), synced: 'IN_SYNC' }).upgrade.resync(ORGANIZATION), { resynced: false });
+  for (const rows of [[], published('UNKNOWN'), published(null)]) {
+    const before = upgradeHarness({ rows });
+    assert.deepEqual(await before.upgrade.resync(ORGANIZATION), { resynced: false });
+    assert.equal(before.pools.length, 0);
+  }
+});
+
+test('the staging profile is the installer\'s own list of steps', () => {
+  const steps = require('../scripts/staging/tenantSteps'), installer = require('../scripts/staging/install');
+  assert.equal(installer.TENANT_STEPS, steps.TENANT_STEPS);
+  assert.equal(installer.applyTenantSteps, steps.applyTenantSteps);
+  assert.deepEqual(steps.TENANT_STEPS.map(([to]) => to.slice(0, 3)), ['034', '035', '036', '037', '038', '039', '040', '041']);
+});

@@ -118,6 +118,19 @@ Critérios de aceitação: os itens acima. Verificado com substitutos: ordem mig
 - **Retoma.** Repetir `upgrade --apply`: os passos em falta são calculados a partir da versão real da base (034), e o primeiro registo aceite leva a Central diretamente para a versão desse passo.
 - **Resultado (commit `2a2a6ad`).** Relatório com os sete passos em falta (035 a 041) só na base da adesão; `upgrade --apply` aplicou os sete, cada um registado na Central (`PUBLISHED`); base e Central em `041_account_identity_erasure`, estado `COMPATIBLE`; papel do instalador sem privilégios; entidade instalada inalterada; API pronta depois de recriada. **Por verificar no browser:** chat, estratégia e detalhe das tarefas na entidade «Teste».
 
+## Migração automática ao criar uma entidade (24/11/2026, em Review, por ensaiar)
+
+Pedido do utilizador: deixar de ser preciso correr `upgrade --apply` à mão depois de cada entidade criada.
+
+- **O que muda.** Com `tenantUpgrade` no `worker.json`, o worker de adesão, logo depois de criar e publicar a base no esquema base, aplica-lhe os passos registados que faltam (034 a 041) e só então a adesão avança. Usa o mesmo módulo que o `upgrade` do instalador (`scripts/staging/tenantSteps.js`): mesma lista de passos, mesma janela de autoridade, mesma verificação e mesmo registo na Central, com a mesma chave por entidade. O comando `upgrade` continua a existir e a servir para passos futuros.
+- **Opcional e nomeado.** `tenantUpgrade` tem `profile` (`staging-registered-v1`) e `installationId`. Sem a chave, o comportamento é o anterior. Um perfil desconhecido impede o arranque do worker. O instalador passa a escrevê-la; um `worker.json` antigo continua válido.
+- **Só bases da adesão.** O alvo é a base que a Central regista para essa entidade, e só se for exatamente uma e tiver o nome `c4g_onb_<id>`.
+- **Retoma.** Se a migração for interrompida depois de aplicar um passo e antes de o registar na Central (o caso do ensaio de 23/11), a tentativa seguinte começa por pôr a Central de acordo com a base e depois continua. Uma falha fica visível como `C4G_ADMISSION_STEP_FAILED TENANT:<código>` e é repetida ao fim de 60 s.
+- **Privilégios.** O worker abre a janela de autoridade do instalador (`c4g_f12_admin` com privilégios de superutilizador) durante cada passo, como o `upgrade`. Não é um privilégio novo para o worker, que já usa o administrador do PostgreSQL, mas passa a acontecer sem um operador presente. Se o `upgrade` estiver a correr ao mesmo tempo, o worker falha esse passo e repete.
+- **Duração.** Os oito passos podem demorar mais do que os 60 s de reserva de uma tentativa; nesse caso a tentativa não é confirmada e a seguinte, que já encontra tudo feito, confirma.
+
+Critérios de aceitação: os itens acima, verificados com substitutos (ordem reconciliar → criar → migrar, alvo recusado se não for uma base da adesão, ligações fechadas, falha visível). **Não provado:** uma criação real de entidade com a migração automática.
+
 ## Limites e decisões
 
 - A listagem de convites lê a Central pelo pool da API. No staging a API liga à Central como administrador (decisão de 14/11/2026); numa Central com logins limitados esta leitura precisa do seu próprio perfil.

@@ -22,7 +22,7 @@ const { randomBytes, randomUUID } = require('node:crypto');
 const { Pool, escapeLiteral } = require('pg');
 const { connection, identifier, saveState } = require('../localPlatform/config');
 const { withInstallerAuthority, nativePool } = require('../localPlatform/installerAuthority');
-const { syncCentralObservation } = require('../localPlatform/centralObservation');
+const { OPPORTUNITY_V2_PACKAGE, TENANT_STEPS, TENANT_HEAD_SQL, pendingTenantSteps, applyTenantSteps, onboardedObservationScope } = require('./tenantSteps');
 const { initialState, installSchemas } = require('../localPlatform/schema');
 const { parseArguments, requirePerson, requireProfile, projectionOperationId, stagingTarget, apiPrivateEnvironment, carriedSettings,
   memberHttpConfiguration, memberWorkerConfiguration, memberTarget, MEMBER_CLIENTS, ADMISSION_CALLBACK_PATH, admissionWorkerConfiguration,
@@ -239,7 +239,6 @@ async function projectIntoTenant({ config, state, userId, membershipId, name, em
 
 // Registered packages after the base install, in the order the local environment applied them. Each step names the
 // version it leaves behind; steps already in the ledger are skipped, so the command can be repeated.
-const OPPORTUNITY_V2_PACKAGE = 'opportunity-v2-activation-11145';
 const CENTRAL_STEPS = Object.freeze([
   ['042_opportunity_eu_source_control_v2', (run, pool) => run.applyRegisteredCentralPackage(pool, OPPORTUNITY_V2_PACKAGE)],
   ['043_opportunity_eu_writer_v2', (run, pool) => run.applyRegisteredEuWriterPackage(pool, 'opportunity-eu-writer-v2')],
@@ -252,16 +251,6 @@ const CENTRAL_STEPS = Object.freeze([
   ['052_central_runtime_read', (run, pool) => run.applyRegisteredCentralRuntimeReadPackage(pool, 'central-runtime-read-v1')],
   ['053_opportunity_complement', (run, pool) => run.applyRegisteredOpportunityComplementPackage(pool, 'opportunity-complement-v1')]
 ]);
-const TENANT_STEPS = Object.freeze([
-  ['034_application_snapshot_v2', (runners, options) => runners.createRegisteredTenantMigrationRunner({ ...options, packageId: OPPORTUNITY_V2_PACKAGE })],
-  ['035_application_review_assignments', (runners, options) => runners.createAssignedReviewMigrationRunner(options)],
-  ['036_application_team_chat', (runners, options) => runners.createApplicationChatMigrationRunner(options)],
-  ['037_organization_strategy', (runners, options) => runners.createOrganizationStrategyMigrationRunner(options)],
-  ['038_application_task_details', (runners, options) => runners.createApplicationTaskDetailsMigrationRunner(options)],
-  ['039_document_deletion', (runners, options) => runners.createDocumentDeletionMigrationRunner(options)],
-  ['040_application_chat_retention', (runners, options) => runners.createChatRetentionMigrationRunner(options)],
-  ['041_account_identity_erasure', (runners, options) => runners.createAccountIdentityErasureMigrationRunner(options)]
-]);
 
 async function ledgerHead(pool, sql) {
   return (await pool.query(sql)).rows[0]?.version;
@@ -270,35 +259,7 @@ async function ledgerHead(pool, sql) {
 // Databases created by entity admission (context/features/staging-entity-admission.md): each is a tenant of its own, with
 // the identity Central recorded for it. They are created on the base schema and receive the same registered steps.
 const ONBOARDED_TENANTS_SQL = "SELECT database_ref, tenant_id, database_generation_id FROM public.tenant_database_generation WHERE retired_at IS NULL AND database_ref ~ '^c4g_onb_' ORDER BY database_ref";
-const TENANT_HEAD_SQL = 'SELECT migration_id AS version FROM c4g_system.schema_migration ORDER BY ordinal DESC LIMIT 1';
-const pendingTenantSteps = head => TENANT_STEPS.filter(([to]) => to > head);
 
-// Applies the given registered steps to one tenant database, in order. After each step the database must be exactly on
-// that version, and Central is told before the next step starts. Stops at the first failure; nothing is skipped.
-// observationScope: Central admits one event per idempotency key across all tenants. The installed tenant keeps the
-// installation's own keys; every other tenant must pass a scope of its own or its observation is refused.
-async function applyTenantSteps({ steps, central, tenant, identity, installationId, observationScope = null, onStep = () => {}, dependencies = {} }) {
-  const runners = dependencies.runners || require('../../src/security/tenantMigrationRunner');
-  const preflight = dependencies.preflightTenant || require('../../src/security/tenantMigrationPreflight').preflightTenant;
-  const authority = dependencies.withInstallerAuthority || withInstallerAuthority;
-  const native = dependencies.nativePool || nativePool;
-  const sync = dependencies.syncCentralObservation || syncCentralObservation;
-  const applied = [];
-  for (const [to, createRunner] of steps) {
-    await authority(central, { targets: [central] }, async ({ demote }) => {
-      await createRunner(runners, { pool: native(tenant), observationPublisher: { async publish() {} }, timeoutMs: 30000,
-        scheduler: { setTimeout, clearTimeout } }).migrate({ ...identity, expectedRevision: 1, correlationId: installationId,
-        idempotencyKey: `${installationId}-${identity.tenantId}-${to}` });
-      await demote();
-    });
-    const observation = await preflight(tenant, identity, undefined, { timeoutMs: 15000 });
-    if (observation.currentVersion !== to) throw refuse('STAGING_UPGRADE_TENANT_VERSION_UNEXPECTED');
-    const synced = await sync({ central, observation, tenantId: identity.tenantId, installationId, apply: true, ...(observationScope ? { idempotencyScope: observationScope } : {}) });
-    await onStep(observation);
-    applied.push(`${to}:${synced.status}`);
-  }
-  return applied;
-}
 
 // Brings Central to 053 and every tenant to 041: the installed one first, then each database created by admission.
 // Without --apply it reports what is pending and changes nothing. --skip-onboarded leaves the admission databases alone.
@@ -355,7 +316,7 @@ async function upgrade(env, args) {
     for (const item of skipOnboarded ? [] : onboarded) {
       try {
         item.entry.steps = await applyTenantSteps({ steps: item.pending, central, tenant: item.pool, identity: item.identity, installationId: state.installationId,
-          observationScope: `${state.installationId}-${item.identity.tenantId}` });
+          observationScope: onboardedObservationScope(state.installationId, item.identity.tenantId) });
       } catch (error) {
         const code = [error?.code, error?.message].find(text => typeof text === 'string' && /^[A-Z0-9_]{3,80}$/.test(text)) || 'UNCLASSIFIED';
         console.error(`STAGING_UPGRADE_ONBOARDED_TENANT_FAILED ${item.entry.database} from=${await ledgerHead(item.pool, TENANT_HEAD_SQL).catch(() => '?')} ${code}`);
