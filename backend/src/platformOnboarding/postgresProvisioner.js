@@ -4,6 +4,11 @@ const {Pool}=require('pg'),{randomUUID,randomBytes,createHmac}=require('node:cry
 const {uuid,hash,fail}=require('./contracts');
 const {createTenantMigrationRunner}=require('../security/tenantMigrationRunner');
 const {manifest}=require('../security/tenantMigrationManifest');
+// The checks of an existing database must recognise every registered version, not only the base ones: a database that was
+// already brought to a later schema (context/features/staging-entity-admission.md) is otherwise refused as unknown.
+// Leaving the entries out makes the preflight choose the manifest that matches the version it finds. `manifest` itself
+// stays the base list: it is what a new database is created on.
+const PREFLIGHT_ENTRIES=undefined;
 const {preflightTenant}=require('../security/tenantMigrationPreflight');
 const {ensureAuditPartitionsWithPool}=require('../audit/partitionMaintenance');
 const {bindingDigest}=require('../security/localTenantCredentialAdapter');
@@ -64,14 +69,14 @@ function createPostgresProvisioner({adminPool,centralPool,connection,journal,own
     await ensureAuditPartitionsWithPool(pool);
     const provisioner=await createLocalTenantIdentityProvisioner(adminPool);await provisioner.reconcile({apiLogin:r.apiLogin,workerLogin:r.workerLogin,apiPassword:r.apiPassword,workerPassword:r.workerPassword,apiRoles:[...apiRoles],workerRoles:[...workerRoles]});
     await pool.query(`GRANT CONNECT ON DATABASE ${id(r.database)} TO ${id(r.apiLogin)},${id(r.workerLogin)}`);
-    const evidence=await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},manifest,{timeoutMs:15000});
+    const evidence=await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},PREFLIGHT_ENTRIES,{timeoutMs:15000});
     for(const workload of ['API','WORKER']){const m=material(r,workload),limited=new Pool({...connection,database:r.database,user:m.login,password:m.password,max:1});try{const result=(await limited.query('SELECT current_database() name,rolsuper,rolcreatedb,rolcreaterole,rolbypassrls FROM pg_roles WHERE rolname=session_user')).rows[0];if(result.name!==r.database||result.rolsuper||result.rolcreatedb||result.rolcreaterole||result.rolbypassrls)fail('PROVISIONING_LOGIN_INVALID');}finally{await limited.end();}}
     await publish(r,evidence);return binding(x);
    }finally{await pool.end();}
   });},
   async project(x){return locked(x,async r=>{
    const pool=new Pool({...connection,database:r.database,max:1});try{
-    await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},manifest,{timeoutMs:15000});
+    await preflightTenant(pool,{tenantId:r.tenantId,databaseGenerationId:r.generationId},PREFLIGHT_ENTRIES,{timeoutMs:15000});
     const c=await pool.connect();try{await c.query('BEGIN');await c.query("SELECT set_config('app.organization_id',$1,true)",[r.organizationId]);await c.query('SET LOCAL ROLE c4g_opportunity_tenant_runtime');
      const prior=(await c.query('SELECT * FROM organizational_scope.directory_receipt WHERE organization_id=$1 AND idempotency_key=$2',[r.organizationId,r.operationId])).rows[0],digest=hash(JSON.stringify({organizationId:r.organizationId,membershipId:r.membershipId,name:x.input.adminName,email:x.input.adminEmail}));
      if(prior){if(prior.intention_digest!==digest)fail('PROVISIONING_INTENT_CONFLICT');}

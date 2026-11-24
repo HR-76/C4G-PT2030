@@ -305,3 +305,22 @@ test('the staging profile is the installer\'s own list of steps', () => {
   assert.equal(installer.applyTenantSteps, steps.applyTenantSteps);
   assert.deepEqual(steps.TENANT_STEPS.map(([to]) => to.slice(0, 3)), ['034', '035', '036', '037', '038', '039', '040', '041']);
 });
+
+// Found in the staging trial of 24/11/2026: the person step refused a database that had already been upgraded.
+test('the provisioner checks an existing database against every registered version, not only the base ones', () => {
+  const fs = require('node:fs');
+  const manifests = require('../src/security/tenantMigrationManifest');
+  const source = fs.readFileSync(require.resolve('../src/platformOnboarding/postgresProvisioner'), 'utf8');
+  // The base list ends before the registered steps.
+  assert.notEqual(manifests.manifest, manifests.registeredManifest);
+  assert.equal(manifests.manifest.some(entry => entry.version === '041_account_identity_erasure'), false);
+  assert.equal(manifests.accountIdentityErasureManifest.at(-1).version, '041_account_identity_erasure');
+  assert.equal(source.includes('},manifest,{timeoutMs'), false, 'no check of an existing database is pinned to the base list');
+  assert.equal(source.split('},PREFLIGHT_ENTRIES,{timeoutMs:15000})').length - 1, 2);
+  assert.match(source, /const PREFLIGHT_ENTRIES=undefined;/);
+  // Why it matters: the preflight widens its choice to the manifest of the version it finds only when it is handed its own
+  // default, which is the registered list under another name. Handed the base list, it keeps it and knows no later version.
+  const preflight = fs.readFileSync(require.resolve('../src/security/tenantMigrationPreflight'), 'utf8');
+  assert.match(preflight, /const \{ registeredManifest: manifest,/);
+  assert.match(preflight, /if \(entries === manifest && currentMigration === ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION\) entries = accountIdentityErasureManifest;/);
+});

@@ -129,7 +129,15 @@ Pedido do utilizador: deixar de ser preciso correr `upgrade --apply` à mão dep
 - **Privilégios.** O worker abre a janela de autoridade do instalador (`c4g_f12_admin` com privilégios de superutilizador) durante cada passo, como o `upgrade`. Não é um privilégio novo para o worker, que já usa o administrador do PostgreSQL, mas passa a acontecer sem um operador presente. Se o `upgrade` estiver a correr ao mesmo tempo, o worker falha esse passo e repete.
 - **Duração.** Os oito passos podem demorar mais do que os 60 s de reserva de uma tentativa; nesse caso a tentativa não é confirmada e a seguinte, que já encontra tudo feito, confirma.
 
-Critérios de aceitação: os itens acima, verificados com substitutos (ordem reconciliar → criar → migrar, alvo recusado se não for uma base da adesão, ligações fechadas, falha visível). **Não provado:** uma criação real de entidade com a migração automática.
+Critérios de aceitação: os itens acima, verificados com substitutos (ordem reconciliar → criar → migrar, alvo recusado se não for uma base da adesão, ligações fechadas, falha visível).
+
+### Ensaio no staging (24/11/2026)
+
+- **Passou:** a primeira entidade criada com a migração automática (`c4g_onb_27796885…`) ficou no esquema 041, com a Central em dia e o papel do instalador sem privilégios, sem intervenção.
+- **Falhou a seguir:** o passo que cria a pessoa na base nova (`PROJECTION`) foi recusado 27 vezes com `UNEXPECTED_SCHEMA`. As três bases têm exatamente os mesmos esquemas e os mesmos 41 passos, por isso a base não era o problema.
+- **Causa.** O provisionador verificava a base contra a lista de passos do esquema **base** (`manifest`, que acaba no 033). O verificador só alarga a escolha à lista da versão que encontra quando recebe a sua própria lista por omissão, que é a registada sob outro nome (`registeredManifest: manifest`). Com a lista base, uma base no 041 não tem entrada, nenhum esquema é permitido e todos parecem inesperados. Ontem não se viu porque a pessoa foi criada antes de a base ser migrada.
+- **Correção.** As duas verificações de uma base existente no provisionador (ao criar e ao projetar a pessoa) deixam de fixar a lista base e passam a deixar o verificador escolher. A base nova continua a ser criada sobre a lista base. Nenhum ficheiro de `backend/src/security` foi alterado.
+- **Por provar:** a criação da pessoa numa base já no 041 (as tabelas que escreve mudaram nos passos 037 e 041, mas só com colunas com valor por omissão e gatilhos de atualização) e a publicação final das credenciais nesse estado.
 
 ## Limites e decisões
 
