@@ -78,7 +78,8 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
       }
       oidc = await createOidc({ issuer: settings.issuer, origin: settings.origin, manualClientId: settings.manualClientId,
         existingClientId: settings.existingClientId, callbackPath: ACTIVATION_PATH + '/callback', service,
-        passwordReady: subject => worker.call('passwordReady', { subject }) });
+        passwordReady: subject => worker.call('passwordReady', { subject }),
+        passwordSetupPending: subject => worker.call('passwordSetupPending', { subject }) });
       // Keycloak consults one bridge. A ticket that is not a member invitation goes to the fallback (entity admission), if one was set.
       const bridgeOidc = { ...oidc, async bridge(ticket, subject) {
         try { return await oidc.bridge(ticket, subject); } catch (error) { if (!bridgeFallback) throw error; return bridgeFallback(ticket, subject); }

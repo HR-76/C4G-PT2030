@@ -121,6 +121,8 @@ test('activation pages and bridge answer after start and close releases the work
     [ISSUER, ORIGIN, '/api/activation/callback', service]);
   await f.state.oidcOptions.passwordReady(SUBJECT);
   assert.deepEqual(f.calls.at(-1), ['passwordReady', { subject: SUBJECT }]);
+  await f.state.oidcOptions.passwordSetupPending(SUBJECT);
+  assert.deepEqual(f.calls.at(-1), ['passwordSetupPending', { subject: SUBJECT }]);
   for (const [url, expected] of [['/api/activation', true], ['/api/activation/begin', true], ['/api/activation?x=1', true], ['/api/activations', false], ['/api/auth/session', false]]) {
     assert.equal(started.handles(url), expected, url);
   }

@@ -35,6 +35,9 @@ function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,
    if(!user?.enabled||user.username!==username||user.email?.toLowerCase()!==x.input.adminEmail||user.attributes?.c4g_onboarding_owner?.[0]!==marker(x))fail('IDENTITY_RECONCILIATION_REQUIRED');
    return {...binding(x),issuer,subject:user.id,mode:'CREATED'};
   },
+  // An account an earlier invitation created and nobody ever activated: enabled, marked as created by onboarding and with
+  // no password at all. A later invitation finds it as an existing account, but there is no password to sign in with.
+  async passwordSetupPending(subject){uuid(subject);const user=await request('/users/'+subject);if(!user?.enabled||typeof user.attributes?.c4g_onboarding_owner?.[0]!=='string'||!user.attributes.c4g_onboarding_owner[0])return false;const credentials=await request('/users/'+subject+'/credentials');return !credentials.some(c=>c.type==='password');},
   async passwordReady(subject){uuid(subject);const user=await request('/users/'+subject);if(!user?.enabled)return false;const credentials=await request('/users/'+subject+'/credentials');return credentials.some(c=>c.type==='password')&&!user.requiredActions?.includes('UPDATE_PASSWORD');}
  });
 }

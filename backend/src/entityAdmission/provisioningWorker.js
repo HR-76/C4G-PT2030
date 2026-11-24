@@ -205,6 +205,7 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
     invitationEmail: async value => ({ status: (await email.send(value))?.status || 'UNCONFIRMED' }),
     identity: value => identity.ensure(value),
     passwordReady: value => identity.passwordReady(value.subject),
+    passwordSetupPending: value => identity.passwordSetupPending(value.subject),
     resolve: value => registry.resolve(value),
     health: async () => ({ ready: now() - lastPass < READY_WITHIN_MS, lastFailure }),
     async memberProjection(value) {

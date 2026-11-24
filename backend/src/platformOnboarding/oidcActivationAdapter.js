@@ -10,7 +10,7 @@ const {hash,fail}=require('./contracts');
 //   conflict -> the visitor agreed: the session ends with the identity the probe returned, then activation follows.
 // Anything unexpected in the probe falls back to the activation request, which is what happened before the probe existed.
 // Contract: context/features/activation-other-account-session.md.
-async function createOidcActivationAdapter({issuer,origin,manualClientId,existingClientId,service,passwordReady,callbackPath='/activation/callback',library=null}){
+async function createOidcActivationAdapter({issuer,origin,manualClientId,existingClientId,service,passwordReady,passwordSetupPending=async()=>false,callbackPath='/activation/callback',library=null}){
  if(!['/activation/callback','/api/activation/callback','/api/admission-activation/callback'].includes(callbackPath))fail('ACTIVATION_INVALID');
  const oidc=library||await import('openid-client'),manual=await oidc.discovery(new URL(issuer),manualClientId),existing=await oidc.discovery(new URL(issuer),existingClientId);
  for(const config of [manual,existing])oidc.enableNonRepudiationChecks(config);
@@ -18,7 +18,10 @@ async function createOidcActivationAdapter({issuer,origin,manualClientId,existin
  const sweep=()=>{for(const [state,tx] of transactions)if(tx.until<Date.now())transactions.delete(state);};
  // The activation request itself: the invitation-bound flow for an account without a password, a fresh sign-in otherwise.
  async function authorize(exchange,browserBinding){
-  const expected=await service.checkActivation(exchange,browserBinding),hasPassword=await passwordReady(expected.subject),useManual=expected.mode==='CREATED'&&!hasPassword;
+  // An existing account normally signs in with its password. One that an earlier, abandoned invitation created has none,
+  // so it sets it through the invitation-bound flow, exactly like a new account (passwordSetupPending).
+  const expected=await service.checkActivation(exchange,browserBinding),hasPassword=await passwordReady(expected.subject);
+  const useManual=!hasPassword&&(expected.mode==='CREATED'||await passwordSetupPending(expected.subject)===true);
   const verifier=oidc.randomPKCECodeVerifier(),state=oidc.randomState(),nonce=oidc.randomNonce(),config=useManual?manual:existing;
   transactions.set(state,{kind:'auth',exchange,browserBinding,verifier,nonce,config,expected,until:Date.now()+600000});
   return oidc.buildAuthorizationUrl(config,{redirect_uri:redirect,scope:'openid profile email',response_type:'code',state,nonce,code_challenge:await oidc.calculatePKCECodeChallenge(verifier),code_challenge_method:'S256',...(useManual?{c4g_ticket:exchange}:{prompt:'login',max_age:'0'})}).href;

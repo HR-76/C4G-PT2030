@@ -15,7 +15,7 @@ const purpose=config.purpose||'MEMBERSHIP';
 if(local&&config.adminOrigin)throw Error('LOCAL_IDENTITY_REQUIRED');
 const identity=require('./keycloakAdapter').createKeycloakAdapter({issuer:config.issuer,accessToken,ownershipKey:config.ownershipKey,usernameMode:'email',purpose,adminOrigin:config.adminOrigin||null});
 const projection=purpose==='MEMBERSHIP'?require('./memberProjection').createMemberProjection({bindings:config.bindings,allowedResidency:config.allowedResidency,tenantApiProfile:config.tenantApiProfile}):null;
-const methods={identity:x=>identity.ensure(x),...(projection?{projection:x=>projection.ensure(x)}:{}),passwordReady:x=>identity.passwordReady(x.subject)};
+const methods={identity:x=>identity.ensure(x),...(projection?{projection:x=>projection.ensure(x)}:{}),passwordReady:x=>identity.passwordReady(x.subject),passwordSetupPending:x=>identity.passwordSetupPending(x.subject)};
 if(purpose==='MEMBERSHIP'&&process.env.USER_DELETION_RUNTIME==='central'){
  const deletionIdentity=require('../platformDirectory/deletionIdentity').createDeletionIdentity({issuer:config.issuer,accessToken,adminOrigin:config.adminOrigin||null});
  const deletionProjection=require('../platformDirectory/deletionProjection').createDeletionProjection({bindings:config.bindings,allowedResidency:config.allowedResidency,tenantApiProfile:config.tenantApiProfile});

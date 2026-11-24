@@ -83,7 +83,8 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
       supervisor.unref?.();
       oidc = await createOidc({ issuer: settings.issuer, origin: settings.origin, manualClientId: settings.manualClientId,
         existingClientId: settings.existingClientId, callbackPath: ADMISSION_PATH + '/callback', service,
-        passwordReady: subject => worker.call('passwordReady', { subject }) });
+        passwordReady: subject => worker.call('passwordReady', { subject }),
+        passwordSetupPending: subject => worker.call('passwordSetupPending', { subject }) });
       // One bridge for Keycloak: a ticket that is not a member invitation is checked as an admission invitation.
       members.setBridgeFallback((ticket, subject) => oidc.bridge(ticket, subject));
       // People invited into an entity created by admission are projected into that entity's own database by the worker.

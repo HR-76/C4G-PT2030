@@ -72,7 +72,7 @@ function fakes() {
     createProvisioner(options) { state.provisioner = options; return { ensure: record('ensure'), project: record('project'), apiCredentials: record('api'), workerCredentials: record('worker') }; },
     createRegistry(options) { state.registry = options; return { async publish(binding, api, worker) { state.calls.push(['publish', binding, api, worker]); return { published: true }; },
       async resolve(request) { state.calls.push(['resolve', request]); return { login: 'c4g_onb_api_x' }; } }; },
-    createIdentity(options) { state.identity = options; return { ensure: record('identity'), passwordReady: record('passwordReady') }; },
+    createIdentity(options) { state.identity = options; return { ensure: record('identity'), passwordReady: record('passwordReady'), passwordSetupPending: record('passwordSetupPending') }; },
     createCompletion(options) { state.completion = options; return { marker: 'completion' }; },
     createCompletionWorker(service) { state.completionService = service; return { async runOnce() { state.runs += 1; if (state.fail) throw Error('private'); return []; } }; },
     createMemberProjection(options) { state.projection = options; return { ensure: record('memberProjection') }; },
@@ -96,11 +96,11 @@ test('the invitation email is sent from the worker with the inherited provider s
   assert.deepEqual(await worker.methods.invitationEmail(value), { status: 'UNCONFIRMED' });
 });
 
-test('administration stays inside the worker and only six closed methods cross the boundary', async t => {
+test('administration stays inside the worker and only seven closed methods cross the boundary', async t => {
   const { state, dependencies } = fakes(), directory = folder(t);
   let clock = 1000000;
   const worker = buildWorker({ settings: valid(), directory, dependencies, now: () => clock });
-  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'invitationEmail', 'memberProjection', 'passwordReady', 'resolve']);
+  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'invitationEmail', 'memberProjection', 'passwordReady', 'passwordSetupPending', 'resolve']);
 
   assert.deepEqual(state.pools.map(pool => [pool.database, pool.user, pool.ssl]), [['c4g_central_staging', 'postgres', false], ['postgres', 'postgres', false], ['c4g_central_staging', 'c4g_authority_runtime', false]]);
   assert.deepEqual([state.coordinator.permitSecret, state.journals.map(journal => path.relative(directory, journal.directory)), state.journals.every(journal => journal.key === 'cd'.repeat(32))],

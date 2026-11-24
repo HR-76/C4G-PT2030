@@ -27,6 +27,17 @@ O Keycloak mantém uma sessão por navegador e recusa autenticar outra conta por
 
 O Keycloak só regressa à aplicação depois de terminar a sessão se o cliente o permitir. O comando `admission` do instalador passa a definir `post.logout.redirect.uris = +` (os mesmos endereços de retorno) nos dois clientes de ativação. Sem isso, o clique termina a sessão mas o Keycloak mostra a sua página final em vez de regressar; reabrir a ligação do convite conclui a ativação.
 
+## Ensaio no staging (24/11/2026)
+
+- **Passou:** com sessão do Admin C4G no navegador, a página «Outra conta com sessão iniciada» apareceu, o botão terminou a sessão e o Keycloak regressou à aplicação sem página intermédia. Os três comportamentos do Keycloak de que isto dependia confirmaram-se.
+- **Encontrado a seguir:** o convite levou à página de entrada, e não à de definir a palavra-passe. O endereço (`projetos@c4g.pt`) tinha recebido antes um convite que foi cancelado: esse convite criou a conta no Keycloak, sem palavra-passe, e o convite seguinte encontrou-a como «conta existente», que entra com a palavra-passe que não tem. Beco sem saída, anterior a esta alteração.
+
+## Conta existente sem palavra-passe
+
+- **Regra.** Uma conta existente que foi criada por um convite (tem a marca `c4g_onboarding_owner`), está ativa e não tem nenhuma credencial de palavra-passe define-a pelo percurso ligado ao convite, como uma conta nova. Qualquer outra conta existente continua a entrar com a sua palavra-passe: uma palavra-passe já definida nunca é substituída por um convite, e uma conta criada por outra via nunca recebe palavra-passe por aqui.
+- **Onde.** `keycloakAdapter.passwordSetupPending`, exposto pelos dois workers (convites e adesão) e consultado pelo adaptador de ativação só quando a conta é «existente» e não tem palavra-passe pronta. Vale para o convite de utilizador e para o convite de entidade.
+- **Não provado:** o percurso completo no Keycloak com uma conta nestas condições. O módulo de ativação do Keycloak já recusa contas com palavra-passe, e aceita as que não têm, independentemente de serem novas.
+
 ## Não provado
 
 Nada disto correu contra um Keycloak real. Dependem do comportamento do Keycloak 26.8: a resposta ao pedido silencioso com o cliente de contas existentes, o fim de sessão sem página de confirmação quando leva `id_token_hint`, e o regresso com `state` a um endereço de retorno registado.

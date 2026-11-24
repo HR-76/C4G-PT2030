@@ -97,6 +97,8 @@ test('admission pages answer after start, the bridge fallback is registered and 
   assert.deepEqual([f.state.oidc.issuer, f.state.oidc.origin, f.state.oidc.callbackPath, f.state.oidc.service], [ISSUER, ORIGIN, '/api/admission-activation/callback', { marker: 'admission' }]);
   await f.state.oidc.passwordReady(SUBJECT);
   assert.deepEqual(f.calls.at(-1), ['passwordReady', { subject: SUBJECT }]);
+  await f.state.oidc.passwordSetupPending(SUBJECT);
+  assert.deepEqual(f.calls.at(-1), ['passwordSetupPending', { subject: SUBJECT }]);
   assert.deepEqual(await f.state.service.verification.verify({ e: 5 }), { verified: { e: 5 } });
   assert.deepEqual(await member.fallback('ticket', SUBJECT), { subject: SUBJECT, by: 'admission' });
   await member.projection({ organizationId: 'o' });
