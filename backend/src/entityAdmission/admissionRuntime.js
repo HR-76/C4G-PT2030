@@ -28,7 +28,8 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
   if (selection === 'disabled') return null;
   if (selection !== 'central') throw invalid('ENTITY_ADMISSION_RUNTIME_INVALID');
   // The activation clients, the bridge secret and the bridge listener belong to the member runtime.
-  if (!members || typeof members.setBridgeFallback !== 'function' || typeof members.setProjectionFallback !== 'function') throw invalid('ENTITY_ADMISSION_REQUIRES_MEMBER_RUNTIME');
+  if (!members || typeof members.setBridgeFallback !== 'function' || typeof members.setProjectionFallback !== 'function'
+    || typeof members.setErasureFallback !== 'function') throw invalid('ENTITY_ADMISSION_REQUIRES_MEMBER_RUNTIME');
   if (!centralPool || typeof centralPool.query !== 'function') throw invalid('ENTITY_ADMISSION_CENTRAL_POOL_REQUIRED');
   const directory = env.ENTITY_ADMISSION_DIRECTORY;
   if (typeof directory !== 'string' || !path.isAbsolute(directory)) throw invalid('ENTITY_ADMISSION_DIRECTORY_INVALID');
@@ -89,6 +90,8 @@ function configuredEntityAdmission({ env, express, members = null, centralPool =
       members.setBridgeFallback((ticket, subject) => oidc.bridge(ticket, subject));
       // People invited into an entity created by admission are projected into that entity's own database by the worker.
       members.setProjectionFallback(value => worker.call('memberProjection', value));
+      // A deleted person is anonymized in such an entity's database the same way (used only with USER_DELETION_RUNTIME=central).
+      members.setErasureFallback(value => worker.call('memberErasure', value));
       const activation = require('../platformOnboarding/activationHttp').createActivationHttp({ express, service, oidc, origin: settings.origin,
         identityOrigin: new URL(settings.issuer).origin, bridgeSecret: settings.bridgeSecret, purpose: 'ADMISSION' });
       const app = express();

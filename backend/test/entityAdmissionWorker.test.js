@@ -76,6 +76,7 @@ function fakes() {
     createCompletion(options) { state.completion = options; return { marker: 'completion' }; },
     createCompletionWorker(service) { state.completionService = service; return { async runOnce() { state.runs += 1; if (state.fail) throw Error('private'); return []; } }; },
     createMemberProjection(options) { state.projection = options; return { ensure: record('memberProjection') }; },
+    createDeletionProjection(options) { state.erasure = options; return { anonymize: record('memberErasure') }; },
     createEmail(options) { state.email = options; return { async send(value) { state.calls.push(['email', value]); return state.emailResult; } }; },
     async probe(input) { state.calls.push(['probe', input.material, input.workload]); }
   };
@@ -96,11 +97,11 @@ test('the invitation email is sent from the worker with the inherited provider s
   assert.deepEqual(await worker.methods.invitationEmail(value), { status: 'UNCONFIRMED' });
 });
 
-test('administration stays inside the worker and only seven closed methods cross the boundary', async t => {
+test('administration stays inside the worker and only eight closed methods cross the boundary', async t => {
   const { state, dependencies } = fakes(), directory = folder(t);
   let clock = 1000000;
   const worker = buildWorker({ settings: valid(), directory, dependencies, now: () => clock });
-  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'invitationEmail', 'memberProjection', 'passwordReady', 'passwordSetupPending', 'resolve']);
+  assert.deepEqual(Object.keys(worker.methods).sort(), ['health', 'identity', 'invitationEmail', 'memberErasure', 'memberProjection', 'passwordReady', 'passwordSetupPending', 'resolve']);
 
   assert.deepEqual(state.pools.map(pool => [pool.database, pool.user, pool.ssl]), [['c4g_central_staging', 'postgres', false], ['postgres', 'postgres', false], ['c4g_central_staging', 'c4g_authority_runtime', false]]);
   assert.deepEqual([state.coordinator.permitSecret, state.journals.map(journal => path.relative(directory, journal.directory)), state.journals.every(journal => journal.key === 'cd'.repeat(32))],
@@ -127,6 +128,10 @@ test('administration stays inside the worker and only seven closed methods cross
   assert.deepEqual([state.projection.bindings[0].organizationId, state.projection.bindings[0].credentials], [ORGANIZATION, { login: 'c4g_onb_api_x' }]);
   assert.deepEqual(state.projection.allowedResidency, [{ regionCode: 'EU', policyVersion: 'staging-v1' }], 'the staging region, not the local default');
   assert.deepEqual(state.calls.at(-1), ['memberProjection', { organizationId: ORGANIZATION, name: 'Pessoa' }]);
+  await worker.methods.memberErasure({ organizationId: ORGANIZATION, membershipId: ORGANIZATION });
+  assert.deepEqual([state.erasure.bindings.length, state.erasure.bindings[0].organizationId, state.erasure.bindings[0].snapshot.workload, state.erasure.bindings[0].credentials], [1, ORGANIZATION, 'API', { login: 'c4g_onb_api_x' }]);
+  assert.deepEqual(state.erasure.allowedResidency, [{ regionCode: 'EU', policyVersion: 'staging-v1' }]);
+  assert.deepEqual(state.calls.at(-1), ['memberErasure', { organizationId: ORGANIZATION, membershipId: ORGANIZATION }]);
 
   assert.deepEqual(await worker.methods.health(), { ready: false, lastFailure: null }, 'not ready before the first completed pass');
   await worker.tick();

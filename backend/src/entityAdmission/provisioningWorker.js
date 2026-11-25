@@ -109,6 +109,7 @@ const realDependencies = Object.freeze({
   createCompletion: options => require('./completionService').createCompletionService(options),
   createCompletionWorker: service => require('./completionWorker').createCompletionWorker(service),
   createMemberProjection: options => require('../platformOnboarding/memberProjection').createMemberProjection(options),
+  createDeletionProjection: options => require('../platformDirectory/deletionProjection').createDeletionProjection(options),
   createEmail: options => require('../platformOnboarding/activationEmail').createActivationEmail(options),
   createTenantUpgrade: options => createTenantUpgrade(options),
   // A published login must reach only its own database, without elevated attributes, and match the Central binding.
@@ -213,6 +214,14 @@ function buildWorker({ settings, directory, dependencies = {}, fetchImpl = fetch
       const credentials = await registry.resolve({ ...snapshot, workload: 'API' });
       return d.createMemberProjection({ bindings: [{ organizationId: value.organizationId, snapshot, credentials }],
         allowedResidency: [{ regionCode: settings.regionCode, policyVersion: settings.residencyPolicyVersion }] }).ensure(value);
+    },
+    // Anonymizes one deleted person in the database of an entity created by admission, with that entity's API login:
+    // the same function, checks and login as the member worker uses for the entities of its file.
+    async memberErasure(value) {
+      const snapshot = await tenantDirectory.resolveSnapshotByOrganization(value.organizationId, 'API');
+      const credentials = await registry.resolve({ ...snapshot, workload: 'API' });
+      return d.createDeletionProjection({ bindings: [{ organizationId: value.organizationId, snapshot, credentials }],
+        allowedResidency: [{ regionCode: settings.regionCode, policyVersion: settings.residencyPolicyVersion }] }).anonymize(value);
     }
   });
   async function close() {

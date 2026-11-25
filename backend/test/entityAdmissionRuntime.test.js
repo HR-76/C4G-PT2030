@@ -49,7 +49,8 @@ function fakes({ workerFails = false } = {}) {
     createInvitationEmail(options) { state.email = options; return async input => { state.prepared = input; if (state.prepareFails) throw Error('private'); return { message: { subject: 's', html: 'h', text: 't' } }; }; },
     async createOidc(options) { state.oidc = options; return { async bridge(ticket, subject) { return { subject: subject || SUBJECT, by: 'admission' }; }, async verify(value) { return { verified: value }; } }; } };
 }
-const members = () => ({ fallback: null, projection: null, setBridgeFallback(check) { this.fallback = check; }, setProjectionFallback(project) { this.projection = project; } });
+const members = () => ({ fallback: null, projection: null, erasure: null, setBridgeFallback(check) { this.fallback = check; }, setProjectionFallback(project) { this.projection = project; },
+  setErasureFallback(erase) { this.erasure = erase; } });
 
 test('admission stays off unless selected and refuses what it cannot run on', t => {
   const folder = memberDirectory(t), f = fakes();
@@ -58,6 +59,7 @@ test('admission stays off unless selected and refuses what it cannot run on', t 
   assert.throws(() => configuredEntityAdmission({ env: { ENTITY_ADMISSION_RUNTIME: 'local' }, express }), { code: 'ENTITY_ADMISSION_RUNTIME_INVALID' });
   assert.throws(() => configuredEntityAdmission({ env: environment(folder), express, centralPool: pool, ...f }), { code: 'ENTITY_ADMISSION_REQUIRES_MEMBER_RUNTIME' });
   assert.throws(() => configuredEntityAdmission({ env: environment(folder), express, members: { setBridgeFallback() {} }, centralPool: pool, ...f }), { code: 'ENTITY_ADMISSION_REQUIRES_MEMBER_RUNTIME' });
+  assert.throws(() => configuredEntityAdmission({ env: environment(folder), express, members: { setBridgeFallback() {}, setProjectionFallback() {} }, centralPool: pool, ...f }), { code: 'ENTITY_ADMISSION_REQUIRES_MEMBER_RUNTIME' });
   assert.throws(() => configuredEntityAdmission({ env: environment(folder), express, members: members(), ...f }), { code: 'ENTITY_ADMISSION_CENTRAL_POOL_REQUIRED' });
   for (const directory of [undefined, '', 'relative/admissions']) {
     assert.throws(() => configuredEntityAdmission({ env: { ...environment(folder), ENTITY_ADMISSION_DIRECTORY: directory }, express, members: members(), centralPool: pool, ...f }), { code: 'ENTITY_ADMISSION_DIRECTORY_INVALID' });
@@ -103,6 +105,8 @@ test('admission pages answer after start, the bridge fallback is registered and 
   assert.deepEqual(await member.fallback('ticket', SUBJECT), { subject: SUBJECT, by: 'admission' });
   await member.projection({ organizationId: 'o' });
   assert.deepEqual(f.calls.at(-1), ['memberProjection', { organizationId: 'o' }]);
+  await member.erasure({ organizationId: 'o' });
+  assert.deepEqual(f.calls.at(-1), ['memberErasure', { organizationId: 'o' }]);
   for (const [url, expected] of [['/api/admission-activation', true], ['/api/admission-activation/begin', true], ['/api/admission-activation?x=1', true],
     ['/api/admission-activations', false], ['/api/activation', false], ['/api/admissions/mine', false]]) assert.equal(started.handles(url), expected, url);
 
@@ -125,7 +129,7 @@ test('a selected runtime refuses to start while its worker does not answer', asy
   t.after(() => admission.close());
   admission.createAdmission({ authorityCoordinator: {}, authConfig });
   await assert.rejects(admission.start(), { code: 'ENTITY_ADMISSION_WORKER_UNAVAILABLE' });
-  assert.deepEqual([member.fallback, member.projection], [null, null]);
+  assert.deepEqual([member.fallback, member.projection, member.erasure], [null, null, null]);
   assert.equal(f.state.oidc, null);
 });
 
@@ -214,6 +218,32 @@ test('a person invited into an entity the member worker does not know is project
   assert.deepEqual(calls.at(-1), ['member', 'projection'], 'another failure never reaches the admission worker');
   failure = null;
   assert.deepEqual((await service.projection.ensure({ organizationId: 'installed' })).by, 'member');
+});
+
+test('a deleted person of an entity the member worker does not know is anonymized by the fallback, and nothing else is', async t => {
+  const folder = memberDirectory(t), calls = [];
+  let failure = 'PROJECTION_DELETION_TENANT_UNKNOWN';
+  const runtime = configuredMemberOnboarding({ env: { ...environment(folder), USER_DELETION_RUNTIME: 'central' }, express,
+    createWorker: () => ({ async call(method, value) { calls.push(['member', method]); if (method === 'erasePerson' && failure) throw Object.assign(Error(failure), { code: failure }); return { by: 'member', value }; }, async close() {} }),
+    createService: options => options, createDeletion: options => options, createOidc: async () => ({ async bridge() {}, async verify() {} }) });
+  t.after(() => runtime.close());
+  const anonymize = runtime.createUserDeletion({ authorityCoordinator: {}, authConfig }).projection.anonymize;
+  await assert.rejects(anonymize({ organizationId: 'new' }), { code: 'PROJECTION_DELETION_UNCONFIRMED' }, 'without a fallback the deletion stays unconfirmed');
+  assert.throws(() => runtime.setErasureFallback(null), { code: 'MEMBER_ERASURE_FALLBACK_INVALID' });
+  runtime.setErasureFallback(async value => { calls.push(['admission', value.organizationId]); return { by: 'admission' }; });
+  assert.deepEqual(await anonymize({ organizationId: 'new' }), { by: 'admission' });
+  assert.deepEqual(calls.slice(-2), [['member', 'erasePerson'], ['admission', 'new']]);
+  failure = 'PROJECTION_DELETION_UNCONFIRMED';
+  await assert.rejects(anonymize({ organizationId: 'installed' }), { code: 'PROJECTION_DELETION_UNCONFIRMED' });
+  assert.deepEqual(calls.at(-1), ['member', 'erasePerson'], 'another failure never reaches the admission worker');
+  failure = null;
+  assert.deepEqual((await anonymize({ organizationId: 'installed' })).by, 'member');
+});
+
+test('the member worker names an entity outside its file with its own code, before opening any connection', async () => {
+  const { createDeletionProjection } = require('../src/platformDirectory/deletionProjection');
+  const projection = createDeletionProjection({ bindings: [], createPool() { assert.fail('no pool'); } });
+  await assert.rejects(projection.anonymize({ organizationId: SUBJECT, membershipId: SUBJECT, globalUserId: SUBJECT, requestId: SUBJECT }), { code: 'PROJECTION_DELETION_TENANT_UNKNOWN' });
 });
 
 test('a failing step of the worker is reported once per change, as codes only', async t => {

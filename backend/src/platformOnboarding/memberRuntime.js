@@ -37,6 +37,7 @@ function bridgePort(env) {
 function configuredMemberOnboarding({ env, express, trustProxy = 1,
   createWorker = file => require('./memberWorkerClient').createMemberWorkerClient(file),
   createService = options => require('./memberService').createMemberOnboardingService(options),
+  createDeletion = options => require('../platformDirectory/deletion').createUserDeletion(options),
   createOidc = options => require('./oidcActivationAdapter').createOidcActivationAdapter(options) }) {
   const selection = env.MEMBER_ONBOARDING_RUNTIME || 'disabled';
   if (selection === 'disabled') return null;
@@ -46,7 +47,7 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
   const settings = readSettings(directory, env);
   const port = bridgePort(env);
   const worker = createWorker(path.join(directory, 'worker.json'));
-  let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null, bridgeFallback = null, projectionFallback = null;
+  let service = null, deletionService=null, oidc = null, bridgeServer = null, started = null, bridgeFallback = null, projectionFallback = null, erasureFallback = null;
 
   function createMemberOnboarding({ authorityCoordinator, authConfig, prepareEmail, deliveryHistory }) {
     service = createService({ coordinator: authorityCoordinator, issuer: settings.issuer, policyVersion: authConfig.policyVersion,
@@ -110,10 +111,19 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
 
   function createUserDeletion({authorityCoordinator,authConfig}){
     if(env.USER_DELETION_RUNTIME!=='central')return null;
-    deletionService=require('../platformDirectory/deletion').createUserDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
+    deletionService=createDeletion({coordinator:authorityCoordinator,issuer:settings.issuer,
       policyVersion:authConfig.policyVersion,recentMfaRequirement:authConfig.assurancePolicy[authConfig.privilegedLoginCategory || 'recent-mfa'],
       audit:require('./audit').createOnboardingAudit(),
-      identity:{remove:value=>worker.call('deleteIdentity',value)},projection:{anonymize:value=>worker.call('erasePerson',value)}});
+      identity:{remove:value=>worker.call('deleteIdentity',value)},
+      // The member worker only knows the organizations of its own file. A person of an entity created by admission is
+      // anonymized by the fallback (the admission worker), if one was set; any other failure is never retried there.
+      projection:{anonymize:async value=>{
+        try{return await worker.call('erasePerson',value);}catch(error){
+          if(error?.code!=='PROJECTION_DELETION_TENANT_UNKNOWN')throw error;
+          if(!erasureFallback)throw invalid('PROJECTION_DELETION_UNCONFIRMED');
+          return erasureFallback(value);
+        }
+      }}});
     return deletionService;
   }
   function setBridgeFallback(check) {
@@ -124,7 +134,11 @@ function configuredMemberOnboarding({ env, express, trustProxy = 1,
     if (typeof project !== 'function') throw invalid('MEMBER_PROJECTION_FALLBACK_INVALID');
     projectionFallback = project;
   }
-  return Object.freeze({ createMemberOnboarding, createUserDeletion, setBridgeFallback, setProjectionFallback, start, close });
+  function setErasureFallback(erase) {
+    if (typeof erase !== 'function') throw invalid('MEMBER_ERASURE_FALLBACK_INVALID');
+    erasureFallback = erase;
+  }
+  return Object.freeze({ createMemberOnboarding, createUserDeletion, setBridgeFallback, setProjectionFallback, setErasureFallback, start, close });
 }
 
 module.exports = { configuredMemberOnboarding, readSettings, ACTIVATION_PATH, BRIDGE_PORT };

@@ -10,7 +10,8 @@ function createDeletionProjection({bindings,allowedResidency=[{regionCode:'LOCAL
  const profile=require('../security/tenantApiProfile').requireTenantApiProfile(tenantApiProfile);
  async function run(value,readOnly=false){
   for(const key of ['organizationId','membershipId','globalUserId','requestId'])uuid(value[key]);
-  const entry=bindings.find(b=>b.organizationId===value.organizationId);if(!entry)fail('PROJECTION_DELETION_UNCONFIRMED');
+  // Its own code: the caller may hand an entity outside this file to the process that holds its credentials. Nothing was opened yet.
+  const entry=bindings.find(b=>b.organizationId===value.organizationId);if(!entry)fail('PROJECTION_DELETION_TENANT_UNKNOWN');
   const {credentials,snapshot}=entry;
   if(snapshot.organizationId!==value.organizationId||snapshot.tenantId!==credentials.tenantId||snapshot.databaseRef!==credentials.database)fail('PROJECTION_DELETION_UNCONFIRMED');
   const runtime=require('../config/opportunityRuntime').createConfiguredOpportunityRuntime({centralPool:{query(){throw Error('CENTRAL_DISABLED');},connect(){throw Error('CENTRAL_DISABLED');}},editorialEnabled:profile.editorialEnabled,env:{OPPORTUNITY_API_CREDENTIALS_JSON:JSON.stringify([credentials]),OPPORTUNITY_ALLOWED_RESIDENCY_JSON:JSON.stringify(allowedResidency)}});

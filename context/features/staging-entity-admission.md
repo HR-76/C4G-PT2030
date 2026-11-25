@@ -74,8 +74,7 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 **Por fazer (cada um exige contrato e prova própria)**
 
 - **Retenção do chat.** `CHAT_RETENTION_CREDENTIALS_JSON` é uma lista explícita por organização com o login WORKER. As entidades novas não entram: as suas conversas não são eliminadas aos 90 dias. O login WORKER delas existe no registo cifrado, mas a fronteira do worker só expõe o login API.
-- **Eliminação de utilizadores** (`USER_DELETION_RUNTIME=central`): a anonimização da pessoa no tenant só conhece as organizações do ficheiro dos convites.
-- **Rotação mensal das partições de auditoria** nas bases novas: o provisionamento cria as partições iniciais; a rotação por base não foi verificada.
+- **Rotação mensal das partições de auditoria** nas bases novas: resolvido por leitura do código a 25/11/2026. O provisionador da adesão cria 60 meses de partições ao criar a base (`postgresProvisioner.js`, `ensureAuditPartitionsWithPool`), como na entidade instalada; não há rotação mensal a fazer até 2031. Por confirmar na VPS com uma consulta só de leitura.
 - **Documentos das candidaturas** continuam adiados no staging, para todas as entidades.
 
 ## Fase 5 — ensaio na VPS (23/11/2026): segunda entidade criada, com limites
@@ -139,6 +138,22 @@ Critérios de aceitação: os itens acima, verificados com substitutos (ordem re
 - **Correção.** As duas verificações de uma base existente no provisionador (ao criar e ao projetar a pessoa) deixam de fixar a lista base e passam a deixar o verificador escolher. A base nova continua a ser criada sobre a lista base. Nenhum ficheiro de `backend/src/security` foi alterado.
 - **Resultado (commit `8cb4eff`).** O worker retomou a mesma adesão sem intervenção: a pessoa foi criada na base já no 041, as credenciais foram publicadas e a adesão chegou a `COMPLETE`. A entidade «PROJETOS» ficou `ACTIVE` com provisionamento `READY`, os agregadores partilhados ficaram como a instalação os tem e o papel do instalador sem privilégios. É a primeira entidade criada de ponta a ponta com a migração automática.
 - **Por corrigir:** enquanto a entidade está em preparação, a página do cliente mostrou «Esta adesão já não está disponível» em vez de «Em preparação».
+
+## Eliminação de utilizadores nas entidades novas (25/11/2026, em Review, por ensaiar)
+
+Fecha o ponto «Eliminação de utilizadores» da fase 4. Antes, eliminar uma conta com adesão a uma entidade criada pela adesão parava em `PROJECTION_DELETION_UNCONFIRMED` depois de a identidade já ter sido removida, porque o worker dos convites só conhece as organizações do seu ficheiro.
+
+- **O que muda.** O worker dos convites responde `PROJECTION_DELETION_TENANT_UNKNOWN` quando a organização não está no seu ficheiro, antes de abrir qualquer ligação. Só nesse caso a API entrega o pedido ao worker de adesão (método novo `memberErasure`), que anonimiza a pessoa na base dessa entidade com o login API dela, pela mesma função (`erase_account_identity`) e com as mesmas verificações da entidade instalada. É o mesmo desenho do convite de pessoas (`memberProjection`).
+- **O que não muda.** Qualquer outra falha do worker dos convites nunca chega ao worker de adesão. Sem adesão ligada, a resposta continua a ser `PROJECTION_DELETION_UNCONFIRMED`. Nenhum login, papel ou privilégio novo; o login WORKER continua a não sair do worker de adesão. Nenhum ficheiro de `backend/src/security` alterado; sem migração.
+- **Requisito.** A base da entidade tem de estar no esquema 041 (capacidade `ACCOUNT_IDENTITY_ERASURE`), o que a migração automática já garante.
+
+Critérios de aceitação: os itens acima, verificados com substitutos. Backend 3628 aprovados, 9 ignorados, 2 falhas anteriores e alheias (SEC-AC-01) e 1 intermitente noutro ficheiro, que passa isolado; 2 testes novos e 3 alargados; lint aprovado.
+
+**Não provado:** nenhuma eliminação real numa entidade criada pela adesão. O ensaio é eliminar no staging um utilizador de teste convidado para a entidade «Teste» e confirmar que a operação chega a `COMPLETE` e que a pessoa fica anonimizada só nessa base.
+
+## Retenção do chat nas entidades novas (25/11/2026, por decidir)
+
+O executor da retenção (`backend/src/chatRetention.js`) é um comando diário lançado pelo agendador do sistema, com uma lista explícita de logins WORKER. O compose do staging não o inclui e o repositório não regista que tenha sido instalado na VPS. Se não estiver a correr no staging, o ponto não é específico das entidades novas. Estendê-lo a essas entidades exige que o login WORKER delas saia do worker de adesão, o que hoje é recusado de propósito (`credentialRegistry.resolve` só entrega o login API); é uma decisão do utilizador, não um ajuste.
 
 ## Limites e decisões
 
