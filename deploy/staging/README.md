@@ -351,12 +351,75 @@ docker exec c4g-staging-postgres-db-1 psql -U postgres -Atc "select datname from
 **Depois de existirem entidades novas:**
 
 - Uma base nova nasce no esquema base (033) e o worker leva-a logo ao esquema do staging (041), se o `worker.json` tiver `tenantUpgrade` (um ficheiro escrito antes de 24/11/2026 não tem: repete o passo 1, que o acrescenta e mantém as chaves, e recria a API). Sem isso, corre `upgrade --apply` depois de cada entidade criada. `upgrade` (sem `--apply`) mostra cada base em `onboardedTenants`, com a versão atual e os passos em falta; `upgrade --apply` aplica-os, depois da Central e da entidade instalada, e é o que se usa para passos novos. Se uma base recusar um passo, o comando pára e escreve `STAGING_UPGRADE_ONBOARDED_TENANT_FAILED <base> from=<versão> <código>`; `--skip-onboarded` deixa as bases da adesão como estão.
-- A retenção do chat (90 dias) e a eliminação de utilizadores não abrangem as entidades novas.
+- A retenção do chat (90 dias) só as abrange depois da secção «Retenção do chat (entidades da adesão)». A eliminação de utilizadores abrange-as sem mais passos.
 - As cópias de segurança abrangem-nas sem mais passos.
 
 **Guardar fora da VPS:** a pasta `/srv/c4g-staging/admissions` inteira (`worker.json` e as subpastas `credentials` e `provisioning`). Sem ela, ou sem a `journalKey` que está no `worker.json`, a API deixa de conseguir entrar nas bases das entidades novas, mesmo com as cópias de segurança das bases. Não apagues nem regeneres o `worker.json`.
 
 **Voltar atrás:** retira as duas linhas `ENTITY_ADMISSION_` do `api-private.env` e recria a API (`up -d --force-recreate api`). As rotas de adesão deixam de existir; as bases já criadas, os registos na Central e as contas no Keycloak ficam, e as entidades novas ficam inacessíveis até a adesão voltar a ser ligada.
+
+## Retenção do chat (entidades da adesão)
+
+Elimina, todos os dias às 03:00 (Lisboa), o chat das candidaturas fechadas há 90 ou mais dias. Runbook: [chat-retention.md](../../context/runbooks/chat-retention.md). Exige a adesão ligada (secção anterior) e as bases na 040 ou acima. **Abrange só as entidades criadas pela adesão**: a entidade instalada não tem ligação WORKER publicada na Central. A ordem dos passos 1 a 3 é obrigatória; pela ordem inversa a criação de entidades pára.
+
+**1. Papel no ficheiro do worker de adesão.** As credenciais do Keycloak vêm do próprio contentor e o ficheiro é apagado no fim:
+
+```bash
+cd /srv/c4g-staging/src && IMG=$(docker inspect -f '{{.Config.Image}}' c4g-staging-api-api-1) && KC=c4g-staging-keycloak-keycloak-1
+install -m 600 /dev/null /srv/c4g-staging/keycloak-admin.env
+docker exec $KC sh -c 'printf "C4G_KEYCLOAK_ADMIN_USER=%s\nC4G_KEYCLOAK_ADMIN_PASSWORD=%s\n" "$KC_BOOTSTRAP_ADMIN_USERNAME" "$KC_BOOTSTRAP_ADMIN_PASSWORD"' > /srv/c4g-staging/keycloak-admin.env
+docker run --rm --user 0:0 --network container:$KC --env-file /srv/c4g-staging/postgres/.env --env-file /srv/c4g-staging/api-oidc.env --env-file /srv/c4g-staging/keycloak-admin.env -e C4G_STAGING_STATE=/state/install.json -v /srv/c4g-staging/state:/state -v /srv/c4g-staging/members:/members:ro -v /srv/c4g-staging/admissions:/admissions $IMG node scripts/staging/install.js admission --chat-retention
+rm -f /srv/c4g-staging/keycloak-admin.env
+```
+
+Esperado: `{"configured":true,...}`. `STAGING_ARGUMENT_INVALID` significa que a imagem em execução é anterior a esta opção: atualiza a release primeiro.
+
+**2. Recriar só a API** (nunca o pod):
+
+```bash
+export C4G_RELEASE=$(git rev-parse --short HEAD) && docker compose -f deploy/staging/compose.yaml up -d --force-recreate api
+sleep 60; curl -s -o /dev/null -w 'ready=%{http_code}\n' http://127.0.0.1:8500/health/ready
+```
+
+**3. Conceder o papel ao agregador dos workers.** Uma vez; vale para todas as bases do cluster:
+
+```bash
+docker exec c4g-staging-postgres-db-1 psql -U postgres -d c4g_tenant_staging -v ON_ERROR_STOP=1 -c "GRANT c4g_chat_retention_runtime TO c4g_tenant_worker_capabilities WITH SET TRUE, INHERIT FALSE, ADMIN FALSE"
+```
+
+`role "c4g_chat_retention_runtime" does not exist` significa que o tenant está abaixo da 040: corre o `upgrade --apply` primeiro.
+
+**4. Variáveis do comando.** Copiadas de ficheiros que já existem, sem as mostrar:
+
+```bash
+install -m 600 /dev/null /srv/c4g-staging/chat-retention.env
+{ grep -E '^(AUTHORITY_DATABASE_URL|AUTHORITY_COMMIT_PERMIT_SECRET)=' /srv/c4g-staging/api-private.env; echo NODE_ENV=production; echo CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY=/journal; printf 'CHAT_RETENTION_ADMISSION_JOURNAL_KEY=%s\n' "$(python3 -c "import json;print(json.load(open('/srv/c4g-staging/admissions/worker.json'))['journalKey'])")"; } > /srv/c4g-staging/chat-retention.env
+grep -c = /srv/c4g-staging/chat-retention.env
+```
+
+Esperado: `5`.
+
+**5. Comando e primeira execução.** O comando usa a imagem que a API estiver a correr, por isso acompanha as atualizações:
+
+```bash
+printf '%s\n' '#!/bin/sh' 'exec docker run --rm --name c4g-staging-chat-retention --network c4g-staging-data --env-file /srv/c4g-staging/chat-retention.env -e NODE_EXTRA_CA_CERTS=/certs/ca.pem -v /srv/c4g-staging/postgres/certs/ca.pem:/certs/ca.pem:ro -v /srv/c4g-staging/admissions/credentials:/journal:ro "$(docker inspect -f "{{.Config.Image}}" c4g-staging-api-api-1)" node src/chatRetention.js' > /srv/c4g-staging/chat-retention.sh && chmod 700 /srv/c4g-staging/chat-retention.sh
+/srv/c4g-staging/chat-retention.sh; echo "exit=$?"
+```
+
+Esperado: uma linha `CHAT_RETENTION_RUN_DONE` com `failures: 0` e `exit=0`. A primeira execução elimina de facto o que já tiver 90 dias. `CHAT_RETENTION_RUN_FAILED` com `CHAT_RETENTION_CONFIGURATION_INVALID`: variáveis, chave ou pasta do diário, ou ainda não existe nenhuma entidade da adesão. Uma organização com `ROLE_CHAIN` no código: o passo 3 não foi feito.
+
+**6. Agendar e confirmar a adesão:**
+
+```bash
+printf '%s\n' '[Unit]' 'Description=C4G staging chat retention' '[Service]' 'Type=oneshot' 'ExecStart=/srv/c4g-staging/chat-retention.sh' > /etc/systemd/system/c4g-staging-chat-retention.service
+printf '%s\n' '[Unit]' 'Description=C4G staging chat retention (daily)' '[Timer]' 'OnCalendar=*-*-* 03:00:00 Europe/Lisbon' 'Persistent=true' '[Install]' 'WantedBy=timers.target' > /etc/systemd/system/c4g-staging-chat-retention.timer
+systemctl daemon-reload && systemctl enable --now c4g-staging-chat-retention.timer && systemctl list-timers c4g-staging-chat-retention.timer --no-pager
+docker logs --since 10m c4g-staging-api-api-1 2>&1 | grep -c C4G_ADMISSION_STEP_FAILED
+```
+
+Esperado: o timer listado e `0` linhas de falha da adesão. Ver uma execução: `journalctl -u c4g-staging-chat-retention.service -n 20 --no-pager`.
+
+**Voltar atrás:** `systemctl disable --now c4g-staging-chat-retention.timer`. O papel pode ficar no agregador; para o retirar, primeiro `REVOKE c4g_chat_retention_runtime FROM c4g_tenant_worker_capabilities`, depois tirar o papel de `tenantRoles.worker` no `worker.json` e recriar a API. Uma entidade retirada da Central conta como falha diária até o ficheiro dela sair de `admissions/credentials`.
 
 ## Limites conhecidos
 

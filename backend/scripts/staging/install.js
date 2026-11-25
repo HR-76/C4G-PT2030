@@ -14,6 +14,7 @@
 //           | upgrade [--apply]   (without --apply it only reports the pending steps)
 //           | runtime-logins      (after upgrade: creates the API and worker Central logins and checks the schema)
 //           | members [--prepare] [--out <folder>] [--keycloak-internal <origin>]   (member invitations; see below)
+//           | admission [--chat-retention]   (entity admission; the switch names the chat retention role in the worker file)
 // Profiles: ORG_ADMIN (Administrador), FUNDING_MANAGER (Gestor de candidaturas), CONTRIBUTOR (Técnico), VIEWER.
 // Secrets are generated on first use, kept in the state file (mode 600) and written only to files, never printed.
 const fs = require('node:fs');
@@ -418,7 +419,8 @@ async function admission(env, args, { fetchImpl = fetch } = {}) {
   const workerFile = path.join(folder, 'worker.json');
   // Built before Keycloak is touched: a refused configuration changes nothing.
   const worker = admissionWorkerConfiguration(state, { issuer, member, centralDatabase: config.centralDatabase,
-    postgres: { host: apiHost, port: config.port, password: config.password }, prior: readJson(workerFile), generateSecret: () => randomBytes(32).toString('hex') });
+    postgres: { host: apiHost, port: config.port, password: config.password }, prior: readJson(workerFile), generateSecret: () => randomBytes(32).toString('hex'),
+    chatRetention: args['chat-retention'] === true });
   const { realm } = memberTarget({ issuer, origin });
   const kc = await keycloakAdministration({ baseUrl: env.C4G_KEYCLOAK_ADMIN_URL || 'http://localhost:8080', realm, username: env.C4G_KEYCLOAK_ADMIN_USER, password: env.C4G_KEYCLOAK_ADMIN_PASSWORD, fetchImpl });
   const redirect = origin + ADMISSION_CALLBACK_PATH, clients = [];
@@ -482,7 +484,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
   }
   if (command === 'storage-check') { parseArguments(rest); return storageCheck(env); }
   if (command === 'members') return members(env, parseArguments(rest, { values: ['--out', '--keycloak-internal'], flags: ['--prepare'] }));
-  if (command === 'admission') return admission(env, parseArguments(rest, { values: ['--out', '--members'] }));
+  if (command === 'admission') return admission(env, parseArguments(rest, { values: ['--out', '--members'], flags: ['--chat-retention'] }));
   throw refuse('STAGING_COMMAND_INVALID');
 }
 

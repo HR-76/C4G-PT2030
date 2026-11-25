@@ -31,6 +31,13 @@ async function inspect(pool) {
 // can serve a database that the API reaches under another name (container network) and over TLS.
 const LOCAL_TARGET = Object.freeze({ apiLogin: 'c4g_local_api', workerLogin: 'c4g_local_worker', credentialRefPrefix: 'local-api',
   credentialHost: null, credentialPort: null, credentialSsl: false, regionCode: 'LOCAL', residencyPolicyVersion: 'local-development-v1' });
+// The functional roles the shared WORKER aggregator holds. Chat retention (context/runbooks/chat-retention.md) is granted
+// by the operator, never here: a membership that already exists is accepted, so repeating the installation still passes.
+async function workerAggregatorRoles(tenant) {
+  const granted = await tenant.query(`SELECT 1 FROM pg_auth_members m JOIN pg_roles g ON g.oid=m.roleid JOIN pg_roles a ON a.oid=m.member
+    WHERE g.rolname=$1 AND a.rolname=$2`, ['c4g_chat_retention_runtime', 'c4g_tenant_worker_capabilities']);
+  return ['c4g_import_worker_runtime', ...(granted.rowCount ? ['c4g_chat_retention_runtime'] : [])];
+}
 async function installSchemas(config, state, persist = () => {}, options = {}) {
   assertTarget(config);
   const target = { ...LOCAL_TARGET, ...options };
@@ -96,7 +103,7 @@ async function installSchemas(config, state, persist = () => {}, options = {}) {
     const provisioner = await createLocalTenantIdentityProvisioner(tenant);
     await provisioner.reconcile({ apiLogin: target.apiLogin, workerLogin: target.workerLogin,
       apiPassword: state.tenantPassword, workerPassword: state.workerPassword,
-      apiRoles: ['c4g_opportunity_tenant_runtime'], workerRoles: ['c4g_import_worker_runtime'] });
+      apiRoles: ['c4g_opportunity_tenant_runtime'], workerRoles: await workerAggregatorRoles(tenant) });
     await tenant.query(`GRANT CONNECT ON DATABASE ${database} TO ${apiLogin},${workerLogin}`);
     await central.query(`REVOKE CONNECT ON DATABASE ${identifier(config.centralDatabase)} FROM PUBLIC`);
     await central.query(`GRANT CONNECT ON DATABASE ${identifier(config.centralDatabase)} TO c4g_authority_runtime`);
@@ -121,4 +128,4 @@ async function installSchemas(config, state, persist = () => {}, options = {}) {
     await central.end(); await tenant.end();
   }
 }
-module.exports = { initialState, inspect, installSchemas };
+module.exports = { initialState, inspect, installSchemas, workerAggregatorRoles };

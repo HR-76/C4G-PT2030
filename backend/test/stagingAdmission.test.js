@@ -20,7 +20,7 @@ const member = () => ({ issuer: ISSUER, adminOrigin: 'http://keycloak:8080', cli
 const secrets = () => { let n = 0; return () => (++n).toString(16).padStart(2, '0').repeat(32); };
 const target = { postgres: { host: 'c4g-postgres', port: 5432, password: 'synthetic-admin' }, centralDatabase: 'c4g_central_staging' };
 
-test('the worker file is one the worker accepts, and repeating keeps both keys', t => {
+test('the worker file is one the worker accepts, and repeating keeps both keys', async t => {
   const first = admissionWorkerConfiguration(state(), { issuer: ISSUER, member: member(), ...target, generateSecret: secrets() });
   assert.deepEqual(first, { issuer: ISSUER, adminOrigin: 'http://keycloak:8080', clientId: 'c4g-member-worker', clientSecret: 'synthetic-client-secret',
     ownershipKey: '01'.repeat(32), journalKey: '02'.repeat(32), postgres: { host: 'c4g-postgres', port: 5432, user: 'postgres', password: 'synthetic-admin', ssl: true },
@@ -30,7 +30,8 @@ test('the worker file is one the worker accepts, and repeating keeps both keys',
     tenantRoles: { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] },
     // New databases are brought to the staging schema by the worker, with the installer's own steps.
     tenantUpgrade: { profile: 'staging-registered-v1', installationId: INSTALLATION } });
-  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/localPlatform/schema.js'), 'utf8'), /apiRoles: \['c4g_opportunity_tenant_runtime'\], workerRoles: \['c4g_import_worker_runtime'\]/);
+  assert.match(fs.readFileSync(path.join(__dirname, '../scripts/localPlatform/schema.js'), 'utf8'), /apiRoles: \['c4g_opportunity_tenant_runtime'\], workerRoles: await workerAggregatorRoles\(tenant\)/);
+  assert.deepEqual(await require('../scripts/localPlatform/schema').workerAggregatorRoles({ async query() { return { rowCount: 0 }; } }), first.tenantRoles.worker, 'without chat retention both name the same set');
   assert.notEqual(first.ownershipKey, member().ownershipKey, 'admission has its own ownership key');
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-staging-admission-'));
   t.after(() => fs.rmSync(folder, { recursive: true, force: true }));
@@ -198,4 +199,34 @@ test('an admission database tells Central under its own scope, the installed ten
   assert.deepEqual(scopes, ['default', `installation-1-${IDENTITY.tenantId}`]);
   assert.match(fs.readFileSync(path.join(__dirname, '../scripts/staging/install.js'), 'utf8'), /observationScope: onboardedObservationScope\(state\.installationId, item\.identity\.tenantId\)/);
   assert.equal(require('../scripts/staging/tenantSteps').onboardedObservationScope('installation-1', IDENTITY.tenantId), `installation-1-${IDENTITY.tenantId}`);
+});
+
+// Chat retention (context/runbooks/chat-retention.md): the shared WORKER aggregator may also hold c4g_chat_retention_runtime.
+test('the worker file names the chat retention role only when asked, and repeating keeps it', () => {
+  const build = (changes = {}) => admissionWorkerConfiguration(state(), { issuer: ISSUER, member: member(), ...target, generateSecret: secrets(), ...changes });
+  assert.deepEqual(build().tenantRoles.worker, ['c4g_import_worker_runtime']);
+  const asked = build({ chatRetention: true });
+  assert.deepEqual(asked.tenantRoles, { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime'] });
+  assert.deepEqual(build({ prior: asked }).tenantRoles.worker, ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime'], 'kept without the switch');
+  assert.deepEqual(build({ prior: asked, chatRetention: true }).tenantRoles.worker, ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime'], 'never twice');
+  // Nothing else in a prior file is carried into the role list.
+  assert.deepEqual(build({ prior: { ...asked, tenantRoles: { api: ['x'], worker: ['c4g_import_worker_runtime', 'c4g_tenant_owner'] } } }).tenantRoles,
+    { api: ['c4g_opportunity_tenant_runtime'], worker: ['c4g_import_worker_runtime'] });
+});
+
+test('the admission command accepts --chat-retention and writes the role into the worker file', async t => {
+  const w = workspace(t), kc = keycloak();
+  await admission(w.env, { out: w.out, members: w.members, 'chat-retention': true }, { fetchImpl: kc.fetchImpl });
+  assert.deepEqual(readSettings(path.join(w.out, 'worker.json'), { OIDC_ISSUER: ISSUER }).tenantRoles.worker, ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime']);
+  await admission(w.env, { out: w.out, members: w.members }, { fetchImpl: kc.fetchImpl });
+  assert.deepEqual(readSettings(path.join(w.out, 'worker.json'), { OIDC_ISSUER: ISSUER }).tenantRoles.worker, ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime']);
+});
+
+test('the installer accepts the chat retention role on the worker aggregator only when it is already granted', async () => {
+  const { workerAggregatorRoles } = require('../scripts/localPlatform/schema');
+  const pool = rowCount => ({ seen: [], async query(sql, values) { this.seen.push(values); return { rowCount, rows: [] }; } });
+  const granted = pool(1), absent = pool(0);
+  assert.deepEqual(await workerAggregatorRoles(granted), ['c4g_import_worker_runtime', 'c4g_chat_retention_runtime']);
+  assert.deepEqual(granted.seen, [['c4g_chat_retention_runtime', 'c4g_tenant_worker_capabilities']]);
+  assert.deepEqual(await workerAggregatorRoles(absent), ['c4g_import_worker_runtime']);
 });

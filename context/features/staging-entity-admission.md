@@ -73,7 +73,8 @@ Levantamento do que assumia uma só entidade e o que foi feito a cada ponto.
 
 **Por fazer (cada um exige contrato e prova própria)**
 
-- **Retenção do chat.** `CHAT_RETENTION_CREDENTIALS_JSON` é uma lista explícita por organização com o login WORKER. As entidades novas não entram: as suas conversas não são eliminadas aos 90 dias. O login WORKER delas existe no registo cifrado, mas a fronteira do worker só expõe o login API.
+- **Retenção do chat:** feito a 25/11/2026, ver «Retenção do chat nas entidades novas».
+- **Eliminação de utilizadores:** feito a 25/11/2026, ver «Eliminação de utilizadores nas entidades novas».
 - **Rotação mensal das partições de auditoria** nas bases novas: resolvido por leitura do código a 25/11/2026. O provisionador da adesão cria 60 meses de partições ao criar a base (`postgresProvisioner.js`, `ensureAuditPartitionsWithPool`), como na entidade instalada; não há rotação mensal a fazer até 2031. Por confirmar na VPS com uma consulta só de leitura.
 - **Documentos das candidaturas** continuam adiados no staging, para todas as entidades.
 
@@ -151,9 +152,25 @@ Critérios de aceitação: os itens acima, verificados com substitutos. Backend 
 
 **Não provado:** nenhuma eliminação real numa entidade criada pela adesão. O ensaio é eliminar no staging um utilizador de teste convidado para a entidade «Teste» e confirmar que a operação chega a `COMPLETE` e que a pessoa fica anonimizada só nessa base.
 
-## Retenção do chat nas entidades novas (25/11/2026, por decidir)
+## Retenção do chat nas entidades novas (25/11/2026, em Review, por ativar)
 
-O executor da retenção (`backend/src/chatRetention.js`) é um comando diário lançado pelo agendador do sistema, com uma lista explícita de logins WORKER. O compose do staging não o inclui e o repositório não regista que tenha sido instalado na VPS. Se não estiver a correr no staging, o ponto não é específico das entidades novas. Estendê-lo a essas entidades exige que o login WORKER delas saia do worker de adesão, o que hoje é recusado de propósito (`credentialRegistry.resolve` só entrega o login API); é uma decisão do utilizador, não um ajuste.
+Decisão do utilizador a 25/11/2026: estender a retenção às entidades criadas pela adesão. Fecha o ponto «Retenção do chat» da fase 4.
+
+- **O que muda.** O comando diário da retenção (`backend/src/chatRetention.js`) aceita duas variáveis novas, `CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY` (pasta `credentials` do worker de adesão) e `CHAT_RETENTION_ADMISSION_JOURNAL_KEY` (a `journalKey` desse worker). Com as duas, lê o diário cifrado e acrescenta à lista cada entidade publicada, com o login WORKER dela. As duas ou nenhuma; sem elas nada muda.
+- **Fronteira do worker intacta.** O worker de adesão continua a entregar só o login API (`credentialRegistry.resolve`). O login WORKER não passa pela API nem por IPC: é lido do disco pelo próprio comando, que corre na VPS com a chave na sua configuração privada. O comando não lê o `worker.json`, que tem as credenciais de administração.
+- **Mesmas verificações.** Para cada entidade: binding igual ao da Central, login limitado, cadeia de papéis exata e esquema com a capacidade `APPLICATION_CHAT_RETENTION`. O diário não guarda a geração da base: usa-se a que a Central regista e a base tem de coincidir.
+- **Falha fechada.** Chave errada, pasta em falta, entrada malformada, organização repetida nas duas listas ou mais de 100 no total param o comando antes de abrir qualquer ligação (`CHAT_RETENTION_CONFIGURATION_INVALID`). Uma entidade que falhe não impede as outras.
+
+Critérios de aceitação: os itens acima, verificados com um diário cifrado real em pasta temporária e portas simuladas. Backend 3636 aprovados, 9 ignorados, 2 falhas anteriores e alheias (SEC-AC-01); 2 testes novos; lint aprovado.
+
+**Correções para o staging (25/11/2026, em Review).** Ao preparar a ativação apareceram dois impedimentos, corrigidos por decisão do utilizador:
+
+- **A entidade instalada não pode entrar.** O instalador só publica na Central a ligação API de «C4G Staging»; sem ligação WORKER o comando recusa-a. Com o diário configurado, `CHAT_RETENTION_CREDENTIALS_JSON` passa a poder faltar ou vir vazia; tem de sobrar pelo menos uma entidade. No staging a retenção corre só nas entidades da adesão. Cobrir a instalada exige publicar uma ligação WORKER na Central: fora do âmbito.
+- **O instalador recusava o papel.** O `admission` ganha `--chat-retention`, que põe `c4g_chat_retention_runtime` em `tenantRoles.worker`; repetir sem a opção mantém-no e não transporta mais nada do ficheiro anterior. O `install` aceita o papel no agregador dos workers quando já lá está e nunca o concede.
+
+A ordem continua obrigatória: papel no `worker.json` e API recriada **antes** do `GRANT`, senão a criação de entidades pára com `LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP` (o caso de 23/11). Passos em [deploy/staging/README.md](../../deploy/staging/README.md#retenção-do-chat-entidades-da-adesão). Uma entidade retirada da Central conta como falha diária até o ficheiro dela sair do diário. Backend 3640 aprovados, 9 ignorados, as mesmas 2 falhas alheias; 4 testes novos; lint aprovado.
+
+**Não provado:** nenhuma execução contra a Central e as bases reais do staging.
 
 ## Limites e decisões
 
