@@ -1,0 +1,10 @@
+[Unit]
+Description=C4G staging: copia das bases para o R2 (cifrada)
+Wants=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /srv/c4g-staging/src/deploy/staging/backup/backup.sh
+TimeoutStartSec=1h
+Nice=10

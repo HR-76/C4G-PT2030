@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import CatalogFilters from './CatalogReadFilters'
@@ -160,7 +161,7 @@ export default function CatalogReadWorkspace({ scope, basePath = '/catalogo', is
           <CatalogReadResults {...{ page, state, store, interestOrganization, basePath, query, labels, Value, view, setView }} />
         </>
       )}
-      {state.busy && <p role="status">A carregar a consulta…</p>}
+      {state.busy && <LoadingIndicator>A carregar a consulta…</LoadingIndicator>}
       {state.error && <ErrorState error={state.error} retry={refresh} />}
       <footer>
         {state.meta && (

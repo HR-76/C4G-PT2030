@@ -1,11 +1,13 @@
 'use strict';
 const {createHmac}=require('node:crypto');
 const {uuid,fail}=require('./contracts');
-function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,usernameMode='generated',purpose='MEMBERSHIP'}){
+// adminOrigin: where the administration API answers when the public issuer does not expose it (a private container network).
+function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,usernameMode='generated',purpose='MEMBERSHIP',adminOrigin=null}){
  if(!['MEMBERSHIP','ADMISSION'].includes(purpose))fail('KEYCLOAK_CONFIGURATION_INVALID');
  if(!['generated','email'].includes(usernameMode))fail('KEYCLOAK_CONFIGURATION_INVALID');
  const url=new URL(issuer);if(url.protocol!=='https:'||!/^\/realms\/[a-zA-Z0-9_-]+$/.test(url.pathname)||typeof accessToken!=='function'||!ownershipKey||ownershipKey.length<32)fail('KEYCLOAK_CONFIGURATION_INVALID');
- const base=url.origin+'/admin'+url.pathname;
+ if(adminOrigin!==null){let admin;try{admin=new URL(adminOrigin);}catch{fail('KEYCLOAK_CONFIGURATION_INVALID');}if(!['http:','https:'].includes(admin.protocol)||admin.origin!==adminOrigin||admin.username||admin.password)fail('KEYCLOAK_CONFIGURATION_INVALID');}
+ const base=(adminOrigin||url.origin)+'/admin'+url.pathname;
  async function request(path,method='GET',body){
   const response=await fetchImpl(base+path,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{Authorization:'Bearer '+await accessToken(),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
   if(!response.ok){if(response.status===409)fail('IDENTITY_RECONCILIATION_REQUIRED');fail('KEYCLOAK_UNAVAILABLE');}
@@ -33,6 +35,9 @@ function createKeycloakAdapter({issuer,accessToken,ownershipKey,fetchImpl=fetch,
    if(!user?.enabled||user.username!==username||user.email?.toLowerCase()!==x.input.adminEmail||user.attributes?.c4g_onboarding_owner?.[0]!==marker(x))fail('IDENTITY_RECONCILIATION_REQUIRED');
    return {...binding(x),issuer,subject:user.id,mode:'CREATED'};
   },
+  // An account an earlier invitation created and nobody ever activated: enabled, marked as created by onboarding and with
+  // no password at all. A later invitation finds it as an existing account, but there is no password to sign in with.
+  async passwordSetupPending(subject){uuid(subject);const user=await request('/users/'+subject);if(!user?.enabled||typeof user.attributes?.c4g_onboarding_owner?.[0]!=='string'||!user.attributes.c4g_onboarding_owner[0])return false;const credentials=await request('/users/'+subject+'/credentials');return !credentials.some(c=>c.type==='password');},
   async passwordReady(subject){uuid(subject);const user=await request('/users/'+subject);if(!user?.enabled)return false;const credentials=await request('/users/'+subject+'/credentials');return credentials.some(c=>c.type==='password')&&!user.requiredActions?.includes('UPDATE_PASSWORD');}
  });
 }

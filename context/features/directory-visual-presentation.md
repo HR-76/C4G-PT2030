@@ -24,7 +24,7 @@ Revisão da direção: agrupar por tarefa, sem criar cartões por métrica nem n
 - Mobile a 390px sem overflow, foco visível, modal com Escape/retorno do foco.
 - Executar testes frontend, build e inspeção visual com API sintética. Sem dados reais, envio de convites ou deploy.
 
-Estado: Review — implementado e validado em 29/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. A classe directory-workspace é hoje usada também na página de logs, ao contrário do isolamento descrito em 29/10. Não repetida: a inspeção visual no Chrome. Estado anterior: Review — implementado e validado em 29/10/2026.
 
 ## Resultado
 

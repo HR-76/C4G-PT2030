@@ -43,7 +43,7 @@ function parse(method,v){
  return {expectedRevision:v.expectedRevision,idempotencyKey:uuid(v.idempotencyKey),...(method!=='partnerCreate'?{partnerId:uuid(v.partnerId)}:{}),...(method!=='partnerRemove'?{partner:partner(v.partner)}:{})};
 }
 const projection=row=>({id:row.partner_id,...row.body,people:row.body.people.filter(p=>p.active),createdAt:new Date(row.created_at).toISOString(),updatedAt:new Date(row.updated_at).toISOString()});
-function createPartnersRepository({organizationId:org,actor,protect,authorize,audit,cursor}){
+function createPartnersRepository({organizationId:org,actor,protect,authorize,audit,cursor,browseAllowed=async()=>true}){
  async function schema(c){if(!(await c.query("SELECT to_regclass('opportunity_catalog.application_partner') AS relation")).rows[0].relation)fail('SCHEMA_UPGRADE_REQUIRED');}
  async function application(c,id,write=false,intention=null){
   const row=(await c.query('SELECT * FROM opportunity_catalog.application WHERE organization_id=$1 AND application_id=$2',[org,id])).rows[0];if(!row)fail('RESOURCE_NOT_AVAILABLE');
@@ -70,7 +70,9 @@ function createPartnersRepository({organizationId:org,actor,protect,authorize,au
   return {items:rows.slice(0,25).map(r=>({revision:Number(r.revision),kind:r.kind,partnerId:r.partner_id,snapshot:r.snapshot,actorSubjectId:r.actor_subject_id,recordedAt:new Date(r.recorded_at).toISOString()})),nextCursor:rows.length>25?cursor.cursor(Number(rows[24].revision),bind):null};
  }
  async function partnersBrowse(c,id,input){
-  await protect({operationCode:'APPLICATION_READ',resource:resource(org,org)});await schema(c);
+  await protect({operationCode:'APPLICATION_READ',resource:resource(org,org)});
+  if(!await browseAllowed())fail('NOT_AUTHORIZED');
+  await schema(c);
   const visible=[];let last=null,exhausted=false;
   for(let n=0;n<=10000;n+=100){
    const limit=n===10000?1:100;

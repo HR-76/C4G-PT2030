@@ -1,9 +1,10 @@
 import LoadingIndicator from '../../components/LoadingIndicator'
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {Link} from 'react-router-dom'
-import {RefreshCw,Building2,Users,Globe,Receipt,Database,ScrollText,Activity,AlertTriangle} from 'lucide-react'
+import {RefreshCw,Building2,Users,Globe,Receipt,Database,DatabaseBackup,ScrollText,Activity,AlertTriangle} from 'lucide-react'
 import {useAuth} from '../../contexts/AuthContext'
 import {platformDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
 import InfoTooltip from '../../components/InfoTooltip'
 import './platform-directory.css'
 import './platform-dashboard.css'
@@ -12,12 +13,18 @@ import '../../dashboard-palette.css'
 const number=v=>new Intl.NumberFormat('pt-PT').format(v)
 const date=v=>new Intl.DateTimeFormat('pt-PT',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Lisbon'}).format(new Date(v))
 const states={ACTIVE:'Ativa',PROVISIONING:'Em preparação',SUSPENDED:'Suspensa',TERMINATING:'Em encerramento',ARCHIVED:'Arquivada'}
-export default function PlatformDashboard(){const {user}=useAuth();return <DashboardView key={user?.id}/>}
-export function DashboardView({api=platformDirectoryApi}){
- const [data,setData]=useState(null),[busy,setBusy]=useState(true),[error,setError]=useState(''),[revision,setRevision]=useState(0)
- useEffect(()=>{let active=true;const controller=new AbortController();setBusy(true);setData(null);setError('')
-  api.dashboard(controller.signal).then(r=>{if(active)setData(r.data)}).catch(e=>{if(active)setError(e.response?.status===403?'Esta área está reservada à administração C4G.':'Não foi possível carregar os indicadores. Tente atualizar o dashboard.')}).finally(()=>{if(active)setBusy(false)})
+export default function PlatformDashboard(){const {user}=useAuth();return <DashboardView key={user?.id} scope={user?.id?readScope(user.id,''):null}/>}
+// The indicators this administrator last received are shown at once and read
+// again on every entry. «Atualizar» waits for the server and shows nothing
+// meanwhile; a refused read removes them.
+export function DashboardView({api=platformDirectoryApi,scope=null}){
+ const [data,setData]=useState(()=>startConfirmedRead(scope,'platform-dashboard').held),[busy,setBusy]=useState(!data),[error,setError]=useState(''),[revision,setRevision]=useState(0)
+ const refreshed=useRef(0)
+ useEffect(()=>{let active=true;const controller=new AbortController(),read=startConfirmedRead(scope,'platform-dashboard'),held=refreshed.current===revision?read.held:null
+  refreshed.current=revision;setBusy(!held);setData(held);setError('')
+  api.dashboard(controller.signal).then(r=>{read.keep(r.data);if(active)setData(r.data)}).catch(e=>{if(active){read.drop();setData(null);setError(e.response?.status===403?'Esta área está reservada à administração C4G.':'Não foi possível carregar os indicadores. Tente atualizar o dashboard.')}}).finally(()=>{if(active)setBusy(false)})
   return()=>{active=false;controller.abort()}
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
  },[api,revision])
  return <div className="page platform-directory platform-dashboard">
   <header className="directory-heading"><div className="heading-with-info"><h1>Dashboard C4G</h1>{data&&<InfoTooltip label="Informação sobre os indicadores">Atualizado em {date(data.observedAt)}.</InfoTooltip>}</div><button className="btn btn-outline" disabled={busy} onClick={()=>setRevision(n=>n+1)}><RefreshCw size={16} aria-hidden="true"/> Atualizar</button></header>
@@ -50,6 +57,7 @@ export function DashboardView({api=platformDirectoryApi}){
      <Link to="/administracao/faturacao"><Receipt aria-hidden="true" size={20} data-icon-tone="amber"/><div>Faturação <span>Acompanhar ciclos, documentos e pagamentos</span></div></Link>
      <Link to="/integracoes"><Database aria-hidden="true" size={20} data-icon-tone="violet"/><div>Fontes de oportunidades <span>Consultar recolhas e importações</span></div></Link>
      <Link to="/administracao/logs"><ScrollText aria-hidden="true" size={20} data-icon-tone="rose"/><div>Logs <span>Rever entradas e erros registados</span></div></Link>
+     <Link to="/administracao/copias-seguranca"><DatabaseBackup aria-hidden="true" size={20} data-icon-tone="sky"/><div>Cópias de segurança <span>Ver a última cópia e o teste de restauro</span></div></Link>
     </section>
    </div>
   </>}

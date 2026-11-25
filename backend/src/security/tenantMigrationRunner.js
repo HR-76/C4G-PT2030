@@ -169,8 +169,8 @@ function createTenantMigrationRunner({
             SELECT migration_id, ordinal, checksum_sha256, irreversible, resulting_fingerprint
               FROM c4g_system.schema_migration
              ORDER BY ordinal`);
-          const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest } = require('./tenantMigrationManifest');
-          const observedEntries = (entries === manifest && [chatRetentionManifest, documentDeletionManifest, applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
+          const { receiptManifest, failureReceiptManifest, assignedReviewManifest, applicationChatManifest, organizationStrategyManifest, applicationTaskDetailsManifest, documentDeletionManifest, chatRetentionManifest, accountIdentityErasureManifest } = require('./tenantMigrationManifest');
+          const observedEntries = (entries === manifest && [accountIdentityErasureManifest, chatRetentionManifest, documentDeletionManifest, applicationTaskDetailsManifest, organizationStrategyManifest, applicationChatManifest, assignedReviewManifest, failureReceiptManifest, receiptManifest]
             .find(candidate => candidate.at(-1).version === existing.currentVersion)) || knownEntries;
           let ledger;
           try { ledger = validateTenantLedger(ledgerRows.rows, observedEntries, loadMigration); }
@@ -371,6 +371,12 @@ function createChatRetentionMigrationRunner({pool,observationPublisher,timeoutMs
     entries:chatRetentionManifest,requiredBaseVersion:DOCUMENT_DELETION_SCHEMA_VERSION});
 }
 
+function createAccountIdentityErasureMigrationRunner({pool,observationPublisher,timeoutMs,scheduler}) {
+  const {accountIdentityErasureManifest,CHAT_RETENTION_SCHEMA_VERSION}=require('./tenantMigrationManifest');
+  return createTenantMigrationRunner({pool,observationPublisher,timeoutMs,scheduler,
+    entries:accountIdentityErasureManifest,requiredBaseVersion:CHAT_RETENTION_SCHEMA_VERSION});
+}
+
 module.exports = { TENANT_MIGRATION_LOCK, TENANT_MIGRATION_OWNERSHIP, boundedTask, createTenantMigrationRunner,
   createRegisteredTenantMigrationRunner, createF12ReceiptTenantMigrationRunner, createF12FailureReceiptTenantMigrationRunner, createAssignedReviewMigrationRunner,
-  createApplicationChatMigrationRunner, createOrganizationStrategyMigrationRunner, createApplicationTaskDetailsMigrationRunner, createDocumentDeletionMigrationRunner, createChatRetentionMigrationRunner };
+  createApplicationChatMigrationRunner, createOrganizationStrategyMigrationRunner, createApplicationTaskDetailsMigrationRunner, createDocumentDeletionMigrationRunner, createChatRetentionMigrationRunner, createAccountIdentityErasureMigrationRunner };

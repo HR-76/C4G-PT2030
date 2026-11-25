@@ -15,7 +15,7 @@ const OrganizationCalendar = routePage(() => import('./pages/Applications/Organi
 const Dashboard = routePage(() => import('./pages/Dashboard'))
 const OpportunitiesList = routePage(() => import('./pages/Opportunities/OpportunitiesList'))
 const OpportunityDetail = routePage(() => import('./pages/Opportunities/OpportunityDetail'))
-const PrivateApplications = routePage(() => import('./pages/Applications/PrivateApplications'))
+const PrivateApplications = routePage(() => import('./pages/Applications/ApplicationsPage'))
 const Matching = routePage(() => import('./pages/Matching'))
 const Partners = routePage(() => import('./pages/Partners'))
 const Profile = routePage(() => import('./pages/Profile'))
@@ -34,10 +34,14 @@ const PlatformDashboard = routePage(() => import('./pages/Platform/PlatformDashb
 const EuLegacyPrearchiveReview = routePage(() => import('./pages/Platform/EuLegacyPrearchiveReview'))
 const EuLegacyAcceptanceReview = routePage(() => import('./pages/Platform/EuLegacyAcceptanceReview.jsx'))
 const PlatformLogs = routePage(() => import('./pages/Platform/PlatformLogs'))
+const PlatformBackups = routePage(() => import('./pages/Platform/PlatformBackups'))
 const PlatformDirectory = routePage(() => import('./pages/Platform/PlatformDirectory'))
 const CustomerBilling = routePage(() => import('./pages/Billing/CustomerBilling.jsx'))
 const PlatformBilling = routePage(() => import('./pages/Platform/PlatformBilling.jsx'))
 const PlatformBillingDetail = routePage(() => import('./pages/Platform/PlatformBillingDetail.jsx'))
+const EmailTemplates = routePage(() => import('./pages/Platform/EmailTemplates.jsx'))
+const EmailTypes = routePage(() => import('./pages/Platform/EmailTypes.jsx'))
+const EmailHistory = routePage(() => import('./pages/Platform/EmailHistory.jsx'))
 const CentralOpportunityCreate = routePage(() => import('./pages/Opportunities/CentralOpportunityCreate'))
 const CentralOpportunities = routePage(() => import('./pages/Opportunities/CentralOpportunities'))
 const ConnectedCatalogRead = routePage(() => import('./pages/Opportunities/ConnectedCatalogRead'))
@@ -92,7 +96,7 @@ function AppRoutes() {
 
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/meu-trabalho" element={<MyWork key={applicationSessionKey} />} />
-        <Route path="/calendario" element={organization?.profileCode === 'ORG_ADMIN'
+        <Route path="/calendario" element={organization?.navigation?.calendar === true
           ? <OrganizationCalendar key={applicationSessionKey} /> : <Navigate to={home} replace />} />
         <Route path="/dashboard" element={<Dashboard key={applicationSessionKey} />} />
         <Route path="/oportunidades" element={<OpportunitiesList />} />
@@ -105,7 +109,7 @@ function AppRoutes() {
         <Route path="/interesses/:id" element={<Interests key={applicationSessionKey} />} />
         <Route path="/candidaturas" element={<PrivateApplications key={applicationSessionKey} />} />
         <Route path="/candidaturas/:id" element={<ApplicationLinkGate><PrivateApplications key={applicationSessionKey} /></ApplicationLinkGate>} />
-        <Route path="/parceiros" element={<Partners />} />
+        <Route path="/parceiros" element={organization?.navigation?.partners === false ? <Navigate to={home} replace /> : <Partners />} />
         <Route path="/matching" element={<Matching />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/conta/seguranca" element={<AccountSecurity showProfile={Boolean(organization)} />} />
@@ -129,11 +133,15 @@ function AppRoutes() {
         <Route path="/administracao/aprovacoes-eu" element={<ProtectedRoute platformOnly><EuLegacyPrearchiveReview /></ProtectedRoute>} />
         <Route path="/administracao/aceitacoes-eu" element={<ProtectedRoute platformOnly><EuLegacyAcceptanceReview /></ProtectedRoute>} />
         <Route path="/administracao/logs" element={<ProtectedRoute platformOnly><PlatformLogs /></ProtectedRoute>} />
+        <Route path="/administracao/copias-seguranca" element={<ProtectedRoute platformOnly><PlatformBackups /></ProtectedRoute>} />
         <Route path="/administracao/entidades" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/entidades/utilizadores" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/entidades/:entityId" element={<ProtectedRoute platformOnly><PlatformDirectory /></ProtectedRoute>} />
         <Route path="/administracao/faturacao" element={<ProtectedRoute platformOnly><PlatformBilling /></ProtectedRoute>} />
         <Route path="/administracao/faturacao/:cycleId" element={<ProtectedRoute platformOnly><PlatformBillingDetail /></ProtectedRoute>} />
+        <Route path="/administracao/email" element={<ProtectedRoute platformOnly><EmailTypes /></ProtectedRoute>} />
+        <Route path="/administracao/email/historico" element={<ProtectedRoute platformOnly><EmailHistory /></ProtectedRoute>} />
+        <Route path="/administracao/email/:type" element={<ProtectedRoute platformOnly><EmailTemplates /></ProtectedRoute>} />
         <Route path="/administracao/importar" element={<ProtectedRoute platformOnly><Import /></ProtectedRoute>} />
       </Route>
 

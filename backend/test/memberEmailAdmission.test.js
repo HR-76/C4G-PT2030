@@ -1,6 +1,18 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {version, fingerprints, admits} = require('../src/security/memberEmailAdmission');
+
+test('053 member email variant admits exact rehearsed pins and rejects other versions and drift', () => {
+ const pins = {schema:'5cf390a2ac1672f4d287f770011ba744f98edd8ad830ff9ee0977cf00a969c26',authority:'8d3e9f9b62b50e5ea5620e33f427ea5496a0ce3c210daad42ac5ad46bae7be21'};
+ for (const [kind, pin] of Object.entries(pins)) {
+  assert.equal(admits('053_opportunity_complement',kind,pin),true);
+  assert.equal(admits('052_central_runtime_read',kind,pin),false);
+  assert.equal(admits('054_unknown',kind,pin),false);
+  assert.equal(admits('053_opportunity_complement',kind,pin.slice(0,-1)+'0'),false);
+ }
+ assert.equal(admits('053_opportunity_complement','schema',pins.authority),false);
+ assert.equal(admits('053_opportunity_complement','authority',pins.schema),false);
+});
 test('member email admission is restricted to the exact rehearsed schema and authority variant', () => {
   for (const kind of ['schema', 'authority']) {
     assert.equal(admits(version, kind, fingerprints[kind]), true);

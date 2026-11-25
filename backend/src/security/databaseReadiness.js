@@ -43,7 +43,7 @@ async function observeCentralDatabase(pool, admissionRequired = false) {
   const observed = await pool.query(
     `SELECT current_database() AS database_name,
             database_catalog.oid::text AS database_oid,
-            (pg_catalog.pg_control_system()).system_identifier::text AS system_identifier,
+            ${pool.productionCapability ? 'c4g_production.system_identifier()' : '(pg_catalog.pg_control_system()).system_identifier::text'} AS system_identifier,
             inet_server_addr()::text AS server_address,
             inet_server_port() AS server_port,
             to_regclass($1) IS NOT NULL AS has_identity_marker

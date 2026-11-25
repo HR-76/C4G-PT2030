@@ -1,0 +1,48 @@
+'use strict';
+// Isolated production permissions gate, upgrading the complete Central 056 baseline. It creates its own
+// PostgreSQL 18 cluster under .tmp on a free loopback port, applies the Central
+// migrations to it and stops it. It never connects to an existing database.
+const fs = require('node:fs'), path = require('node:path'), net = require('node:net');
+const { execFileSync } = require('node:child_process');
+
+const root = path.resolve(__dirname, '../../..');
+const bin = process.env.PRODUCTION_GATE_PG_BIN || 'C:/Program Files/PostgreSQL/18/bin';
+const base = path.join(root, '.tmp', 'central-permissions-pg-' + Date.now());
+const run = (name, args) => execFileSync(path.join(bin, name + '.exe'), args, { windowsHide: true, stdio: 'ignore', timeout: 120000 });
+
+function freePort() {
+  return new Promise(resolve => {
+    const server = net.createServer();
+    server.listen(0, '127.0.0.1', () => {
+      const { port } = server.address();
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+(async () => {
+  fs.mkdirSync(base, { recursive: true });
+  const port = await freePort();
+  const data = path.join(base, 'data');
+  let started = false;
+  try {
+    run('initdb', ['-D', data, '-U', 'c4g_f12_admin', '-A', 'trust', '--encoding=UTF8', '--locale=C']);
+    run('pg_ctl', ['-D', data, '-l', path.join(base, 'postgres.log'), '-o', `-h 127.0.0.1 -p ${port}`, '-w', 'start']);
+    started = true;
+    const { Pool } = require('../../../backend/node_modules/pg');
+    const pool = new Pool({ host: '127.0.0.1', port, user: 'c4g_f12_admin', database: 'postgres' });
+    try {
+      await require('./probe.cjs').run({ pool, base, port });
+    } finally {
+      await pool.end();
+    }
+    console.log(JSON.stringify({ pass: true, evidence: base }));
+  } finally {
+    if (started && fs.existsSync(path.join(data, 'postmaster.pid'))) run('pg_ctl', ['-D', data, '-m', 'fast', '-w', 'stop']);
+    // Only the exact freshly created cluster is disposable; preserve evidence outside data.
+    if (!fs.existsSync(path.join(data,'postmaster.pid')) && path.dirname(data)===base && path.dirname(base)===path.join(root,'.tmp')) fs.rmSync(data,{recursive:true,force:true});
+  }
+})().catch(error => {
+  console.error(error.stack);
+  process.exitCode = 1;
+});

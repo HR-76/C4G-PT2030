@@ -1,5 +1,11 @@
 # Tema C4G
 
+19/11/2026: o título do separador passa a «Oportunidades 2030», no login (`loginTitle`) e na conta (`title`), igual ao novo título da aplicação (`frontend/index.html`), a pedido do utilizador. Reiniciar o Keycloak depois de atualizar os ficheiros no ambiente ativo.
+
+17/11/2026: o separador do browser mostra o ícone C4G (quadrado verde com «C4G» a branco) e o título «Oportunidades», igual ao da aplicação, a pedido do utilizador. Login: `loginTitle` em `login/messages/messages_pt.properties` e `login/resources/img/favicon.ico`. Conta: `title`, `favIcon` e `favIconType` em `account/theme.properties`, com o ícone em `account/resources/favicon-c4g.png`. As páginas de confirmação de saída mantêm o título próprio. Mensagens e propriedades ficam em cache: reiniciar o Keycloak depois de atualizar os ficheiros. O Keycloak guarda ainda uma cópia comprimida de cada recurso em `data/tmp/kc-gzip-cache/<versão>/login/c4g/`; ao substituir o `favicon.ico`, apagar a cópia antiga, senão continua a ser servida.
+
+15/11/2026: favicon do login em `login/resources/img/favicon.ico`, com as letras verdes do logótipo C4G e fundo transparente (16, 32, 48, 64, 128 e 256 px). O template herdado carrega esse caminho automaticamente. Incluir o ficheiro na próxima atualização dos recursos do tema no ambiente ativo.
+
 Login com formulário nativo à esquerda e painel verde-petróleo C4G à direita. O painel mantém o círculo animado original, com catálogo central, matching explicável, candidaturas, equipa e prazos. Até 900 px, o painel segue o formulário; com movimento reduzido, a órbita permanece estática. Campos, submissão e ações de autenticação continuam herdados.
 
 11/11/2026: a proposta Corporate foi retirada a pedido do utilizador; repostos o círculo e a composição anterior. Preservados os estilos adicionais da verificação por email e dos botões. A instância ativa não chegou a ser alterada.

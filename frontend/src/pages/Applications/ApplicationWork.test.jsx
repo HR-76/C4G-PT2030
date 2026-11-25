@@ -58,6 +58,8 @@ it('lets an active member with consultation access send only text and retry the 
  fireEvent.click(await screen.findByRole('button',{name:'Chat da equipa'}))
  const dialog=await screen.findByRole('dialog',{name:'Chat da equipa'})
  await within(dialog).findByText('Ainda não há mensagens.')
+ expect(within(dialog).queryByText(/eliminadas 90 dias/)).toBeNull()
+ expect(within(dialog).getByRole('button',{name:'Exportar conversa'})).toBeTruthy()
  fireEvent.change(within(dialog).getByRole('textbox',{name:'Mensagem'}),{target:{value:' <b>Olá</b> '}})
  fireEvent.click(within(dialog).getByRole('button',{name:'Enviar'}))
  await within(dialog).findByRole('alert')
@@ -419,7 +421,8 @@ it('keeps an uncertain modal locked with explicit recovery and closes only after
 
 it('apresenta primeiro as tarefas abertas entre as carregadas',async()=>{
  api.work.mockResolvedValue({data:{canEdit:true,revision:1,participants:[],tasks:[{taskId:id(4),title:'Concluída antes',status:'COMPLETED',responsibleMembershipId:id(3),deadline:'2027-01-30'},{taskId:id(5),title:'Aberta depois',status:'OPEN',responsibleMembershipId:id(3),deadline:'2027-01-30'}],taskNextCursor:'next'}})
- const view=render(<ApplicationWork {...props}/>);await screen.findByText('Aberta depois');expect([...view.container.querySelectorAll('.work-task strong')].map(x=>x.textContent)).toEqual(['Aberta depois','Concluída antes']);expect(screen.getByText('Tarefas abertas primeiro nas tarefas carregadas.')).toBeTruthy();expect(screen.getByRole('button',{name:'Mais tarefas'})).toBeTruthy()
+ const view=render(<ApplicationWork {...props}/>);await screen.findByText('Aberta depois');expect([...view.container.querySelectorAll('.work-task strong')].map(x=>x.textContent)).toEqual(['Aberta depois','Concluída antes']);expect(screen.queryByText(/Tarefas abertas primeiro/)).toBeNull();expect(screen.queryByText(/A pesquisa abrange/)).toBeNull()
+ const count=screen.getByText(/^2 tarefas apresentadas\./);expect(count.getAttribute('role')).toBe('status');expect(count.className).toBe('sr-only');expect(screen.getByRole('button',{name:'Mais tarefas'})).toBeTruthy()
 })
 
 const filterTasks = () => [

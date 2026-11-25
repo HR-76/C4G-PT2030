@@ -112,6 +112,21 @@
 .strategy-fields .area-checkboxes { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:8px 16px; }
 .strategy-fields .checkbox-label { display:flex; align-items:flex-start; gap:8px; }
 .strategy-fields .checkbox-label input { flex:0 0 auto; width:auto; }
+.department-profile { border:0; margin:0; padding:0; min-width:0; }
+.department-profile h4 { margin:0 0 8px; font-size:.9rem; }
+.department-profile details { margin-top:12px; }
+.department-profile summary { cursor:pointer; margin-bottom:8px; }
+.department-outside { margin:10px 0 0; color:var(--color-warning); font-size:.85rem; }
+.department-contributions h4 { margin:18px 0 8px; font-size:.95rem; }
+.department-contributions ul ul,.department-contributions > ul:not(.strategy-objectives) { margin:6px 0 0; padding-inline-start:20px; }
+.department-contributions .department-proposed { display:grid; gap:8px; padding:0; list-style:none; }
+.department-proposed li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; }
+.department-context { display:grid; gap:14px; margin:0; padding:16px 20px; list-style:none; }
+.detail-section > .department-context { padding:0; }
+.department-context > li { min-width:0; overflow-wrap:anywhere; }
+.department-context p { margin:4px 0 0; font-size:.85rem; }
+.department-context ul { display:grid; gap:8px; margin:8px 0 0; padding-inline-start:20px; }
+.department-context small { display:block; color:var(--color-text-secondary); }
 .strategy-objective-list { padding:0; list-style:none; }
 .strategy-objective,.strategy-fields fieldset.strategy-objective { min-width:0; border:1px solid var(--color-border); border-radius:8px; padding:12px; }
 .strategy-objective p { margin:4px 0 0; overflow-wrap:anywhere; }

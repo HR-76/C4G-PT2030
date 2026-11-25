@@ -169,8 +169,8 @@ test('thematic alignment counts each preparation application once even across se
  const summary=strategyAlignment(objectives,preparation,2);
  assert.equal(summary.state,'READY');assert.equal(summary.total,2);assert.equal(summary.aligned,1);
  assert.deepEqual(summary.objectives.map(goal=>goal.count),[1,1,0]);
- assert.deepEqual(summary.applications,[{applicationId:'1',title:'Candidatura 1',areaIds:[education.id]},
-  {applicationId:'2',title:'Education training',areaIds:[]}]);
+ assert.deepEqual(summary.applications,[{applicationId:'1',title:'Candidatura 1',areaIds:[education.id],objectiveIds:[]},
+  {applicationId:'2',title:'Education training',areaIds:[],objectiveIds:[]}]);
  assert.equal(summary.areaNames[education.id],education.name);
 });
 
@@ -180,6 +180,19 @@ test('alignment distinguishes unavailable, unconfigured and empty data from a ge
  assert.equal(strategyAlignment([],[],2).state,'NO_OBJECTIVE_AREAS');
  assert.equal(strategyAlignment(objectives,[],0).state,'NO_PREPARATION');
  assert.equal(strategyAlignment(objectives,[preparation[1]],1).aligned,0);
+});
+
+test('an application linked to an objective counts for it besides the thematic matches',()=>{
+ const linked=[{...objectives[0],applicationIds:['2']},objectives[1],{...objectives[2],applicationIds:['1','2','archived']}];
+ const summary=strategyAlignment(linked,preparation,2);
+ assert.equal(summary.aligned,2);
+ assert.deepEqual(summary.objectives.map(goal=>[goal.count,goal.linkedCount]),[[2,1],[1,0],[2,3]]);
+ assert.deepEqual(summary.applications.map(item=>item.objectiveIds),[['c'],['a','c']]);
+ assert.equal(Object.hasOwn(summary.objectives[0],'applicationIds'),false);
+ const manualOnly=[{id:'c',title:'Objetivo sem área',areaIds:[],applicationIds:['2']}];
+ assert.equal(strategyAlignment(manualOnly,preparation,2).state,'READY');
+ assert.equal(strategyAlignment(manualOnly,preparation,2).aligned,1);
+ assert.equal(strategyAlignment(manualOnly,[],0).state,'NO_PREPARATION');
 });
 
 test('the report reads strategy and preparation data only when protected access allows it',async()=>{

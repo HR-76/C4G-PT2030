@@ -13,6 +13,7 @@ import CatalogInterestButton from '../Opportunities/CatalogInterestButton'
 import { OpportunityTable } from '../Opportunities/OpportunityPresentation'
 import { interestIntentionKey, safeInterestReturn, readInterestIntention, saveInterestIntention, clearInterestIntentions } from './intentions'
 import UnitSelector from './UnitSelector'
+import { clearConfirmedReads } from '../../api/confirmedReads'
 import eu from '../../../../context/references/opportunity-v2/examples/eu-11145.json'
 const opportunity={opportunityId:'opportunity',title:'Aviso de ensaio',lifecycleState:'ACTIVE'}
 const record={interestId:'interest',opportunityId:'opportunity',centralRevisionId:'revision',title:opportunity.title,snapshot:{title:opportunity.title,callReference:'CALL-1',closingDate:'2027-01-01'},revision:1,status:'ACTIVE',unitIds:[],units:[],notes:null,capabilities:{canManage:true,canCreateApplication:true}}
@@ -20,7 +21,7 @@ const catalogApi={get:vi.fn()}
 const catalog=()=>render(<MemoryRouter><CatalogInterests organization={auth.organization} items={[opportunity]} catalogApi={catalogApi}><CatalogInterestButton item={opportunity}/></CatalogInterests></MemoryRouter>)
 const Destination=()=>{const location=useLocation();return <p data-testid="destination">{location.search}</p>}
 const page=path=>render(<MemoryRouter initialEntries={[path]}><Routes><Route path='/interesses' element={<Interests/>}/><Route path='/interesses/:id' element={<Interests/>}/><Route path='/candidaturas' element={<Destination/>}/></Routes></MemoryRouter>)
-beforeEach(()=>{vi.resetAllMocks();sessionStorage.clear();auth.organization={id:'org'};auth.user={id:'user'};api.context.mockResolvedValue({data:{capabilities:{canRegister:true}}});api.summaries.mockImplementation(ids=>Promise.resolve({data:{items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}));api.units.mockResolvedValue({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}});api.create.mockResolvedValue({data:record});api.get.mockResolvedValue({data:record});api.list.mockResolvedValue({data:{items:[record],nextCursor:null}});api.history.mockResolvedValue({data:{items:[],nextCursor:null}});api.edit.mockResolvedValue({data:{...record,revision:2}});catalogApi.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'revision',snapshot:{title:opportunity.title,lifecycleState:'ACTIVE'}}});central.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}})})
+beforeEach(()=>{vi.resetAllMocks();clearConfirmedReads();sessionStorage.clear();auth.organization={id:'org'};auth.user={id:'user'};api.context.mockResolvedValue({data:{capabilities:{canRegister:true}}});api.summaries.mockImplementation(ids=>Promise.resolve({data:{items:ids.map(opportunityId=>({opportunityId,interestId:null,status:null,unitIds:[]}))}}));api.units.mockResolvedValue({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}});api.create.mockResolvedValue({data:record});api.get.mockResolvedValue({data:record});api.list.mockResolvedValue({data:{items:[record],nextCursor:null}});api.history.mockResolvedValue({data:{items:[],nextCursor:null}});api.edit.mockResolvedValue({data:{...record,revision:2}});catalogApi.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'revision',snapshot:{title:opportunity.title,lifecycleState:'ACTIVE'}}});central.get.mockResolvedValue({data:{opportunityId:'opportunity',revisionId:'current-revision',snapshot:{lifecycleState:'ACTIVE'}}})})
 afterEach(cleanup)
 it('interest detail consumes preserved v2 facts including budget and all seven cutoffs',async()=>{
  const {identity,sourceRecords,provenance,quality,schemaVersion,contractVersion,...projection}=eu
@@ -55,7 +56,7 @@ it('distinguishes a confirmed interest with a success label and keeps its catalo
  expect(status.classList.contains('catalog-interest-status-success')).toBe(true)
  expect(status.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
  const link=screen.getByRole('link',{name:'Consultar na lista de interesses'}),target=new URL(link.getAttribute('href'),'https://example.invalid')
- expect(target.pathname).toBe('/candidaturas');expect(target.searchParams.get('destaque')).toBe('interest')
+ expect(target.pathname).toBe('/interesses');expect(target.searchParams.get('destaque')).toBe('interest')
  expect(screen.queryByRole('button',{name:/Registar interesse/})).toBeNull();expect(api.create).not.toHaveBeenCalled()
 })
 it('shows success only after the save response and prevents duplicate submissions while saving',async()=>{
@@ -121,12 +122,12 @@ it('shows the catalog rows at once and fills in each interest when the response 
  expect(screen.getByRole('link',{name:opportunity.title})).toBeTruthy()
  expect(screen.getByRole('link',{name:`Consultar na lista de interesses: ${opportunity.title}`})).toBeTruthy()
 })
-it('opens registration with the permission from summaries without a second context request',async()=>{
+it('asks for the permissions once, together with the list, and not again when opening registration',async()=>{
  api.summaries.mockResolvedValue({data:{capabilities:{canRegister:true},items:[{opportunityId:'opportunity',interestId:null}]}})
  catalog()
  fireEvent.click(await screen.findByRole('button',{name:/Registar interesse em/}))
  await screen.findByRole('dialog')
- expect(api.context).not.toHaveBeenCalled()
+ expect(api.context).toHaveBeenCalledTimes(1)
 })
 it('keeps recovery after an abandoned in-flight creation resolves',async()=>{
  let finish;api.create.mockImplementation(()=>new Promise(resolve=>{finish=resolve}));const first=catalog();fireEvent.click(await screen.findByRole('button',{name:/Registar interesse em/}));fireEvent.click(await screen.findByLabelText('Interesse transversal à C4G'));fireEvent.click(await screen.findByRole('button',{name:'Guardar interesse'}));await waitFor(()=>expect(api.create).toHaveBeenCalledTimes(1));const saved=sessionStorage.getItem(interestIntentionKey('user','org'));first.unmount();await act(async()=>finish({data:record}));expect(sessionStorage.getItem(interestIntentionKey('user','org'))).toBe(saved)
@@ -229,4 +230,45 @@ it('two command instances cannot overwrite an in-flight intention', async()=>{
  expect(second.result.current.pending.id).toBe('interest')
  expect(readInterestIntention('user','org').id).toBe('interest')
  await act(async()=>{finish({data:record});await pending})
+})
+it('shows the interest without waiting for the units of the analysis form',async()=>{
+ let finishUnits;api.units.mockReturnValue(new Promise(resolve=>{finishUnits=resolve}))
+ page('/interesses/interest')
+ await screen.findByRole('heading',{name:'Aviso de ensaio'})
+ expect(screen.queryByText('A carregar interesse…')).toBeNull()
+ expect(screen.getByRole('button',{name:'Preparar candidatura'})).toBeTruthy()
+ await act(async()=>finishUnits({data:{items:[{unitId:'unit',label:'Projetos',lifecycle:'ACTIVE'}]}}))
+ expect(await screen.findByRole('button',{name:'Guardar análise'})).toBeTruthy()
+})
+it('reopens an interest with the confirmed record at once, reads it again and never shows it to another user',async()=>{
+ const first=page('/interesses/interest');await screen.findByRole('heading',{name:'Aviso de ensaio'});first.unmount()
+ const never=new Promise(()=>{});api.get.mockReturnValue(never);api.history.mockReturnValue(never)
+ const calls=api.get.mock.calls.length
+ const second=page('/interesses/interest')
+ expect(screen.getByRole('heading',{name:'Aviso de ensaio'})).toBeTruthy();expect(screen.queryByText('A carregar interesse…')).toBeNull()
+ expect(api.get.mock.calls.length).toBe(calls+1)
+ second.unmount();auth.user={id:'other'}
+ page('/interesses/interest');expect(screen.queryByRole('heading',{name:'Aviso de ensaio'})).toBeNull()
+})
+it('removes the confirmed interest when the new read is refused',async()=>{
+ const first=page('/interesses/interest');await screen.findByRole('heading',{name:'Aviso de ensaio'});first.unmount()
+ api.get.mockRejectedValue({response:{status:403}})
+ page('/interesses/interest');await screen.findByRole('alert')
+ expect(screen.queryByRole('heading',{name:'Aviso de ensaio'})).toBeNull()
+})
+it('hands the interest and the opportunity just read to the application form',async()=>{
+ let handed
+ const Form=()=>{handed=useLocation().state;return <p>Formulário de candidatura</p>}
+ const before=Date.now()
+ render(<MemoryRouter initialEntries={['/interesses/interest']}><Routes><Route path='/interesses/:id' element={<Interests/>}/><Route path='/candidaturas' element={<Form/>}/></Routes></MemoryRouter>)
+ fireEvent.click(await screen.findByRole('button',{name:'Preparar candidatura'}))
+ await screen.findByText('Formulário de candidatura')
+ expect(handed.centralOpportunity.record.revisionId).toBe('current-revision');expect(handed.centralOpportunity.readAt).toBeGreaterThanOrEqual(before)
+ expect(handed.sourceInterest.record.interestId).toBe('interest');expect(handed.sourceInterest.record.revision).toBe(1);expect(handed.sourceInterest.readAt).toBeGreaterThanOrEqual(before)
+})
+it('reopens the list with the confirmed unit filter at once',async()=>{
+ api.list.mockResolvedValue({data:{items:[],nextCursor:null,capabilities:{canRegister:true}}})
+ const first=page('/interesses');await screen.findByRole('option',{name:/Projetos/});first.unmount()
+ api.units.mockReturnValue(new Promise(()=>{}));api.list.mockReturnValue(new Promise(()=>{}))
+ page('/interesses');expect(screen.getByRole('option',{name:/Projetos/})).toBeTruthy()
 })

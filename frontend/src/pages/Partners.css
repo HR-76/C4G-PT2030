@@ -27,3 +27,4 @@
   .application-partners-browse td[data-label="Entidade"]::before { content:none; }
   .application-partners-browse .partner-card-link { min-height:44px; }
 }
+.partners-stale { opacity: .45; transition: opacity .15s; }

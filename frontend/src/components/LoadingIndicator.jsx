@@ -1,7 +1,8 @@
 import './LoadingIndicator.css'
 
-export default function LoadingIndicator({ children = 'A carregar…', className = '' }) {
-  return <div className={`loading-indicator ${className}`} role="status" aria-live="polite">
+// `compact` is for a part of a page (a history, a list inside a panel): a small icon beside the text.
+export default function LoadingIndicator({ children = 'A carregar…', className = '', compact = false }) {
+  return <div className={`loading-indicator${compact ? ' loading-indicator-compact' : ''} ${className}`} role="status" aria-live="polite">
     <svg className="loading-indicator-icon" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false">
       <circle className="loading-orbit-track" cx="32" cy="32" r="28" />
       <circle className="loading-orbit-track loading-orbit-track-inner" cx="32" cy="32" r="19" />

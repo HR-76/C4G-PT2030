@@ -1,6 +1,6 @@
 # Adaptadores reais de onboarding em composição isolada
 
-Estado: Review, 18/10/2026. Execução explicitamente autorizada pelo utilizador. Continuação do serviço central 020; ecrã, realm e bases habituais não alterados. [Resultados e limites](../reviews/platform-onboarding-real-adapters.md): 12 grupos do gate real, 17 do serviço central, 47 testes direcionados e sintaxe de 13 ficheiros PASS.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Fecho no âmbito deste incremento isolado. Não repetido: o gate Chrome/PostgreSQL/Keycloak. Estado anterior: Review, 18/10/2026. Execução explicitamente autorizada pelo utilizador. Continuação do serviço central 020; ecrã, realm e bases habituais não alterados. [Resultados e limites](../reviews/platform-onboarding-real-adapters.md): 12 grupos do gate real, 17 do serviço central, 47 testes direcionados e sintaxe de 13 ficheiros PASS.
 
 ## Âmbito e critérios
 

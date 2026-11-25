@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Download, Send } from 'lucide-react'
 import FormModal from '../../components/FormModal'
@@ -179,7 +180,7 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
         {!unavailable && <button type="button" className="btn btn-outline btn-sm" disabled={loading}
           onClick={() => load(scopeRef.current)}>Atualizar</button>}
       </div>}
-      {!feed && !loadError && <p role="status" className="application-chat-status">A carregar mensagens…</p>}
+      {!feed && !loadError && <LoadingIndicator compact className="application-chat-status">A carregar mensagens…</LoadingIndicator>}
       {feed?.nextCursor && <button type="button" className="btn btn-outline btn-sm application-chat-older"
         disabled={loading} onClick={() => load(scopeRef.current, feed.nextCursor)}>Mensagens anteriores</button>}
       {feed && feed.items.length === 0 && (feed.purgedAt
@@ -198,7 +199,6 @@ export default function ApplicationTeamChat({ applicationId, organizationId, ope
       </ol>}
     </div>
     {!unavailable && <div className="application-chat-retention">
-      <p>As conversas de candidaturas fechadas são eliminadas 90 dias depois. Exporte uma cópia se precisar dela.</p>
       <button type="button" className="btn btn-outline btn-sm" disabled={!feed || exporting} onClick={exportChat}>
         <Download size={16} aria-hidden="true" /> {exporting ? 'A exportar…' : 'Exportar conversa'}
       </button>

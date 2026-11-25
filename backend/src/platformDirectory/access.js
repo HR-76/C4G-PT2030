@@ -18,7 +18,9 @@ function createPlatformAccess({coordinator,policyVersion,assuranceRequirements,r
    if(!input||Object.keys(input).sort().join(',')!==['expectedRevision','idempotencyKey',field].sort().join(',')||!Number.isSafeInteger(input.expectedRevision)||input.expectedRevision<1||!(kind==='profile'?profiles.map(p=>p.code):['ACTIVE','SUSPENDED']).includes(input[field]))fail('INVALID_INPUT');uuid(input.idempotencyKey);
    return coordinator.write(['POLICY',`ORG:${org}`,`MEMBER:${id}`],async c=>{
     const actorId=await admin(c,req,org);
-    if(recentMfaRequirement?.mfa!==true||!evaluateAssurance({evidence:req.authContext?.evidence,requirement:recentMfaRequirement,nowSeconds:clock()/1000,expectedPolicyVersion:policyVersion}).allowed)fail('MFA_REQUIRED');
+    if(typeof recentMfaRequirement?.mfa!=='boolean'||!evaluateAssurance({evidence:req.authContext?.evidence,requirement:recentMfaRequirement,nowSeconds:clock()/1000,expectedPolicyVersion:policyVersion}).allowed){
+     fail(recentMfaRequirement?.mfa===false?'REAUTH_REQUIRED':'MFA_REQUIRED');
+    }
     const row=await first(c,q.detail,[id,org]);
     if(!row||!['ACTIVE','SUSPENDED'].includes(row.status))fail('RESOURCE_NOT_AVAILABLE');
     if(row.global_user_id===actorId)fail('SELF_ACCESS_PROTECTED');

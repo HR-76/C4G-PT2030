@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import { commonTemporalLabels, formatOpportunityTemporal, safeOpportunityUrl } from './opportunityReadModel'
 import { allocationLabel, firstAnalysis } from './opportunityFirstAnalysis'
 import ManualCallInformation from './ManualCallInformation'
+import OpportunityDescription from './OpportunityDescription'
 import './OpportunityEnrichment.css'
 
 function Field({ label, children }) { return <div className="dl-row"><dt>{label}</dt><dd>{children}</dd></div> }
@@ -25,9 +26,16 @@ function SourceResolution({ resolution, sourceReview }) {
     })}</ul>}
   </section>
 }
+// The published source of a collected description, named by its host and linked only when the address is safe.
+function DescriptionSource({ url }) {
+  const href = safeOpportunityUrl(url)
+  let host = 'fonte oficial'
+  try { host = new URL(href).hostname.replace(/^www\./, '') } catch { /* keeps the generic name */ }
+  return href ? <a href={href} target="_blank" rel="noopener noreferrer">{host}</a> : host
+}
 export function OpportunityReadModelDetails(props) { return <OpportunityReadModelOverview {...props} compact /> }
-export default function OpportunityReadModelOverview({ fields = {}, readModel, source, temporal, sourceReview, reference, lifecycleState, validationState, compact = false, central = false, centralPresentation, interventionClassification, children }) {
-  const data = firstAnalysis({ fields, readModel, source, temporal, sourceReview, validationState, central, catalogPresentation:centralPresentation }), planned = data.deadlineKind === 'PLANNED'
+export default function OpportunityReadModelOverview({ fields = {}, readModel, source, temporal, sourceReview, reference, lifecycleState, validationState, compact = false, central = false, centralPresentation, interventionClassification, complement, children }) {
+  const data = firstAnalysis({ fields, readModel, source, temporal, sourceReview, validationState, central, catalogPresentation:centralPresentation, complement }), planned = data.deadlineKind === 'PLANNED'
   const description = useRef(null), finance = useRef(null), { hash } = useLocation(), [expanded, setExpanded] = useState(hash === '#descricao-oportunidade')
   useEffect(() => {
     setExpanded(hash === '#descricao-oportunidade')
@@ -75,9 +83,16 @@ export default function OpportunityReadModelOverview({ fields = {}, readModel, s
     </section>
     <section ref={description} id="descricao-oportunidade" tabIndex={-1} className="detail-section shell-scroll-target" aria-label="Descrição da fonte">
       <h2 className="opportunity-section-title">Descrição da call</h2>
-      <p id="opportunity-description-text" className="catalog-description">{data.description ? expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800)}…` : data.descriptionFallback}</p>
+      {data.description
+        ? <OpportunityDescription id="opportunity-description-text" text={expanded || data.description.length <= 800 ? data.description : `${data.description.slice(0, 800).replace(/\s+\S*$/, '')}…`} />
+        : <p id="opportunity-description-text" className="catalog-description">{data.descriptionFallback}</p>}
+      {data.descriptionSource && data.descriptionSource.origin !== 'EDITORIAL' && <p className="opportunity-source opportunity-description-origin">{data.descriptionSource.truncated ? 'Resumo parcial publicado em ' : 'Resumo publicado em '}<DescriptionSource url={data.descriptionSource.sourceUrl} />.</p>}
       {data.description?.length > 800 && <button className="btn btn-outline btn-sm" aria-expanded={expanded} aria-controls="opportunity-description-text" onClick={() => setExpanded(value => !value)}>{expanded ? 'Recolher descrição' : 'Ler descrição completa'}</button>}
     </section>
+    {data.complementFacts.length > 0 && <section className="detail-section" aria-label="Informação complementar">
+      <h2 className="opportunity-section-title">Informação complementar</h2>
+      <dl className="dl-list">{data.complementFacts.map(fact => <Field key={fact.key} label={fact.label}>{Array.isArray(fact.value) ? <ul>{fact.value.map((item, index) => <li key={index}>{item}</li>)}</ul> : fact.value}</Field>)}</dl>
+    </section>}
     <SourceResolution resolution={fields.sourceResolution} sourceReview={data.sourceReview} />
     {data.sources.length > 0 && <footer className="opportunity-attribution">
       {data.sources.length > 0 && <p>Fonte: {data.sources.join(' · ')}.{data.eu && ' Dados resumidos e formatados pela C4G.'} {data.eu && <a href="https://commission.europa.eu/legal-notice_en" target="_blank" rel="noopener noreferrer">Condições de reutilização</a>}</p>}

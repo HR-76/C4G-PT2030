@@ -97,7 +97,7 @@ test("SEC-AC-01 creates only server-side application state after a validated PKC
   }
 });
 
-test("SEC-AC-01 frontend persists only the approved editorial recovery envelope, never authentication", async () => {
+test("SEC-AC-01 frontend persists only approved recovery envelopes and UI markers, never authentication", async () => {
   const frontendRoot = path.resolve(__dirname, "../../../frontend/src");
   const files = [];
   const visit = directory => {
@@ -113,20 +113,23 @@ test("SEC-AC-01 frontend persists only the approved editorial recovery envelope,
   const source = executableFiles.map(file => fs.readFileSync(file, "utf8")).join("\n");
   assert.doesNotMatch(source, /localStorage/);
   const envelopePath = path.join(frontendRoot, 'pages/Editorial/intentions.js');
-  const intentionFiles = new Set([envelopePath,path.join(frontendRoot,'pages/Prequalification/intentions.js'),path.join(frontendRoot,'pages/Pq1/intentions.js'),path.join(frontendRoot,'pages/OpportunityCriteria/intentions.js'),
+  const permittedStorageFiles = new Set([envelopePath,path.join(frontendRoot,'pages/Prequalification/intentions.js'),path.join(frontendRoot,'pages/Pq1/intentions.js'),path.join(frontendRoot,'pages/OpportunityCriteria/intentions.js'),
     path.join(frontendRoot,'pages/Applications/intentions.js'),path.join(frontendRoot,'pages/Applications/PrivateApplications.jsx'),path.join(frontendRoot,'pages/Applications/ApplicationBrowse.jsx'),
     path.join(frontendRoot,'pages/Applications/ApplicationWork.jsx'),path.join(frontendRoot,'pages/Applications/ApplicationPartners.jsx'),
     path.join(frontendRoot,'pages/Applications/ApplicationDocumentsReview.jsx'),path.join(frontendRoot,'pages/Organization/OrganizationProfile.jsx'),
     path.join(frontendRoot,'pages/Organization/intentions.js'),path.join(frontendRoot,'pages/Opportunities/manualIntentions.js'),path.join(frontendRoot,'pages/Interests/intentions.js'),
     path.join(frontendRoot,'pages/Platform/euLegacyReview.js'),
     path.join(frontendRoot,'pages/Platform/euLegacyAcceptanceReview.js'),
+    // Scoped UI completion marker only; its persisted shape is exercised below.
+    path.join(frontendRoot,'pages/Applications/useNextStepCompletion.js'),
     // Logout outcome marker only: { status, at }, ten-minute lifetime.
     path.join(frontendRoot,'api/logoutResult.js')]);
   const logoutResult = fs.readFileSync(path.join(frontendRoot,'api/logoutResult.js'),'utf8');
   assert.doesNotMatch(logoutResult, /access_token|refresh_token|id_token|csrfToken|sessionId|user|organization/i);
   assert.match(logoutResult, /JSON\.stringify\(\{ status, at: Date\.now\(\) \}\)/);
-  const applicationSource = files.filter(file => !intentionFiles.has(file) && !/\.test\.(js|jsx)$/.test(file)).map(file => fs.readFileSync(file, 'utf8')).join('\n');
-  assert.doesNotMatch(applicationSource, /sessionStorage/);
+  for (const file of executableFiles.filter(file => !permittedStorageFiles.has(file))) {
+    assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /sessionStorage/, `Unapproved storage consumer: ${path.relative(frontendRoot, file)}`);
+  }
   const acceptanceRecovery = fs.readFileSync(path.join(frontendRoot,'pages/Platform/euLegacyAcceptanceReview.js'),'utf8');
   assert.doesNotMatch(acceptanceRecovery, /access_token|refresh_token|id_token|csrfToken|sessionId/);
   const { saveIntention } = await import(require('node:url').pathToFileURL(envelopePath).href);
@@ -160,6 +163,37 @@ test("SEC-AC-01 frontend persists only the approved editorial recovery envelope,
   const authContext = fs.readFileSync(path.join(frontendRoot, "contexts/AuthContext.jsx"), "utf8");
   assert.match(authContext, /LOGOUT_INCOMPLETE/);
   assert.match(authContext, /error\.response\.data\.redirectUrl/);
+});
+
+test('SEC-AC-01 next-step storage contains only a scoped constant UI marker', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../../../frontend/src/pages/Applications/useNextStepCompletion.js'), 'utf8');
+  assert.doesNotMatch(source, /access_token|refresh_token|id_token|csrfToken|sessionId|authorization|Bearer/i);
+  const entries = new Map();
+  let state = null;
+  // Run the actual hook with only React state and tab storage supplied. No browser or API authority is available.
+  const hook = require('node:vm').runInNewContext(source
+    .replace(/^import \{ useState \} from 'react'\r?$/m, '')
+    .replace('export default function useNextStepCompletion', 'function useNextStepCompletion') + '\nuseNextStepCompletion', {
+    useState: () => [state, value => { state = value; }],
+    sessionStorage: { getItem: key => entries.get(key), setItem: (key, value) => entries.set(key, value) }
+  });
+  const scope = ['synthetic-user', 'synthetic-organization', 'synthetic-application', 'PREPARATION', '2026-11-14'];
+  const key = JSON.stringify(['application-next-step', ...scope]);
+  assert.equal(hook(...scope).completed, false);
+  hook(...scope).complete('edit');
+  assert.equal(entries.size, 0, 'unrelated work does not persist a marker');
+  hook(...scope).complete('documents');
+  assert.deepEqual([...entries], [[key, 'completed']], 'no payload, token, credential or authority is persisted');
+  state = null; // New component instance reads the same tab marker.
+  assert.equal(hook(...scope).completed, true);
+  for (let index = 0; index < scope.length; index++) {
+    const other = [...scope]; other[index] = 'different';
+    assert.equal(hook(...other).completed, false, `completion must remain bound to scope field ${index}`);
+  }
+  for (const value of ['true', '{}', JSON.stringify({ completed: true, role: 'C4G_ADMIN' })]) {
+    entries.set(key, value);
+    assert.equal(hook(...scope).completed, false, 'structured or truthy storage cannot substitute the literal marker');
+  }
 });
 
 test("SEC-AC-02 OIDC adapter delegates state, nonce, PKCE and recent-auth checks to openid-client", async () => {

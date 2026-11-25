@@ -12,24 +12,32 @@ import { centralOpportunitiesApi, platformCentralOpportunitiesApi } from '../../
 import { useAuth } from '../../contexts/AuthContext'
 import { OpportunityOverview } from './OpportunityPresentation'
 import OpportunityListTable from './OpportunityListTable'
+import OpportunityComplementEditor, { ComplementCollection } from './OpportunityComplementEditor'
 import OpportunityApplicationCount from './OpportunityApplicationCount'
-import CatalogInterestButton from './CatalogInterestButton'
+import CatalogInterestButton, { CatalogApplicationButton } from './CatalogInterestButton'
 import CatalogInterests from '../Interests/CatalogInterests'
+import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { downloadOpportunityPage, opportunityDisplay } from './opportunityReadModel'
 import { emptyCatalogFilters as emptyFilters, initialCatalogFilters, catalogFilterParams, catalogPaginationParams, catalogPeriodDates, catalogQuery, catalogSourceOptions } from './catalogFilters'
 export default function CentralOpportunities() {
   const { id } = useParams(), { organization, user } = useAuth()
   if (import.meta.env.MODE === 'catalog-isolated') return <CatalogReadWorkspace scope={`${user?.id || ''}:${organization?.id || ''}`} />
   const platformAdmin = !!user?.platformRoles?.includes('C4G_ADMIN')
-  return <><Catalog key={`${user?.id}:${organization?.id}:${platformAdmin}:${id || 'list'}`} id={id} organization={organization} platformAdmin={platformAdmin} /></>
+  return <><Catalog key={`${user?.id}:${organization?.id}:${platformAdmin}:${id || 'list'}`} id={id} organization={organization} platformAdmin={platformAdmin} scope={user?.id ? readScope(user.id, organization?.id) : null} /></>
 }
-function Catalog({ id, organization, platformAdmin }) {
+// The first page of a catalogue query this user and organization already
+// received is shown at once and read again on every entry. Further pages and
+// the detail are always read from the server.
+const pageName = (platformAdmin, query) => `catalog:${platformAdmin ? 'platform' : 'organization'}:${JSON.stringify(Object.entries(query).sort())}`
+function Catalog({ id, organization, platformAdmin, scope = null }) {
   const canRead = !!organization || platformAdmin
   const api = platformAdmin ? platformCentralOpportunitiesApi : centralOpportunitiesApi
   const [params, setParams] = useSearchParams()
   const [initialFilters] = useState(() => initialCatalogFilters(params))
-  const [items, setItems] = useState([]), [record, setRecord] = useState(null), [next, setNext] = useState(null), [pages, setPages] = useState(() => [...params.getAll('catalogPrevious').map(value => value || null), params.get('catalogCursor') || null])
-  const [draft, setDraft] = useState(initialFilters), [filters, setFilters] = useState(initialFilters), [mode, setMode] = useState(null), [retry, setRetry] = useState(0)
+  const listQuery = (selected, position, order) => { const query = catalogQuery(selected, position); if (order) query.sort = order; return query }
+  const [held] = useState(() => !id && canRead && !params.get('catalogCursor') ? startConfirmedRead(scope, pageName(platformAdmin, listQuery(initialFilters, null, params.get('sort') || ''))).held : null)
+  const [items, setItems] = useState(held?.items || []), [record, setRecord] = useState(null), [next, setNext] = useState(held?.nextCursor || null), [pages, setPages] = useState(() => [...params.getAll('catalogPrevious').map(value => value || null), params.get('catalogCursor') || null])
+  const [draft, setDraft] = useState(initialFilters), [filters, setFilters] = useState(initialFilters), [mode, setMode] = useState(held?.sourceMode || null), [retry, setRetry] = useState(0)
   const columns = selectedCatalogColumns(params, Boolean(organization))
   const sort = params.get('sort') || ''
   function changeSort(value) {
@@ -45,8 +53,8 @@ function Catalog({ id, organization, platformAdmin }) {
     else next.set('colunas', keys.join(','))
     setParams(next, {replace:true})
   }
-  const [interventionAreas,setInterventionAreas]=useState([])
-  const [programmes, setProgrammes] = useState([]), [period, setPeriod] = useState(params.get('period') || 'all')
+  const [interventionAreas,setInterventionAreas]=useState(held?.interventionAreas || [])
+  const [programmes, setProgrammes] = useState(held?.programmes || []), [period, setPeriod] = useState(params.get('period') || 'all')
   function applyFilters(selected, selectedPeriod = period) {
     setPages([null]); setFilters(selected)
     const next = new URLSearchParams(catalogFilterParams(selected, selectedPeriod))
@@ -63,19 +71,21 @@ function Catalog({ id, organization, platformAdmin }) {
     setPeriod(value)
     setDraft({ ...draft, ...catalogPeriodDates(value) })
   }
-  const [error, setError] = useState(''), [loading, setLoading] = useState(true)
+  const [error, setError] = useState(''), [loading, setLoading] = useState(!held)
   const cursor = pages.at(-1)
   useEffect(() => {
     let active = true
     const controller = new AbortController()
-    setLoading(true); setError(''); setRecord(null); setItems([]); setNext(null)
+    const query = listQuery(filters, cursor, sort)
+    const read = startConfirmedRead(scope, !id && canRead && !cursor ? pageName(platformAdmin, query) : null)
+    const show = data => { setMode(data.sourceMode); setItems(data.items); setInterventionAreas(data.interventionAreas || []); setProgrammes(data.programmes || []); setNext(data.nextCursor) }
+    setLoading(!read.held); setError(''); setRecord(null)
+    if (read.held) show(read.held); else { setItems([]); setNext(null) }
     if (!canRead) { setLoading(false); return () => { active = false } }
-    const query = catalogQuery(filters, cursor)
-    if (sort) query.sort = sort
     const request = id ? api.get(id, controller.signal) : api.list(query, controller.signal)
-    request.then(r => { if (!active) return; setMode(r.data.sourceMode); if (id) setRecord(r.data); else { setItems(r.data.items); setInterventionAreas(r.data.interventionAreas || []); setProgrammes(r.data.programmes || []); setNext(r.data.nextCursor) } }).catch(error => { if (active) setError(error?.response?.data?.error?.code === 'INVALID_INPUT' ? 'Filtros inv\u00e1lidos. Reveja a sele\u00e7\u00e3o ou limpe os filtros.' : 'O catálogo não está disponível ou não tem acesso nesta organização.') }).finally(() => { if (active) setLoading(false) })
+    request.then(r => { if (!id && Array.isArray(r.data?.items)) read.keep(r.data); if (!active) return; if (id) { setMode(r.data.sourceMode); setRecord(r.data) } else show(r.data) }).catch(error => { if (active) { read.drop(); setItems([]); setNext(null) } if (active) setError(error?.response?.data?.error?.code === 'INVALID_INPUT' ? 'Filtros inv\u00e1lidos. Reveja a sele\u00e7\u00e3o ou limpe os filtros.' : 'O catálogo não está disponível ou não tem acesso nesta organização.') }).finally(() => { if (active) setLoading(false) })
     return () => { active = false; controller.abort() }
-  }, [id, organization?.id, canRead, api, cursor, filters, sort, retry])
+  }, [id, organization?.id, canRead, api, cursor, filters, sort, retry, platformAdmin, scope])
   const fields = record?.snapshot
   const contextItem = record ? { ...fields, ...opportunityDisplay(record), lifecycleState: record.lifecycleState || fields?.lifecycleState, opportunityId: record.opportunityId } : null
   const filtered = Object.values(filters).some(Boolean)
@@ -96,12 +106,14 @@ function Catalog({ id, organization, platformAdmin }) {
   }
   const pendingFilters = Object.keys(emptyFilters).some(key => draft[key] !== filters[key])
   const invalidDates = draft.closingFrom && draft.closingTo && draft.closingFrom > draft.closingTo
-  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Catálogo C4G</h1>}</div>
-    {organization && <Link className="btn btn-brand" to="/candidaturas?ver=interesses">Candidaturas</Link>}
+  return <CatalogInterests organization={organization} items={id ? (contextItem ? [contextItem] : []) : items} catalogApi={api} handOver={api === centralOpportunitiesApi}><div className={`page recovered-opportunities organization-catalog${id ? "" : columns === null ? " catalog-pilot catalog-summary" : " catalog-pilot catalog-summary catalog-custom" + (columns.length > 6 ? " catalog-wide" : "")}`}><div className="page-header"><div>{!id && <h1>Oportunidades</h1>}</div>
+    {organization && <Link className="btn btn-outline" to="/interesses">Interesses</Link>}
+    {organization && <Link className="btn btn-brand" to="/candidaturas">Candidaturas</Link>}
     {platformAdmin && <Link className="btn btn-primary" to="/administracao/oportunidades/nova"><Plus size={16} /> Criar oportunidade</Link>}
-    {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}</div>
+    {platformAdmin && !organization && <Link className="btn btn-outline" to="/integracoes">Fontes de oportunidades</Link>}
+    {platformAdmin && !id && <ComplementCollection onCollected={() => setRetry(value => value + 1)} />}</div>
     {mode && <aside className="catalog-source" aria-label="Dados do catálogo">
-      <strong>{mode === 'fixture' ? 'Dados de teste' : mode === 'live-demo' ? 'Demonstração' : mode === 'live-rehearsal' ? 'Recolha limitada' : 'Fontes oficiais'}</strong>
+      <strong>{mode === 'fixture' ? 'Dados de teste' : mode === 'live-demo' ? 'Demonstração' : mode === 'live-rehearsal' ? 'Recolha limitada' : mode === 'live-staging' ? 'Recolha de staging' : 'Fontes oficiais'}</strong>
       <details className="catalog-guidance"><summary>Catálogo parcial · cobertura e interpretação dos prazos</summary>
         <p>{mode === 'fixture' ? 'Estes registos servem para testar a aplicação. Não são oportunidades reais.' : 'Consulte a fonte oficial para confirmar os dados e as condições.'} A listagem inclui registos recolhidos e oportunidades criadas manualmente pela C4G; não representa toda a fonte.</p>
         {!id && <p>A listagem inclui todos os prazos. Use os filtros para consultar apenas prazos atuais ou históricos. Os atalhos incluem hoje e a data final, em UTC. Um prazo futuro não garante abertura nem elegibilidade; confirme a fonte oficial.</p>}
@@ -133,9 +145,10 @@ function Catalog({ id, organization, platformAdmin }) {
     </section>}
     {loading && <LoadingIndicator>A consultar oportunidades…</LoadingIndicator>}{error && <div className="catalog-empty"><p role="alert">{error}</p><button className="btn btn-outline" onClick={() => setRetry(v => v + 1)}>Tentar novamente</button></div>}
     {fields && <article className="detail-page">
-      <OpportunityOverview interventionClassification={record.interventionClassification} centralPresentation={record.catalogPresentation} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} temporal={record.temporal} sourceReview={record.sourceReview} fields={fields} source={record.source} reference={fields.callReference || record.externalIdentifier} observedAt={record.observedAt} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization?.id} opportunityId={id} />} central>
+      <OpportunityOverview complement={record.complement} interventionClassification={record.interventionClassification} centralPresentation={record.catalogPresentation} readModel={record.readModel} lifecycleState={record.lifecycleState} validationState={record.validationState} temporal={record.temporal} sourceReview={record.sourceReview} fields={fields} source={record.source} reference={fields.callReference || record.externalIdentifier} observedAt={record.observedAt} registeredAt={record.createdAt} applicationCount={<OpportunityApplicationCount organizationId={organization?.id} opportunityId={id} />} central>
         {organization && <CatalogInterestButton item={contextItem} />}
-        {organization&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}
+        {platformAdmin && <OpportunityComplementEditor opportunityId={record.opportunityId} onSaved={() => setRetry(value => value + 1)} />}
+        {organization?.navigation?.people===true&&<Link className="btn btn-outline btn-sm" to={`/matching?oportunidade=${record.opportunityId}&origem=CENTRAL`}>Pessoas correspondentes</Link>}
       </OpportunityOverview>
     </article>}
     {!id && canRead && <div className="catalog-compare-tools">
@@ -144,11 +157,10 @@ function Catalog({ id, organization, platformAdmin }) {
         <option value="closing_asc">Fecho mais próximo</option><option value="closing_desc">Fecho mais tardio</option>
         <option value="amount_desc">Maior dotação por moeda</option><option value="amount_asc">Menor dotação por moeda</option>
       </select></label>
-      <button type="button" className="btn btn-outline btn-sm" onClick={() => changeColumns(['fecho','dotacao','programa'])}>Comparar oportunidades</button>
     </div>}
     {!id && !loading && !error && canRead && <Card><CardHeader><p className="table-meta" role="status">{items.length} {items.length === 1 ? 'oportunidade' : 'oportunidades'} nesta página{filtered ? ' · filtros aplicados' : ''}</p>
       {!!items.length && <div className="catalog-actions"><CatalogColumnVisibility selected={columns} hasOrganization={Boolean(organization)} onChange={changeColumns}/><button className="btn btn-outline btn-sm" type="button" onClick={() => downloadOpportunityPage(items)}>Exportar página</button></div>}</CardHeader>
-      {!!items.length && <OpportunityListTable sort={sort} onSort={changeSort} visibleColumns={columns} items={items} organizationId={organization?.id} central interestOnly search={search} applicationsLabel="Interesse" renderApplicationAction={organization?item=><CatalogInterestButton key={item.opportunityId} item={item} compact/>:undefined} />}
+      {!!items.length && <OpportunityListTable sort={sort} onSort={changeSort} visibleColumns={columns} items={items} organizationId={organization?.id} central interestOnly search={search} applicationsLabel="Interesse" renderApplicationAction={organization?item=><div key={item.opportunityId} className="catalog-row-actions"><CatalogInterestButton item={item} compact/><CatalogApplicationButton item={item}/></div>:undefined} />}
       {!items.length && <div className="catalog-empty"><h2>{filtered ? 'Sem resultados para estes filtros' : 'Ainda não existem oportunidades no catálogo comum.'}</h2><p>{filtered ? 'Experimente outro termo ou limpe os filtros.' : 'As oportunidades ficam disponíveis depois de a Administração C4G as criar ou atualizar uma fonte.'}</p>{filtered && <button type="button" className="btn btn-outline" onClick={() => { setPeriod('all'); setDraft(emptyFilters); applyFilters(emptyFilters, 'all') }}>Ver todo o catálogo</button>}</div>}
       {(pages.length > 1 || next) && <nav className="catalog-actions" aria-label="Páginas do catálogo"><button className="btn btn-secondary" disabled={pages.length === 1} onClick={() => changePage(pages.slice(0, -1))}>Página anterior</button><span>Página {pages.length}</span><button className="btn btn-secondary" disabled={!next} onClick={() => changePage([...pages, next])}>Página seguinte</button></nav>}</Card>}
   </div></CatalogInterests>

@@ -37,6 +37,11 @@ test('session exposes only a presentation label from the resolved current member
     controller.session(req, res);
     assert.equal(res.body.organization.profileLabel, label);
     assert.equal(res.body.organization.profileCode, role);
+    // The backend decides which areas a profile may open; the client only follows this list.
+    // The organization area of the menu (directory, units, access) follows the permissions of the profile.
+    const area = { directory: true, units: true, access: true }, none = { directory: false, units: false, access: false };
+    assert.deepEqual(res.body.organization.navigation, { ORG_ADMIN: { partners: true, calendar: true, people: true, dashboard: 'ORGANIZATION', ...area }, FUNDING_MANAGER: { partners: true, calendar: false, people: true, dashboard: 'ORGANIZATION', ...area },
+      CONTRIBUTOR: { partners: false, calendar: false, people: false, dashboard: 'TECHNICIAN', ...none }, VIEWER: { partners: true, calendar: false, people: false, dashboard: 'ORGANIZATION', ...none } }[role]);
     assert.equal(res.body.organization.membershipId, undefined);
     assert.equal(res.body.organization.baseRoleCode, undefined);
   }

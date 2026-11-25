@@ -11,7 +11,7 @@ messages.OPPORTUNITY_READ_LIMIT_EXCEEDED = 'A resposta excede o limite de leitur
 messages.OPPORTUNITY_VERSION_UNSUPPORTED = 'Esta revisão usa uma versão de dados não suportada pelo leitor.';
 messages.OPPORTUNITY_V2_EU_SUSPENDED = 'A recolha EU está suspensa. Consulte o estado da fonte antes de iniciar novos pedidos.';
 messages.OPPORTUNITY_V2_SOURCE_FENCE_STALE = 'O estado da fonte EU mudou. Atualize o estado antes de repetir o pedido.';
-function createFundingRouters({ express, pool, catalogReader, authenticate, organizationMiddleware, sessionRegistry, policyVersion, recentMfaRequirement, sourceMode = 'fixture', sourceApproval, workerHealth, coverage = {supported:false,enabled:false}, euSourceControlEnabled = false, euWriterV2 = null }) {
+function createFundingRouters({ express, pool, catalogReader, authenticate, organizationMiddleware, sessionRegistry, policyVersion, recentMfaRequirement, sourceMode = 'fixture', sourceApproval, workerHealth, complements = null, coverage = {supported:false,enabled:false}, euSourceControlEnabled = false, euWriterV2 = null }) {
   if(!catalogReader||!['list','get','revision'].every(key=>typeof catalogReader[key]==='function'))throw new TypeError('CATALOG_READER_REQUIRED');
   const collection = collectionPolicy(sourceMode, sourceApproval);
   if(coverage.enabled&&!coverage.supported)throw Error('FUNDING_COVERAGE_SCHEMA_REQUIRED');
@@ -20,6 +20,8 @@ function createFundingRouters({ express, pool, catalogReader, authenticate, orga
   const manual = require('./manualAuthoring').createCentralManualAuthoring({pool,repository});
   const admin = express.Router(), catalog = express.Router(), platformCatalog = express.Router();
   function handle(work) { return async (req, res) => { try { res.setHeader('Cache-Control', 'no-store'); await work(req, res); } catch (error) { const status = ['FUNDING_FORBIDDEN', 'MFA_REQUIRED'].includes(error.code) ? 403 : ['FUNDING_BUSY','IDEMPOTENCY_CONFLICT','OPPORTUNITY_V2_EU_SUSPENDED','OPPORTUNITY_V2_SOURCE_FENCE_STALE'].includes(error.code) ? 409 : error.code === 'INVALID_INPUT' ? 400 : error.code === 'RESOURCE_NOT_AVAILABLE' ? 404 : 503; res.status(status).json({ error: { code: messages[error.code] ? error.code : 'SERVICE_UNAVAILABLE', message: messages[error.code] || 'Não foi possível concluir o pedido. Consulte o estado antes de tentar novamente.' } }); } }; }
+  // Descriptive data kept beside the opportunity (Central 053); read only after the detail itself was authorized.
+  const withComplement = async detail => { const complement = complements ? await complements.effective(detail.opportunityId) : null; return complement ? { ...detail, complement } : detail; };
   admin.use(authenticate);
   admin.get('/funding-tenders', handle(async (req, res) => {
     const status=await repository.status(req.user.id);
@@ -46,7 +48,7 @@ function createFundingRouters({ express, pool, catalogReader, authenticate, orga
     if (context?.state !== 'VALID') throw Object.assign(new Error(), { code: 'RESOURCE_NOT_AVAILABLE' });
     if (req.method !== 'GET') return res.status(405).json({ error: { code: 'METHOD_NOT_ALLOWED' } });
     if (req.path === '/') return res.json({ ...await catalogReader.list(catalogQuery(req.query)), sourceMode });
-    if (/^\/[a-f0-9-]+$/i.test(req.path)) return res.json({ ...await catalogReader.get(req.path.slice(1)), sourceMode });
+    if (/^\/[a-f0-9-]+$/i.test(req.path)) return res.json({ ...await withComplement(await catalogReader.get(req.path.slice(1))), sourceMode });
     res.status(404).json({ error: { code: 'RESOURCE_NOT_AVAILABLE' } });
   }));
   // Explicit platform read authority; never bypass organization middleware on client routes.
@@ -56,7 +58,7 @@ function createFundingRouters({ express, pool, catalogReader, authenticate, orga
     if (!req.authContext || !evaluateAssurance({evidence:req.authContext.evidence,requirement:recentMfaRequirement,
       nowSeconds:Date.now()/1000,expectedPolicyVersion:policyVersion}).allowed)
       throw Object.assign(new Error(),{code:'MFA_REQUIRED'});
-    try { res.status(201).json(await manual.create(req.user.id,req.body)); }
+    try { res.status(201).json(await manual.create(req.user.id,req.body,req.sessionID)); }
     catch(error) {
       if (['OPPORTUNITY_INVALID_INPUT','OPPORTUNITY_UNKNOWN_FIELD','OPPORTUNITY_LIMIT_EXCEEDED'].includes(error.code)) error.code='INVALID_INPUT';
       if (error.code==='OPPORTUNITY_DIGEST_MISMATCH') error.code='IDEMPOTENCY_CONFLICT';
@@ -66,7 +68,7 @@ function createFundingRouters({ express, pool, catalogReader, authenticate, orga
   platformCatalog.use(handle(async (req, res) => {
     if (req.method !== 'GET') return res.status(405).json({ error: { code: 'METHOD_NOT_ALLOWED' } });
     if (req.path === '/') return res.json({ ...await repository.platformList(req.user.id, catalogQuery(req.query)), sourceMode });
-    if (/^\/[a-f0-9-]+$/i.test(req.path)) return res.json({ ...await repository.platformGet(req.user.id, req.path.slice(1)), sourceMode });
+    if (/^\/[a-f0-9-]+$/i.test(req.path)) return res.json({ ...await withComplement(await repository.platformGet(req.user.id, req.path.slice(1))), sourceMode });
     res.status(404).json({ error: { code: 'RESOURCE_NOT_AVAILABLE' } });
   }));
   return { admin, catalog, platformCatalog };

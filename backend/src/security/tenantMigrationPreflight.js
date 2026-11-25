@@ -2,7 +2,7 @@ const { validateInterestCapabilities } = require('./tenantInterestCapabilities')
 const { isRotatingAuditTable } = require('./auditPartitionPolicy');
 const { registeredManifest: manifest, allRegisteredMigrations, receiptManifest, failureReceiptManifest, assignedReviewManifest,
   applicationChatManifest, APPLICATION_CHAT_SCHEMA_VERSION, organizationStrategyManifest, ORGANIZATION_STRATEGY_SCHEMA_VERSION,
-  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION, documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION, chatRetentionManifest, CHAT_RETENTION_SCHEMA_VERSION,
+  applicationTaskDetailsManifest, APPLICATION_TASK_DETAILS_SCHEMA_VERSION, documentDeletionManifest, DOCUMENT_DELETION_SCHEMA_VERSION, chatRetentionManifest, CHAT_RETENTION_SCHEMA_VERSION, accountIdentityErasureManifest, ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION,
   migrationSql, validateTenantLedger } = require('./tenantMigrationManifest');
 const { tenantSchemaFingerprint, tenantSchemaSnapshot } = require('./tenantSchemaFingerprint');
 const {
@@ -220,7 +220,7 @@ function opportunityCatalogSpecification(required) {
 
 function organizationalScopeSpecification(required) {
   return ['F13_P1_ORGANIZATIONAL_SCOPE', 'organizational_scope', ['idempotency_record', 'scope',
-      ...(required.has('ORGANIZATION_DIRECTORY')?['organization_card','person','person_unit','directory_receipt']:[]),...(required.has('PERSONAL_PROFILE')?['person_profile']:[])].sort(), required.has('PERSONAL_PROFILE')?7:required.has('ORGANIZATION_DIRECTORY')?6:2];
+      ...(required.has('ORGANIZATION_DIRECTORY')?['organization_card','person','person_unit','directory_receipt']:[]),...(required.has('PERSONAL_PROFILE')?['person_profile']:[]),...(required.has('ACCOUNT_IDENTITY_ERASURE')?['account_identity_erasure']:[])].sort(), required.has('ACCOUNT_IDENTITY_ERASURE')?8:required.has('PERSONAL_PROFILE')?7:required.has('ORGANIZATION_DIRECTORY')?6:2];
 }
 
 function profileCatalogSpecification(required) {
@@ -560,6 +560,7 @@ async function preflightTenantClient(client, expected, entries = manifest, loadM
     if (entries === manifest && currentMigration === APPLICATION_TASK_DETAILS_SCHEMA_VERSION) entries = applicationTaskDetailsManifest;
     if (entries === manifest && currentMigration === DOCUMENT_DELETION_SCHEMA_VERSION) entries = documentDeletionManifest;
     if (entries === manifest && currentMigration === CHAT_RETENTION_SCHEMA_VERSION) entries = chatRetentionManifest;
+    if (entries === manifest && currentMigration === ACCOUNT_IDENTITY_ERASURE_SCHEMA_VERSION) entries = accountIdentityErasureManifest;
     const currentEntry = entries.find(item => item.version === currentMigration);
     const allowedFeatureSchemas = currentEntry ? [
       currentEntry.capabilities.includes('F9_ASYNC_EXECUTION') && 'async_exec',

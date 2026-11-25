@@ -28,7 +28,7 @@ function createCatalogReader({env,Pool=require('pg').Pool}) {
     try{await assertReaderSession(client,admission);return client;}catch(error){client.release();throw error;}
   }};
   const repository=createFundingRepository({pool:guardedPool,readRole:true});
-  return Object.freeze({list:repository.list,get:repository.get,revision:repository.revision,dashboardSummary:repository.dashboardSummary,ready,
+  return Object.freeze({list:repository.list,listForMatching:repository.listForMatching,get:repository.get,revision:repository.revision,dashboardSummary:repository.dashboardSummary,ready,
     close(){closed=true;return closing||(closing=pool.end());}});
 }
 module.exports={createCatalogReader,readerOptions,VERSION};

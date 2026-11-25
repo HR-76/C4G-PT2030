@@ -15,8 +15,9 @@ export function LogsView({api=platformDirectoryApi}){
  const [q,setQ]=useState(''),[type,setType]=useState(''),[query,setQuery]=useState({page:'1'}),[revision,setRevision]=useState(0)
  const [data,setData]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(true)
  useEffect(()=>{
-  let active=true;const controller=new AbortController();setBusy(true);setData(null);setError('')
-  api.logs(query,controller.signal).then(r=>{if(active)setData(r.data)}).catch(e=>{if(active)setError(e.response?.status===403?'Esta área está reservada à administração C4G.':'Não foi possível consultar os logs. Tente novamente.')}).finally(()=>{if(active)setBusy(false)})
+  // An audit view: nothing is kept between entries. While another selection or page is read, the previous rows stay on screen, dimmed and inactive.
+  let active=true;const controller=new AbortController();setBusy(true);setError('')
+  api.logs(query,controller.signal).then(r=>{if(active)setData(r.data)}).catch(e=>{if(active)setData(null);if(active)setError(e.response?.status===403?'Esta área está reservada à administração C4G.':'Não foi possível consultar os logs. Tente novamente.')}).finally(()=>{if(active)setBusy(false)})
   return()=>{active=false;controller.abort()}
  },[api,query,revision])
  return <div className="page platform-directory directory-workspace platform-logs">
@@ -31,7 +32,7 @@ export function LogsView({api=platformDirectoryApi}){
   </FilterBar>
   {busy&&<LoadingIndicator>A consultar os logs…</LoadingIndicator>}
   {error&&<div role="alert" className="alert alert-error">{error}</div>}
-  {data&&<>
+  {data&&<div className={busy?'directory-stale':undefined} inert={busy?'':undefined} aria-busy={busy||undefined}>
    {data.collection?.failedEvents>0&&<div role="alert" className="alert alert-error">A recolha encontrou uma falha. Podem faltar registos deste período; contacte o suporte C4G.</div>}
    <p className="directory-result" role="status">{data.total} {data.total===1?'registo encontrado':'registos encontrados'}</p>
    {data.items.length?<div className="table-wrap"><table role="table" className="data-table mobile-card-table directory-table"><caption className="sr-only">Entradas e erros da plataforma</caption><thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Utilizador</th><th role="columnheader" scope="col">Data e hora</th><th role="columnheader" scope="col">Tipo</th><th role="columnheader" scope="col">Descrição</th></tr></thead><tbody role="rowgroup">{data.items.map(row=><tr role="row" key={row.id}>
@@ -41,7 +42,7 @@ export function LogsView({api=platformDirectoryApi}){
     <td role="cell" data-label="Descrição">{row.description}{row.httpStatus&&<small>HTTP {row.httpStatus}</small>}</td>
    </tr>)}</tbody></table></div>:<div className="directory-empty"><h2>Sem registos</h2><p>{query.q||query.type?'Altere a pesquisa ou limpe os filtros.':'As próximas entradas e erros aparecerão aqui.'}</p></div>}
    <nav className="directory-pagination" aria-label="Paginação"><button className="btn btn-secondary" disabled={data.page<=1} onClick={()=>setQuery({...query,page:String(data.page-1)})}>Anterior</button><span>Página {data.page}{data.total>0?` de ${Math.ceil(data.total/data.pageSize)}`:''}</span><button className="btn btn-secondary" disabled={data.page*data.pageSize>=data.total} onClick={()=>setQuery({...query,page:String(data.page+1)})}>Seguinte</button></nav>
-  </>}
+  </div>}
   </section>
  </div>
 }

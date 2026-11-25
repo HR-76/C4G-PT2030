@@ -64,7 +64,8 @@
   .organization-dashboard .dashboard-stats { gap: 10px; }
 }
 
-.organization-dashboard .dashboard-stat-action { display:inline-flex; align-items:center; gap:5px; margin-top:8px; color:var(--color-action); font-size:.8rem; font-weight:650; }
+/* margin-top:auto encosta o link ao fundo do cartão; o padding garante o intervalo mínimo ao texto. */
+.organization-dashboard .dashboard-stat-action { display:inline-flex; align-items:center; gap:5px; margin-top:auto; padding-top:8px; color:var(--color-action); font-size:.8rem; font-weight:650; }
 .organization-dashboard a.metric-row { text-decoration:none; color:inherit; }
 .organization-dashboard a.metric-row:hover span { text-decoration:underline; }
 .organization-dashboard :is(a.metric-row,a.stat-item):focus-visible { outline:2px solid var(--color-info); outline-offset:-2px; }

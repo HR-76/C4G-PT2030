@@ -26,7 +26,10 @@ it('can count stored unread alerts after a network failure in deadline refresh',
  api.refreshList.mockRejectedValue(new Error('offline'));render(<MemoryRouter><AlertBell modern organizationId="org-a"/></MemoryRouter>)
  await screen.findByRole('link',{name:'Alertas · 6 não lidos'})
 })
-it('keeps the communication heading concise',async()=>{session.organization.displayName='C4G';api.noticeContext.mockResolvedValue({data:{canManage:true,recipients:[]}});render(ui());fireEvent.click(screen.getByRole('tab',{name:'Comunicação'}));await screen.findByRole('heading',{name:'Comunicação da organização'});expect(screen.queryByText(/Avisos internos para os membros/)).toBeNull();expect(screen.queryByText('org-a')).toBeNull()})
+it('keeps the communication heading concise',async()=>{session.organization.displayName='C4G';api.noticeContext.mockResolvedValue({data:{canManage:true,recipients:[]}});render(ui());fireEvent.click(await screen.findByRole('tab',{name:'Comunicação'}));expect(screen.getByRole('heading',{name:'Alertas e comunicação'})).toBeTruthy();await screen.findByRole('heading',{name:'Comunicação da organização'});expect(screen.queryByText(/Avisos internos para os membros/)).toBeNull();expect(screen.queryByText('org-a')).toBeNull()})
+it('shows only alerts to a member who cannot manage notices',async()=>{render(ui());await screen.findByText(row.message);await act(async()=>{});expect(screen.queryByRole('tablist')).toBeNull();expect(screen.queryByRole('tab',{name:'Comunicação'})).toBeNull();expect(screen.queryByText(/gerir avisos/)).toBeNull();expect(screen.getByRole('heading',{level:1}).textContent).toBe('Alertas')})
+it('keeps communication hidden when access cannot be verified',async()=>{api.noticeContext.mockRejectedValue(new Error('offline'));render(ui());await screen.findByText(row.message);await act(async()=>{});expect(screen.queryByRole('tab')).toBeNull();expect(screen.getByText(/Não foi possível verificar o acesso/).closest('[hidden]')).toBeTruthy()})
+it('describes the empty inbox as personal and offers only produced alert types',async()=>{api.refreshList.mockResolvedValue({data:{notifications:[],unread_count:0,total:0}});render(ui('/notificacoes?type=NEW_OPPORTUNITY'));await screen.findByText(/Nenhuma notificação/);expect(screen.queryByRole('button',{name:/Oportunidade/})).toBeNull();fireEvent.click(screen.getByRole('button',{name:'Ver todos os alertas'}));expect(screen.getByText('Os seus alertas aparecem aqui quando estiverem disponíveis.')).toBeTruthy()})
 it('requires an associated entity before any request',()=>{session.organization=null;render(ui());expect(screen.getByRole('status').textContent).toContain('não tem uma entidade associada');expect(api.list).not.toHaveBeenCalled();expect(api.refreshList).not.toHaveBeenCalled()})
 it('shows errors with retry instead of empty inbox',async()=>{api.refreshList.mockRejectedValueOnce(new Error('offline'));api.list.mockRejectedValueOnce(new Error('offline'));render(ui());await screen.findByRole('alert');expect(screen.queryByText(/Nenhuma notificação/)).toBeNull();fireEvent.click(screen.getByRole('button',{name:'Tentar novamente'}));await screen.findByText(row.message)})
 it('links to application and removes read rows from unread selection',async()=>{render(ui('/notificacoes?unread=1'));await screen.findByText(row.message);expect(screen.getByRole('link',{name:'Candidatura A'}).getAttribute('href')).toBe('/candidaturas/application-a');fireEvent.click(screen.getByTitle('Marcar como lida'));await screen.findByText(/Nenhuma notificação/);expect(api.markRead).toHaveBeenCalledWith('alert-a','org-a')})
@@ -79,4 +82,12 @@ it('groups using Lisbon civil days across the autumn DST change and sorts newest
 it('does not mislabel invalid or future dates as older notifications',()=>{
  const groups=notificationGroups([{created_at:'invalid'},{created_at:'2027-01-01T00:00:00Z'}],new Date('2026-11-11T12:00:00Z'))
  expect(groups.map(g=>g.label)).toEqual(['Outras datas'])
+})
+
+it('records that the alerts page generated the deadline alerts so the header bell only reads', async () => {
+  const { alertGenerationDue } = await import('../api/alertGeneration')
+  expect(alertGenerationDue('a:org-a')).toBe(true)
+  render(ui())
+  await screen.findAllByText('Candidatura em preparação')
+  expect(api.refreshList).toHaveBeenCalled(); expect(alertGenerationDue('a:org-a')).toBe(false)
 })

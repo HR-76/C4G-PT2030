@@ -72,7 +72,7 @@ function createPlatformBillingService({ coordinator, centralPool, repository = c
     return expectedActorId;
   }
   async function authorizeRead(client, request, expectedActorId) {
-    const row = (await client.query(sql.readAdmin, [request.sessionID, expectedActorId])).rows[0];
+    const row = (await client.query(client.productionCapability?'SELECT $2::uuid AS id WHERE c4g_production.administrator($1,$2,false)':sql.readAdmin, [request.sessionID, expectedActorId])).rows[0];
     if (!row || row.id !== expectedActorId) fail('C4G_ADMIN_REQUIRED');
   }
   function write(organizationId, actorId, mutation) {

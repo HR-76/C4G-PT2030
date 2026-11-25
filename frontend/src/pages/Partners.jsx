@@ -1,3 +1,4 @@
+import LoadingIndicator from '../components/LoadingIndicator'
 import FormModal from '../components/FormModal'
 import { PartnerCards } from './Applications/PartnerComponents'
 import FilterBar from '../components/FilterBar'
@@ -60,17 +61,23 @@ function PartnersView({organizationId, organizationName, scope=null}) {
   const [filters, setFilters] = useState({ q: '', country: '', person_role: '' })
 
   const hasFilters = Boolean(filters.q || filters.country || filters.person_role)
+  // Only typing in the search waits before asking; opening, other filters and pages ask at once.
+  const lastSearch = useRef('')
+  // While another selection or page is read, the previous rows stay on screen, dimmed and inactive.
+  const stale = loading && rows.length > 0
 
   useEffect(() => {
-    let active=true;const controller=new AbortController(),read=startConfirmedRead(scope,readName(filters,cursor));setLoading(!read.held);setError('');setRows(read.held?.items||[]);setPage(read.held);setSelected(null)
-    if(read.held)setCountries(read.held.countries)
+    let active=true;const controller=new AbortController(),read=startConfirmedRead(scope,readName(filters,cursor));setLoading(!read.held);setError('');setSelected(null)
+    if(read.held){setRows(read.held.items);setPage(read.held);setCountries(read.held.countries)}
+    const delay=lastSearch.current!==filters.q?250:0
+    lastSearch.current=filters.q
     const timer=setTimeout(()=>{
       const params=Object.fromEntries(Object.entries({...filters,...(cursor?{cursor}:{})}).filter(([,v])=>v))
       const request=privateApplicationsApi.partnersBrowse(params,organizationId,controller.signal)
       request.then(r=>{read.keep(r.data);if(active){setRows(r.data.items);setCountries(r.data.countries);setPage(r.data)}})
         .catch(e=>{if(active&&e?.code!=='ERR_CANCELED'){read.drop();setRows([]);setPage(null);setCountries([]);setError(e?.response?.data?.error?.code==='SCHEMA_UPGRADE_REQUIRED'?'A recuperação dos parceiros aguarda a atualização local.':e?.response?.data?.error?.code==='INVALID_CURSOR'?'Os dados mudaram. Recarregue a lista.':'Não foi possível consultar os parceiros. Tente novamente.')}})
         .finally(()=>{if(active)setLoading(false)})
-    },250)
+    },delay)
     return ()=>{active=false;controller.abort();clearTimeout(timer)}
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope is read at that moment.
   },[filters,cursor,refresh,organizationId])
@@ -119,6 +126,7 @@ function PartnersView({organizationId, organizationName, scope=null}) {
         {loading ? 'A consultar parceiros…' : error?'Consulta indisponível':`${page?.total??rows.length} parceiro${(page?.total??rows.length) !== 1 ? 's' : ''}`}
       </div>
 
+      {loading && !rows.length && <LoadingIndicator />}
       <div className="table-wrap">
         <table role="table" className="data-table partners-table mobile-card-table">
           <colgroup>
@@ -139,7 +147,7 @@ function PartnersView({organizationId, organizationName, scope=null}) {
               <th role="columnheader" scope="col"></th>
             </tr>
           </thead>
-          <tbody role="rowgroup">
+          <tbody role="rowgroup" className={stale?'partners-stale':undefined} inert={stale?'':undefined} aria-busy={stale||undefined}>
             {rows.map(partner => (
               <tr role="row" key={partner.id}>
                 <td role="cell" data-label="Entidade" className="td-notrunc">

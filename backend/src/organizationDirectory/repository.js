@@ -27,11 +27,11 @@ function createDirectoryRepository({organizationId:org,actor,authorize,protect,a
   return {digest,previous:row?.result_projection};
  }
  async function finish(client,method,input,id,digest,result){
-  const cardChanged=method==='profileEdit'||method==='strategyEdit';
+  const cardChanged=['profileEdit','strategyEdit','departmentProfileEdit'].includes(method);
   await audit(client,{eventCode:cardChanged?'ORGANIZATION_CARD_CHANGED':method==='personCreate'?'ORGANIZATION_PERSON_CREATED':'ORGANIZATION_PERSON_CHANGED',
    resourceId:result.personId||id,resourceType:cardChanged?'ORGANIZATION':'ORGANIZATION_PERSON',idempotencyKey:input.idempotencyKey});
   await client.query(`INSERT INTO organizational_scope.directory_receipt(organization_id,idempotency_key,subject_id,operation,resource_id,intention_digest,result_projection)
-   VALUES($1,$2,$3,$4,$5,$6,$7)`,[org,input.idempotencyKey,actor.id,{profileEdit:'PROFILE_EDIT',strategyEdit:'PROFILE_EDIT',personCreate:'PERSON_CREATE',personEdit:'PERSON_EDIT',personProfileEdit:'PERSON_PROFILE_EDIT',personLinkEdit:'PERSON_LINK_EDIT',selfEdit:'SELF_EDIT'}[method],id,digest,result]);
+   VALUES($1,$2,$3,$4,$5,$6,$7)`,[org,input.idempotencyKey,actor.id,{profileEdit:'PROFILE_EDIT',strategyEdit:'PROFILE_EDIT',departmentProfileEdit:'PROFILE_EDIT',personCreate:'PERSON_CREATE',personEdit:'PERSON_EDIT',personProfileEdit:'PERSON_PROFILE_EDIT',personLinkEdit:'PERSON_LINK_EDIT',selfEdit:'SELF_EDIT'}[method],id,digest,result]);
   return result;
  }
  async function context(client){
@@ -64,17 +64,47 @@ function createDirectoryRepository({organizationId:org,actor,authorize,protect,a
   const result=cardProjection(row);if(registered){result.email=registered.fields.institutionalEmail||'';result.website=registered.fields.website||'';}
   return finish(client,'profileEdit',input,org,prior.digest,result);
  }
+ const saveStrategy=`INSERT INTO organizational_scope.organization_card(organization_id,strategy,revision,updated_by)
+   VALUES($1,$2,1,$3) ON CONFLICT(organization_id) DO UPDATE SET strategy=$2,revision=organization_card.revision+1,
+   updated_by=$3,updated_at=transaction_timestamp() RETURNING strategy,revision`;
+ // The department's interests and objectives live inside the organization strategy,
+ // under the same revision: one writer at a time for the whole strategy.
+ async function departmentProfileEdit(client,input,unitId){
+  await guarded('departmentProfileEdit',input,unitId);
+  if(!supportsStrategy)fail('RESOURCE_NOT_AVAILABLE');
+  const prior=await receipt(client,'departmentProfileEdit',input,unitId);
+  if(prior.previous)return prior.previous;
+  const unit=(await client.query(`SELECT lifecycle FROM organizational_scope.scope
+   WHERE organization_id=$1 AND scope_id=$2 AND scope_type='UNIT'`,[org,unitId])).rows[0];
+  if(!unit)fail('RESOURCE_NOT_AVAILABLE');
+  if(unit.lifecycle!=='ACTIVE')fail('UNIT_UNAVAILABLE');
+  const current=(await client.query('SELECT revision,strategy FROM organizational_scope.organization_card WHERE organization_id=$1 FOR UPDATE',[org])).rows[0];
+  if(Number(current?.revision||0)!==input.expectedRevision)fail('STALE_REVISION');
+  const strategy=current?.strategy||emptyStrategy();
+  // A department with interests stands on at least one strategic area, once the entity has any.
+  if(input.areaIds.length&&strategy.areaIds.length&&!input.areaIds.some(id=>strategy.areaIds.includes(id)))fail('STRATEGIC_AREA_REQUIRED');
+  const strategic=new Set(strategy.objectives.map(objective=>objective.id));
+  if(input.objectives.some(objective=>objective.objectiveIds.some(id=>!strategic.has(id))))fail('STRATEGIC_OBJECTIVE_UNAVAILABLE');
+  const units={...(strategy.units||{}),[unitId]:{areaIds:input.areaIds,objectives:input.objectives}};
+  const row=(await client.query(saveStrategy,[org,{...strategy,units},actor.id])).rows[0];
+  return finish(client,'departmentProfileEdit',input,org,prior.digest,{strategy:row.strategy,revision:Number(row.revision)});
+ }
  async function strategyEdit(client,input){
   await guarded('strategyEdit',input,org);
   if(!supportsStrategy)fail('RESOURCE_NOT_AVAILABLE');
   const prior=await receipt(client,'strategyEdit',input,org);
   if(prior.previous)return prior.previous;
-  const current=(await client.query('SELECT revision FROM organizational_scope.organization_card WHERE organization_id=$1 FOR UPDATE',[org])).rows[0];
+  const current=(await client.query('SELECT revision,strategy FROM organizational_scope.organization_card WHERE organization_id=$1 FOR UPDATE',[org])).rows[0];
   if(Number(current?.revision||0)!==input.expectedRevision)fail('STALE_REVISION');
-  const {areaIds,interests,objectives}=input;
-  const row=(await client.query(`INSERT INTO organizational_scope.organization_card(organization_id,strategy,revision,updated_by)
-   VALUES($1,$2,1,$3) ON CONFLICT(organization_id) DO UPDATE SET strategy=$2,revision=organization_card.revision+1,
-   updated_by=$3,updated_at=transaction_timestamp() RETURNING strategy,revision`,[org,{areaIds,interests,objectives},actor.id])).rows[0];
+  const {areaIds,interests}=input;
+  // An objective sent without its application links keeps the ones already stored.
+  const stored=new Map((current?.strategy?.objectives||[]).map(objective=>[objective.id,objective.applicationIds||[]]));
+  const objectives=input.objectives.map(objective=>({...objective,applicationIds:objective.applicationIds||stored.get(objective.id)||[]}));
+  // Department profiles are kept; only their links to objectives that no longer exist are dropped.
+  const kept=new Set(objectives.map(objective=>objective.id));
+  const units=Object.fromEntries(Object.entries(current?.strategy?.units||{}).map(([unitId,profile])=>[unitId,{...profile,
+   objectives:(profile.objectives||[]).map(objective=>({...objective,objectiveIds:(objective.objectiveIds||[]).filter(id=>kept.has(id))}))}]));
+  const row=(await client.query(saveStrategy,[org,{areaIds,interests,objectives,units},actor.id])).rows[0];
   return finish(client,'strategyEdit',input,org,prior.digest,{strategy:row.strategy,revision:Number(row.revision)});
  }
  async function people(client,input,withResearchAreas=false){
@@ -162,7 +192,7 @@ function createDirectoryRepository({organizationId:org,actor,authorize,protect,a
   return {scopeId:result.scopeId,label:result.label,parentScopeId:result.parentScopeId,stableCode:result.stableCode,lifecycle:result.lifecycle,revision:Number(result.revision)};
  }
  const personal=require('./personalRepository').createPersonalRepository({org,actor,guarded,receipt,finish,memberships,authorize,root,supportsStrategy});
- return {context,units,profileEdit,strategyEdit,descriptionEdit:(c,i)=>profileEdit(c,i,true),people,peopleWithResearchAreas:(c,i)=>people(c,i,true),personWrite,unitWrite,person:(c,i,id)=>personal.read(c,id),self:c=>personal.read(c,null,true),
+ return {context,units,profileEdit,strategyEdit,departmentProfileEdit,descriptionEdit:(c,i)=>profileEdit(c,i,true),people,peopleWithResearchAreas:(c,i)=>people(c,i,true),personWrite,unitWrite,person:(c,i,id)=>personal.read(c,id),self:c=>personal.read(c,null,true),
  personProfileEdit:(c,i,id)=>personal.write(c,'personProfileEdit',i,id),personLinkEdit:(c,i,id)=>personal.write(c,'personLinkEdit',i,id),
  selfEdit:(c,i)=>personal.write(c,'selfEdit',i),memberships:personal.members};
 }

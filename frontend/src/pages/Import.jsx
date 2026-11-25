@@ -16,7 +16,7 @@ export default function Import() {
 }
 
 function CentralImportAvailability() {
-  const [state, setState] = useState('loading'), [error, setError] = useState(''), [attempt, setAttempt] = useState(0)
+  const [state, setState] = useState('loading'), [error, setError] = useState(''), [attempt, setAttempt] = useState(0), [catalog, setCatalog] = useState(false)
   useEffect(() => {
     let active = true
     const controller = new AbortController()
@@ -24,7 +24,8 @@ function CentralImportAvailability() {
     platformImportsApi.availability(controller.signal).then(({data}) => {
       if (!active) return
       if (typeof data?.available !== 'boolean') throw new Error('Invalid availability response')
-      setState(data.available ? data.mode === 'PREVIEW_ONLY' ? 'ready' : 'integration-pending' : 'unavailable')
+      setCatalog(data.mode === 'STAGE_AND_ACCEPT')
+      setState(data.available ? ['PREVIEW_ONLY', 'STAGE_AND_ACCEPT'].includes(data.mode) ? 'ready' : 'integration-pending' : 'unavailable')
     }).catch(err => {
       if (!active) return
       setError([401,403].includes(err.response?.status) ? importError(err) : 'Não foi possível consultar a disponibilidade da importação. Tente novamente.')
@@ -39,7 +40,7 @@ function CentralImportAvailability() {
       <a className="btn btn-outline" href="https://portugal2030.pt/plano-anual-de-avisos/" target="_blank" rel="noopener noreferrer"><Download size={14} aria-hidden="true"/> Obter Excel oficial</a>
       <Link className="btn btn-outline" to="/catalogo">Consultar catálogo C4G</Link>
     </div>
-    {state === 'ready' ? <CentralImportPreview/> : <section className="detail-section" aria-label="Disponibilidade da importação" aria-busy={state === 'loading'}>
+    {state === 'ready' ? <CentralImportPreview catalog={catalog}/> : <section className="detail-section" aria-label="Disponibilidade da importação" aria-busy={state === 'loading'}>
       {state === 'loading' ? <LoadingIndicator>A verificar disponibilidade…</LoadingIndicator>
         : state === 'error' ? <p role="alert">{error}</p>
         : <p role="status">{state === 'unavailable' ? 'A importação para o catálogo C4G ainda não está disponível.' : 'O serviço está disponível, mas o envio de ficheiros por esta página ainda não está integrado.'}</p>}

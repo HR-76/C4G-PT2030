@@ -1,0 +1,69 @@
+{
+  "status": "LOCAL_FIX_VALIDATED_NOT_DEPLOYED",
+  "date": "2026-11-15",
+  "baseCommit": "b32d334d94e9b40cb0741d6984067d99bebd34ee",
+  "policyVersion": "c4g-user-mfa-v1",
+  "privilegedCategory": "recent-auth",
+  "mfaOptional": true,
+  "validation": {
+    "regressionsReproducedBeforeFix": true,
+    "backendFocused": {
+      "passed": 35,
+      "failed": 0
+    },
+    "frontendFocused": {
+      "files": 3,
+      "passed": 36,
+      "failed": 0
+    },
+    "backendFull": {
+      "total": 3436,
+      "passed": 3427,
+      "skipped": 9,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "frontendFull": {
+      "files": 128,
+      "passed": 1150,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "preparation": {
+      "passed": 7,
+      "failed": 0
+    },
+    "lint": "PASS",
+    "syntax": "PASS",
+    "build": "PASS",
+    "independentReview": "NO_ACTIONABLE_FINDINGS",
+    "postgresGate": "NOT_RERUN_NO_SQL_CHANGES",
+    "liveOidcBrowser": "NOT_RUN"
+  },
+  "scope": {
+    "stagingChanges": false,
+    "productionChanges": false,
+    "deploy": false,
+    "commit": false,
+    "push": false,
+    "sqlChanges": false
+  },
+  "limits": [
+    "Audit failure test uses a simulated coordinator; no new real PostgreSQL rollback claim.",
+    "Isolated OIDC acceptance and integrated release checks remain required.",
+    "Other production blockers remain in the deployment runbook."
+  ],
+  "files": {
+    "backend/src/platformDirectory/access.js": "eb687628b9b2a745aace7a1902e084ad67b72736fa524136acfae12d47235671",
+    "backend/src/productionComposition.js": "ad5b883fa1eb94b6e485a2ed1438a940c5651b9716f61feb1dae712e1fdf6ea5",
+    "backend/src/routes/platformDirectoryRoutes.js": "045c1b68a3ae4178998d3bf5b2245899c60ff8ffaeb7c90836a1e7885d92b8d4",
+    "backend/test/platformAccessRecentMfa.test.js": "0a44dd77cb7a18c6a41c683dedf393b7e08b2263a07b6b65b0ebb8a67997491f",
+    "backend/test/productionCompositionParity.test.js": "4857ace4789a0918c7d9de664ea9e531ce949397420a334031f4192531eaaa48",
+    "frontend/src/pages/Organization/OrganizationAccess.jsx": "9697294b1c99dbae6e64d83eec0b0c12905e061977eb3a94e0e11133466c8cfa",
+    "frontend/src/pages/Organization/OrganizationAccess.test.jsx": "afb9d01527d1ad698d6af4243e7796a469ee63b2394c6753b984176275b81295",
+    "context/features/platform-access-optional-mfa.md": "ccbe47b3d64ba9c15f2de52671b404925c7fb9e0adfed65cf8c2e88d8fe4665d",
+    "context/runbooks/production-057-configuration.md": "37ab6082a21577f2e6cc2540d4993ebfdefc5ee6f63662a86688f39926abf84f",
+    "context/runbooks/production-057-deployment.md": "0c2cfa47bd6a0e6d1cfee6ec40f50e9a2e32c39b682ce695bfe4dd0bc8cf01f5",
+    "deploy/production/api.env.example": "f6ba4c62f3f2eb17ee851e9bf07c4f5381a5c307cb54f7595aca55e5a8ceb296"
+  }
+}

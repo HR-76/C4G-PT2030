@@ -100,6 +100,81 @@ test('login com herança, superutilizador ou cadeia de papéis inválida é recu
   await assert.rejects(infrastructure.openTenant({ organizationId: ORG }), /ROLE_CHAIN_INVALID/);
 });
 
+// Entities created by admission (context/features/staging-entity-admission.md): read from the admission worker's encrypted journal.
+const KEY = 'cd'.repeat(32);
+const ADMITTED = '55555555-5555-4555-8555-555555555555';
+async function journalFolder(t, entries = [ADMITTED]) {
+  const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'c4g-retention-journal-'));
+  t.after(() => fs.rmSync(folder, { recursive: true, force: true }));
+  const journal = require('../src/platformOnboarding/encryptedJournal').createEncryptedJournal({ directory: folder, key: KEY });
+  for (const id of entries) {
+    const material = workload => ({ tenantId: id, credentialRef: `onboarding-${workload.toLowerCase()}-${id}`, connectionVersion: 1, host: 'db.invalid', port: 5432, database: 'c4g_onb_x',
+      login: `c4g_onb_${workload.toLowerCase()}_x`, password: `synthetic-${workload}`, ssl: false });
+    await journal.reserve(id, { id }, () => ({ binding: { organizationId: id }, api: material('API'), worker: material('WORKER') }));
+  }
+  return folder;
+}
+const admitted = folder => ({ CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY: folder, CHAT_RETENTION_ADMISSION_JOURNAL_KEY: KEY });
+
+test('entidades da adesão: entram pela leitura do diário cifrado, com o login WORKER e a geração que a Central regista', async t => {
+  const folder = await journalFolder(t);
+  const { state, deps } = fakes({ snapshot: { tenantId: ADMITTED, connectionVersion: 1, credentialRef: `onboarding-worker-${ADMITTED}`, databaseGenerationId: 'generation-from-central', bindingDigest: 'digest' } });
+  let digested = null;
+  deps.bindingDigest = fields => { digested = fields; return 'digest'; };
+  const infrastructure = await createChatRetentionInfrastructure({ env: env(admitted(folder)), deps });
+  assert.deepEqual(await infrastructure.listTenants(), [{ organizationId: ORG }, { organizationId: ADMITTED }]);
+  assert.deepEqual(state.organizations, [ORG, ADMITTED]);
+  const handle = await infrastructure.openTenant({ organizationId: ADMITTED });
+  assert.deepEqual(state.resolved, [ADMITTED, 'WORKER']);
+  assert.deepEqual([digested.workload, digested.login, digested.database, digested.credentialRef], ['WORKER', 'c4g_onb_worker_x', 'c4g_onb_x', `onboarding-worker-${ADMITTED}`]);
+  const tenantPool = state.pools.at(-1).options;
+  assert.deepEqual([tenantPool.user, tenantPool.password, tenantPool.database, tenantPool.ssl], ['c4g_onb_worker_x', 'synthetic-WORKER', 'c4g_onb_x', false], 'never the API login');
+  assert.deepEqual(state.observed, { tenantId: ADMITTED, databaseGenerationId: 'generation-from-central' });
+  assert.equal(state.chain.workload, 'WORKER');
+  await handle.close();
+  await infrastructure.close();
+});
+
+test('entidades da adesão: binding diferente recusa, e a configuração é fechada', async t => {
+  const folder = await journalFolder(t);
+  const mismatch = fakes({ snapshot: { tenantId: ADMITTED, connectionVersion: 2, credentialRef: `onboarding-worker-${ADMITTED}`, databaseGenerationId: 'g', bindingDigest: 'digest' } });
+  const a = await createChatRetentionInfrastructure({ env: env(admitted(folder)), deps: mismatch.deps });
+  await assert.rejects(a.openTenant({ organizationId: ADMITTED }), { code: 'CHAT_RETENTION_TENANT_BINDING_REQUIRED' });
+  const noGeneration = fakes({ snapshot: { tenantId: ADMITTED, connectionVersion: 1, credentialRef: `onboarding-worker-${ADMITTED}`, bindingDigest: 'digest' } });
+  const b = await createChatRetentionInfrastructure({ env: env(admitted(folder)), deps: noGeneration.deps });
+  await assert.rejects(b.openTenant({ organizationId: ADMITTED }), { code: 'CHAT_RETENTION_TENANT_BINDING_REQUIRED' });
+  assert.equal(noGeneration.state.pools.length, 1, 'no tenant pool');
+
+  const invalid = async overrides => { const f = fakes(); await assert.rejects(createChatRetentionInfrastructure({ env: env({ ...admitted(folder), ...overrides }), deps: f.deps }), { code: 'CHAT_RETENTION_CONFIGURATION_INVALID' }); assert.equal(f.state.pools.length, 0, 'nothing opened'); };
+  await invalid({ CHAT_RETENTION_ADMISSION_JOURNAL_KEY: undefined });
+  await invalid({ CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY: undefined });
+  await invalid({ CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY: 'relative/credentials' });
+  await invalid({ CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY: require('node:path').join(folder, 'missing') });
+  await invalid({ CHAT_RETENTION_ADMISSION_JOURNAL_KEY: 'ef'.repeat(32) });
+  await invalid({ CHAT_RETENTION_CREDENTIALS_JSON: JSON.stringify([credential(ADMITTED)]) });
+
+  const without = fakes();
+  const c = await createChatRetentionInfrastructure({ env: env(), deps: without.deps });
+  assert.deepEqual(await c.listTenants(), [{ organizationId: ORG }], 'without the two variables nothing changes');
+});
+
+test('entidades da adesão: a lista explícita pode faltar ou vir vazia, mas tem de sobrar pelo menos uma entidade', async t => {
+  const folder = await journalFolder(t);
+  for (const list of [undefined, '[]']) {
+    const f = fakes();
+    const infrastructure = await createChatRetentionInfrastructure({ env: env({ ...admitted(folder), CHAT_RETENTION_CREDENTIALS_JSON: list }), deps: f.deps });
+    assert.deepEqual(await infrastructure.listTenants(), [{ organizationId: ADMITTED }]);
+    assert.deepEqual(f.state.organizations, [ADMITTED]);
+  }
+  const refused = async overrides => { const f = fakes(); await assert.rejects(createChatRetentionInfrastructure({ env: env(overrides), deps: f.deps }), { code: 'CHAT_RETENTION_CONFIGURATION_INVALID' }); assert.equal(f.state.pools.length, 0, 'nothing opened'); };
+  await refused({ CHAT_RETENTION_CREDENTIALS_JSON: undefined });
+  await refused({ CHAT_RETENTION_CREDENTIALS_JSON: '[]' });
+  const empty = await journalFolder(t, []);
+  await refused({ ...admitted(empty), CHAT_RETENTION_CREDENTIALS_JSON: undefined });
+  await refused({ ...admitted(folder), CHAT_RETENTION_CREDENTIALS_JSON: 'não é json' });
+});
+
 test('entrypoint: código de saída 0 quando tudo corre e 1 com falhas, e fecha sempre a infraestrutura', async () => {
   const run = async (summary) => {
     let closed = 0;

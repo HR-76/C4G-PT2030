@@ -212,3 +212,9 @@ test('a new registration needs an explicit scope and preserves initial notes in 
  assert.equal(saved.transversal,true);assert.equal(saved.notes,'Rever calendário')
  assert.equal(f.state.changes[0][5],'Rever calendário')
 })
+test('summaries return every capability the catalog needs, including starting an application',async()=>{
+ const f=fixture();
+ const result=await f.repository.summaries(f.client,{opportunityIds:[f.input.opportunityId]});
+ assert.deepEqual(Object.keys(result.capabilities).sort(),['canCreateApplication','canIncludeResponsibleInTeam','canManage','canRegister']);
+ assert.equal(result.capabilities.canCreateApplication,true);
+});

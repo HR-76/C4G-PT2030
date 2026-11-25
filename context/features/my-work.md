@@ -23,3 +23,7 @@ Validação: testes de contrato/autorização/paginação e UI, build, Chrome em
 - Limite: consulta SQL inspecionada e testada com cliente simulado; não executada integração PostgreSQL nem migrações ou validação com sessão real. Não foi feito deploy.
 
 Próximo passo: validar a vista com uma sessão real de Técnico e candidaturas da organização, no ambiente autorizado.
+
+## Grupos recolhíveis (19/11/2026)
+
+Pedido do utilizador: em O meu trabalho, cada grupo (Em atraso, Hoje, Próximas, Concluídas, Canceladas) pode ser recolhido e expandido pelo seu título, para a página não ficar muito comprida. Os grupos abrem expandidos; a escolha mantém-se enquanto a página estiver aberta e não provoca novas leituras. O título do grupo continua a mostrar o total. Só frontend.

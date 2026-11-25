@@ -38,4 +38,18 @@ async function listLogs(c,input,collector){
  const activatedAt=(await c.query("SELECT applied_at FROM public.c4g_schema_migration WHERE version='026_platform_logs'")).rows[0]?.applied_at;
  return {items,total,page:p.page,pageSize:PAGE_SIZE,activatedAt,collection:collector.status()};
 }
-module.exports={createPlatformLogs,logQuery,listLogs};
+// The collector is opt-in: PLATFORM_LOGS_RUNTIME=central creates it over the Central pool. A collector supplied by the
+// caller (the local profile builds its own) is kept as it is and stays the caller's to flush.
+function configuredPlatformLogs({env={},pool,provided=null,onFailure}){
+ const mode=env.PLATFORM_LOGS_RUNTIME||'disabled';
+ if(!['disabled','central'].includes(mode))throw new TypeError('Platform logs runtime must be disabled or central.');
+ if(provided)return {logs:provided,owned:false};
+ if(mode!=='central')return {logs:null,owned:false};
+ return {logs:createPlatformLogs({pool,onFailure}),owned:true};
+}
+// Start-up never migrates: without Central 026 the collector could neither record nor be read.
+async function assertLogsSchema(pool){
+ const present=(await pool.query("SELECT to_regclass('public.platform_support_event') IS NOT NULL AS present")).rows[0]?.present;
+ if(present!==true)throw Object.assign(new Error('LOGS_SCHEMA_REQUIRED'),{code:'LOGS_SCHEMA_REQUIRED'});
+}
+module.exports={createPlatformLogs,logQuery,listLogs,configuredPlatformLogs,assertLogsSchema};

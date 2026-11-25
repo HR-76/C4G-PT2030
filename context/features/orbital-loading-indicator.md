@@ -11,6 +11,6 @@ Pedido de 28/10/2026: melhorar o loader, inspirado nos círculos do login.
 - Respeitar movimento reduzido e permitir quebra do texto em mobile.
 - Validar suite frontend e build. Sem alterações funcionais ou de contratos HTTP.
 
-Estado: Review — implementado no componente partilhado.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Confirmado no componente: dois anéis, desenho oculto a leitores de ecrã e regra de movimento reduzido. Sem validação visual em navegador, como já constava. Estado anterior: Review — implementado no componente partilhado.
 
 Validação: suite frontend 376 PASS em 57 ficheiros; build Vite PASS. Logs em `output/orbital-loader-tests.log` e `output/orbital-loader-build.log`. A primeira tentativa foi bloqueada pela sandbox (spawn EPERM); repetição autorizada fora da sandbox concluída. Sem validação visual em navegador nesta passagem, sem deploy.

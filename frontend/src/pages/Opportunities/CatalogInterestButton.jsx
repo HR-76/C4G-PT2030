@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom'
-import { Check, Heart, Plus } from 'lucide-react'
+import { Check, FilePlus2, Heart, Plus } from 'lucide-react'
 import { useCatalogInterests } from '../Interests/CatalogInterests'
+
+export function CatalogApplicationButton({ item }) {
+  const context = useCatalogInterests()
+  // Shown as soon as the permission is known; it does not wait for the interests of the rows.
+  if (!context?.capabilities?.canCreateApplication || item.lifecycleState === 'ARCHIVED') return null
+  return <button className="btn btn-primary btn-sm catalog-start-application" type="button" disabled={context.busy} onClick={() => context.startApplication(item)} aria-label={`Iniciar candidatura para ${item.title}`} title="Iniciar candidatura"><FilePlus2 size={16} aria-hidden="true"/></button>
+}
 
 export default function CatalogInterestButton({ item, compact = false }) {
   const context = useCatalogInterests()
@@ -14,7 +21,7 @@ export default function CatalogInterestButton({ item, compact = false }) {
   if (!context || context.state !== 'ready') return null
   const summary = context.summaries[item.opportunityId]
   if (!summary) return null
-  const listTarget='/candidaturas?'+new URLSearchParams({ver:'interesses',q:item.title||'',destaque:summary.interestId||'',...(summary.status==='ARCHIVED'?{status:'ARCHIVED'}:{})})
+  const listTarget='/interesses?'+new URLSearchParams({ver:'interesses',q:item.title||'',destaque:summary.interestId||'',...(summary.status==='ARCHIVED'?{status:'ARCHIVED'}:{})})
   if (compact && summary.interestId && summary.status === 'ACTIVE') {
     return <Link className="catalog-interest-heart is-active" title="Consultar na lista de interesses" aria-label={`Consultar na lista de interesses: ${item.title}`}
       to={listTarget}>

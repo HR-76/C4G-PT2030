@@ -40,3 +40,22 @@ it('edits both sources in a single thematic area selector while preserving exist
 it('does not display a response arriving after the old organization view was removed',async()=>{
  let resolve;const old=mount({self:()=>new Promise(r=>resolve=r)});await waitFor(()=>expect(resolve).toBeTypeOf('function'));old.unmount();mount({self:vi.fn().mockResolvedValue({data:{person:null}})});resolve({data:record});await screen.findByText('Perfil ainda não associado');expect(screen.queryByText('Pessoa de ensaio')).toBeNull()
 })
+it('reopens with the confirmed profile at once, reads it again and never shows it to another user',async()=>{
+ const api={self:vi.fn().mockResolvedValue({data:record})}
+ const open=scope=>render(<MemoryRouter><ProfileForm organizationId="org-a" api={api} scope={scope}/></MemoryRouter>)
+ open('user:org-a');await screen.findByLabelText('Biografia');cleanup()
+ api.self.mockReturnValue(new Promise(()=>{}))
+ open('user:org-a');expect(screen.getByLabelText('Biografia')).toBeTruthy();await waitFor(()=>expect(api.self).toHaveBeenCalledTimes(2));cleanup()
+ open('other:org-a');expect(screen.queryByLabelText('Biografia')).toBeNull()
+})
+it('keeps an edit in progress when the new read confirms the profile already on screen and removes it when the read is refused',async()=>{
+ const api={self:vi.fn().mockResolvedValue({data:record})}
+ const open=()=>render(<MemoryRouter><ProfileForm organizationId="org-a" api={api} scope="user:org-a"/></MemoryRouter>)
+ open();await screen.findByLabelText('Biografia');cleanup()
+ let finish;api.self.mockReturnValue(new Promise(resolve=>{finish=resolve}))
+ open();fireEvent.change(screen.getByLabelText('Biografia'),{target:{value:'Em edição'}})
+ finish({data:record});await waitFor(()=>expect(api.self).toHaveBeenCalledTimes(2))
+ await new Promise(resolve=>setTimeout(resolve,0));expect(screen.getByLabelText('Biografia').value).toBe('Em edição');cleanup()
+ api.self.mockRejectedValue({response:{status:403}})
+ open();await screen.findByRole('alert');expect(screen.queryByLabelText('Biografia')).toBeNull()
+})

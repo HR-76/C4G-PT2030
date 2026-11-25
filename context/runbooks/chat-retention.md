@@ -37,6 +37,25 @@ GRANT c4g_chat_retention_runtime TO c4g_tenant_worker_capabilities WITH SET TRUE
 
 Contrapartida aceite (decisão de 11/11/2026): o agregador é partilhado, por isso **todos os logins WORKER desse tenant** (documentos, importações, receitas, retenção) passam a poder executar a função de eliminação através de `SET ROLE`. Está limitada a candidaturas fechadas há 90 ou mais dias, só apaga o chat e nunca texto de outros dados. Os restantes workers toleram a presença deste papel (`validateLocalTenantRoleChain`) sem o exigirem. Para retirar: `REVOKE c4g_chat_retention_runtime FROM c4g_tenant_worker_capabilities;`.
 
+### Entidades criadas pela adesão
+
+Opcional; [contrato](../features/staging-entity-admission.md). Acrescentar ao ficheiro de ambiente do comando, as duas ou nenhuma:
+
+- `CHAT_RETENTION_ADMISSION_JOURNAL_DIRECTORY`: caminho absoluto da pasta `credentials` ao lado do `worker.json` da adesão. O utilizador do comando precisa de a ler.
+- `CHAT_RETENTION_ADMISSION_JOURNAL_KEY`: o valor de `journalKey` desse `worker.json`. Copiar só esta chave; o comando não lê o `worker.json`.
+
+As entidades publicadas no diário juntam-se às de `CHAT_RETENTION_CREDENTIALS_JSON`, que não pode repetir nenhuma delas. Com o diário configurado, essa lista pode faltar ou vir vazia (`[]`); no total tem de haver pelo menos uma entidade, senão o comando pára com `CHAT_RETENTION_CONFIGURATION_INVALID`.
+
+**Ordem obrigatória onde a adesão está ligada.** O provisionador da adesão recusa qualquer papel que não espere no agregador dos workers. Antes do `GRANT` acima:
+
+1. Pôr `c4g_chat_retention_runtime` em `tenantRoles.worker` do `worker.json` da adesão e recriar a API (só o serviço da API, nunca o pod inteiro). No staging é o comando `admission --chat-retention` do instalador; repetir `admission` sem a opção mantém o papel.
+2. Só depois conceder o papel ao agregador. Os papéis são do cluster PostgreSQL: uma concessão vale para todas as bases.
+3. Confirmar que a adesão continua sem linhas `C4G_ADMISSION_STEP_FAILED`.
+
+Pela ordem inversa, a criação de entidades pára com `LOCAL_IDENTITY_UNEXPECTED_MEMBERSHIP` até o `worker.json` ser corrigido. O `install` do instalador aceita o papel no agregador quando já lá está, e nunca o concede.
+
+**Staging: a entidade instalada fica de fora.** O instalador só publica na Central a ligação API da entidade instalada («C4G Staging»); sem ligação WORKER o comando não a consegue abrir. No staging a retenção corre só nas entidades da adesão, sem `CHAT_RETENTION_CREDENTIALS_JSON`. Passos: [deploy/staging/README.md](../../deploy/staging/README.md#retenção-do-chat-entidades-da-adesão).
+
 ### Timer (systemd)
 
 ```ini

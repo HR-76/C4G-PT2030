@@ -6,7 +6,7 @@ const fields={nif:'500000000',acronym:'C4G',address:'Rua da Escola',addressCompl
 function fixture(t){
  for(const name of ['assertAuthorityAdmission','assertAuthoritySecurity'])t.mock.method(require('../src/security/authoritySecurityManifest'),name,async()=>{});
  t.mock.method(require('../src/security/authorityProtocolQueries'),'execute',(client,sql,values)=>client.query(sql,values));
- const registrations=new Map(),receipts=new Map(),membershipId=randomUUID();let admin=true,selectedOrganization=null;
+ const registrations=new Map(),receipts=new Map(),membershipId=randomUUID();let admin=true,selectedOrganization=null;const types=new Map();
  const central={release(){},async query(sql,values=[]){
   const normalized=String(sql).replace(/\s+/g,' ').trim();
   if(normalized.includes('c4g_database_identity'))return {rows:[{valid:true}]};
@@ -19,6 +19,7 @@ function fixture(t){
   if(normalized.startsWith('SELECT * FROM public.organization_registration_receipt'))return {rows:[receipts.get(`${values[0]}:${values[1]}`)].filter(Boolean)};
   if(normalized.startsWith('SELECT * FROM public.organization_registration WHERE organization_id'))return {rows:[registrations.get(values[0])].filter(Boolean)};
   if(normalized.startsWith("SELECT organization_id FROM public.organization_registration WHERE fields->>'nif'"))return {rows:[...registrations.values()].filter(row=>row.fields.nif===values[0]).slice(0,1).map(row=>({organization_id:row.organization_id}))};
+  if(normalized.startsWith('UPDATE public.organization SET type_code=')){if((types.get(values[0])||'COMPANY')!==values[2])return {rows:[]};types.set(values[0],values[1]);return {rows:[{id:values[0]}]};}
   if(normalized.startsWith('INSERT INTO public.organization_registration(')){
    const row={organization_id:values[0],fields:JSON.parse(values[1]),source_revision:values[2],source_digest:values[3],revision:0,updated_at:'2026-10-21T00:00:00.000Z'};registrations.set(values[0],row);return {rows:[row]};
   }
@@ -29,9 +30,9 @@ function fixture(t){
   return {rows:[],rowCount:0};
  }};
  const coordinator=createAuthorityCoordinator({pool:{connect:async()=>central,query:(...args)=>central.query(...args)},permitSecret:'synthetic-entity-profile-permit-secret'});
- const service=createRegistrationService({coordinator,organizationReader:async id=>({id,legalName:'Entidade Exemplo, Lda.',name:'Entidade Exemplo',typeCode:'COMPANY',status:'ACTIVE',currency:'EUR'}),audit:async()=>{}});
+ const service=createRegistrationService({coordinator,organizationReader:async id=>({id,legalName:'Entidade Exemplo, Lda.',name:'Entidade Exemplo',typeCode:types.get(id)||'COMPANY',status:'ACTIVE',currency:'EUR'}),audit:async()=>{}});
  const actor=randomUUID(),request={user:{id:actor},sessionID:'session',authContext:{sessionId:'session'}};
- return {service,request,registrations,receipts,setAdmin:value=>{admin=value},selectOrganization:value=>{selectedOrganization=value},trusted:organizationId=>({actor:{id:actor,organizationId,membershipId,membershipVersion:1}})};
+ return {service,request,registrations,receipts,types,setAdmin:value=>{admin=value},selectOrganization:value=>{selectedOrganization=value},trusted:organizationId=>({actor:{id:actor,organizationId,membershipId,membershipVersion:1}})};
 }
 test('canonical service initializes, edits and replays an existing entity profile',async t=>{
  const f=fixture(t),organizationId=randomUUID(),requestId=randomUUID(),command={expectedRevision:0,requestId,fields};
@@ -52,4 +53,25 @@ test('entity write requires the live selected membership and the edit permission
  const saved=await f.service.saveForEntity(organizationId,{...command,requestId:randomUUID()},f.request,trusted,async()=>true);assert.equal(saved.complete,true);
  await assert.rejects(()=>f.service.saveForEntity(organizationId,{expectedRevision:0,requestId:randomUUID(),fields},f.request,{actor:{...trusted.actor,organizationId:randomUUID()}},async()=>true),error=>error.code==='NOT_AUTHORIZED');
  f.selectOrganization(null);await assert.rejects(()=>f.service.saveForEntity(organizationId,{expectedRevision:0,requestId:randomUUID(),fields},f.request,trusted,async()=>true),error=>error.code==='NOT_AUTHORIZED');
+});
+
+test('type can be changed before completing the profile and is replayable',async t=>{
+ const f=fixture(t),org=randomUUID();f.types.set(org,'UNSPECIFIED');
+ const body={expectedRevision:0,expectedTypeCode:'UNSPECIFIED',typeCode:'CONSULTANCY',requestId:randomUUID()};
+ const result=await f.service.typeForPlatform(org,body,f.request);
+ assert.equal(f.types.get(org),'CONSULTANCY');assert.equal(result.fields.typeCode,'CONSULTANCY');assert.equal(result.complete,false);
+ assert.deepEqual(await f.service.typeForPlatform(org,body,f.request),result);assert.equal(f.receipts.size,1);
+ await assert.rejects(()=>f.service.typeForPlatform(org,{...body,requestId:randomUUID()},f.request),e=>e.code==='ONBOARDING_STALE');
+ await assert.rejects(()=>f.service.typeForPlatform(org,{...body,typeCode:'UNSPECIFIED'},f.request),e=>e.code==='REGISTRATION_FIELDS_INVALID');
+});
+test('type changes preserve profile fields and require current permissions and organization',async t=>{
+ const f=fixture(t),org=randomUUID();await f.service.saveForPlatform(org,{expectedRevision:0,requestId:randomUUID(),fields},f.request);
+ const body={expectedRevision:0,expectedTypeCode:'COMPANY',typeCode:'RESEARCH',requestId:randomUUID()};
+ f.setAdmin(false);await assert.rejects(()=>f.service.typeForPlatform(org,body,f.request),e=>e.code==='C4G_ADMIN_REQUIRED');
+ f.selectOrganization(org);const trusted=f.trusted(org);
+ await assert.rejects(()=>f.service.typeForEntity(org,body,f.request,trusted,async()=>false),e=>e.code==='NOT_AUTHORIZED');
+ await assert.rejects(()=>f.service.typeForEntity(randomUUID(),body,f.request,trusted,async()=>true),e=>e.code==='NOT_AUTHORIZED');
+ const result=await f.service.typeForEntity(org,body,f.request,trusted,async()=>true);
+ assert.equal(result.revision,1);assert.equal(result.fields.nif,fields.nif);assert.equal(result.fields.typeCode,'RESEARCH');
+ f.selectOrganization(null);await assert.rejects(()=>f.service.typeForEntity(org,body,f.request,trusted,async()=>true),e=>e.code==='NOT_AUTHORIZED');
 });

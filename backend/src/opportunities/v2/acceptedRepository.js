@@ -40,7 +40,7 @@ function command(input,{approval=false}={}){
 function createAcceptedOpportunityV2Repository({pool,authorize,verifyApproval,audit}){
  if(!pool||typeof pool.connect!=='function'||typeof authorize!=='function'||typeof verifyApproval!=='function'||typeof audit!=='function')throw new TypeError('Central authority, approval and transactional audit ports are required');
  async function authority(client,context){if(await authorize(client,context)!==true)fail('OPPORTUNITY_V2_AUTHORITY_DENIED');}
- async function transaction(work,context){const client=await pool.connect();try{await client.query('BEGIN');await client.query('SET LOCAL ROLE c4g_opportunity_central_runtime');await authority(client,context);const result=await work(client);await authority(client,context);await client.query('COMMIT');return deepFreeze(result);}catch(error){await client.query('ROLLBACK').catch(()=>{});if(error.code?.startsWith('OPPORTUNITY_'))throw error;fail(['23505','40001','40P01'].includes(error.code)?'OPPORTUNITY_V2_PERSISTENCE_CONFLICT':'OPPORTUNITY_V2_PERSISTENCE_UNAVAILABLE');}finally{client.release();}}
+ async function transaction(work,context){const client=await pool.connect();try{await client.query('BEGIN');await client.query(`SET LOCAL ROLE ${pool.productionRole||'c4g_opportunity_central_runtime'}`);await authority(client,context);const result=await work(client);await authority(client,context);await client.query('COMMIT');return deepFreeze(result);}catch(error){await client.query('ROLLBACK').catch(()=>{});if(error.code?.startsWith('OPPORTUNITY_'))throw error;fail(['23505','40001','40P01'].includes(error.code)?'OPPORTUNITY_V2_PERSISTENCE_CONFLICT':'OPPORTUNITY_V2_PERSISTENCE_UNAVAILABLE');}finally{client.release();}}
  async function current(client,input,lock){
   const identities=input.snapshot.sourceRecords.filter(s=>s.role!=='PROGRAMME_METADATA').map(s=>({namespace:s.namespace,externalId:s.externalId}));
   if(lock)for(const key of identities.map(i=>i.namespace+'\0'+i.externalId).sort())await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,620061))',[key.replaceAll('\0',':')]);
@@ -89,6 +89,7 @@ function createAcceptedOpportunityV2Repository({pool,authorize,verifyApproval,au
    if(receipt){if(receipt.intent_digest!==intentDigest)fail('OPPORTUNITY_V2_IDEMPOTENCY_CONFLICT');if(await verifyApproval(client,{input,receipt,context})!==true)fail('OPPORTUNITY_V2_APPROVAL_REQUIRED');return receipt.result;}
    const {row,accepted}=await current(client,input,true),proposal=previewFor(input,accepted),item=proposal.items[0];
    if(!item||item.action==='BLOCKED')fail('OPPORTUNITY_V2_RECONCILIATION_BLOCKED');
+   if(pool.productionCapability&&item.action!=='NEW')fail('OPPORTUNITY_V2_PRODUCTION_NEW_ONLY');
    if(proposal.previewDigest!==input.approvalDigest)fail('OPPORTUNITY_V2_APPROVAL_STALE');
    if(await verifyApproval(client,{input,preview:proposal,item,context})!==true)fail('OPPORTUNITY_V2_APPROVAL_REQUIRED');
    const snapshot=input.snapshot,opportunityId=row?.opportunity_id||randomUUID(),unchanged=item.action==='UNCHANGED';

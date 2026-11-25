@@ -49,3 +49,4 @@
  .directory-workspace .directory-table td { padding:12px; }
  .directory-workspace .entity-invitations > :is(.entity-user-form,p,button) { margin:18px; }
 }
+.directory-stale { opacity:.45; transition:opacity .15s; }

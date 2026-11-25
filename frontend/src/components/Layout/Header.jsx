@@ -5,6 +5,8 @@ import { Bell, Menu, Search, UserRound, ShieldCheck, LogOut, X } from 'lucide-re
 import './header-tools.css'
 import { organizationNotificationsApi } from '../../api/api'
 import { afterPageRequests } from '../../api/pageRequests'
+import { readScope } from '../../api/confirmedReads'
+import { alertGenerationDue, markAlertsGenerated } from '../../api/alertGeneration'
 import { useAuth } from '../../contexts/AuthContext'
 import OrganizationSelector from '../OrganizationSelector'
 
@@ -46,7 +48,7 @@ export default function Header({ metronicSection, title, onMenuToggle, menuOpen,
       <div className="header-actions">
         {hasContext && <OrganizationSelector />}
         <PageSearch user={user} organization={organization} navigationAccess={navigationAccess} />
-        {organization && <AlertBell key={`${user?.id}:${organization?.id}:${organization?.membershipVersion || ''}`} organizationId={organization?.id} />}
+        {organization && <AlertBell key={`${user?.id}:${organization?.id}:${organization?.membershipVersion || ''}`} organizationId={organization?.id} scope={user?.id ? readScope(user.id, organization.id) : null} />}
         <ProfileMenu user={user} organization={organization} logout={logout} />
       </div>
     </header>
@@ -55,11 +57,11 @@ export default function Header({ metronicSection, title, onMenuToggle, menuOpen,
 
 function pagesFor(user, organization, navigationAccess = {directory:true,units:true,access:true}) {
   const admin = user?.platformRoles?.includes('C4G_ADMIN')
-  const pages = [{to:'/catalogo', label:'Catálogo C4G'}, {to:'/conta/seguranca', label:'Segurança da conta'}]
+  const pages = [{to:'/catalogo', label:'Oportunidades'}, {to:'/conta/seguranca', label:'Segurança da conta'}]
   if (admin) pages.push({to:'/integracoes', label:'Fontes de oportunidades'})
-  if (organization?.profileCode === 'ORG_ADMIN') pages.push({to:'/calendario', label:'Calendário da entidade'})
-  if (organization) pages.push(...[{to:'/dashboard',label:'Dashboard'}, {to:'/meu-trabalho',label:'O meu trabalho'}, {to:'/candidaturas',label:'Candidaturas'}, {to:'/parceiros',label:'Parceiros'}, {to:'/matching',label:'Matching'}, {to:'/notificacoes',label:'Alertas'}, ...(navigationAccess.directory ? [{to:'/perfil-organizacao',label:'Perfil da organização'}, {to:'/perfil-organizacao/pessoas',label:'Pessoas'}] : []), ...(navigationAccess.units ? [{to:'/perfil-organizacao/unidades',label:'Departamentos / Unidades'}] : []), ...(navigationAccess.access ? [{to:'/utilizadores',label:'Acessos'}] : []), {to:'/perfil',label:'Perfil pessoal'}])
-  if (admin) pages.push(...[{to:'/administracao/dashboard',label:'Dashboard C4G'}, {to:'/administracao/entidades',label:'Entidades e utilizadores'}, {to:'/administracao/faturacao',label:'Faturação da plataforma'}, {to:'/administracao/logs',label:'Logs'}, {to:'/administracao/importar',label:'Importar Portugal 2030'}, {to:'/administracao/oportunidades/nova',label:'Criar oportunidade'}])
+  if (organization?.navigation?.calendar === true) pages.push({to:'/calendario', label:'Calendário da entidade'})
+  if (organization) pages.push(...[{to:'/dashboard',label:'Dashboard'}, {to:'/meu-trabalho',label:'O meu trabalho'}, {to:'/interesses',label:'Interesses'}, {to:'/candidaturas',label:'Candidaturas'}, ...(organization.navigation?.partners !== false ? [{to:'/parceiros',label:'Parceiros'}] : []), {to:'/matching',label:'Matching'}, {to:'/notificacoes',label:'Alertas'}, ...(navigationAccess.directory ? [{to:'/perfil-organizacao',label:'Perfil da organização'}, {to:'/perfil-organizacao/pessoas',label:'Pessoas'}] : []), ...(navigationAccess.units ? [{to:'/perfil-organizacao/unidades',label:'Departamentos / Unidades'}] : []), ...(navigationAccess.access ? [{to:'/utilizadores',label:'Acessos'}] : []), {to:'/perfil',label:'Perfil pessoal'}])
+  if (admin) pages.push(...[{to:'/administracao/dashboard',label:'Dashboard C4G'}, {to:'/administracao/entidades',label:'Entidades e utilizadores'}, {to:'/administracao/faturacao',label:'Faturação da plataforma'}, {to:'/administracao/logs',label:'Logs'}, {to:'/administracao/copias-seguranca',label:'Cópias de segurança'}, {to:'/administracao/importar',label:'Importar Portugal 2030'}, {to:'/administracao/oportunidades/nova',label:'Criar oportunidade'}])
   return pages
 }
 function PageSearch({user,organization,navigationAccess}) {
@@ -80,17 +82,20 @@ function ProfileMenu({user,organization,logout}) {
   const admin=user?.platformRoles?.includes('C4G_ADMIN')
   return <details ref={details} className="header-profile" onKeyDown={event=>{if(event.key==='Escape'){details.current.open=false;details.current.querySelector('summary')?.focus()}}}>
     <summary aria-label="Menu de perfil"><span className="header-avatar">{user?.name?.[0]?.toUpperCase() || '?'}</span></summary>
-    <div className="header-profile-menu"><div className="header-profile-identity"><strong>{user?.name || 'Utilizador'}</strong><span>{admin?'Administração C4G':organization?.profileLabel || (organization?'Membro da organização':'Sem entidade selecionada')}</span></div>
+    <div className="header-profile-menu"><div className="header-profile-identity"><strong>{user?.name || 'Utilizador'}</strong><span>{admin?'Administração C4G':organization?.profileLabel || (organization?'Membro da organização':'Sem entidade selecionada')}</span>{organization&&<span className="header-profile-entity">{organization.displayName||organization.name}</span>}</div>
       {organization && <Link to="/perfil" onClick={()=>{details.current.open=false}}><UserRound size={17}/>Perfil pessoal</Link>}
       <Link to="/conta/seguranca" onClick={()=>{details.current.open=false}}><ShieldCheck size={17}/>Segurança da conta</Link>
       <button type="button" onClick={logout}><LogOut size={17}/>Sair</button>
     </div></details>
 }
 
-export function AlertBell({ organizationId }) {
+// The bell reads the unread count on every page. It asks the server to generate deadline alerts only when that is due
+// (see alertGeneration), and coming back to the window reads again at most once a minute.
+const FOCUS_READ_INTERVAL_MS = 60000
+export function AlertBell({ organizationId, scope = null }) {
   const [unread, setUnread] = useState(null)
   useEffect(() => {
-    let active = true, sequence = 0, readController = null
+    let active = true, sequence = 0, readController = null, lastRead = 0
     const api = organizationNotificationsApi
     const load = async (refresh = false) => {
       const current = ++sequence
@@ -100,21 +105,24 @@ export function AlertBell({ organizationId }) {
       try {
         let r
         if (refresh) {
-          try { r = await api.refreshList({ unread: true, limit: 1 }, organizationId) }
+          try { r = await api.refreshList({ unread: true, limit: 1 }, organizationId); markAlertsGenerated(scope) }
           catch (e) { if (e.response?.status && e.response.status < 500) throw e }
         }
         if (!active || current !== sequence) return
         r ||= await api.list({ unread: true, limit: 1 }, organizationId, controller.signal)
+        lastRead = Date.now()
         if (active && current === sequence) setUnread(Number.isSafeInteger(r.data?.unread_count) ? r.data.unread_count : null)
       } catch { if (active && current === sequence) setUnread(null) }
     }
     const reload = () => load()
+    const refocus = () => { if (Date.now() - lastRead >= FOCUS_READ_INTERVAL_MS) load() }
     const first = new AbortController()
-    afterPageRequests(first.signal, () => load(true))
+    // By now the page's own requests have settled: if the alerts page has just generated, the bell only reads.
+    afterPageRequests(first.signal, () => load(alertGenerationDue(scope)))
     window.addEventListener('notifications:changed', reload)
-    window.addEventListener('focus', reload)
-    return () => { active = false; sequence++; first.abort(); readController?.abort(); window.removeEventListener('notifications:changed', reload); window.removeEventListener('focus', reload) }
-  }, [organizationId])
+    window.addEventListener('focus', refocus)
+    return () => { active = false; sequence++; first.abort(); readController?.abort(); window.removeEventListener('notifications:changed', reload); window.removeEventListener('focus', refocus) }
+  }, [organizationId, scope])
   return <Link to="/notificacoes" className="notif-btn" aria-label={unread === null ? 'Alertas' : `Alertas · ${unread} não lidos`}>
     <Bell size={20} data-icon-tone="amber" />{unread > 0 && <span className="notif-badge">{unread > 99 ? '99+' : unread}</span>}
   </Link>

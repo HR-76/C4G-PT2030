@@ -1,0 +1,74 @@
+{
+  "backend": {
+    "logSha256": "dc1cee356995eaddabf8ed82950fb3dce339ac4ad345a2fe1652c85c9d3d94d1",
+    "counts": {
+      "tests": 3412,
+      "pass": 3400,
+      "fail": 3,
+      "skipped": 9
+    },
+    "failures": [
+      "every runtime allowlist of Central versions admits 052",
+      "every runtime allowlist of Central versions admits 053",
+      "SEC-AC-01 frontend persists only the approved editorial recovery envelope, never authentication"
+    ]
+  },
+  "focused": {
+    "logSha256": "db8d102d315b8ffee728e08b223df98d48606386b8a13733e260134dd12a21ac",
+    "counts": {
+      "tests": 58,
+      "pass": 58,
+      "fail": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  "schema": {
+    "logSha256": "26fd69852894bd8b838c682277d54fb920a5bdda30b345df48e77bbb6502b504",
+    "counts": {
+      "tests": 49,
+      "pass": 49,
+      "fail": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  "retention": {
+    "logSha256": "43d1b1f3b41ed09d8c2d7f4cfd601608352955f5605c3a8859f7b6da6de40950",
+    "counts": {
+      "tests": 13,
+      "pass": 13,
+      "fail": 0,
+      "skipped": 0
+    },
+    "failures": []
+  },
+  "frontend": {
+    "logSha256": "f8f924b7ab4ef2bf407a3ae4d961389b4dd26cdc5767848550a51c595fbbb405",
+    "counts": {},
+    "failures": []
+  },
+  "frontendRecheck": {
+    "logSha256": "3636bebb5768683c98314736ef26fa0a5efa763601ac74324c10c3b59448a6d2",
+    "counts": {},
+    "failures": []
+  },
+  "lint": {
+    "logSha256": "3ee35f58941f95e0af2d3d3a37f72d3d6a4635c9595ed2f28da21461ed2953c2",
+    "counts": {},
+    "failures": []
+  },
+  "build": {
+    "logSha256": "92d98204d1131576120afc630985245967c657d66d457ccf2c39631e7f04b748",
+    "counts": {},
+    "failures": []
+  },
+  "postgres": {
+    "version": "18.6",
+    "upgradeChecks": 30,
+    "freshChecks": 31,
+    "clustersStopped": true,
+    "clusterDataRemoved": true,
+    "stagingTouched": false
+  }
+}

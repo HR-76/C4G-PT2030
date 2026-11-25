@@ -1,6 +1,6 @@
 'use strict';
 const {readOpportunitySnapshot}=require('./compatibility');
-const {projectTemporalV2}=require('./temporal');
+const {projectTemporalV2,projectTemporalFacts}=require('./temporal');
 const {instant}=require('./normalization');
 const {deepFreeze}=require('./data');
 const {temporalState}=require('../temporal');
@@ -51,7 +51,10 @@ const prepareOpportunitySnapshot=readOpportunitySnapshot;
 function createOpportunityReadModel(snapshot,{revisionId=null,asOf,observedAt=null,sourceReview=null,corrections={},prepared=null}={}){
  if(instant(asOf)!==asOf)throw new TypeError('A canonical UTC reference time is required.');
  const read=prepared||readOpportunitySnapshot(snapshot),version=read.sourceVersion;
- const temporal=version===2?{...projectTemporalV2(read.snapshot,{asOf})}:legacyTemporal(read.snapshot,{asOf,corrections,sourceReview});
+ // readOpportunitySnapshot returns the snapshot validated and deep-frozen: it cannot have changed, so its temporal
+ // facts are projected without validating it a second time. Anything else is validated before use.
+ const validated=Object.isFrozen(read)&&Object.isFrozen(read.snapshot);
+ const temporal=version===2?{...(validated?projectTemporalFacts(read.snapshot,{asOf}):projectTemporalV2(read.snapshot,{asOf}))}:legacyTemporal(read.snapshot,{asOf,corrections,sourceReview});
  if(sourceReview){temporal.effectiveState='UNKNOWN';temporal.reasonCodes=[...temporal.reasonCodes,'SOURCE_REVIEW_REQUIRED'];}
  const sourceRecords=version===2?read.snapshot.sourceRecords:[];
  const identity=version===2?{kind:read.snapshot.identity.kind,references:{...read.snapshot.identity.references,candidates:[],complete:['PRESENT','NOT_FOUND','NOT_APPLICABLE'].includes(read.snapshot.identity.references.state),representation:'v2',sourcePaths:['/identity/references']}}

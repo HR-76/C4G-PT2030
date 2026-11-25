@@ -1,0 +1,11 @@
+.complement-modal { width: min(100%, 720px); }
+.complement-form { display: grid; gap: 16px; margin-top: 16px; }
+.complement-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+.complement-form input, .complement-form textarea { width: 100%; font: inherit; font-weight: 400; padding: 8px 10px; border: 1px solid var(--color-border-strong); border-radius: 6px; background: var(--color-background); }
+.complement-form textarea { resize: vertical; line-height: 1.5; }
+.complement-optional, .complement-hint, .complement-note { font-weight: 400; color: var(--color-text-secondary); }
+.complement-hint { font-size: 12px; overflow-wrap: anywhere; }
+.complement-note { margin: 0; font-size: 13px; line-height: 1.5; }
+.complement-form .form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.complement-collection { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+.opportunity-description-origin { margin: 0 0 16px; }

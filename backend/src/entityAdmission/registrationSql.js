@@ -1,5 +1,6 @@
 'use strict';
 const queries={
+ changeType:`UPDATE public.organization SET type_code=$2,updated_at=clock_timestamp() WHERE id=$1 AND type_code=$3 AND status='ACTIVE' AND $2 IN ('UNIVERSITY','COMPANY','MUNICIPALITY','ASSOCIATION','PUBLIC_BODY','RESEARCH','CONSULTANCY','OTHER') RETURNING id`,
  get:`SELECT * FROM public.organization_registration WHERE organization_id=$1`,
  seed:`INSERT INTO public.organization_registration(organization_id,fields,source_revision,source_digest) VALUES($1,$2,$3,$4) RETURNING *`,
  save:`UPDATE public.organization_registration SET fields=fields || $2::jsonb,revision=revision+1,updated_at=clock_timestamp() WHERE organization_id=$1 AND revision=$3 RETURNING *`,

@@ -1,0 +1,132 @@
+{
+  "pass": true,
+  "mode": "upgrade",
+  "checks": [
+    {
+      "name": "unchanged 057 denies invitation receipt and deletion protocol commands",
+      "pass": true
+    },
+    {
+      "name": "failed migration rolls back schema, ledger and existing data",
+      "pass": true
+    },
+    {
+      "name": "explicit checked installer upgrades 057 without changing prior records or provisioning logins",
+      "pass": true
+    },
+    {
+      "name": "registered package replay is idempotent and all exact fingerprints match",
+      "pass": true
+    },
+    {
+      "name": "read: 058 preflight with unchanged limited capability and no direct account DML",
+      "pass": true
+    },
+    {
+      "name": "commands: 058 preflight with unchanged limited capability and no direct account DML",
+      "pass": true
+    },
+    {
+      "name": "authoring: 058 preflight with unchanged limited capability and no direct account DML",
+      "pass": true
+    },
+    {
+      "name": "logs: 058 preflight with unchanged limited capability and no direct account DML",
+      "pass": true
+    },
+    {
+      "name": "retention: 058 preflight with unchanged limited capability and no direct account DML",
+      "pass": true
+    },
+    {
+      "name": "authority login remains limited; direct reads, DML and owner escalation denied",
+      "pass": true
+    },
+    {
+      "name": "058 catalog, production lifecycle readiness and metadata observation work under limited read",
+      "pass": true
+    },
+    {
+      "name": "invitations: missing authority, session mismatch and cross-organization create are refused",
+      "pass": true
+    },
+    {
+      "name": "invitations: audit failure rolls back a new operation in PostgreSQL",
+      "pass": true
+    },
+    {
+      "name": "invitations: create is idempotent and rejects a changed intention",
+      "pass": true
+    },
+    {
+      "name": "invitations: lost identity reply resumes with the same identity and pending membership",
+      "pass": true
+    },
+    {
+      "name": "invitations: receipt precedes email, failure is retryable and accepted delivery is not resent",
+      "pass": true
+    },
+    {
+      "name": "invitations: explicit issue replay hides its secret and replacement revokes the old invitation",
+      "pass": true
+    },
+    {
+      "name": "invitations: another organization cannot read, issue or send a foreign operation",
+      "pass": true
+    },
+    {
+      "name": "invitations: failed activation audit rolls back membership, grants, consumption and completion",
+      "pass": true
+    },
+    {
+      "name": "invitations: activation retry is idempotent, scoped and retains optional MFA",
+      "pass": true
+    },
+    {
+      "name": "deletion: 058 readiness and status use the limited authority protocol",
+      "pass": true
+    },
+    {
+      "name": "deletion: optional MFA still rejects unauthorized, stale and invalid authentication without effects",
+      "pass": true
+    },
+    {
+      "name": "deletion: own account and the last active organization administrator are protected",
+      "pass": true
+    },
+    {
+      "name": "deletion: audit failure rolls back journal, access revocation and the actual audit append",
+      "pass": true
+    },
+    {
+      "name": "deletion: recent password authentication revokes access before an external failure",
+      "pass": true
+    },
+    {
+      "name": "deletion: retry completes selective anonymization and replay has no repeated effects",
+      "pass": true
+    },
+    {
+      "name": "schema, ledger and authority permission drift are refused",
+      "pass": true
+    },
+    {
+      "name": "actual tenant041 identity erasure preserves RLS and repeatability",
+      "pass": true
+    }
+  ],
+  "invitations": {
+    "organizations": 2,
+    "externalPorts": "synthetic identity/projection/OIDC/email; no external calls",
+    "emailAttempts": 2
+  },
+  "deletion": {
+    "checks": 6,
+    "identityProvider": "SIMULATED",
+    "tenantProjection": "SIMULATED",
+    "data": "SYNTHETIC"
+  },
+  "limits": [
+    "External identity, mail and OIDC ports are simulated. Tenant041 erasure separately exercised on real PostgreSQL."
+  ]
+}

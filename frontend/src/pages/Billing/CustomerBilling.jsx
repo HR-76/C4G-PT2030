@@ -1,42 +1,75 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
+import BillingValidationPanel from '../../components/BillingValidationPanel'
 import BillingPdf from './BillingPdf'
 import SearchInput from '../../components/SearchInput'
 import {useEffect,useMemo,useState} from 'react'
 import {Link,useParams,useSearchParams} from 'react-router-dom'
 import {ReceiptText,ArrowLeft} from 'lucide-react'
 import {useAuth} from '../../contexts/AuthContext'
-import {customerBillingApi} from '../../api/api'
+import {customerBillingApi,organizationDirectoryApi} from '../../api/api'
+import {readScope,startConfirmedRead} from '../../api/confirmedReads'
+import {directoryCacheKey,readDirectoryCache} from '../Organization/directoryCache'
 import {formatMoney,formatDate,formatInstant,paymentStates,paymentMethods,documentStates,documentTypes} from '../Platform/billingPresentation'
+import {profileDifferences} from '../Platform/billingAccountPrefill'
 import '../Platform/platform-billing.css'
 import './customer-billing.css'
 
 export default function CustomerBilling({history=false}){
   const {user,organization}=useAuth()
   if(!organization || user?.platformRoles?.includes('C4G_ADMIN')) return <p role="alert">Esta área está disponível para utilizadores autorizados da entidade.</p>
-  return <CustomerBillingView key={`${user.id}:${organization.id}`} organizationId={organization.id} history={history}/>
+  return <CustomerBillingView key={`${user.id}:${organization.id}`} organizationId={organization.id} history={history} scope={readScope(user.id,organization.id)} directoryKey={directoryCacheKey(user.id,organization.id)}/>
 }
 function message(error){
   const status=error?.response?.status
   return status===403?'Não tem permissão para consultar a faturação desta entidade.':status===404?'Esta fatura não está disponível.':status===401||status===409?'A sessão ou o acesso mudou. Atualize a página.':'Não foi possível carregar a faturação. Tente novamente.'
 }
-export function CustomerBillingView({organizationId,api:providedApi,history=false}){
-  const api=useMemo(()=>providedApi||customerBillingApi(organizationId),[providedApi,organizationId])
-  const {id}=useParams(),[params,setParams]=useSearchParams(),query=params.toString()
-  const [result,setResult]=useState(null),[error,setError]=useState(''),[reload,setReload]=useState(0)
-  const requestKey=`${organizationId}:${id||''}:${query}:${reload}`
+// Read-only. The entity profile is only compared; when it cannot be read there is no warning.
+function BillingAccountSection({api,directoryApi,scope=null,directoryKey=null}){
+  const [state,setState]=useState(()=>startConfirmedRead(scope,'billing-account').held)
   useEffect(()=>{
-    const controller=new AbortController();setResult(null);setError('')
-    const work=id?api.invoice(id,controller.signal):Promise.all([api.invoices(Object.fromEntries(new URLSearchParams(query)),controller.signal),api.summary(controller.signal)])
-    Promise.resolve(work).then(value=>{if(!controller.signal.aborted)setResult({key:requestKey,data:id?value.data:{list:value[0].data,summary:value[1].data}})})
-      .catch(e=>{if(!controller.signal.aborted)setError(message(e))})
+    const controller=new AbortController(),read=startConfirmedRead(scope,'billing-account');setState(read.held)
+    // The entity profile the shell already confirmed is used for the comparison; it is asked for only when it is not in memory.
+    const known=directoryKey?readDirectoryCache(directoryKey)?.context:null
+    Promise.all([api.account(controller.signal).then(response=>({account:response.data.account}),()=>({failed:true})),known?Promise.resolve(known):directoryApi.context(controller.signal).then(response=>response.data,()=>null)])
+      .then(([result,profile])=>{const value={...result,profile};if(result.failed)read.drop();else read.keep(value);if(!controller.signal.aborted)setState(value)})
     return()=>controller.abort()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the directory key follow them.
+  },[api,directoryApi])
+  const account=state?.account,differences=account?profileDifferences(account,state.profile?.registration,state.profile?.organization?.legalName):[]
+  const rows=account?[['Denominação legal',account.legalName],['NIF / identificação fiscal',account.taxIdentifier],['País fiscal',account.taxCountry],['Morada',[account.addressLine1,account.addressLine2].filter(Boolean).join(', ')],['Código postal',account.postalCode],['Localidade',account.locality],['Região',account.region],['Email de faturação',account.billingEmail],['Contacto',account.contactName]].filter(([,value])=>value):[]
+  return <section className="billing-section customer-billing-account" aria-label="Dados de faturação"><header><h2>Dados de faturação</h2><span>Só consulta</span></header>
+    {!state?<p className="billing-section-empty">A carregar dados de faturação…</p>:state.failed?<p className="billing-section-empty">Não foi possível carregar os dados de faturação. As faturas continuam disponíveis.</p>:!account?<p className="billing-section-empty">Os dados de faturação ainda não foram configurados pela C4G.</p>:<>
+      <dl>{rows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      {differences.length>0&&<div className="alert alert-info" data-testid="billing-profile-difference"><strong>A ficha da entidade difere destes dados.</strong><ul>{differences.map(item=><li key={item.field}>{item.label}: ficha «{item.profile||'vazio'}»</li>)}</ul></div>}
+      <p>A alteração destes dados é feita pela C4G.</p>
+    </>}
+  </section>
+}
+// With a `scope` the invoices, summary and account this user and organization last received are shown at once and read again.
+export function CustomerBillingView({organizationId,api:providedApi,directoryApi:providedDirectoryApi,history=false,scope=null,directoryKey=null}){
+  const api=useMemo(()=>providedApi||customerBillingApi(organizationId),[providedApi,organizationId])
+  const directoryApi=useMemo(()=>providedDirectoryApi||organizationDirectoryApi(organizationId),[providedDirectoryApi,organizationId])
+  const {id}=useParams(),[params,setParams]=useSearchParams(),validationOrganization=params.get('validarEntidade'),query=(() => { const filtered=new URLSearchParams(params);filtered.delete('validarEntidade');return filtered.toString() })()
+  const [error,setError]=useState(''),[reload,setReload]=useState(0)
+  const requestKey=`${organizationId}:${id||''}:${query}:${reload}`,readName=`billing:${id||''}:${query}`
+  const [result,setResult]=useState(()=>{const held=startConfirmedRead(scope,readName).held;return held?{key:requestKey,data:held}:null})
+  useEffect(()=>{
+    const controller=new AbortController(),read=startConfirmedRead(scope,readName);setResult(read.held?{key:requestKey,data:read.held}:null);setError('')
+    const work=id?api.invoice(id,controller.signal):Promise.all([api.invoices(Object.fromEntries(new URLSearchParams(query)),controller.signal),api.summary(controller.signal)])
+    Promise.resolve(work).then(value=>{const data=id?value.data:{list:value[0].data,summary:value[1].data};read.keep(data);if(!controller.signal.aborted)setResult({key:requestKey,data})})
+      .catch(e=>{if(!controller.signal.aborted){read.drop();setResult(null);setError(message(e))}})
+    return()=>controller.abort()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; scope and the read name follow them.
   },[api,id,query,requestKey])
   const data=result?.key===requestKey?result.data:null
   const page=delta=>{const next=new URLSearchParams(params);next.set('page',String(data.list.page+delta));setParams(next)}
   return <div className="platform-billing customer-billing">
     <header className="customer-billing-heading"><div><span className="customer-billing-eyebrow"><ReceiptText size={16}/> CONTA DA ENTIDADE</span><h1>{id?'Detalhe da fatura':history?'Histórico de faturação':'Faturação'}</h1><p>{history?'Consulte e filtre as faturas da entidade.':'Resumo financeiro e documentos da sua entidade.'}</p></div>{id?<Link className="btn btn-outline" to="/faturacao/historico"><ArrowLeft size={16}/>Todas as faturas</Link>:<Link className="btn btn-outline" to={history?"/faturacao":"/faturacao/historico"}>{history?"Faturação":"Histórico de faturação"}</Link>}</header>
-    {error?<div className="billing-error" role="alert">{error} <button className="btn btn-outline" onClick={()=>setReload(n=>n+1)}>Tentar novamente</button></div>:!data?<p role="status">A carregar faturação…</p>:id?<InvoiceDetail data={data} organizationId={organizationId}/>:<>
+    {error?<div className="billing-error" role="alert">{error} <button className="btn btn-outline" onClick={()=>setReload(n=>n+1)}>Tentar novamente</button></div>:!data?<LoadingIndicator>A carregar faturação…</LoadingIndicator>:id?<InvoiceDetail data={data} organizationId={organizationId}/>:<>
       {!history&&<section className="billing-ledger" aria-label="Resumo da conta">{data.summary.currencies.length?data.summary.currencies.map(row=><article key={row.currency}><header><strong>{row.currency}</strong><span>Conta corrente · todos os períodos</span></header><dl>{[['Faturado',row.billedAmount],['Pago',row.paidAmount],['Por pagar',row.balanceAmount],['Em atraso',row.overdueAmount]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{formatMoney(value,row.currency)}</dd></div>)}</dl></article>):<p>Ainda não existem valores faturados.</p>}</section>}
       {!history&&<div className="billing-enterprise-panels"><section><h2>Fatura em destaque</h2>{data.list.items[0]?<><p>Primeiro resultado da lista</p><Link to={`/faturacao/${data.list.items[0].cycleId}`}>Ver detalhe da fatura</Link><p>{data.list.items[0].number} · {data.list.items[0].serviceDescription}</p></>:<p>Não existem faturas para apresentar.</p>}</section><section><h2>Histórico de faturação</h2><p>Consulte as faturas, os respetivos estados e documentos.</p><Link className="btn btn-outline" to="/faturacao/historico">Consultar histórico</Link></section></div>}
+      {!history&&<BillingValidationPanel key={organizationId} api={api} organizationId={organizationId} expectedOrganizationId={validationOrganization}/>}
+      {!history&&<BillingAccountSection api={api} directoryApi={directoryApi} scope={scope} directoryKey={directoryKey}/>}
       <InvoiceFilters key={query} params={params} onApply={values=>setParams(values)}/>
       <p className="billing-result" role="status">{data.list.total} {data.list.total===1?'fatura encontrada':'faturas encontradas'}</p>
       {data.list.items.length?<div className="customer-billing-table" tabIndex={0} role="region" aria-label="Faturas"><table><thead><tr>{['Fatura / Serviço','Período','Emissão / Vencimento','Total','Pago','Por pagar','Estado'].map(label=><th key={label} scope="col">{label}</th>)}</tr></thead><tbody>{data.list.items.map(row=><tr key={row.cycleId}>

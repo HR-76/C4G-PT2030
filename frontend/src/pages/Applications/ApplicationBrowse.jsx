@@ -1,3 +1,4 @@
+import LoadingIndicator from '../../components/LoadingIndicator'
 import ApplicationListPriority from './ApplicationListPriority'
 import EmptyStatePanel from '../../components/EmptyStatePanel'
 import FilterBar from '../../components/FilterBar'
@@ -11,7 +12,7 @@ import { readScope, startConfirmedRead } from '../../api/confirmedReads'
 import { privateApplicationsApi as api } from '../../api/api'
 import InfoTooltip from '../../components/InfoTooltip'
 import { ApplicationsTable, SortIcon } from './ApplicationPresentation'
-import ApplicationAreaNav, { ApplicationAreaHeader } from './ApplicationAreaNav'
+import { ApplicationAreaHeader } from './ApplicationAreaNav'
 import { LABEL, CHIP, budgetLabel, dateLabel } from './lifecycle'
 import { primaryApplicationStatuses } from '../../utils/applicationStatuses'
 import { applicationIntentKey, loadApplicationIntention } from './intentions'
@@ -34,8 +35,8 @@ export default function ApplicationBrowse(){
  const [pending,setPending]=useState(()=>loadApplicationIntention(userId,org))
  const units=data?.units||[],lastQuery=useRef({org,userId,q})
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
- useEffect(()=>{setCursor(null);setData(null);setSelection(null)},[q,status,sort,direction,opportunityId,unitId])
- useEffect(()=>{if(!org||!userId)return;let active=true;const controller=new AbortController(),read=startConfirmedRead(scope,cursor?null:pageName);setLoading(!read.held);setData(read.held);setError('')
+ useEffect(()=>{setCursor(null);setSelection(null)},[q,status,sort,direction,opportunityId,unitId])
+ useEffect(()=>{if(!org||!userId)return;let active=true;const controller=new AbortController(),read=startConfirmedRead(scope,cursor?null:pageName);setLoading(!read.held);if(read.held)setData(read.held);setError('')
   const previous=lastQuery.current,delay=previous.org===org&&previous.userId===userId&&previous.q!==q?250:0
   lastQuery.current={org,userId,q}
   const timer=setTimeout(()=>api.browsePage({q,status,sort,direction,opportunityId:opportunityId||undefined,unitId:unitId||undefined,cursor:cursor||undefined},org,controller.signal).then(r=>{if(!Array.isArray(r.data.units))throw Error('Incomplete page');read.keep(r.data);if(active)setData(r.data)})
@@ -44,7 +45,7 @@ export default function ApplicationBrowse(){
   return()=>{active=false;controller.abort();clearTimeout(timer)}
  // eslint-disable-next-line react-hooks/exhaustive-deps -- Runs only when the listed keys change; pageName, scope are read at that moment.
  },[org,userId,q,status,sort,direction,opportunityId,unitId,cursor,refresh])
- function filter(values){setCursor(null);setData(null);setSelection(null);setParams(previous=>{const next=new URLSearchParams(previous);for(const [key,value] of Object.entries(values)){if(value)next.set(key,value);else next.delete(key)}return next},{replace:true})}
+ function filter(values){setCursor(null);setSelection(null);setParams(previous=>{const next=new URLSearchParams(previous);for(const [key,value] of Object.entries(values)){if(value)next.set(key,value);else next.delete(key)}return next},{replace:true})}
  async function send(intent){if(busy)return;setBusy(true);setError('');setNotice('')
   const key=applicationIntentKey(userId,org)
   try{
@@ -66,12 +67,13 @@ export default function ApplicationBrowse(){
   setPending(intent);send(intent)
  }
  if(!org||!userId)return <main className="page"><p role="status">Esta conta não tem uma entidade associada para acompanhar candidaturas.</p></main>
- const choosePage=value=>{setCursor(value);setData(null);setSelection(null)}
+ const choosePage=value=>{setCursor(value);setSelection(null)}
+ // While another selection or page is being read, the previous rows stay on screen, dimmed and inactive.
+ const stale=loading&&Boolean(data)
  const otherStates=Object.keys(LABEL).filter(code=>!primaryApplicationStatuses.includes(code))
  const stateDot=code=><span aria-hidden="true" className="state-dot" data-state={code}/>
  const stateButton=code=><button key={code} aria-pressed={status===code} className="state-option" onClick={()=>filter({status:status===code?'':code})}>{stateDot(code)}<span>{LABEL[code]}</span><span className="pill-count">{data?data.countsByStatus[code]??0:'—'}</span></button>
- return <main className="page application-browse"><ApplicationAreaHeader organization={organization} title="Candidaturas"><Link className="btn btn-primary" to="/candidaturas?ver=interesses" title="Escolher um interesse para iniciar a candidatura"><Plus size={17} aria-hidden="true"/>Nova candidatura</Link></ApplicationAreaHeader>
-  <ApplicationAreaNav/>
+ return <main className="page application-browse"><ApplicationAreaHeader organization={organization} title="Candidaturas"><Link className="btn btn-primary" to="/catalogo" title="Escolher uma oportunidade para iniciar a candidatura"><Plus size={17} aria-hidden="true"/>Nova candidatura</Link></ApplicationAreaHeader>
   {pending&&<p role="status">Existe um envio por confirmar. <button className="btn btn-outline" disabled={busy} onClick={()=>send(pending)}>Repetir o mesmo envio</button></p>}
   {notice&&<p role="status">{notice}</p>}
   <FilterBar aria-label="Filtros de candidaturas"><label className="filter-search">Pesquisar candidaturas<SearchInput aria-label="Pesquisar candidaturas" placeholder="Pesquisar candidatura, oportunidade ou responsável…" value={q} maxLength={200} onChange={e=>filter({q:e.target.value})}/></label>
@@ -98,7 +100,7 @@ export default function ApplicationBrowse(){
   {error&&<div role="alert"><p>{error}</p><button className="btn btn-outline" onClick={()=>{setCursor(null);setRefresh(n=>n+1)}}>Recarregar primeira página</button></div>}
   <div className="table-meta" aria-live="polite">{loading?'A carregar candidaturas…':data?`${data.total} candidatura${data.total===1?'':'s'}`:''}</div>
   <ApplicationsTable scrollLabel="Tabela de candidaturas"><colgroup>{columns.map(([key])=><col key={key}/>)}<col/></colgroup><thead role="rowgroup"><tr role="row">{columns.map(([key,label])=><th role="columnheader" scope="col" key={key} aria-label={label} aria-sort={sort===key?(direction==='asc'?'ascending':'descending'):'none'}><button className="application-sort" onClick={()=>filter({sort:key,direction:sort===key&&direction==='asc'?'desc':'asc'})}>{label}<SortIcon active={sort===key} dir={direction}/></button></th>)}<th role="columnheader" scope="col">Ações</th></tr></thead>
-   <tbody role="rowgroup">{loading&&!data&&<tr role="row"><td role="cell" colSpan={9} className="application-list-loading">A obter candidaturas e filtros…</td></tr>}{data?.items.map(row=><tr role="row" key={row.applicationId} className="application-state-row" data-status={row.status}>
+   <tbody role="rowgroup" className={stale?'application-list-stale':undefined} inert={stale?'':undefined} aria-busy={stale||undefined}>{loading&&!data&&<tr role="row"><td role="cell" colSpan={9} className="application-list-loading"><LoadingIndicator>A obter candidaturas e filtros…</LoadingIndicator></td></tr>}{data?.items.map(row=><tr role="row" key={row.applicationId} className="application-state-row" data-status={row.status}>
     <td role="cell" data-label="Título" className="col-title"><div className="application-title-cell"><Link className="application-title-link" aria-label={row.title} to={applicationDetailTarget(row.applicationId,returnTo)}><strong>{row.title}</strong></Link>{row.units?.length>0&&<p>{row.units.map(unit=>unitLabel(unit,row.units)).join('; ')}</p>}<ApplicationListPriority row={row} target={applicationDetailTarget(row.applicationId,returnTo)}/></div></td>
     <td role="cell" data-label="Oportunidade"><Link to={`${row.origin==='CENTRAL'?'/catalogo':'/oportunidades'}/${row.opportunityId}`}>{row.opportunityTitle||'—'}</Link></td>
     <td role="cell" data-label="Estado">{row.allowedTransitions?.length?<button type="button" aria-haspopup="dialog" aria-label={`Estado de ${row.title}`} className={`status-select ${CHIP[row.status]||'chip-grey'}`} disabled={busy||Boolean(pending)} onClick={e=>{statusTrigger.current=e.currentTarget;setSelection({row,status:''});setReason('')}}>{stateDot(row.status)}{LABEL[row.status]}</button>:<span className={`chip ${CHIP[row.status]||'chip-grey'}`}>{stateDot(row.status)}{LABEL[row.status]}</span>}</td>

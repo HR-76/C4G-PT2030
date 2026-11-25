@@ -23,6 +23,14 @@ const PRIMARY_DOCUMENT_TYPES = Object.freeze(['INVOICE', 'SIMPLIFIED_INVOICE', '
 const PAGE_SIZE = 25;
 
 function first(result) { return result.rows[0]; }
+// node-postgres returns DATE columns as local-midnight Date objects. The API contract is the civil day
+// (YYYY-MM-DD), so the day is read with the same local getters the driver used to build the value.
+function civilDay(value) {
+  if (!(value instanceof Date)) return value ?? null;
+  if (Number.isNaN(value.getTime())) fail('BILLING_DATA_INVALID');
+  const pad = (number, size) => String(number).padStart(size, '0');
+  return `${pad(value.getFullYear(), 4)}-${pad(value.getMonth() + 1, 2)}-${pad(value.getDate(), 2)}`;
+}
 function integer(value) {
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 1) fail('BILLING_DATA_INVALID');
@@ -76,13 +84,13 @@ function cycleProjection(row) {
     organizationName: row.organization_name,
     organizationLegalName: row.organization_legal_name,
     accountVersionId: row.account_version_id,
-    periodStart: row.period_start,
-    periodEnd: row.period_end,
+    periodStart: civilDay(row.period_start),
+    periodEnd: civilDay(row.period_end),
     serviceDescription: row.service_description,
     currency: row.currency,
     cycleAmount: money(row.cycle_amount),
-    plannedIssueDate: row.planned_issue_date,
-    dueDate: row.due_date,
+    plannedIssueDate: civilDay(row.planned_issue_date),
+    dueDate: civilDay(row.due_date),
     contractReference: row.contract_reference,
     cycleState: row.cycle_state,
     cycleRevision: integer(row.cycle_revision),
@@ -90,8 +98,8 @@ function cycleProjection(row) {
       id: row.document_id,
       type: row.document_type,
       number: row.document_number,
-      issueDate: row.issue_date,
-      dueDate: row.document_due_date,
+      issueDate: civilDay(row.issue_date),
+      dueDate: civilDay(row.document_due_date),
       state: row.document_state,
       revision: integer(row.document_revision)
     }) : null,
@@ -479,7 +487,7 @@ function createPlatformBillingRepository({
         id: document.id, cycleId: document.billing_cycle_id, sourceCode: document.source_code,
         issuerReference: document.issuer_reference, type: document.document_type,
         number: document.document_number, externalDocumentId: document.external_document_id,
-        issueDate: document.issue_date, dueDate: document.due_date, currency: document.currency,
+        issueDate: civilDay(document.issue_date), dueDate: civilDay(document.due_date), currency: document.currency,
         subtotal: money(document.subtotal), taxTotal: money(document.tax_total), total: money(document.total),
         correctsDocumentId: document.corrects_document_id, state: document.state,
         revision: integer(document.revision), createdAt: instant(document.created_at), updatedAt: instant(document.updated_at),
@@ -493,7 +501,7 @@ function createPlatformBillingRepository({
       return Object.freeze({
         id: payment.id, documentId: payment.billing_document_id, recordType: payment.record_type,
         reversesPaymentId: payment.reverses_payment_id, amount: money(payment.amount), currency: payment.currency,
-        effectiveOn: payment.effective_on, methodCode: payment.method_code,
+        effectiveOn: civilDay(payment.effective_on), methodCode: payment.method_code,
         externalReference: payment.external_reference, note: payment.note, createdBy: payment.created_by,
         createdAt: instant(payment.created_at), allowedActions: Object.freeze({ reverse: remaining > 0n })
       });
@@ -574,4 +582,4 @@ function createPlatformBillingRepository({
     cycleOrganization, documentOrganization, paymentOrganization });
 }
 
-module.exports = { OPERATIONS, PAGE_SIZE, createPlatformBillingRepository };
+module.exports = { OPERATIONS, PAGE_SIZE, civilDay, createPlatformBillingRepository };

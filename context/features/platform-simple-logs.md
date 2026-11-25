@@ -1,6 +1,6 @@
 # Logs simples da plataforma
 
-Estado: Review. Pedido e implementação inicial em 18/10/2026; apresentação revista em 21/10/2026.
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Não repetidos: o gate PostgreSQL e a revisão no Chrome. Estado anterior: Review. Pedido e implementação inicial em 18/10/2026; apresentação revista em 21/10/2026.
 
 ## Contrato
 
@@ -32,6 +32,14 @@ Registar erros de autenticação reportados pelo controlador e respostas HTTP 5x
 - Simplificação de 21/10/2026: removidos o subtítulo redundante e a nota permanente. Data inicial, fuso horário e exclusões permanecem num tooltip junto ao título, acessível por foco e descrito para tecnologia assistiva. Quatro testes direcionados e build frontend PASS.
 
 Evidência: `output/playwright/c4g-logs/{service-verification,local-upgrade,native-verification}.json` e `native-logs-{1440,390}.png`. Instalação explícita local: `backend/scripts/localPlatform/logsSetup.js --apply`; o startup não migra bases. Rollback operacional: desativar `platformLogs` na configuração local e reiniciar, preservando o histórico; restauro apenas sob decisão explícita.
+
+## Correção de 14/11/2026: logs fora do perfil local
+
+Sintoma: no staging, `GET /api/admin/directory/logs` respondia 503 e a página mostrava «Não foi possível consultar os logs». Causa: só o runtime local criava o coletor (`state.platformLogs`); a API arrancada por `backend/src/server.js` nunca o criava, por isso o serviço lançava `LOGS_UNAVAILABLE` e nada era registado.
+
+Correção: seletor fechado `PLATFORM_LOGS_RUNTIME` (`disabled` por omissão, `central` cria o coletor sobre a pool Central) resolvido em `createProductionComposition`. Um coletor fornecido pelo chamador (perfil local) é mantido tal como está. Com `central`, o arranque exige a tabela `public.platform_support_event` (`LOGS_SCHEMA_REQUIRED`) e o encerramento aguarda os eventos pendentes. Falhas de recolha emitem `c4g.telemetry.dropped`. O `env` do staging passa a gerar a variável.
+
+Verificado: regressão `backend/test/platformLogsRuntime.test.js` (7 testes), suíte do backend com 3239 a passar e 0 falhas, lint sem avisos. Não verificado: comportamento na VPS (depende de o utilizador acrescentar a variável e atualizar) e a presença da migração 026 na Central do staging.
 
 ## Limites
 

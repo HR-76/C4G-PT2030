@@ -96,7 +96,8 @@ async function centralSchemaSnapshot(client, {compact = false, compactAuthority 
        ORDER BY n.nspname, p.proname, pg_catalog.pg_get_function_identity_arguments(p.oid)) AS catalog_row) AS "triggerFunctions",
     (SELECT COALESCE(json_agg(catalog_row), '[]'::json)
        FROM (SELECT seqstart::text,seqincrement::text,seqmin::text,seqmax::text,seqcache::text,seqcycle
-    FROM pg_sequence WHERE seqrelid=to_regclass('public.authority_epoch_seq')) AS catalog_row) AS "authoritySequence"`;
+    FROM pg_sequence WHERE seqrelid=to_regclass('public.authority_epoch_seq')) AS catalog_row) AS "authoritySequence",
+    to_regnamespace('c4g_production') IS NOT NULL AS "productionInstalled"`;
   const transport = compact ? require('./catalogMetadataTransport') : null;
   const catalogSql = includeF12ReplayCapacity
     ? primarySql.replaceAll("'public','async_exec','audit','opportunity_catalog'",
@@ -107,7 +108,8 @@ async function centralSchemaSnapshot(client, {compact = false, compactAuthority 
     : primarySql;
   const constraintSql = nativeConstraints ? await require('./catalogConstraintQuery').nativeConstraintSql(client,catalogSql) : catalogSql;
   const result = await client.query(compact ? transport.compactCatalogSql(constraintSql) : constraintSql);
-  const row = compact ? transport.decodeCatalog(result?.rows?.[0]) : result?.rows?.[0];
+  const {productionInstalled,...catalogRow}=result?.rows?.[0]||{};
+  const row = compact ? transport.decodeCatalog(catalogRow) : catalogRow;
   const fields = ['tables', 'columns', 'constraints', 'indexes', 'triggers', 'triggerFunctions', 'authoritySequence'];
   if (!Array.isArray(result?.rows) || result.rows.length !== 1 || !row || !fields.every(field => Array.isArray(row[field]))) {
     throw Object.assign(new Error('CENTRAL_SCHEMA_SNAPSHOT_INVALID'), { code: 'CENTRAL_SCHEMA_SNAPSHOT_INVALID' });
@@ -134,6 +136,9 @@ async function centralSchemaSnapshot(client, {compact = false, compactAuthority 
   }
   const catalogReader = await require('./catalogReaderSecurity').catalogReaderSnapshot(client);
   if (catalogReader) snapshot.catalogReader = catalogReader;
+  if (productionInstalled === true) {
+    snapshot.productionSecurity = await require('./productionCentralSecurity').snapshot(client);
+  }
   return snapshot;
 }
 
@@ -146,7 +151,8 @@ function schemaFingerprint(snapshot) {
 async function validateCentralSchemaSnapshot(client, snapshot, version, observedFingerprint) {
   const expectedFingerprint = EXPECTED_CENTRAL_SCHEMA_SHA256_BY_VERSION[version];
   if (!expectedFingerprint) throw new Error(`Central schema fingerprint is not defined for ${version}.`);
-  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)) {
+  if (observedFingerprint !== expectedFingerprint && !require('./memberEmailAdmission').admits(version, 'schema', observedFingerprint)
+    && !require('./stagingCentralRuntimeAdmission').admits(version, 'schema', observedFingerprint) && !require('./userDeletionAdmission').admits(version, 'schema', observedFingerprint)) {
     throw new Error(`Central schema drift detected for ${version} (observed fingerprint ${observedFingerprint}).`);
   }
   if(registeredManifest.find(entry=>entry.version===version)?.authoritySecurityFingerprint)
@@ -161,7 +167,8 @@ async function validateCentralSchemaSnapshot(client, snapshot, version, observed
   if(prearchiveFingerprint)await require('./euLegacyPrearchiveSecurityManifest').assertEuLegacyPrearchiveSecurity(client,prearchiveFingerprint);
   const readFingerprint=registeredManifest.find(entry=>entry.version===version)?.readFingerprint;
   if(readFingerprint && await require('../opportunities/catalogRead/dedicatedCredentials').normalReadFingerprint(client)!==readFingerprint)throw Error('CATALOG_READ_SCHEMA_DRIFT');
-  if(registeredManifest.find(entry=>entry.version===version)?.centralImportSecurity)await require('./centralImportSecurity').assertCentralImportSecurity(client);
+  const registeredEntry=registeredManifest.find(entry=>entry.version===version);
+  if(registeredEntry?.centralImportSecurity)await require('./centralImportSecurity').assertCentralImportSecurity(client, { production: registeredEntry.productionPermissions === true });
   return observedFingerprint;
 }
 
@@ -178,7 +185,7 @@ async function assertCentralSchemaForVersions(client, versions) {
   const snapshot = await centralSchemaSnapshot(client,{compactAuthority:true,includeF12Receipt:versions.includes('036_f12_service_authority'),
     includeF12ReplayCapacity:capacity && (await client.query("SELECT to_regclass('f12_replay_capacity.reservation') IS NOT NULL AS installed")).rows[0]?.installed === true});
   const fingerprint = schemaFingerprint(snapshot);
-  const entry = registeredManifest.find(item => versions.includes(item.version) && (item.schemaFingerprint === fingerprint || require('./memberEmailAdmission').admits(item.version, 'schema', fingerprint)));
+  const entry = registeredManifest.find(item => versions.includes(item.version) && (item.schemaFingerprint === fingerprint || require('./memberEmailAdmission').admits(item.version, 'schema', fingerprint) || require('./stagingCentralRuntimeAdmission').admits(item.version, 'schema', fingerprint) || require('./userDeletionAdmission').admits(item.version, 'schema', fingerprint)));
   if (!entry) throw Object.assign(new Error('CENTRAL_SCHEMA_VERSION_NOT_ADMITTED'), { code: 'CENTRAL_SCHEMA_VERSION_NOT_ADMITTED' });
   await validateCentralSchemaSnapshot(client, snapshot, entry.version, fingerprint);
   return Object.freeze({ version: entry.version, fingerprint });

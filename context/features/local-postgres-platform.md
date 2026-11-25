@@ -1,6 +1,6 @@
 # Plataforma local — PostgreSQL nativo e dois acessos
 
-Estado: Review. Autorizado pelo utilizador em 2026-10-17. Instalação 5432 e validação dos acessos concluídas; pronta para utilização/revisão humana. [Evidência e limites](../reviews/local-postgres-platform.md), [instruções locais](../../LOCAL.md).
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Não repetido: a instalação e o login real no ambiente local. Estado anterior: Review. Autorizado pelo utilizador em 2026-10-17. Instalação 5432 e validação dos acessos concluídas; pronta para utilização/revisão humana. [Evidência e limites](../reviews/local-postgres-platform.md), [instruções locais](../../LOCAL.md).
 
 ## Contrato confirmado
 

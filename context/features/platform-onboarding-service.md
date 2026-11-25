@@ -1,6 +1,6 @@
 # Serviço central de criação e ativação
 
-Estado: Review, 18/10/2026. Implementação explicitamente autorizada após a prova isolada. Incremento backend anterior à ligação do ecrã/ambiente habitual. Serviço persistido, migração e factory HTTP implementados; 54 testes direcionados e 17 grupos PostgreSQL/HTTP passaram. [Resultados e fronteira dos adaptadores](../reviews/platform-onboarding-service.md).
+Estado: Complete — fecho em 14/11/2026 por decisão do utilizador. Verificado nessa data: o código e os testes descritos existem; suíte do backend com 3193 testes a passar e do frontend com 1014; build e lint sem erros. Fecho no âmbito deste incremento de backend. Não repetidos: os 17 grupos PostgreSQL/HTTP isolados. Estado anterior: Review, 18/10/2026. Implementação explicitamente autorizada após a prova isolada. Incremento backend anterior à ligação do ecrã/ambiente habitual. Serviço persistido, migração e factory HTTP implementados; 54 testes direcionados e 17 grupos PostgreSQL/HTTP passaram. [Resultados e fronteira dos adaptadores](../reviews/platform-onboarding-service.md).
 
 ## Contrato deste incremento
 

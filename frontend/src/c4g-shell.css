@@ -29,9 +29,13 @@
 .organization-context-note { max-width: 340px; }
 .organization-context { display: grid; gap: 2px; color: var(--text-secondary); font-size: 11px; line-height: 1.2; }
 .organization-context strong { color: var(--text-primary); font-size: 14px; font-weight: 600; }
+/* The entity name leaves the narrow top bar and is shown inside the personal menu instead. */
+.header-profile-entity { display: none; }
 .catalog-guidance summary { cursor: pointer; margin-top: 5px; color: var(--text-secondary); font-size: 12px; }
 .catalog-guidance summary:focus-visible { outline: 2px solid var(--action-primary-emphasis); outline-offset: 3px; }
 @media (max-width: 768px) {
+  .top-header .organization-context { display: none; }
+  .header-profile-identity .header-profile-entity { display: block; }
   .c4g-shell .main-area { margin-left: 0; width: 100%; }
   .c4g-shell .page-content { padding: var(--space-16); }
   .c4g-shell .top-header { padding-left: var(--space-16); padding-right: var(--space-16); }

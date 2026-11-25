@@ -30,10 +30,30 @@ test('interest permissions are distinct and install least privilege for each pro
  assert.equal(catalogs.operationCatalog.resolve('OPPORTUNITY_INTEREST_REGISTER').resourceType,'OPPORTUNITY_INTEREST');
  const perms=profileCode=>grantsForProfile({organizationId:org,profileCode}).map(g=>g.permission);
  for(const p of ['ORG_ADMIN','FUNDING_MANAGER'])for(const op of ['read','register','manage'])assert.ok(perms(p).includes('opportunity_interest.'+op));
- assert.ok(perms('CONTRIBUTOR').includes('opportunity_interest.register'));
- assert.ok(!perms('CONTRIBUTOR').includes('opportunity_interest.manage'));
- assert.ok(!perms('CONTRIBUTOR').includes('organization_directory.read'));
- assert.ok(!perms('CONTRIBUTOR').includes('application.create'));
+ // 12/11/2026: the Técnico may manage interests and start applications; the rest of the management set stays out.
+ for(const p of ['opportunity_interest.register','opportunity_interest.manage','application.create'])assert.ok(perms('CONTRIBUTOR').includes(p),p);
+ assert.ok(!perms('CONTRIBUTOR').includes('opportunity.read'),'source reads stay derived from the team');
+ for(const p of ['organization_directory.read','organization_directory.edit','organization_membership.manage','opportunity.private.create','opportunity.archive','application.transition'])assert.ok(!perms('CONTRIBUTOR').includes(p),p);
+ assert.ok(!perms('VIEWER').includes('opportunity_interest.manage')&&!perms('VIEWER').includes('application.create'));
  assert.ok(perms('VIEWER').includes('opportunity_interest.read'));
  assert.ok(!perms('VIEWER').includes('opportunity_interest.register'));
+});
+
+test('the navigation policy is decided by the backend: partners, calendar and the dashboard variant per profile',()=>{
+ const {navigationFor}=require('../src/organizationDirectory/accessProfiles');
+ const organizationArea={directory:true,units:true,access:true},none={directory:false,units:false,access:false};
+ assert.deepEqual(navigationFor('CONTRIBUTOR'),{partners:false,calendar:false,people:false,dashboard:'TECHNICIAN',...none});
+ assert.deepEqual(navigationFor('ORG_ADMIN'),{partners:true,calendar:true,people:true,dashboard:'ORGANIZATION',...organizationArea});
+ assert.deepEqual(navigationFor('FUNDING_MANAGER'),{partners:true,calendar:false,people:true,dashboard:'ORGANIZATION',...organizationArea});
+ assert.deepEqual(navigationFor('VIEWER'),{partners:true,calendar:false,people:false,dashboard:'ORGANIZATION',...none});
+ assert.equal(navigationFor('UNKNOWN'),null);
+});
+test('the organization area of the menu follows the permissions the profile is actually granted',()=>{
+ const {navigationFor,grantsForProfile}=require('../src/organizationDirectory/accessProfiles');
+ const organizationId='00000000-0000-4000-8000-000000000001';
+ const areas={directory:'organization_directory.read',units:'organizational_scope.read',access:'organization_membership.read'};
+ for(const profileCode of ['ORG_ADMIN','FUNDING_MANAGER','CONTRIBUTOR','VIEWER']){
+  const granted=new Set(grantsForProfile({organizationId,profileCode}).map(grant=>grant.permission)),navigation=navigationFor(profileCode);
+  for(const [area,permission] of Object.entries(areas))assert.equal(navigation[area],granted.has(permission),`${profileCode} ${area}`);
+ }
 });

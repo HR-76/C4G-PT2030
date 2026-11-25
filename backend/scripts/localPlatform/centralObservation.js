@@ -15,7 +15,10 @@ function createCentralPublisher(central) {
 
 // Returns IN_SYNC when Central already records the observed schema, STALE when it does not and
 // apply is false, PUBLISHED after recording it. Never writes unless apply is true.
-async function syncCentralObservation({ central, observation, tenantId, installationId, apply, publisher = createCentralPublisher(central) }) {
+// idempotencyScope: Central keeps one event per idempotency key across all tenants, so a second tenant reaching the same
+// version must not reuse the key of the first. It defaults to the installation, which is what the installed tenant used.
+async function syncCentralObservation({ central, observation, tenantId, installationId, apply, idempotencyScope = installationId, publisher = createCentralPublisher(central) }) {
+  assert(typeof idempotencyScope === 'string' && idempotencyScope.length > 0, 'CENTRAL_OBSERVATION_SCOPE_INVALID');
   assert.equal(observation?.tenantId, tenantId, 'CENTRAL_OBSERVATION_TENANT_MISMATCH');
   assert(typeof observation.currentVersion === 'string' && typeof observation.schemaFingerprint === 'string', 'CENTRAL_OBSERVATION_INVALID');
   const rows = (await central.query(ROW, [tenantId])).rows;
@@ -28,7 +31,7 @@ async function syncCentralObservation({ central, observation, tenantId, installa
   assert.equal(row.compatibility_state, 'COMPATIBLE', 'CENTRAL_SCHEMA_STATE_UNEXPECTED');
   assert.equal(row.migration_lock_ref, null, 'CENTRAL_SCHEMA_STATE_LOCKED');
   const published = await publisher.publish({ expectedRevision: revision, correlationId: installationId,
-    idempotencyKey: `${installationId}-central-observation-${observation.currentVersion}`, evidence: observation });
+    idempotencyKey: `${idempotencyScope}-central-observation-${observation.currentVersion}`, evidence: observation });
   return { status: 'PUBLISHED', revision: Number(published.revision), centralVersion: row.current_version };
 }
 

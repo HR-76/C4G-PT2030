@@ -32,3 +32,22 @@ test('detail capabilities evaluate their own permission without turning UI check
  assert.equal(await f.check(target,'APPLICATION_READ'),false);
  f.expire();await assert.rejects(f.check(target,'APPLICATION_EDIT'),/STALE_GUARD/);
 });
+
+function teamFixture(team){
+ const org=randomUUID(),id=randomUUID(),member=randomUUID(),app=randomUUID(),other=randomUUID(),now=new Date();
+ const context={actor:{type:'HUMAN',id,organizationId:org,membershipId:member,membershipVersion:1,authorizationVersion:1},assuranceEvidence:null};
+ const membership={id:member,globalUserId:id,organizationId:org,membershipVersion:1,status:'ACTIVE',validUntil:Infinity};
+ const snapshot={organizationId:org,membershipVersion:1,authorizationVersion:1,profileCode:'CONTRIBUTOR',grants:[],sodRules:[],supportGrant:null};
+ // Stands in for the team policy: a participating technician gets write grants on the team's application only.
+ const snapshotForResource=team?async({snapshot,resource,operationCode})=>resource.id===app&&operationCode==='APPLICATION_WORK_EDIT'
+   ?{...snapshot,grants:[...snapshot.grants,{permission:'application.edit',resourceId:app,resourceType:'APPLICATION',scope:{type:'RESOURCE',id:app,organizationId:org}}]}:snapshot:null;
+ const check=createTransitionCapability({catalogs:validateProductionAuthorizationBootstrap(),policyVersion:'test-policy',recentMfaRequirement:{mfa:false,maxAgeSeconds:300,acceptedAcr:[],acceptedAmr:[],amrMode:'all'},snapshotForResource,data:{membershipPort:{async revalidate(){return membership}},authorizationDataPort:{async load(){return snapshot}}},context,assertCurrent(){},clock:{now:()=>now}});
+ return {org,app,other,check};
+}
+test('a participating technician gets team write capabilities through the team policy; without it they stay read-only',async()=>{
+ const f=teamFixture(true);
+ assert.equal(await f.check(resource(f.app,f.org),'APPLICATION_WORK_EDIT'),true);
+ assert.equal(await f.check(resource(f.other,f.org),'APPLICATION_WORK_EDIT'),false);
+ const g=teamFixture(false);
+ assert.equal(await g.check(resource(g.app,g.org),'APPLICATION_WORK_EDIT'),false);
+});

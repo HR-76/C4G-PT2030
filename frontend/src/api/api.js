@@ -118,11 +118,15 @@ export const admissionApi = {
 export const platformDirectoryApi = {
   dashboard: signal => api.get('/admin/directory/dashboard', { signal, timeout: 15000 }),
   logs: (params, signal) => api.get('/admin/directory/logs', { params, signal, timeout: 15000 }),
+  backups: signal => api.get('/admin/directory/backups', { signal, timeout: 15000 }),
   entities: (params, signal) => api.get('/admin/directory/entities', { params, signal, timeout: 15000 }),
   entity: (id, signal) => api.get(`/admin/directory/entities/${id}`, { signal, timeout: 15000 }),
   entityProfile: (id, signal) => api.get(`/admin/directory/entities/${id}/registration`, { signal, timeout: 15000 }),
+  saveEntityType: (id, body) => api.put(`/admin/directory/entities/${id}/type`, body, { timeout: 20000 }),
   saveEntityProfile: (id, body) => api.put(`/admin/directory/entities/${id}/registration`, body, { timeout: 20000 }),
   users: (params, signal) => api.get('/admin/directory/users', { params, signal, timeout: 15000 }),
+  userDeletionStatus: id => api.get(`/admin/directory/users/${encodeURIComponent(id)}/deletion`, { timeout: 15000 }),
+  deleteUser: (id, body) => api.post(`/admin/directory/users/${encodeURIComponent(id)}/deletion`, body, { timeout: 120000 }),
 }
 
 const billingRoot = '/admin/billing'
@@ -131,6 +135,8 @@ export const platformBillingApi = {
   cycles: (params, signal) => api.get(billingRoot + '/cycles', { params, signal, timeout: 15000 }),
   cycle: (id, signal) => api.get(`${billingRoot}/cycles/${id}`, { signal, timeout: 15000 }),
   account: (organizationId, signal) => api.get(`${billingRoot}/organizations/${organizationId}/account`, { signal, timeout: 15000 }),
+  validation: (organizationId, signal) => api.get(`${billingRoot}/organizations/${organizationId}/account/validation`, { signal }),
+  requestValidation: (organizationId, body) => api.post(`${billingRoot}/organizations/${organizationId}/account/validation`, body),
   accountWrite: (organizationId, body) => api.put(`${billingRoot}/organizations/${organizationId}/account`, body, { timeout: 20000 }),
   cycleCreate: body => api.post(billingRoot + '/cycles', body, { timeout: 20000 }),
   cycleEdit: (id, body) => api.put(`${billingRoot}/cycles/${id}`, body, { timeout: 20000 }),
@@ -139,6 +145,25 @@ export const platformBillingApi = {
   documentTransition: (documentId, body) => api.post(`${billingRoot}/documents/${documentId}/transitions`, body, { timeout: 20000 }),
   paymentRecord: (documentId, body) => api.post(`${billingRoot}/documents/${documentId}/payments`, body, { timeout: 20000 }),
   paymentReverse: (paymentId, body) => api.post(`${billingRoot}/payments/${paymentId}/reversals`, body, { timeout: 20000 }),
+}
+
+const emailRoot = '/admin/email'
+// scope: null for the global template, or the organization id for its own one.
+const emailTemplatePath = (type, scope) => scope
+  ? `${emailRoot}/organizations/${scope}/templates/${type}`
+  : `${emailRoot}/templates/${type}`
+export const platformEmailApi = {
+  history: (params, signal) => api.get(`${emailRoot}/history`, { params, signal }),
+  types: signal => api.get(emailRoot + '/templates', { signal, timeout: 15000 }),
+  template: (type, scope, signal) => api.get(emailTemplatePath(type, scope), { signal, timeout: 15000 }),
+  save: (type, scope, body) => api.put(emailTemplatePath(type, scope), body, { timeout: 20000 }),
+  reset: (type, scope, body) => api.post(emailTemplatePath(type, scope) + '/reset', body, { timeout: 20000 }),
+  preview: (type, scope, body, signal) => api.post(emailTemplatePath(type, scope) + '/preview', body, { signal, timeout: 15000 }),
+  test: (type, scope, body) => api.post(emailTemplatePath(type, scope) + '/test', body, { timeout: 30000 }),
+  logo: signal => api.get(emailRoot + '/logo', { signal, timeout: 15000 }),
+  // The body of an upload is the image itself, so the revision and the idempotency key travel in headers.
+  logoWrite: (file, revision) => api.put(emailRoot + '/logo', file, { timeout: 30000, headers: { 'Content-Type': file.type, 'X-Logo-Revision': String(revision), 'Idempotency-Key': crypto.randomUUID() } }),
+  logoRemove: revision => api.delete(emailRoot + '/logo', { timeout: 20000, headers: { 'X-Logo-Revision': String(revision), 'Idempotency-Key': crypto.randomUUID() } }),
 }
 
 export function entityAccessApi(organizationId,platform=false){
@@ -234,9 +259,13 @@ export function organizationDirectoryApi(organizationId) {
     matching:(params,signal)=>read('/matching',{params,timeout:60000},signal),
     personProfileEdit:(id,body)=>write('put',`/people/${id}/profile`,body),
     personLinkEdit:(id,body)=>write('put',`/people/${id}/account`,body),selfEdit:body=>write('put','/me',body),
-    profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
-    unitRename:(id,body)=>write('put',`/units/${id}/name`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
+    profileEdit:body=>write('put','',body),descriptionEdit:body=>write('put','/description',body),strategyEdit:body=>write('put','/strategy',body),registrationType:body=>write('put','/registration/type',body),registrationProfile:body=>write('put','/registration',body),registrationContacts:body=>write('put','/registration/contacts',body),unitCreate:body=>write('post','/units',body),
+    unitRename:(id,body)=>write('put',`/units/${id}/name`,body),departmentProfileEdit:(id,body)=>write('put',`/units/${id}/profile`,body),unitMove:(id,body)=>write('put',`/units/${id}/parent`,body),
     personCreate:body=>write('post','/people',body),personEdit:(id,body)=>write('put',`/people/${id}`,body),
+    // The entity's own email logo. The body of an upload is the image itself, so the revision and the idempotency key travel in headers.
+    emailLogo:signal=>read('/email-logo',{},signal),
+    emailLogoWrite:(file,revision)=>api.put(root+'/email-logo',file,{timeout:30000,headers:{...options.headers,'Content-Type':file.type,'X-Logo-Revision':String(revision),'Idempotency-Key':crypto.randomUUID()}}),
+    emailLogoRemove:revision=>api.delete(root+'/email-logo',{timeout:20000,headers:{...options.headers,'X-Logo-Revision':String(revision),'Idempotency-Key':crypto.randomUUID()}}),
   }
 }
 
@@ -274,6 +303,8 @@ export const privateApplicationsApi = {
   edit: (id, body, organizationId) => api.put(`/applications/${id}`, body, applicationContext(organizationId)),
   transition: (id, body, organizationId) => api.post(`/applications/${id}/transitions`, body, applicationContext(organizationId)),
   myWork: (params, organizationId, signal) => api.get('/applications/my-work', { params, ...applicationContext(organizationId, signal) }),
+  // Tasks, alerts and assigned reviews of the Técnico dashboard in one request; a part that failed carries `error`.
+  technicianDashboard: (organizationId, signal) => api.get('/applications/technician-dashboard', { ...applicationContext(organizationId, signal), timeout: 30000 }),
   calendar: (params, organizationId, signal) => api.get('/applications/calendar', { params, ...applicationContext(organizationId, signal) }),
   work: (id, params, signal) => inSessionContext(() => api.get(`/applications/${id}/work`, withSignal({ params }, signal))),
   workHistory: (id, params, signal) => inSessionContext(() => api.get(`/applications/${id}/work/history`, withSignal({ params }, signal))),
@@ -322,6 +353,9 @@ export const platformImportsApi = {
   upload: body => api.post('/admin/directory/imports/portugal2030/xlsx', body, { timeout: 180000 }),
   get: id => api.get(`/admin/directory/imports/portugal2030/${id}`, { timeout: 30000 }),
   preview: (id, body) => api.post(`/admin/directory/imports/portugal2030/${id}/preview`, body, { timeout: 180000 }),
+  stage: (id, body) => api.post(`/admin/directory/imports/portugal2030/${id}/stage`, body, { timeout: 180000 }),
+  review: importId => api.get(`/admin/directory/imports/portugal2030/staged/${importId}`, { timeout: 180000 }),
+  accept: (importId, body) => api.post(`/admin/directory/imports/portugal2030/staged/${importId}/accept`, body, { timeout: 300000 }),
 }
 export const importsApi = {
   upload: fd => api.post('/imports/xlsx', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
@@ -400,6 +434,12 @@ export const platformCentralOpportunitiesApi = {
   list: (query, signal) => api.get('/admin/central-opportunities', withSignal({ params: query || {} }, signal)),
   get: (id, signal) => api.get(`/admin/central-opportunities/${id}`, withSignal({}, signal)),
 }
+// Descriptive data kept beside a catalog opportunity; Admin C4G only.
+export const opportunityComplementsApi = {
+  get: (id, signal) => api.get(`/admin/opportunity-complements/${id}`, withSignal({}, signal)),
+  save: (id, body) => api.put(`/admin/opportunity-complements/${id}`, body),
+  collectPortugal2030: body => api.post('/admin/opportunity-complements/collections/portugal2030', body),
+}
 
 // Context-dependent work runs concurrently but remains ordered around context changes.
 const activationRoot='/organizational-profile/pq1-activation'
@@ -427,6 +467,9 @@ export function customerBillingApi(organizationId) {
   return {
     access: signal => get('/access',undefined,signal),
     summary: signal => get('/summary',undefined,signal),
+    account: signal => get('/account',undefined,signal),
+    validation: signal => get('/account/validation',undefined,signal),
+    confirmValidation: body => api.post('/billing/account/validation', body, { headers: { 'X-C4G-Organization': organizationId } }),
     invoices: (params,signal) => get('/invoices',params,signal),
     invoice: (id,signal) => get('/invoices/'+encodeURIComponent(id),undefined,signal),
   }

@@ -790,6 +790,7 @@ a.stat-item:hover { background: var(--green-light); color: var(--text); }
   letter-spacing: 0.1px;
 }
 .page-loading { padding: 48px; text-align: center; color: var(--text-muted); font-size: 14px; }
+.direct-login-message p + p { margin-top: 16px; }
 
 /* ── Sidebar (new classes) ───────────────────────────────────────────────── */
 .sidebar-logo { padding: 22px 20px 18px; border-bottom: 1px solid color-mix(in srgb, var(--color-surface) 7%, transparent); }

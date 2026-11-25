@@ -50,7 +50,7 @@ O primeiro administrador guardado na adesão continua como evidência histórica
 | Descrição privada, unidades e pessoas | Sem acesso pela ficha central | Mantém as permissões tenant existentes | Mantém as permissões tenant existentes |
 | Utilizadores e acessos | Percurso administrativo existente | Percurso de acessos existente | Conforme perfil existente |
 
-Alterações à denominação legal, nome apresentado, tipo ou NIF já confirmado exigem um percurso futuro de correção de identidade com auditoria própria. Esta feature não permite divergência entre `organization` e a ficha JSON.
+Alterações à denominação legal, nome apresentado ou NIF já confirmado exigem um percurso futuro de correção de identidade com auditoria própria. O tipo passa a ter edição independente, auditada e acessível à C4G e a quem edita a ficha, conforme [Alteração do tipo da entidade](entity-type-edit.md), confirmada em 15/11/2026. Não é permitida divergência entre `organization` e a ficha JSON.
 
 ## Comportamento
 

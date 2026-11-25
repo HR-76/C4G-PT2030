@@ -1,5 +1,19 @@
 # Verificação adicional por email — AV-02 substituído
 
+## Funcionalidade retirada em 15/11/2026
+
+Após esclarecer a diferença entre TOTP no telemóvel e código enviado por email, o utilizador pediu eliminar esta componente. Retirados o tipo «Código por email» da administração de emails e a opção «Verificação adicional por email» da Segurança da conta. Cancelada a seleção/implantação da extensão externa. Mantêm-se os acessos à gestão de palavra-passe e aplicação autenticadora. Não remover credenciais existentes nem alterar fluxos IdP nesta mudança; o código backend legado continua condicionado pela configuração explícita anterior. As decisões abaixo são históricas.
+
+## Decisão reafirmada em 15/11/2026
+
+O utilizador confirmou expressamente: manter **«Não implementar autenticador próprio.»** A personalização do código por email depende de recuperar um componente externo adequado ou selecionar uma extensão externa que cumpra o contrato. Não substituir o RC4 ausente por um autenticador C4G nem ativar um editor sem integração com o envio real.
+
+Atualização posterior: a decisão de retirar a funcionalidade, acima, cancela esta procura. Remoção da interface validada com 36 testes focados e build. Suite frontend: 1135 PASS/1 timeout alheio em ApplicationPartners; repetição isolada 16/16 PASS. Regressões da listagem falharam antes da remoção e passaram depois. A publicação desta remoção no staging depende da execução dos comandos pelo utilizador na VPS; não confundir alteração local com implantação confirmada.
+
+Revisão estática preliminar do upstream `mesutpiskin/keycloak-2fa-email-authenticator`, tag `v26.7.2`, commit `d1724447f11a0d48e44970fcbf18c1ccf085e55e`: a release anuncia artefactos Keycloak 26.8.0 e correção de limites de tentativas, mas não equivale ao RC4 customizado documentado. Em `EmailAuthenticatorRequiredAction.java:260`, a adesão guarda o código diretamente numa auth note. `OtpHashUtils.java` usa SHA-256 sem segredo no login, o que não cumpre a proteção exigida contra recuperação offline de um código de baixa entropia se esse verificador for obtido. O envio SMTP passa por `KeycloakEmailSender.java:70`, com `emailCodeSubject` e `code-email.ftl`; personalização é tecnicamente possível, mas insuficiente para aprovar a autenticação. Nenhum código externo compilado/executado, extensão instalada, realm alterado ou email enviado nesta análise. Não foi uma auditoria completa nem uma prova em execução; seleção de alternativa permanece pendente.
+
+Fontes: [release](https://github.com/mesutpiskin/keycloak-2fa-email-authenticator/releases/tag/v26.7.2), [adesão](https://github.com/mesutpiskin/keycloak-2fa-email-authenticator/blob/d1724447f11a0d48e44970fcbf18c1ccf085e55e/src/main/java/com/mesutpiskin/keycloak/auth/email/EmailAuthenticatorRequiredAction.java#L260), [verificador](https://github.com/mesutpiskin/keycloak-2fa-email-authenticator/blob/d1724447f11a0d48e44970fcbf18c1ccf085e55e/src/main/java/com/mesutpiskin/keycloak/auth/email/OtpHashUtils.java).
+
 ## Integração APP autorizada em 2026-10-25 — validada localmente
 
 O componente externo RC4 foi validado no Keycloak 26.8.0; o histórico abaixo conserva as fases anteriores.
@@ -55,3 +69,5 @@ Sem novas migrations, alterações a realms existentes ou instalação de depend
 18 testes backend, 17 frontend e build PASS. Chrome com Keycloak 26.8.0, PostgreSQL Central/Tenant reais e API pelo entrypoint normal: dois logins sem TOTP/email, associação e pedido pela UI, decisor distinto, HTTP 200, persistência do pedido/versão e auditoria SESSION. Claims reais observadas: acr c4g-loa1, amr vazio/pwd, nunca otp. Uma versão AVAILABLE/CLEAN foi preparada como fixture; não houve upload/scan/download ou reexecução das provas R2/OOXML. Recursos exclusivos removidos.
 
 Isto comprova a política sem assurance adicional, não a alternância de uma preferência ainda inexistente. Todas as provas com email ativo continuam bloqueadas. A imagem local não contém provider de email OTP. O candidato `mesutpiskin/keycloak-2fa-email-authenticator` v26.7.2 publica artefacto KC26.8.0 e adesão individual, mas o código da ativação guarda verificador em claro, resend repõe tentativas e remoção não demonstra desafio de email. Não foi instalado; adoção exige versão adequada e autorização específica. Avaliação e fontes: `idp-assessment.md` na evidência externa. Sem alteração da configuração de utilizadores reais, nem promessa de MFA forte ou entrega de email.
+
+15/11/2026 � Utilizador confirmou `CODIGO_POR_EMAIL_RETIRADO` na VPS e aus�ncia da op��o em Email e Seguran�a da conta. Retirada do frontend validada no staging por essa confirma��o.

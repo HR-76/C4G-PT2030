@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "worker:billing-validation": "node src/billingValidation/workerMain.js",
     "test": "node --test \"test/**/*.test.js\"",
     "audit:security": "npm audit --offline=false",
     "test:f5": "node --test test/f5FunctionalAuthorization.test.js",
@@ -63,6 +64,7 @@
     "pg": "^8.20.0",
     "pg-boss": "12.37.0",
     "pino": "10.4.0",
+    "sanitize-html": "2.18.1",
     "saxes": "6.0.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "yauzl": "3.4.0"
